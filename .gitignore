@@ -1,6 +1,6 @@
 # compiled output
-*/dist/
-*/node_modules/
+dist/
+node_modules/
 
 # Logs
 logs
@@ -36,7 +36,5 @@ lerna-debug.log*
 .yarnrc
 ormconfig.json
 
-#database-backup
-docker/database/database-backup
 
 
