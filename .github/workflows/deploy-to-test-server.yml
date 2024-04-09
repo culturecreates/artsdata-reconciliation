@@ -71,5 +71,5 @@ jobs:
             
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} ' docker login ghcr.io -u ${{ github.actor }} -p  ${{ secrets.PAT }} && docker pull ghcr.io/${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:develop && docker images &&  docker ps -q --filter name=artsdata-reconciliation | xargs -r docker rm -f && docker run -itd --restart always -p 3030:3030  --name artsdata-reconciliation ghcr.io/${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:develop && docker image prune -a -f'
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} ' docker login ghcr.io -u ${{ github.actor }} -p  ${{ secrets.PAT }} && docker pull ghcr.io/${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main && docker images &&  docker ps -q --filter name=artsdata-reconciliation | xargs -r docker rm -f && docker run -itd --restart always -p 3030:3030  --name artsdata-reconciliation ghcr.io/${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main && docker image prune -a -f'
         
