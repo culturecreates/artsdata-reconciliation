@@ -46,12 +46,6 @@ jobs:
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-#      - name: Create secret key files
-#        run: |
-#         mkdir -p secrets
-#         echo "${{ secrets.PRIVATE_KEY_PEM }}" | base64 -d >> secrets/private-key.pem
-#         echo "${{ secrets.PUBLIC_CERTIFICATE_PEM_OPEN_DEV }}" | base64 -d >> secrets/public-certificate.pem
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
@@ -72,5 +66,5 @@ jobs:
             
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} ' docker login ghcr.io -u ${{ github.actor }} -p  ${{ secrets.PAT }} && docker pull ghcr.io/${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main && docker images &&  docker ps -q --filter name=artsdata-reconciliation | xargs -r docker rm -f && docker run -itd --restart always -p 3030:3030  --name artsdata-reconciliation ghcr.io/${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main && docker image prune -a -f'
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} ' docker login ghcr.io -u ${{ github.actor }} -p  ${{ secrets.PAT }} && docker pull ghcr.io/${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main && docker images &&  docker ps -q --filter name=artsdata-reconciliation | xargs -r docker rm -f && docker run -itd --restart always -p 3000:3000  --name artsdata-reconciliation ghcr.io/${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main && docker image prune -a -f'
         
