@@ -1,6 +1,7 @@
 name: CI CD - Test Server
 
 on:
+  workflow_dispatch:
   push:
     branches: ['main']
 
