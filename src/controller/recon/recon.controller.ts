@@ -1,6 +1,6 @@
-import { Controller, Get, Query } from "@nestjs/common";
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { ReconciliationResponse } from "../../dto";
+import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ReconciliationRequest, ReconciliationResponse } from "../../dto";
 import { ReconciliationService } from "../../service";
 import { ReconciliationTypesEnum } from "../../enum";
 
@@ -28,10 +28,20 @@ export class ReconciliationController {
     explode: false,
     enum: Object.values(ReconciliationTypesEnum)
   })
-  async reconcile(
+  async reconcileByQuery(
     @Query("name") name: string,
     @Query("type") type: string
   ): Promise<ReconciliationResponse[]> {
-    return await this._reconciliationService.reconcile(name, type);
+    return await this._reconciliationService.reconcileByQuery(name, type);
   }
+
+  @Post("/recon")
+  @ApiOperation({ summary: "Reconcile" })
+  @ApiResponse({ status: 200, type: ReconciliationResponse, isArray: true, description: "Reconciliation response" })
+  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiBody({type: ReconciliationRequest, isArray: true})
+  async reconcileByQueries(@Body() reconciliationRequest: ReconciliationRequest[]): Promise<ReconciliationResponse[]>{
+    return await this._reconciliationService.reconcileByQueries(reconciliationRequest);
+  }
+
 }
