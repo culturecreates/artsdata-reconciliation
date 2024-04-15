@@ -1,12 +1,12 @@
 import { Controller, Get } from "@nestjs/common";
-import { AppService } from "../service/app.service";
+import { ManifestService } from "../../service/manifest/manifest.service";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { ServiceManifestResponse } from "../dto/manifest.dto";
+import { ServiceManifestResponse } from "../../dto/manifest.dto";
 
 @Controller()
 @ApiTags("APIs")
-export class AppController {
-  constructor(private readonly appService: AppService) {
+export class ManifestController {
+  constructor(private readonly appService: ManifestService) {
   }
 
   @Get()

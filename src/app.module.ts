@@ -1,11 +1,22 @@
 import { Module } from "@nestjs/common";
-import { AppController } from "./controller/app.controller";
-import { AppService } from "./service/app.service";
+import { ManifestController, ReconciliationController } from "./controller";
+import { ManifestService, ReconciliationService } from "./service";
+import { ArtsdataService } from "./service/artsdata";
+import { HttpService } from "./service/http";
 
 @Module({
   imports: [],
-  controllers: [AppController],
-  providers: [AppService]
+  controllers: [
+    ManifestController,
+    ReconciliationController
+  ],
+  providers: [
+    ManifestService,
+    ReconciliationService,
+    ArtsdataService,
+    HttpService
+
+  ]
 })
 export class AppModule {
 }
