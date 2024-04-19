@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
-import { ReconciliationRequest, ReconciliationResponse } from "../../dto";
+import { ReconciliationQuery, ReconciliationResponse } from "../../dto";
 
 @Injectable()
 export class ReconciliationService {
@@ -12,7 +12,7 @@ export class ReconciliationService {
     return this._artsdataService.getReconciliationResult(name, type);
   }
 
-  async reconcileByQueries(reconciliationRequest: ReconciliationRequest[]): Promise<ReconciliationResponse[]> {
+  async reconcileByQueries(reconciliationRequest: ReconciliationQuery[]): Promise<ReconciliationResponse[]> {
     const promises = reconciliationRequest.map(query =>
       this._artsdataService.getReconciliationResult(query.query, query.type)
     );
