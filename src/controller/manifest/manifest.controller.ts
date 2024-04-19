@@ -3,7 +3,7 @@ import { ManifestService } from "../../service/manifest/manifest.service";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ServiceManifestResponse } from "../../dto/manifest.dto";
 
-@Controller('recon')
+@Controller()
 @ApiTags("APIs")
 export class ManifestController {
   constructor(private readonly appService: ManifestService) {
