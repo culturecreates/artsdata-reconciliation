@@ -22,7 +22,7 @@ export class ReconciliationResponse {
   match: boolean;
 }
 
-export class ReconciliationRequest {
+export class ReconciliationQuery {
   @ApiProperty()
   query: string;
   @ApiProperty()
