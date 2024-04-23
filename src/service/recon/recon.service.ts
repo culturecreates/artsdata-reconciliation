@@ -1,14 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
-import { ReconciliationQuery, ReconciliationResponse } from "../../dto";
 import { ManifestService } from "../manifest";
+import { ReconciliationResponse } from "../../dto";
 
 @Injectable()
 export class ReconciliationService {
 
   constructor(private readonly _artsdataService: ArtsdataService,
-              private readonly _manifestService: ManifestService
-  ) {
+              private readonly _manifestService: ManifestService) {
   }
 
   async reconcileByRawQueries(rawQueries: string): Promise<any> {
@@ -16,8 +15,11 @@ export class ReconciliationService {
     if (!rawQueries) {
       return this._manifestService.getServiceManifest();
     }
-
     const queries = JSON.parse(rawQueries);
+    return await this.reconcileByQueries(queries);
+  }
+
+  async reconcileByQueries(queries: any): Promise<any> {
     let index = 0;
     const results: any = {};
     while (true) {
@@ -26,28 +28,12 @@ export class ReconciliationService {
       if (!query) {
         break;
       }
-      const result =
+      const result: ReconciliationResponse[] =
         await this._artsdataService.getReconciliationResult(query.query, query.type, query.limit);
       results["q0"] = { result: result };
       index++;
     }
     return results;
-  }
-
-  async reconcileByQueries(reconciliationRequest: ReconciliationQuery[]): Promise<ReconciliationResponse[]> {
-    const promises = reconciliationRequest.map(query =>
-      this._artsdataService.getReconciliationResult(query.query, query.type)
-    );
-
-    const results = (await Promise.all(promises)).flat();
-
-    const uniqueResults = results.filter((result, index, self) =>
-        index === self.findIndex((object) => (
-          object.id === result.id
-        ))
-    );
-
-    return uniqueResults;
   }
 
 }
