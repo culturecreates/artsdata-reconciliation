@@ -17,7 +17,7 @@ export class ReconciliationController {
   @ApiQuery({
     name: "queries",
     description: "Queries",
-    required: true,
+    required: false,
     explode: false,
   })
   async reconcileByQuery(

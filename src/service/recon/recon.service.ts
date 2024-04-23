@@ -1,14 +1,22 @@
 import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
 import { ReconciliationQuery, ReconciliationResponse } from "../../dto";
+import { ManifestService } from "../manifest";
 
 @Injectable()
 export class ReconciliationService {
 
-  constructor(private readonly _artsdataService: ArtsdataService) {
+  constructor(private readonly _artsdataService: ArtsdataService,
+              private readonly _manifestService: ManifestService
+  ) {
   }
 
   async reconcileByRawQueries(rawQueries: string): Promise<any> {
+
+    if (!rawQueries) {
+      return this._manifestService.getServiceManifest();
+    }
+
     const queries = JSON.parse(rawQueries);
     let index = 0;
     const results: any = {};
