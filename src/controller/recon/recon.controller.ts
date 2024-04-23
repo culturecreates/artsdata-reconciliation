@@ -15,24 +15,15 @@ export class ReconciliationController {
   @ApiResponse({ status: 200, type: ReconciliationResponse, isArray: true, description: "Reconciliation response" })
   @ApiResponse({ status: 500, description: "Internal server error" })
   @ApiQuery({
-    name: "name",
-    description: "Name of the entity to reconcile",
+    name: "queries",
+    description: "Queries",
     required: true,
     explode: false,
-    type: String
-  })
-  @ApiQuery({
-    name: "type",
-    description: "Type of the entity to reconcile",
-    required: true,
-    explode: false,
-    enum: Object.values(ReconciliationTypesEnum)
   })
   async reconcileByQuery(
-    @Query("name") name: string,
-    @Query("type") type: string
+    @Query("queries") rawQueries: string,
   ): Promise<ReconciliationResponse[]> {
-    return await this._reconciliationService.reconcileByQuery(name, type);
+    return await this._reconciliationService.reconcileByRawQueries(rawQueries);
   }
 
   @Post("/recon")

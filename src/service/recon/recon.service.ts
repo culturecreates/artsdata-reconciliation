@@ -8,8 +8,22 @@ export class ReconciliationService {
   constructor(private readonly _artsdataService: ArtsdataService) {
   }
 
-  async reconcileByQuery(name: string, type: string): Promise<ReconciliationResponse[]> {
-    return this._artsdataService.getReconciliationResult(name, type);
+  async reconcileByRawQueries(rawQueries: string): Promise<any> {
+    const queries = JSON.parse(rawQueries);
+    let index = 0;
+    const results: any = {};
+    while (true) {
+      const queryIndex: string = "q" + index;
+      const query = queries[queryIndex];
+      if (!query) {
+        break;
+      }
+      const result =
+        await this._artsdataService.getReconciliationResult(query.query, query.type, query.limit);
+      results["q0"] = { result: result };
+      index++;
+    }
+    return results;
   }
 
   async reconcileByQueries(reconciliationRequest: ReconciliationQuery[]): Promise<ReconciliationResponse[]> {
@@ -20,9 +34,9 @@ export class ReconciliationService {
     const results = (await Promise.all(promises)).flat();
 
     const uniqueResults = results.filter((result, index, self) =>
-      index === self.findIndex((object) => (
-        object.id === result.id 
-      ))
+        index === self.findIndex((object) => (
+          object.id === result.id
+        ))
     );
 
     return uniqueResults;

@@ -16,11 +16,17 @@ export class ArtsdataService {
     return sparqlEndpoint.toString();
   }
 
-  async getReconciliationResult(name: string, type: string): Promise<ReconciliationResponse[]> {
+  async getReconciliationResult(name: string, type: string, limit?: number): Promise<ReconciliationResponse[]> {
+    if (name === undefined || name === null || name === "" || type === undefined || type === null || type === "") {
+      return [];
+    }
     const sparqlEndpoint = this._getArtsdataEndPoint();
-    const rawSparqlQuery = QUERIES.RECONCILITAION_QUERY
+    let rawSparqlQuery: string = QUERIES.RECONCILITAION_QUERY
       .replace("QUERY_PLACE_HOLDER", name)
       .replace("TYPE_PLACE_HOLDER", type);
+    if (limit && limit > 0) {
+      rawSparqlQuery = rawSparqlQuery + " LIMIT " + limit;
+    }
     const sparqlQuery = "query=" + encodeURIComponent(rawSparqlQuery);
     const response = await this.httpService.postRequest(sparqlEndpoint, sparqlQuery);
     return ReconciliationServiceHelper.formatReconciliationResponse(response);
