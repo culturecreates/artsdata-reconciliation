@@ -31,7 +31,6 @@ lerna-debug.log*
 .vscode/*
 
 # Env
-.env
 .docker.env
 .yarnrc
 ormconfig.json
