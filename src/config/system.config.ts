@@ -5,7 +5,7 @@ const { env } = process;
 
 export const ARTSDATA: { ENDPOINT: string, REPOSITORY: string } = {
   ENDPOINT: env.ARTSDATA_ENDPOINT || "https://db.artsdata.ca/",
-  REPOSITORY: env.REPOSITORY || "artsdata2"
+  REPOSITORY: env.REPOSITORY || "artsdata"
 };
 
 export const APPLICATION = {
