@@ -65,7 +65,6 @@ WHERE
 	BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?type_label) 
 
 } GROUP BY ?entity ?score ?name ?type ?typeLabel ?disambiguatingDescription  
-  LIMIT 5
   `
 
 };
