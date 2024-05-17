@@ -1,7 +1,7 @@
 PREFIX :<http://www.ontotext.com/connectors/lucene#>
 PREFIX inst:<http://www.ontotext.com/connectors/lucene/instance#>
 INSERT DATA {
-	inst:place-index :createConnector '''
+	inst:resource-index :createConnector '''
 {
   "fields": [
     {
@@ -19,7 +19,7 @@ INSERT DATA {
   ],
   "languages": [],
   "types": [
-    "http://schema.org/Place"
+    "http://www.w3.org/2000/01/rdf-schema#Resource"
   ],
   "readonly": false,
   "detectFields": false,
