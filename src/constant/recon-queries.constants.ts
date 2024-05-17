@@ -19,7 +19,7 @@ WHERE
     values ?query { "QUERY_PLACE_HOLDER"  }
     values ?type { TYPE_PLACE_HOLDER }
 
-    ?search a luc-index:place-index ;
+    ?search a luc-index:INDEX_PLACE_HOLDER ;
       luc:query ?query ;
       luc:entities ?entity .
     FILTER (CONTAINS(STR(?entity),"kg.artsdata.ca/resource/")) 
