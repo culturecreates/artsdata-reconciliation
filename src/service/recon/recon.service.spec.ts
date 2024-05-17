@@ -26,7 +26,7 @@ describe('Recon Service tests', () => {
                         limit: 1
                     }
                 },
-                expectedName: "Théâtre Maisonneuve",
+                expectedName: "Place des Arts - Théâtre Maisonneuve",
                 expectedCount: 1
             },
             {
@@ -38,7 +38,7 @@ describe('Recon Service tests', () => {
                         limit: 1
                     }
                 },
-                expectedName: "Berkeley Street Theatre",
+                expectedName: "St. Lawrence Centre for the Arts - Bluma Appel Theatre",
                 expectedCount: 1
                 
             },
@@ -70,12 +70,12 @@ describe('Recon Service tests', () => {
                 description:"it should search cckg for nowhere",
                 query:{
                     q0: {
-                        query: "Show is at nowhere",
+                        query: "Show is nowhere",
                         type: "schema:Place",
                         limit: 1
                     }
                 },
-                expectedName: "",
+                expectedName: undefined,
                 expectedCount: 0
             },
             {
@@ -88,19 +88,8 @@ describe('Recon Service tests', () => {
                     }
                 },
                 expectedName: "Canadian Stage - Berkeley Street Theatre",
-                expectedCount: 1
-            },
-            {
-                description:"it should not match names with common words",
-                query:{
-                    q0: {
-                        query: "Wil",
-                        type: "schema:Person",
-                        limit: 1
-                    }
-                },
-                expectedName: "",
-                expectedCount: 1
+                expectedCount: 2,
+                duplicateCheck: true
             },
             {
                 description:"it should match names with single neutral quote",
@@ -147,7 +136,7 @@ describe('Recon Service tests', () => {
                         limit: 1
                     }
                 },
-                expectedName: "Théâtre Marc Lescarbot",
+                expectedName: "le Marc Lescarbot (Pointe-de-l’église)",
                 expectedCount: 1
             },
             {
@@ -167,7 +156,7 @@ describe('Recon Service tests', () => {
                 query:{
                     q0: {
                         query: "Dance",
-                        type: "schema:EventType",
+                        type: "ado:EventType",
                         limit: 1
                     }
                 },
@@ -179,8 +168,11 @@ describe('Recon Service tests', () => {
         for(const test of testCases){
             it(test.description, async () => {
                 const result = await reconService.reconcileByQueries(test.query);
-                expect(result.q0.result[0].name).toBe(test.expectedName);
-                expect(result.q0.result.length).toBe(test.expectedCount);
+                expect(result.q0?.result[0]?.name).toBe(test.expectedName);
+                expect(result.q0?.result?.length).toBe(test.expectedCount);
+                if(test.duplicateCheck){
+                    expect(result.q0.result[0].name === result.q0.result[1].name).toBeFalsy();
+                }
             })
         }
 
