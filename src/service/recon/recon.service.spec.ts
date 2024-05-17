@@ -18,7 +18,7 @@ describe('Recon Service tests', () => {
         jest.setTimeout(200000)
         const testCases = [
             {
-                description:"it should search cckg for uris that match 100%",
+                description: "It should search for uris that match 100%",
                 query: {
                     q0: {
                         query: "Théâtre Maisonneuve",
@@ -30,7 +30,7 @@ describe('Recon Service tests', () => {
                 expectedCount: 1
             },
             {
-                description:"it should search cckg for uris by matching name in substring",
+                description: "It should search for uris by matching name in substring",
                 query:{
                     q0: {
                         query: "The locations is in the lovely Bluma Appel Theatre and Berkeley Street Theatre.",
@@ -43,7 +43,7 @@ describe('Recon Service tests', () => {
                 
             },
             {
-                description:"it should search cckg for VaughnCo Entertainment presents",
+                description: "It should search for VaughnCo Entertainment presents",
                 query:{
                     q0: {
                         query: "VaughnCo Entertainment presents",
@@ -55,7 +55,7 @@ describe('Recon Service tests', () => {
                 expectedCount: 1
             },
             {
-                description:"it should search cckg for Wajdi Mouawad",
+                description: "It should search for Wajdi Mouawad",
                 query:{
                     q0: {
                         query: "Wajdi Mouawad",
@@ -63,11 +63,11 @@ describe('Recon Service tests', () => {
                         limit: 1
                     }
                 },
-                expectedName: "Wajdi Mouawad" ,
+                expectedName: "Wajdi Mouawad",
                 expectedCount: 1
             },
             {
-                description:"it should search cckg for nowhere",
+                description: "It should search for nowhere",
                 query:{
                     q0: {
                         query: "Show is nowhere",
@@ -79,7 +79,7 @@ describe('Recon Service tests', () => {
                 expectedCount: 0
             },
             {
-                description:"it should remove duplicates",
+                description: "It should remove duplicates",
                 query:{
                     q0: {
                         query: "The locations is in the lovely Berkeley Street Theatre and Canadian Stage - Berkeley Street Theatre.",
@@ -92,7 +92,7 @@ describe('Recon Service tests', () => {
                 duplicateCheck: true
             },
             {
-                description:"it should match names with single neutral quote",
+                description: "It should match names with single neutral quote",
                 query:{
                     q0: {
                         query: "Shippagan 20 h 00 La P'tite Église (Shippagan)",
@@ -104,7 +104,7 @@ describe('Recon Service tests', () => {
                 expectedCount: 1
             },
             {
-                description:"it should match names with single curved quote",
+                description: "It should match names with single curved quote",
                 query:{
                     q0: {
                         query: "Emily D’Angelo",
@@ -116,7 +116,7 @@ describe('Recon Service tests', () => {
                 expectedCount: 1
             },
             {
-                description:"it should match names with &",
+                description: "It should match names with &",
                 query:{
                     q0: {
                         query: "meagan&amp;amy",
@@ -128,7 +128,7 @@ describe('Recon Service tests', () => {
                 expectedCount: 1
             },
             {
-                description:"it should match places with title in French",
+                description: "It should match places with title in French",
                 query:{
                     q0: {
                         query: "Théâtre Marc Lescarbot",
@@ -140,7 +140,7 @@ describe('Recon Service tests', () => {
                 expectedCount: 1
             },
             {
-                description:"it should find alternate names",
+                description: "It should find alternate names",
                 query:{
                     q0: {
                         query: "Shell Theatre",
@@ -152,7 +152,7 @@ describe('Recon Service tests', () => {
                 expectedCount: 1
             },
             {
-                description:"it should find additional type using artsdata",
+                description: "It should find additional type using artsdata",
                 query:{
                     q0: {
                         query: "Dance",
