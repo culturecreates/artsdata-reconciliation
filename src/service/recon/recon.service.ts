@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
 import { ManifestService } from "../manifest";
 import { ReconciliationResponse } from "../../dto";
+import { Exception } from "../../helper";
 
 @Injectable()
 export class ReconciliationService {
@@ -15,7 +16,12 @@ export class ReconciliationService {
     if (!rawQueries) {
       return this._manifestService.getServiceManifest();
     }
-    const queries = JSON.parse(rawQueries);
+    let queries;
+    try {
+      queries = JSON.parse(rawQueries);
+    } catch (e) {
+      return Exception.badRequest("The request is not a valid JSON object.");
+    }
     return await this.reconcileByQueries(queries);
   }
 
