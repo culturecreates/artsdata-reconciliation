@@ -168,7 +168,7 @@ describe('Recon Service tests', () => {
         for(const test of testCases){
             it(test.description, async () => {
                 const result = await reconService.reconcileByQueries(test.query);
-                expect(result.q0?.result[0]?.name).toBe(test.expectedName);
+                expect(result.q0?.result[0]?.name.en || result.q0?.result[0]?.name.fr|| result.q0?.result[0]?.name.none).toBe(test.expectedName);
                 expect(result.q0?.result?.length).toBe(test.expectedCount);
                 if(test.duplicateCheck){
                     expect(result.q0.result[0].name === result.q0.result[1].name).toBeFalsy();
