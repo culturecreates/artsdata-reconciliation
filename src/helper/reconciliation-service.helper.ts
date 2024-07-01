@@ -1,4 +1,4 @@
-import { ReconciliationResponse } from "../dto";
+import { MultilingualString, ReconciliationResponse } from "../dto";
 import { GRAPHDB_INDEX } from "../config";
 
 export class ReconciliationServiceHelper {
@@ -9,8 +9,14 @@ export class ReconciliationServiceHelper {
 
       const result = new ReconciliationResponse();
       result.id = binding["entity"].value;
-      result.disambiguatingDescription = binding["disambiguatingDescription"]?.value;
-      result.name = binding["name"]?.value;
+      result.disambiguatingDescription = new MultilingualString();
+      result.disambiguatingDescription.none = binding["disambiguatingDescription"]?.value;
+      result.disambiguatingDescription.en = binding["disambiguatingDescription_en"]?.value;
+      result.disambiguatingDescription.fr = binding["disambiguatingDescription_fr"]?.value;
+      result.name = new MultilingualString();
+      result.name.none = binding["name"]?.value;
+      result.name.en = binding["name_en"]?.value;
+      result.name.fr = binding["name_fr"]?.value;
       result.score = binding["score"]?.value;
       //TODO match is incorrect when query contains accent characters
       result.match = binding["name"]?.value.toLowerCase() === query.toLowerCase();

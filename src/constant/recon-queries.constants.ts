@@ -10,10 +10,14 @@ PREFIX ado: <http://kg.artsdata.ca/ontology/>
 SELECT DISTINCT
  ?entity 
  ?score 
+ ?name_en
+ ?name_fr
  ?name
- ?disambiguatingDescription
- ?type 
- ?typeLabel
+?type
+?type_label
+?disambiguatingDescription
+?disambiguatingDescription_en
+?disambiguatingDescription_fr
 WHERE
 {
     values ?query { "QUERY_PLACE_HOLDER"  }
@@ -27,44 +31,21 @@ WHERE
     ?entity luc:score ?score.
     
 #NAME
-    OPTIONAL { 
-		?entity rdfs:label ?name_in_english. 
-		FILTER( LANG(?name_in_english) = "en") 
-	}
-	OPTIONAL { 
-		?entity rdfs:label ?name_in_french. 
-		FILTER( LANG(?name_in_french) = "fr")
-	}
-	OPTIONAL { 
-		?entity rdfs:label ?name_without_language. 
-		FILTER ( LANG(?name_without_language) = "")
-	}
-	BIND (COALESCE(?name_in_english,?name_in_french, ?name_without_language) as ?name)
-    
-# DISAMBIGUATING DESCRIPTION
-    
-	OPTIONAL {
-        ?entity schema:disambiguatingDescription ?disambiguatingDescription_same_language .
-        FILTER (LANG(?name) = LANG(?disambiguatingDescription_same_language))
-    }
-
-    OPTIONAL {
-        ?entity schema:disambiguatingDescription ?disambiguatingDescription_another_language .
-        FILTER (LANG(?name) != LANG(?disambiguatingDescription_another_language))
-    } 
-    BIND (COALESCE(?disambiguatingDescription_same_language,?disambiguatingDescription_another_language) as ?disambiguatingDescription)
+  OPTIONAL { ?entity rdfs:label ?name_en. FILTER( LANG(?name_en) = "en")  }
+  OPTIONAL {  ?entity rdfs:label ?name_fr.  FILTER( LANG(?name_fr) = "fr")}
+  OPTIONAL {  ?entity rdfs:label ?name. FILTER ( LANG(?name) = "")}
 
 #TYPE
+ OPTIONAL { ?type rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "") } 
+ OPTIONAL { ?type rdfs:label ?type_label_en filter(lang(?type_label_en) = "en") } 
+      BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?type_label)
 
-    OPTIONAL {
-        ?type rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "") 
-    } 
-	OPTIONAL {
-        ?type rdfs:label ?type_label_en filter(lang(?type_label_en) = "en") 
-    } 
-	BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?type_label) 
+# DISAMBIGUATING DESCRIPTION
+ OPTIONAL { ?entity schema:disambiguatingDescription ?disambiguatingDescription_en. FILTER( LANG(?disambiguatingDescription_en) = "en")  }
+ OPTIONAL {  ?entity schema:disambiguatingDescription ?disambiguatingDescription_fr.  FILTER( LANG(?disambiguatingDescription_fr) = "fr")}
+ OPTIONAL {  ?entity schema:disambiguatingDescription ?disambiguatingDescription. FILTER ( LANG(?disambiguatingDescription) = "")}
 
-} GROUP BY ?entity ?score ?name ?type ?typeLabel ?disambiguatingDescription  
-  `
+} group by ?entity ?score ?name_en ?name_fr ?name ?type ?type_label ?disambiguatingDescription_en ?disambiguatingDescription_fr ?disambiguatingDescription
+    `
 
 };
