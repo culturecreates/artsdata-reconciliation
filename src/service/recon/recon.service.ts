@@ -36,7 +36,7 @@ export class ReconciliationService {
       }
       const result: ReconciliationResponse[] =
         await this._artsdataService.getReconciliationResult(query.query, query.type, query.limit);
-      results["q0"] = { result: result };
+      results["q" + index] = { result: result };
       index++;
     }
     return results;
