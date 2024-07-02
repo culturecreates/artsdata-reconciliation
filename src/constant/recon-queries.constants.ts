@@ -1,6 +1,7 @@
 export const QUERIES = {
 
   RECONCILITAION_QUERY:`
+
 PREFIX luc: <http://www.ontotext.com/connectors/lucene#>
 PREFIX luc-index: <http://www.ontotext.com/connectors/lucene/instance#>
 PREFIX schema: <http://schema.org/>
@@ -10,14 +11,14 @@ PREFIX ado: <http://kg.artsdata.ca/ontology/>
 SELECT DISTINCT
  ?entity 
  ?score 
- ?name_en
- ?name_fr
- ?name
+ (SAMPLE(?name_en) as ?nameEn)
+ (SAMPLE(?name_fr) as ?nameFr)
+ (SAMPLE(?name_no) as ?description)
 ?type
 ?type_label
-?description
-?description_en
-?description_fr
+(SAMPLE(?description_no) as ?description)
+(SAMPLE(?description_en) as ?descriptionEn)
+(SAMPLE(?description_fr) as ?descriptionFr)
 WHERE
 {
     values ?query { "QUERY_PLACE_HOLDER"  }
@@ -33,19 +34,18 @@ WHERE
 #NAME
   OPTIONAL { ?entity rdfs:label ?name_en. FILTER( LANG(?name_en) = "en")  }
   OPTIONAL {  ?entity rdfs:label ?name_fr.  FILTER( LANG(?name_fr) = "fr")}
-  OPTIONAL {  ?entity rdfs:label ?name. FILTER ( LANG(?name) = "")}
+  OPTIONAL {  ?entity rdfs:label ?name_no. FILTER ( LANG(?name_no) = "")}
 
 #TYPE
  OPTIONAL { ?type rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "") } 
  OPTIONAL { ?type rdfs:label ?type_label_en filter(lang(?type_label_en) = "en") } 
-      BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?type_label)
+ BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?type_label)
 
 # DISAMBIGUATING DESCRIPTION
  OPTIONAL { ?entity schema:disambiguatingDescription ?description_en. FILTER( LANG(?description_en) = "en")  }
  OPTIONAL {  ?entity schema:disambiguatingDescription ?description_fr.  FILTER( LANG(?description_fr) = "fr")}
- OPTIONAL {  ?entity schema:disambiguatingDescription ?description. FILTER ( LANG(?description) = "")}
+ OPTIONAL {  ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
 
 } group by ?entity ?score ?name_en ?name_fr ?name ?type ?type_label ?description_en ?description_fr ?description
-    `
-
+`
 };

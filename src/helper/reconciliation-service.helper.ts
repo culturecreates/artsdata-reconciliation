@@ -16,8 +16,8 @@ export class ReconciliationServiceHelper {
 
       //NAME
       const name = binding["name"]?.value;
-      const nameEn = binding["name_en"]?.value;
-      const nameFr = binding["name_fr"]?.value;
+      const nameEn = binding["nameEn"]?.value;
+      const nameFr = binding["nameFr"]?.value;
       if (nameEn) {
         nameValues.push({ str: nameEn, lang: LanguageTagEnum.ENGLISH });
       }
@@ -31,8 +31,8 @@ export class ReconciliationServiceHelper {
 
       //DESCRIPTION
       const description = binding["description"]?.value;
-      const descriptionEn = binding["description_en"]?.value;
-      const descriptionFr = binding["description_fr"]?.value;
+      const descriptionEn = binding["descriptionEn"]?.value;
+      const descriptionFr = binding["descriptionFr"]?.value;
       if (descriptionEn) {
         descriptionValues.push({ str: descriptionEn, lang: LanguageTagEnum.ENGLISH });
       }
