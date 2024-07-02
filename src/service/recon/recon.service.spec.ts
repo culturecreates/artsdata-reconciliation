@@ -1,6 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { ReconciliationService, ManifestService, ArtsdataService, HttpService} from "../../service";
 import { ManifestController, ReconciliationController } from "../../controller";
+import { LanguageTagEnum } from "../../enum";
 
 describe('Recon Service tests', () => {
     let reconService: ReconciliationService;
@@ -168,7 +169,12 @@ describe('Recon Service tests', () => {
         for(const test of testCases){
             it(test.description, async () => {
                 const result = await reconService.reconcileByQueries(test.query);
-                expect(result.q0?.result[0]?.name.en || result.q0?.result[0]?.name.fr|| result.q0?.result[0]?.name.none).toBe(test.expectedName);
+              const title = result.q0.result[0]?.name.values.find((value: {
+                lang: string;
+                str: string
+              }) => value.lang === LanguageTagEnum.ENGLISH || value.lang === LanguageTagEnum.FRENCH || value.lang === undefined).str;
+
+              expect(title).toBe(test.expectedName);
                 expect(result.q0?.result?.length).toBe(test.expectedCount);
                 if(test.duplicateCheck){
                     expect(result.q0.result[0].name === result.q0.result[1].name).toBeFalsy();
