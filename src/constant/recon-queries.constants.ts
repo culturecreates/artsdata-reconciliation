@@ -13,7 +13,7 @@ SELECT DISTINCT
  ?score 
  (SAMPLE(?name_en) as ?nameEn)
  (SAMPLE(?name_fr) as ?nameFr)
- (SAMPLE(?name_no) as ?description)
+ (SAMPLE(?name_no) as ?name)
 ?type
 ?type_label
 (SAMPLE(?description_no) as ?description)
@@ -46,6 +46,6 @@ WHERE
  OPTIONAL {  ?entity schema:disambiguatingDescription ?description_fr.  FILTER( LANG(?description_fr) = "fr")}
  OPTIONAL {  ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
 
-} group by ?entity ?score ?name_en ?name_fr ?name ?type ?type_label ?description_en ?description_fr ?description
+} group by ?entity ?score ?name_en ?name_fr ?name_no ?type ?type_label ?description_en ?description_fr ?description_no
 `
 };
