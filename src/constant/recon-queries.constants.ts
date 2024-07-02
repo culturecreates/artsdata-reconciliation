@@ -15,9 +15,9 @@ SELECT DISTINCT
  ?name
 ?type
 ?type_label
-?disambiguatingDescription
-?disambiguatingDescription_en
-?disambiguatingDescription_fr
+?description
+?description_en
+?description_fr
 WHERE
 {
     values ?query { "QUERY_PLACE_HOLDER"  }
@@ -41,11 +41,11 @@ WHERE
       BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?type_label)
 
 # DISAMBIGUATING DESCRIPTION
- OPTIONAL { ?entity schema:disambiguatingDescription ?disambiguatingDescription_en. FILTER( LANG(?disambiguatingDescription_en) = "en")  }
- OPTIONAL {  ?entity schema:disambiguatingDescription ?disambiguatingDescription_fr.  FILTER( LANG(?disambiguatingDescription_fr) = "fr")}
- OPTIONAL {  ?entity schema:disambiguatingDescription ?disambiguatingDescription. FILTER ( LANG(?disambiguatingDescription) = "")}
+ OPTIONAL { ?entity schema:disambiguatingDescription ?description_en. FILTER( LANG(?description_en) = "en")  }
+ OPTIONAL {  ?entity schema:disambiguatingDescription ?description_fr.  FILTER( LANG(?description_fr) = "fr")}
+ OPTIONAL {  ?entity schema:disambiguatingDescription ?description. FILTER ( LANG(?description) = "")}
 
-} group by ?entity ?score ?name_en ?name_fr ?name ?type ?type_label ?disambiguatingDescription_en ?disambiguatingDescription_fr ?disambiguatingDescription
+} group by ?entity ?score ?name_en ?name_fr ?name ?type ?type_label ?description_en ?description_fr ?description
     `
 
 };

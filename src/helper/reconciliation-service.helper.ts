@@ -1,4 +1,5 @@
-import { MultilingualString, ReconciliationResponse } from "../dto";
+import { MultilingualValues, ReconciliationResponse } from "../dto";
+import { LanguageTagEnum } from "../enum";
 import { GRAPHDB_INDEX } from "../config";
 
 export class ReconciliationServiceHelper {
@@ -6,21 +7,49 @@ export class ReconciliationServiceHelper {
   static formatReconciliationResponse(query: string, sparqlResponse: any): ReconciliationResponse[] {
 
     return sparqlResponse?.results?.bindings?.map((binding: any) => {
+      const nameValues: MultilingualValues[] = [];
+      const descriptionValues: MultilingualValues[] = [];
 
       const result = new ReconciliationResponse();
-      result.id = binding["entity"].value;
-      result.disambiguatingDescription = new MultilingualString();
-      result.disambiguatingDescription.none = binding["disambiguatingDescription"]?.value;
-      result.disambiguatingDescription.en = binding["disambiguatingDescription_en"]?.value;
-      result.disambiguatingDescription.fr = binding["disambiguatingDescription_fr"]?.value;
-      result.name = new MultilingualString();
-      result.name.none = binding["name"]?.value;
-      result.name.en = binding["name_en"]?.value;
-      result.name.fr = binding["name_fr"]?.value;
+      const uri = binding["entity"].value;
+      result.id = uri?.split("http://kg.artsdata.ca/resource/").pop();
+
+      //NAME
+      const name = binding["name"]?.value;
+      const nameEn = binding["name_en"]?.value;
+      const nameFr = binding["name_fr"]?.value;
+      if (nameEn) {
+        nameValues.push({ str: nameEn, lang: LanguageTagEnum.ENGLISH });
+      }
+      if (nameFr) {
+        nameValues.push({ str: nameFr, lang: LanguageTagEnum.FRENCH });
+      }
+      if (name && !nameEn || !nameFr) {
+        nameValues.push({ str: name });
+      }
+      result.name = { values: nameValues };
+
+      //DESCRIPTION
+      const description = binding["description"]?.value;
+      const descriptionEn = binding["description_en"]?.value;
+      const descriptionFr = binding["description_fr"]?.value;
+      if (descriptionEn) {
+        descriptionValues.push({ str: descriptionEn, lang: LanguageTagEnum.ENGLISH });
+      }
+      if (descriptionFr) {
+        descriptionValues.push({ str: descriptionFr, lang: LanguageTagEnum.FRENCH });
+      }
+      if (description && !descriptionEn && !descriptionFr) {
+        descriptionValues.push({ str: description });
+      }
+      result.description = { values: descriptionValues };
+
+      //SCORE
       result.score = binding["score"]?.value;
-      //TODO match is incorrect when query contains accent characters
+
+      //TODO match is incorrect when query contains accented characters
       result.match = binding["name"]?.value.toLowerCase() === query.toLowerCase();
-      result.type = [{ id: binding["type"]?.value, name: binding["typeLabel"]?.value }];
+      result.type = [{ id: binding["type"]?.value, name: binding["type_label"]?.value }];
       return result;
     });
 

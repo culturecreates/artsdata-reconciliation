@@ -7,13 +7,16 @@ class ReconciliationType {
   name: string;
 }
 
-export class MultilingualString {
+export class MultilingualValues {
   @ApiProperty()
-  en: string;
+  str: string;
   @ApiProperty()
-  fr: string;
-  @ApiProperty()
-  none: string;
+  lang?: string;
+}
+
+ class MultilingualString {
+  @ApiProperty({ type: [MultilingualValues] })
+  values: MultilingualValues[];
 }
 
 export class ReconciliationResponse {
@@ -22,7 +25,7 @@ export class ReconciliationResponse {
   @ApiProperty({ type: [MultilingualString] })
   name: MultilingualString;
   @ApiProperty({ type: [MultilingualString] })
-  disambiguatingDescription: MultilingualString;
+  description: MultilingualString;
   @ApiProperty({ type: [ReconciliationType] })
   type: ReconciliationType[];
   @ApiProperty()

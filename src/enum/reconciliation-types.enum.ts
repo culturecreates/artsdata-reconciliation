@@ -4,3 +4,9 @@ export enum ReconciliationTypesEnum {
   PERSON = "schema:Person",
   ORGANIZATION = "schema:Organization"
 }
+
+
+export enum LanguageTagEnum {
+  ENGLISH = "en",
+  FRENCH = "fr"
+}
