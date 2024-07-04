@@ -34,9 +34,9 @@ WHERE
 #    a ?type_additional.
     
   #NAME
-  OPTIONAL { ?entity schema:name ?name_en. FILTER( LANG(?name_en) = "en")  }
-  OPTIONAL {  ?entity schema:name ?name_fr.  FILTER( LANG(?name_fr) = "fr")}
-  OPTIONAL {  ?entity schema:name ?name_no. FILTER ( LANG(?name_no) = "")}
+  OPTIONAL { ?entity rdfs:label ?name_en. FILTER( LANG(?name_en) = "en")  }
+  OPTIONAL {  ?entity rdfs:label ?name_fr.  FILTER( LANG(?name_fr) = "fr")}
+  OPTIONAL {  ?entity rdfs:label ?name_no. FILTER ( LANG(?name_no) = "")}
 
   #TYPE
  OPTIONAL { ?type rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "") } 

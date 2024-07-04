@@ -14,7 +14,7 @@ export class MultilingualValues {
   lang?: string;
 }
 
-class MultilingualString {
+export class MultilingualString {
   @ApiProperty({ type: [MultilingualValues] })
   values: MultilingualValues[];
 }

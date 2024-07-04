@@ -1,188 +1,252 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { ReconciliationService, ManifestService, ArtsdataService, HttpService} from "../../service";
+import { ArtsdataService, HttpService, ManifestService, ReconciliationService } from "../../service";
 import { ManifestController, ReconciliationController } from "../../controller";
 import { LanguageTagEnum } from "../../enum";
+import { MultilingualString, MultilingualValues } from "../../dto";
 
-describe('Recon Service tests', () => {
-    let reconService: ReconciliationService;
+describe("Recon Service tests", () => {
+  let reconService: ReconciliationService;
 
-    beforeEach(async () => {
-        const app: TestingModule = await Test.createTestingModule({
-          controllers: [ManifestController, ReconciliationController],
-          providers: [ManifestService, ReconciliationService, ArtsdataService, HttpService]
-        }).compile();
-    
-        reconService = app.get<ReconciliationService>(ReconciliationService);
-    });
+  beforeEach(async () => {
+    const app: TestingModule = await Test.createTestingModule({
+      controllers: [ManifestController, ReconciliationController],
+      providers: [ManifestService, ReconciliationService, ArtsdataService, HttpService]
+    }).compile();
 
-    describe("Recon API Tests", () => {
-        jest.setTimeout(200000)
-        const testCases = [
-            {
-                description: "It should search for uris that match 100%",
-                query: {
-                    q0: {
-                        query: "Théâtre Maisonneuve",
-                        type: "schema:Place",
-                        limit: 1
-                    }
-                },
-                expectedName: "Place des Arts - Théâtre Maisonneuve",
-                expectedCount: 1
-            },
-            {
-                description: "It should search for uris by matching name in substring",
-                query:{
-                    q0: {
-                        query: "The locations is in the lovely Bluma Appel Theatre and Berkeley Street Theatre.",
-                        type: "schema:Place",
-                        limit: 1
-                    }
-                },
-                expectedName: "St. Lawrence Centre for the Arts - Bluma Appel Theatre",
-                expectedCount: 1
-                
-            },
-            {
-                description: "It should search for VaughnCo Entertainment presents",
-                query:{
-                    q0: {
-                        query: "VaughnCo Entertainment presents",
-                        type: "schema:Organization",
-                        limit: 1
-                    }
-                },
-                expectedName: "VaughnCo Entertainment",
-                expectedCount: 1
-            },
-            {
-                description: "It should search for Wajdi Mouawad",
-                query:{
-                    q0: {
-                        query: "Wajdi Mouawad",
-                        type: "schema:Person",
-                        limit: 1
-                    }
-                },
-                expectedName: "Wajdi Mouawad",
-                expectedCount: 1
-            },
-            {
-                description: "It should search for nowhere",
-                query:{
-                    q0: {
-                        query: "Show is nowhere",
-                        type: "schema:Place",
-                        limit: 1
-                    }
-                },
-                expectedName: undefined,
-                expectedCount: 0
-            },
-            {
-                description: "It should remove duplicates",
-                query:{
-                    q0: {
-                        query: "The locations is in the lovely Berkeley Street Theatre and Canadian Stage - Berkeley Street Theatre.",
-                        type: "schema:Place",
-                        limit: 2
-                    }
-                },
-                expectedName: "Canadian Stage - Berkeley Street Theatre",
-                expectedCount: 2,
-                duplicateCheck: true
-            },
-            {
-                description: "It should match names with single neutral quote",
-                query:{
-                    q0: {
-                        query: "Shippagan 20 h 00 La P'tite Église (Shippagan)",
-                        type: "schema:Place",
-                        limit: 1
-                    }
-                },
-                expectedName: "La P'tite Église (Shippagan)",
-                expectedCount: 1
-            },
-            {
-                description: "It should match names with single curved quote",
-                query:{
-                    q0: {
-                        query: "Emily D’Angelo",
-                        type: "schema:Person",
-                        limit: 1
-                    }
-                },
-                expectedName: "Emily D’Angelo",
-                expectedCount: 1
-            },
-            {
-                description: "It should match names with &",
-                query:{
-                    q0: {
-                        query: "meagan&amp;amy",
-                        type: "schema:Organization",
-                        limit: 1
-                    }
-                },
-                expectedName: "meagan&amy",
-                expectedCount: 1
-            },
-            {
-                description: "It should match places with title in French",
-                query:{
-                    q0: {
-                        query: "Théâtre Marc Lescarbot",
-                        type: "schema:Place",
-                        limit: 1
-                    }
-                },
-                expectedName: "le Marc Lescarbot (Pointe-de-l’église)",
-                expectedCount: 1
-            },
-            {
-                description: "It should find alternate names",
-                query:{
-                    q0: {
-                        query: "Shell Theatre",
-                        type: "schema:Place",
-                        limit: 1
-                    }
-                },
-                expectedName: "Dow Centennial Centre - Shell Theatre",
-                expectedCount: 1
-            },
-            {
-                description: "It should find additional type using artsdata",
-                query:{
-                    q0: {
-                        query: "Dance",
-                        type: "ado:EventType",
-                        limit: 1
-                    }
-                },
-                expectedName: "Dance",
-                expectedCount: 1
-            }
-        ]
+    reconService = app.get<ReconciliationService>(ReconciliationService);
+  });
 
-        for(const test of testCases){
-            it(test.description, async () => {
-                const result = await reconService.reconcileByQueries(test.query);
-              const title = result.q0.result[0]?.name.values.find((value: {
-                lang: string;
-                str: string
-              }) => value.lang === LanguageTagEnum.ENGLISH || value.lang === LanguageTagEnum.FRENCH || value.lang === undefined).str;
+  describe("Recon API Tests", () => {
+    jest.setTimeout(200000);
+    const testCases = [
+      {
+        description: "It should search for uris that match 100%",
+        queries: [
+          {
+            type: "schema:Place",
+            limit: 1,
+            conditions: [
+              {
+                matchType: "name",
+                v: "Théâtre Maisonneuve"
+              }
+            ]
+          }
+        ],
+        expectedName: "Place des Arts - Théâtre Maisonneuve",
+        expectedCount: 1
+      },
+      {
+        description: "It should search for uris by matching name in substring",
+        queries: [
+          {
+            type: "schema:Place",
+            limit: 1,
+            conditions: [
+              {
+                matchType: "name",
+                v: "The locations is in the lovely Bluma Appel Theatre and Berkeley Street Theatre."
+              }
+            ]
+          }
+        ],
+        expectedName: "St. Lawrence Centre for the Arts - Bluma Appel Theatre",
+        expectedCount: 1
 
-              expect(title).toBe(test.expectedName);
-                expect(result.q0?.result?.length).toBe(test.expectedCount);
-                if(test.duplicateCheck){
-                    expect(result.q0.result[0].name === result.q0.result[1].name).toBeFalsy();
-                }
-            })
+      },
+      {
+        description: "It should search for VaughnCo Entertainment presents",
+        queries: [
+          {
+            type: "schema:Organization",
+            limit: 1,
+            conditions: [
+              {
+                matchType: "name",
+                v: "VaughnCo Entertainment presents"
+              }
+            ]
+          }
+        ],
+        expectedName: "VaughnCo Entertainment",
+        expectedCount: 1
+      },
+      {
+        description: "It should search for Wajdi Mouawad",
+        queries: [
+          {
+            type: "schema:Person",
+            limit: 1,
+            conditions: [
+              {
+                matchType: "name",
+                v: "Wajdi Mouawad"
+              }
+            ]
+          }
+        ],
+        expectedName: "Wajdi Mouawad",
+        expectedCount: 1
+      },
+      {
+        description: "It should search for nowhere",
+        queries: [
+          {
+            type: "schema:Place",
+            limit: 1,
+            conditions: [
+              {
+                matchType: "name",
+                v: "Show is nowhere"
+              }
+            ]
+          }
+        ],
+        expectedName: undefined,
+        expectedCount: 0
+      },
+      {
+        description: "It should remove duplicates",
+        queries: [
+          {
+            type: "schema:Place",
+            limit: 2,
+            conditions: [
+              {
+                matchType: "name",
+                v: "The locations is in the lovely Berkeley Street Theatre and Canadian Stage - Berkeley Street Theatre."
+              }
+            ]
+          }
+        ],
+        expectedName: "Canadian Stage - Berkeley Street Theatre",
+        expectedCount: 2,
+        duplicateCheck: true
+      },
+      {
+        description: "It should match names with single neutral quote",
+        queries: [
+          {
+            type: "schema:Place",
+            limit: 1,
+            conditions: [
+              {
+                matchType: "name",
+                v: "Shippagan 20 h 00 La P'tite Église (Shippagan)"
+              }
+            ]
+          }
+        ],
+        expectedName: "La P'tite Église (Shippagan)",
+        expectedCount: 1
+      },
+      {
+        description: "It should match names with single curved quote",
+        queries: [
+          {
+            type: "schema:Person",
+            limit: 1,
+            conditions: [
+              {
+                matchType: "name",
+                v: "Emily D’Angelo"
+              }
+            ]
+          }
+        ],
+        expectedName: "Emily D’Angelo",
+        expectedCount: 1
+      },
+      {
+        description: "It should match names with &",
+        queries: [
+          {
+            type: "schema:Organization",
+            limit: 1,
+            conditions: [
+              {
+                matchType: "name",
+                v: "meagan&amp;amy"
+              }
+            ]
+          }
+        ],
+        expectedName: "meagan&amy",
+        expectedCount: 1
+      },
+      {
+        description: "It should match places with title in French",
+        queries: [
+          {
+            type: "schema:Place",
+            limit: 1,
+            conditions: [
+              {
+                matchType: "name",
+                v: "Théâtre Marc Lescarbot"
+              }
+            ]
+          }
+        ],
+        expectedName: "le Marc Lescarbot (Pointe-de-l’église)",
+        expectedCount: 1
+      },
+      {
+        description: "It should find alternate names",
+        queries: [
+          {
+            type: "schema:Place",
+            limit: 1,
+            conditions: [
+              {
+                matchType: "name",
+                v: "Shell Theatre"
+              }
+            ]
+          }
+        ],
+        expectedName: "Dow Centennial Centre - Shell Theatre",
+        expectedCount: 1
+      },
+      {
+        description: "It should find additional type using artsdata",
+        queries: [
+          {
+            type: "ado:EventType",
+            limit: 1,
+            conditions: [
+              {
+                matchType: "name",
+                v: "Dance"
+              }
+            ]
+          }
+        ],
+        expectedName: "Dance",
+        expectedCount: 1
+      }
+    ];
+
+    for (const test of testCases) {
+      it(test.description, async () => {
+        const result = await reconService
+          .reconcileByQueries({ queries: test.queries });
+        let title = result.results?.[0]?.candidates?.[0]?.name;
+        title = title instanceof String ? title : (title as  any)?.values.find((value: {
+          lang: string;
+          str: string
+        }) => value.lang === LanguageTagEnum.ENGLISH || value.lang === LanguageTagEnum.FRENCH || value.lang === undefined).str;
+
+        expect(title).toBe(test.expectedName);
+        expect(result.results?.[0].candidates.length).toBe(test.expectedCount);
+        if (test.duplicateCheck) {
+          expect(result.results[0]?.candidates?.[0].name === result.results[0]?.candidates?.[1].name).toBeFalsy();
+
         }
+      });
+    }
 
-    })
+  });
 
-    
+
 });
