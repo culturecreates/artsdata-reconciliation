@@ -10,3 +10,9 @@ export enum LanguageTagEnum {
   ENGLISH = "en",
   FRENCH = "fr"
 }
+
+
+export enum ReconRequestMatchTypeEnum {
+  NAME = "name",
+  PROPERTY = "property"
+}
