@@ -3,7 +3,6 @@ import { ARTSDATA } from "../../config";
 import { QUERIES } from "../../constant/recon-queries.constants";
 import { HttpService } from "../http";
 import { ReconciliationServiceHelper } from "../../helper/reconciliation-service.helper";
-import { ReconciliationResponse } from "../../dto";
 
 @Injectable()
 export class ArtsdataService {
@@ -12,12 +11,12 @@ export class ArtsdataService {
   }
 
   _getArtsdataEndPoint(): string {
-    const route = "repositories/"+ARTSDATA.REPOSITORY
+    const route = "repositories/" + ARTSDATA.REPOSITORY;
     const sparqlEndpoint = new URL(route, ARTSDATA.ENDPOINT);
     return sparqlEndpoint.toString();
   }
 
-  async getReconciliationResult(name: string, type: string, limit?: number): Promise<ReconciliationResponse[]> {
+  async getReconciliationResult(name: string, type: string, limit?: number) {
     if (name === undefined || name === null || name === "") {
       return [];
     }
@@ -32,7 +31,7 @@ export class ArtsdataService {
     }
     const sparqlQuery = "query=" + encodeURIComponent(rawSparqlQuery);
     const response = await this.httpService.postRequest(sparqlEndpoint, sparqlQuery);
-    return ReconciliationServiceHelper.formatReconciliationResponse(name,response);
+    return ReconciliationServiceHelper.formatReconciliationResponse(name, response);
   }
 
 

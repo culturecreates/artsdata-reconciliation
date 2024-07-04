@@ -14,30 +14,54 @@ export class MultilingualValues {
   lang?: string;
 }
 
- class MultilingualString {
+class MultilingualString {
   @ApiProperty({ type: [MultilingualValues] })
   values: MultilingualValues[];
 }
 
-export class ReconciliationResponse {
+export class ResultCandidates {
   @ApiProperty()
   id: string;
-  @ApiProperty({ type: [MultilingualString] })
-  name: MultilingualString;
-  @ApiProperty({ type: [MultilingualString] })
-  description: MultilingualString;
-  @ApiProperty({ type: [ReconciliationType] })
-  type: ReconciliationType[];
+  @ApiProperty()
+  name: MultilingualString | string;
+  @ApiProperty()
+  description: MultilingualString | string;
   @ApiProperty()
   score: number;
   @ApiProperty()
   match: boolean;
+  @ApiProperty({ type: [ReconciliationType] })
+  type: ReconciliationType[];
 }
 
-export class ReconciliationQuery {
+export class ReconciliationResults {
   @ApiProperty()
-  query: string;
+  candidates: ResultCandidates[];
+}
+
+export class ReconciliationResponse {
+  @ApiProperty({ type: ReconciliationResults })
+  results: ReconciliationResults[];
+}
+
+
+class QueryCondition {
+  @ApiProperty()
+  matchType: string;
+  @ApiProperty()
+  v: string;
+}
+
+class ReconciliationQuery {
   @ApiProperty()
   type: string;
+  @ApiProperty()
+  limit: number;
+  @ApiProperty({ type: [QueryCondition] })
+  conditions: QueryCondition[];
+}
 
+export class ReconciliationRequest {
+  @ApiProperty({ type: [ReconciliationQuery] })
+  queries: ReconciliationQuery[];
 }

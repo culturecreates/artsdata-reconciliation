@@ -1,12 +1,13 @@
 export const QUERIES = {
 
-  RECONCILITAION_QUERY:`
+  RECONCILITAION_QUERY: `
 
 PREFIX luc: <http://www.ontotext.com/connectors/lucene#>
 PREFIX luc-index: <http://www.ontotext.com/connectors/lucene/instance#>
 PREFIX schema: <http://schema.org/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ado: <http://kg.artsdata.ca/ontology/>
+PREFIX onto: <http://www.ontotext.com/>
 
 SELECT DISTINCT
  ?entity 
@@ -14,11 +15,11 @@ SELECT DISTINCT
  (SAMPLE(?name_en) as ?nameEn)
  (SAMPLE(?name_fr) as ?nameFr)
  (SAMPLE(?name_no) as ?name)
-?type
-?type_label
-(SAMPLE(?description_no) as ?description)
-(SAMPLE(?description_en) as ?descriptionEn)
-(SAMPLE(?description_fr) as ?descriptionFr)
+ (SAMPLE(?description_no) as ?description) 
+ (SAMPLE(?description_en) as ?descriptionEn)
+ (SAMPLE(?description_fr) as ?descriptionFr)
+ ?type_label
+ ?type
 WHERE
 {
     values ?query { "QUERY_PLACE_HOLDER"  }
@@ -29,23 +30,23 @@ WHERE
       luc:entities ?entity .
     FILTER (CONTAINS(STR(?entity),"kg.artsdata.ca/resource/")) 
  
-    ?entity luc:score ?score.
+    ?entity luc:score ?score;
+#    a ?type_additional.
     
-#NAME
-  OPTIONAL { ?entity rdfs:label ?name_en. FILTER( LANG(?name_en) = "en")  }
-  OPTIONAL {  ?entity rdfs:label ?name_fr.  FILTER( LANG(?name_fr) = "fr")}
-  OPTIONAL {  ?entity rdfs:label ?name_no. FILTER ( LANG(?name_no) = "")}
+  #NAME
+  OPTIONAL { ?entity schema:name ?name_en. FILTER( LANG(?name_en) = "en")  }
+  OPTIONAL {  ?entity schema:name ?name_fr.  FILTER( LANG(?name_fr) = "fr")}
+  OPTIONAL {  ?entity schema:name ?name_no. FILTER ( LANG(?name_no) = "")}
 
-#TYPE
+  #TYPE
  OPTIONAL { ?type rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "") } 
  OPTIONAL { ?type rdfs:label ?type_label_en filter(lang(?type_label_en) = "en") } 
  BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?type_label)
 
-# DISAMBIGUATING DESCRIPTION
+  #DISAMBIGUATING DESCRIPTION
  OPTIONAL { ?entity schema:disambiguatingDescription ?description_en. FILTER( LANG(?description_en) = "en")  }
  OPTIONAL {  ?entity schema:disambiguatingDescription ?description_fr.  FILTER( LANG(?description_fr) = "fr")}
  OPTIONAL {  ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
-
-} group by ?entity ?score ?name_en ?name_fr ?name_no ?type ?type_label ?description_en ?description_fr ?description_no
+} group by ?entity ?score ?type_label ?type
 `
 };

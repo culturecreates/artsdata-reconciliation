@@ -1,18 +1,18 @@
-import { MultilingualValues, ReconciliationResponse } from "../dto";
+import { MultilingualValues, ReconciliationResults, ResultCandidates } from "../dto";
 import { LanguageTagEnum } from "../enum";
 import { GRAPHDB_INDEX } from "../config";
 
 export class ReconciliationServiceHelper {
 
-  static formatReconciliationResponse(query: string, sparqlResponse: any): ReconciliationResponse[] {
+  static formatReconciliationResponse(query: string, sparqlResponse: any) {
 
     return sparqlResponse?.results?.bindings?.map((binding: any) => {
       const nameValues: MultilingualValues[] = [];
       const descriptionValues: MultilingualValues[] = [];
 
-      const result = new ReconciliationResponse();
+      const resultCandidate = new ResultCandidates();
       const uri = binding["entity"].value;
-      result.id = uri?.split("http://kg.artsdata.ca/resource/").pop();
+      resultCandidate.id = uri?.split("http://kg.artsdata.ca/resource/").pop();
 
       //NAME
       const name = binding["name"]?.value;
@@ -27,7 +27,7 @@ export class ReconciliationServiceHelper {
       if (name && !nameEn || !nameFr) {
         nameValues.push({ str: name });
       }
-      result.name = { values: nameValues };
+      resultCandidate.name = { values: nameValues };
 
       //DESCRIPTION
       const description = binding["description"]?.value;
@@ -42,15 +42,25 @@ export class ReconciliationServiceHelper {
       if (description && !descriptionEn && !descriptionFr) {
         descriptionValues.push({ str: description });
       }
-      result.description = { values: descriptionValues };
+      resultCandidate.description = { values: descriptionValues };
 
       //SCORE
-      result.score = binding["score"]?.value;
+      resultCandidate.score = binding["score"]?.value;
 
       //TODO match is incorrect when query contains accented characters
-      result.match = binding["name"]?.value.toLowerCase() === query.toLowerCase();
-      result.type = [{ id: binding["type"]?.value, name: binding["type_label"]?.value }];
-      return result;
+      resultCandidate.match = binding["name"]?.value.toLowerCase() === query.toLowerCase();
+      const typeUris = binding["type"]?.value.split("|");
+      const typeLabels = binding["type_label"]?.value.split("|");
+      const resultType: { id: string; name: string; }[] = [];
+      if (typeUris?.length > 1) {
+        for (let i = 0; typeUris?.length > i; i++) {
+          resultType.push({ id: typeUris[i], name: typeLabels[i] });
+        }
+      } else {
+        resultType.push({ id: typeUris[0], name: typeLabels[0] });
+      }
+      resultCandidate.type = resultType;
+      return  resultCandidate ;
     });
 
   }

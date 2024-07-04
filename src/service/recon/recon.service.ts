@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
 import { ManifestService } from "../manifest";
-import { ReconciliationResponse } from "../../dto";
+import { ReconciliationRequest, ReconciliationResponse, ReconciliationResults } from "../../dto";
 import { Exception } from "../../helper";
+import { ReconRequestMatchTypeEnum } from "../../enum";
 
 @Injectable()
 export class ReconciliationService {
@@ -25,21 +26,21 @@ export class ReconciliationService {
     return await this.reconcileByQueries(queries);
   }
 
-  async reconcileByQueries(queries: any): Promise<any> {
-    let index = 0;
-    const results: any = {};
-    while (true) {
-      const queryIndex: string = "q" + index;
-      const query = queries[queryIndex];
-      if (!query) {
-        break;
-      }
-      const result: ReconciliationResponse[] =
-        await this._artsdataService.getReconciliationResult(query.query, query.type, query.limit);
-      results["q" + index] = { result: result };
-      index++;
+  async reconcileByQueries(reconciliationRequest: ReconciliationRequest): Promise<ReconciliationResponse> {
+
+    const { queries } = reconciliationRequest;
+    const results: ReconciliationResults[] = [];
+    if (!queries) {
+      return { results: [] };
     }
-    return results;
+    for (const reconciliationQuery of queries) {
+      const { type, limit, conditions } = reconciliationQuery;
+      const query = conditions
+        .find(condition => condition.matchType == ReconRequestMatchTypeEnum.NAME)?.v;
+      const candidates = await this._artsdataService.getReconciliationResult(query as string, type, limit);
+      results.push({ candidates: candidates });
+    }
+    return { results };
   }
 
 }
