@@ -26,7 +26,7 @@ export class ReconciliationController {
     return await this._reconciliationService.reconcileByRawQueries(rawQueries);
   }
 
-  @Post("/recon")
+  @Post("/reconcile")
   @ApiOperation({ summary: "Reconcile" })
   @ApiResponse({ status: 200, type: ReconciliationResponse, isArray: true, description: "Reconciliation response" })
   @ApiResponse({ status: 500, description: "Internal server error" })
