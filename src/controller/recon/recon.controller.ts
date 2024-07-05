@@ -9,7 +9,7 @@ export class ReconciliationController {
   constructor(private readonly _reconciliationService: ReconciliationService) {
   }
 
-  @Get("/recon")
+  @Get("/reconcile")
   @ApiOperation({ summary: "Reconcile" })
   @ApiResponse({ status: 200, type: ReconciliationResponse, isArray: true, description: "Reconciliation response" })
   @ApiResponse({ status: 500, description: "Internal server error" })
