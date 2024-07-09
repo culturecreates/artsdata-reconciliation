@@ -18,7 +18,7 @@ export class ReconciliationController {
     description: "Queries",
     required: false,
     explode: false,
-    example: "{\"queries\":{\"conditions\":[{\"matchType\":\"string\",\"v\":\"string\"}]}}"
+    example: "{ \"queries\": [ { \"type\": \"schema:Place\", \"limit\": 2, \"conditions\": [ { \"matchType\": \"name\", \"v\": \"Roy Thomson hall\" } ] } ] }"
   })
   async reconcileByQuery(
     @Query("queries") rawQueries: string
