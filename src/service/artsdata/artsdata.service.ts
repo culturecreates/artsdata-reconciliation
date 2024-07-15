@@ -24,8 +24,16 @@ export class ArtsdataService {
     const sparqlEndpoint: string = this._getArtsdataEndPoint();
     let rawSparqlQuery: string = QUERIES.RECONCILITAION_QUERY
       .replace("INDEX_PLACE_HOLDER", graphdbIndex)
-      .replace("QUERY_PLACE_HOLDER", name)
-      .replace("TYPE_PLACE_HOLDER", type);
+      .replace("QUERY_PLACE_HOLDER", name);
+    let typePlaceholderReplace: string;
+    if (type) {
+      typePlaceholderReplace = `values ?type { ${type} }`;
+    } else {
+      typePlaceholderReplace = "";
+    }
+    rawSparqlQuery = rawSparqlQuery.replace("TYPE_PLACE_HOLDER", typePlaceholderReplace);
+
+
     if (limit && limit > 0) {
       rawSparqlQuery = rawSparqlQuery + " LIMIT " + limit;
     }

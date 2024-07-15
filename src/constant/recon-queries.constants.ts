@@ -23,7 +23,7 @@ SELECT DISTINCT
 WHERE
 {
     values ?query { "QUERY_PLACE_HOLDER"  }
-    values ?type { TYPE_PLACE_HOLDER }
+    TYPE_PLACE_HOLDER
 
     ?search a luc-index:INDEX_PLACE_HOLDER ;
       luc:query ?query ;
