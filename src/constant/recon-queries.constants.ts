@@ -24,10 +24,12 @@ WHERE
 {
     values ?query { "QUERY_PLACE_HOLDER"  }
     TYPE_PLACE_HOLDER
-
+    
     ?search a luc-index:INDEX_PLACE_HOLDER ;
       luc:query ?query ;
       luc:entities ?entity .
+       PROPERTY_PLACE_HOLDER
+   
     FILTER (CONTAINS(STR(?entity),"kg.artsdata.ca/resource/")) 
  
     ?entity luc:score ?score;

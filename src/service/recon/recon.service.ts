@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
 import { ManifestService } from "../manifest";
-import { ReconciliationRequest, ReconciliationResponse, ReconciliationResults } from "../../dto";
+import { QueryCondition, ReconciliationRequest, ReconciliationResponse, ReconciliationResults } from "../../dto";
 import { Exception } from "../../helper";
 import { ReconRequestMatchTypeEnum } from "../../enum";
 
@@ -35,12 +35,19 @@ export class ReconciliationService {
     }
     for (const reconciliationQuery of queries) {
       const { type, limit, conditions } = reconciliationQuery;
-      const query = conditions
-        .find(condition => condition.matchType == ReconRequestMatchTypeEnum.NAME)?.v;
-      const candidates = await this._artsdataService.getReconciliationResult(query as string, type, limit);
+
+      const { name, propertyConditions } = this._resolveConditions(conditions);
+      const candidates = await this._artsdataService.getReconciliationResult(name as string, propertyConditions, type, limit);
       results.push({ candidates: candidates });
     }
     return { results };
   }
 
+  private _resolveConditions(conditions: QueryCondition[]) {
+    const name = conditions
+      .find(condition => condition.matchType == ReconRequestMatchTypeEnum.NAME)?.v;
+    const propertyConditions = conditions
+      .filter(condition => condition.matchType == ReconRequestMatchTypeEnum.PROPERTY);
+    return { name, propertyConditions };
+  }
 }

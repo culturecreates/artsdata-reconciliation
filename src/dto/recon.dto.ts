@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { MatchQualifierEnum, MatchQuantifierEnum } from "../enum";
 
 class ReconciliationType {
   @ApiProperty()
@@ -45,11 +46,15 @@ export class ReconciliationResponse {
 }
 
 
-class QueryCondition {
+export class QueryCondition {
   @ApiProperty()
   matchType: string;
   @ApiProperty()
   v: string;
+  @ApiProperty()
+  pid?: string;
+  @ApiProperty()
+  required?: boolean;
 }
 
 class ReconciliationQuery {
