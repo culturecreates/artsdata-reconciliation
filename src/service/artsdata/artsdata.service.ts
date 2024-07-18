@@ -11,7 +11,7 @@ export class ArtsdataService {
   constructor(private readonly httpService: HttpService) {
   }
 
-  _getArtsdataEndPoint(): string {
+  private _getArtsdataEndPoint(): string {
     const route = "repositories/" + ARTSDATA.REPOSITORY;
     const sparqlEndpoint = new URL(route, ARTSDATA.ENDPOINT);
     return sparqlEndpoint.toString();
@@ -27,13 +27,12 @@ export class ArtsdataService {
     const sparqlQuery: string = "query=" + encodeURIComponent(rawSparqlQueryWithPropertyFilters);
     const sparqlEndpoint: string = this._getArtsdataEndPoint();
     const response = await this.httpService.postRequest(sparqlEndpoint, sparqlQuery);
-    return ReconciliationServiceHelper.formatReconciliationResponse(name, response);
+    return ReconciliationServiceHelper.formatReconciliationResponse(response, name);
   }
-
 
   private _getSparqlQuery(name: string, type: string, limit: number | undefined): string {
     const graphdbIndex: string = ReconciliationServiceHelper.getGraphdbIndex(type);
-    let rawSparqlQuery: string = QUERIES.RECONCILITAION_QUERY
+    let rawSparqlQuery: string = QUERIES.RECONCILIATION_QUERY
       .replace("INDEX_PLACE_HOLDER", graphdbIndex)
       .replace("QUERY_PLACE_HOLDER", name);
     let typePlaceholderReplace: string;
@@ -51,15 +50,28 @@ export class ArtsdataService {
   }
 
   private _resolvePropertyConditions(rawSparqlQuery: string, propertyConditions: QueryCondition[]) {
-    const propertyTriples: string = "";
+    let propertyTriples: string = "";
+    let rawConditionValue: string;
+    let formattedConditionValue: string;
     propertyConditions.forEach((condition) => {
+      rawConditionValue = condition.v;
+      formattedConditionValue = ReconciliationServiceHelper.isValidURI(rawConditionValue) ? `<${rawConditionValue}>` : `"${rawConditionValue}"`;
       if (condition.required) {
-        propertyTriples.concat(`?entity schema:${condition.pid} ${condition.v} .`);
+        propertyTriples = propertyTriples.concat(`?entity schema:${condition.pid} ${formattedConditionValue} .`);
       } else {
-        propertyTriples.concat(`OPTIONAL {?entity schema:${condition.pid} ${condition.v} .}`);
+        propertyTriples = propertyTriples.concat(`OPTIONAL {?entity schema:${condition.pid} ${formattedConditionValue} .}`);
       }
     });
     rawSparqlQuery = rawSparqlQuery.replace("PROPERTY_PLACE_HOLDER", propertyTriples);
     return rawSparqlQuery;
+  }
+
+  async getReconcileResultById(id: string) {
+    const uri = id.startsWith("http://kg.artsdata.ca/resource/") ? `<id>` : `<http://kg.artsdata.ca/resource/${id}>`;
+    const rawSparqlQuery = QUERIES.RECONCILIATION_BY_ID_QUERY.replace("URI_PLACEHOLDER", uri);
+    const sparqlQuery: string = "query=" + encodeURIComponent(rawSparqlQuery) + "&infer=false";
+    const sparqlEndpoint: string = this._getArtsdataEndPoint();
+    const response = await this.httpService.postRequest(sparqlEndpoint, sparqlQuery);
+    return ReconciliationServiceHelper.formatReconciliationResponse(response);
   }
 }

@@ -50,4 +50,12 @@ export class ReconciliationService {
       .filter(condition => condition.matchType == ReconRequestMatchTypeEnum.PROPERTY);
     return { name, propertyConditions };
   }
+
+  async reconcileById(id: string) {
+    if (id?.trim()) {
+      const result =  await this._artsdataService.getReconcileResultById(id);
+      return result;
+    }
+    return undefined;
+  }
 }

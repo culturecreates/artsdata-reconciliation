@@ -26,6 +26,21 @@ export class ReconciliationController {
     return await this._reconciliationService.reconcileByRawQueries(rawQueries);
   }
 
+  @Get("/suggest/entity")
+  @ApiOperation({ summary: "Reconcile" })
+  @ApiResponse({ status: 200, type: ReconciliationResponse, isArray: true, description: "Reconciliation response" })
+  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiQuery({
+    name: "prefix",
+    description: "prefix",
+    required: true,
+ })
+  async getById(
+    @Query("prefix") id: string
+  ): Promise<ReconciliationResponse> {
+    return await this._reconciliationService.reconcileById(id);
+  }
+
   @Post("/reconcile")
   @ApiOperation({ summary: "Reconcile" })
   @ApiResponse({ status: 200, type: ReconciliationResponse, isArray: true, description: "Reconciliation response" })
@@ -33,5 +48,7 @@ export class ReconciliationController {
   async reconcileByQueries(@Body() reconciliationRequest: ReconciliationRequest): Promise<ReconciliationResponse> {
     return await this._reconciliationService.reconcileByQueries(reconciliationRequest);
   }
+
+
 
 }

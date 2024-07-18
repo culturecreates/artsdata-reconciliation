@@ -1,10 +1,10 @@
-import { MultilingualValues, ReconciliationResults, ResultCandidates } from "../dto";
+import { MultilingualValues, ResultCandidates } from "../dto";
 import { LanguageTagEnum } from "../enum";
 import { GRAPHDB_INDEX } from "../config";
 
 export class ReconciliationServiceHelper {
 
-  static formatReconciliationResponse(query: string, sparqlResponse: any) {
+  static formatReconciliationResponse(sparqlResponse: any, query?: string) {
 
     return sparqlResponse?.results?.bindings?.map((binding: any) => {
       const nameValues: MultilingualValues[] = [];
@@ -48,7 +48,9 @@ export class ReconciliationServiceHelper {
       resultCandidate.score = binding["score"]?.value;
 
       //TODO match is incorrect when query contains accented characters
-      resultCandidate.match = binding["name"]?.value.toLowerCase() === query.toLowerCase();
+      if (query) {
+        resultCandidate.match = binding["name"]?.value.toLowerCase() === query.toLowerCase();
+      }
       const typeUris = binding["type"]?.value.split("|");
       const typeLabels = binding["type_label"]?.value.split("|");
       const resultType: { id: string; name: string; }[] = [];
@@ -60,7 +62,7 @@ export class ReconciliationServiceHelper {
         resultType.push({ id: typeUris[0], name: typeLabels[0] });
       }
       resultCandidate.type = resultType;
-      return  resultCandidate ;
+      return resultCandidate;
     });
 
   }
@@ -83,5 +85,14 @@ export class ReconciliationServiceHelper {
         return GRAPHDB_INDEX.DEFAULT;
     }
 
+  }
+
+  static isValidURI(text: string) {
+    try {
+      new URL(text);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
