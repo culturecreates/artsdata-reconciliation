@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ReconciliationRequest, ReconciliationResponse } from "../../dto";
 import { ReconciliationService } from "../../service";
@@ -26,18 +26,11 @@ export class ReconciliationController {
     return await this._reconciliationService.reconcileByRawQueries(rawQueries);
   }
 
-  @Get("/suggest/entity")
-  @ApiOperation({ summary: "Reconcile" })
+  @Get("/resource/:id")
+  @ApiOperation({ summary: "Reconcile by id" })
   @ApiResponse({ status: 200, type: ReconciliationResponse, isArray: true, description: "Reconciliation response" })
   @ApiResponse({ status: 500, description: "Internal server error" })
-  @ApiQuery({
-    name: "prefix",
-    description: "prefix",
-    required: true,
- })
-  async getById(
-    @Query("prefix") id: string
-  ): Promise<ReconciliationResponse> {
+  async getById(@Param('id') id: string): Promise<ReconciliationResponse> {
     return await this._reconciliationService.reconcileById(id);
   }
 
