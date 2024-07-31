@@ -22,11 +22,11 @@ SELECT DISTINCT
  ?type
 WHERE
 {
-    values ?query { "QUERY_PLACE_HOLDER"  }
+    QUERY_PLACE_HOLDER
     TYPE_PLACE_HOLDER
     
     ?search a luc-index:INDEX_PLACE_HOLDER ;
-      luc:query ?query ;
+        QUERY_FILTER_PLACE_HOLDER
       luc:entities ?entity .
        PROPERTY_PLACE_HOLDER
    

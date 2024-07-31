@@ -67,16 +67,16 @@ export class ReconciliationService {
 
   private _getSparqlQuery(name: string, type: string, limit: number | undefined): string {
     const graphdbIndex: string = ReconciliationServiceHelper.getGraphdbIndex(type);
+
+    const queryReplacementString: string = name ? `values ?query { "${name}"  }` : "";
+    const queryFilterReplacementString: string = name ? `      luc:query ?query ;` : "";
+    const typePlaceholderReplace: string = type ? `values ?type { ${type} }` : "";
+
     let rawSparqlQuery: string = QUERIES.RECONCILIATION_QUERY
       .replace("INDEX_PLACE_HOLDER", graphdbIndex)
-      .replace("QUERY_PLACE_HOLDER", name);
-    let typePlaceholderReplace: string;
-    if (type) {
-      typePlaceholderReplace = `values ?type { ${type} }`;
-    } else {
-      typePlaceholderReplace = "";
-    }
-    rawSparqlQuery = rawSparqlQuery.replace("TYPE_PLACE_HOLDER", typePlaceholderReplace);
+      .replace("QUERY_PLACE_HOLDER", queryReplacementString)
+      .replace("QUERY_FILTER_PLACE_HOLDER", queryFilterReplacementString)
+      .replace("TYPE_PLACE_HOLDER", typePlaceholderReplace);
 
     if (limit && limit > 0) {
       rawSparqlQuery = rawSparqlQuery + " LIMIT " + limit;
