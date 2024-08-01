@@ -4,8 +4,8 @@ import { ManifestService } from "../manifest";
 import { QueryCondition, ReconciliationRequest, ReconciliationResponse, ReconciliationResults } from "../../dto";
 import { Exception, ReconciliationServiceHelper } from "../../helper";
 import { ReconRequestMatchTypeEnum } from "../../enum";
-import * as queryConstants from "../../constant/recon-queries.constants";
-import * as propertyConstants from "../../constant/properties.constants";
+import { ArtsdataProperties, QUERIES } from "../../constant";
+
 
 @Injectable()
 export class ReconciliationService {
@@ -69,7 +69,7 @@ export class ReconciliationService {
   private _getSparqlQuery(name: string, isQueryByURI: boolean, type: string, limit: number | undefined): string {
     const graphdbIndex: string = ReconciliationServiceHelper.getGraphdbIndex(type);
 
-    const rawQuery = isQueryByURI ? queryConstants.QUERIES.RECONCILIATION_QUERY_BY_URI : queryConstants.QUERIES.RECONCILIATION_QUERY;
+    const rawQuery = isQueryByURI ? QUERIES.RECONCILIATION_QUERY_BY_URI : QUERIES.RECONCILIATION_QUERY;
     name = isQueryByURI ? (name.startsWith("K") ?
         "<http://kg.artsdata.ca/resource/" + name + ">" :
         "<" + name + ">") :
@@ -109,19 +109,19 @@ export class ReconciliationService {
 
   private _resolvePropertyValue(value: string, property: string) {
     switch (property) {
-      case propertyConstants.ArtsdataProperties.START_DATE:
-      case propertyConstants.ArtsdataProperties.END_DATE:
+      case ArtsdataProperties.START_DATE:
+      case ArtsdataProperties.END_DATE:
         return `"${value}"^^xsd:dateTime`;
-      case propertyConstants.ArtsdataProperties.SAME_AS:
-      case propertyConstants.ArtsdataProperties.LOCATION:
-      case propertyConstants.ArtsdataProperties.ORGANIZER:
-      case propertyConstants.ArtsdataProperties.PERFORMER:
-      case propertyConstants.ArtsdataProperties.ADDITIONAL_TYPE:
-      case propertyConstants.ArtsdataProperties.MAIN_ENTITY_OF_PAGE:
-      case propertyConstants.ArtsdataProperties.AUDIENCE:
-      case propertyConstants.ArtsdataProperties.EVENT_STATUS:
-      case propertyConstants.ArtsdataProperties.IN_LANGUAGE:
-      case propertyConstants.ArtsdataProperties.SUB_EVENT:
+      case ArtsdataProperties.SAME_AS:
+      case ArtsdataProperties.LOCATION:
+      case ArtsdataProperties.ORGANIZER:
+      case ArtsdataProperties.PERFORMER:
+      case ArtsdataProperties.ADDITIONAL_TYPE:
+      case ArtsdataProperties.MAIN_ENTITY_OF_PAGE:
+      case ArtsdataProperties.AUDIENCE:
+      case ArtsdataProperties.EVENT_STATUS:
+      case ArtsdataProperties.IN_LANGUAGE:
+      case ArtsdataProperties.SUB_EVENT:
         return `<${value}>`;
       default:
         return `'${value}'`;
