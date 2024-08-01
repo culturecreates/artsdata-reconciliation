@@ -38,7 +38,8 @@ export class ReconciliationService {
     for (const reconciliationQuery of queries) {
       const { type, limit, conditions } = reconciliationQuery;
       const { name, propertyConditions } = this._resolveConditions(conditions);
-      const rawSparqlQuery: string = this._getSparqlQuery(name as string, type, limit);
+      const isQueryByURI = ReconciliationServiceHelper.isQueryByURI(name as string);
+      const rawSparqlQuery: string = this._getSparqlQuery(name as string, isQueryByURI, type, limit);
       const rawSparqlQueryWithPropertyFilters = this._resolvePropertyConditions(rawSparqlQuery, propertyConditions);
       const sparqlQuery: string = "query=" + encodeURIComponent(rawSparqlQueryWithPropertyFilters);
       const candidates = await this._artsdataService.getReconciliationResult(sparqlQuery, name as string);
@@ -65,18 +66,26 @@ export class ReconciliationService {
     return rawSparqlQuery;
   }
 
-  private _getSparqlQuery(name: string, type: string, limit: number | undefined): string {
+  private _getSparqlQuery(name: string, isQueryByURI: boolean, type: string, limit: number | undefined): string {
     const graphdbIndex: string = ReconciliationServiceHelper.getGraphdbIndex(type);
 
-    const queryReplacementString: string = name ? `values ?query { "${name}"  }` : "";
+    const rawQuery = isQueryByURI ? QUERIES.RECONCILIATION_QUERY_BY_URI : QUERIES.RECONCILIATION_QUERY;
+    if (isQueryByURI && name.startsWith("K")) {
+      name = `<http://kg.artsdata.ca/resource/${name}>`;
+    }else{
+      name = `<${name}>`;
+    }
+
+    const queryReplacementString: string = name ? `values ?query { ${name}  }` : "";
     const queryFilterReplacementString: string = name ? `      luc:query ?query ;` : "";
     const typePlaceholderReplace: string = type ? `values ?type { ${type} }` : "";
 
-    let rawSparqlQuery: string = QUERIES.RECONCILIATION_QUERY
+    let rawSparqlQuery: string = rawQuery
       .replace("INDEX_PLACE_HOLDER", graphdbIndex)
       .replace("QUERY_PLACE_HOLDER", queryReplacementString)
       .replace("QUERY_FILTER_PLACE_HOLDER", queryFilterReplacementString)
-      .replace("TYPE_PLACE_HOLDER", typePlaceholderReplace);
+      .replace("TYPE_PLACE_HOLDER", typePlaceholderReplace)
+      .replace("URI_PLACEHOLDER", `${name}`);
 
     if (limit && limit > 0) {
       rawSparqlQuery = rawSparqlQuery + " LIMIT " + limit;

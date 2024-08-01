@@ -25,7 +25,8 @@ export class ArtsdataService {
 
   async getReconcileResultById(id: string) {
     const uri = id.startsWith("http://kg.artsdata.ca/resource/") ? `<id>` : `<http://kg.artsdata.ca/resource/${id}>`;
-    const rawSparqlQuery = QUERIES.RECONCILIATION_BY_ID_QUERY.replace("URI_PLACEHOLDER", uri);
+    const rawSparqlQuery = QUERIES.RECONCILIATION_QUERY_BY_URI
+      .replace("URI_PLACEHOLDER", uri);
     const sparqlQuery: string = "query=" + encodeURIComponent(rawSparqlQuery) + "&infer=false";
     const sparqlEndpoint: string = this._getArtsdataEndPoint();
     const response = await this.httpService.postRequest(sparqlEndpoint, sparqlQuery);

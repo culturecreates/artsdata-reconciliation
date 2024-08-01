@@ -59,7 +59,7 @@ export class ReconciliationServiceHelper {
           resultType.push({ id: typeUris[i], name: typeLabels[i] });
         }
       } else {
-        resultType.push({ id: typeUris[0], name: typeLabels[0] });
+        resultType.push({ id: typeUris?.[0], name: typeLabels?.[0] });
       }
       resultCandidate.type = resultType;
       return resultCandidate;
@@ -94,5 +94,12 @@ export class ReconciliationServiceHelper {
     } catch (e) {
       return false;
     }
+  }
+
+  static isQueryByURI(query: string) {
+    const artsdataIdPattern = "^K[0-9]+-[0-9]+$";
+    return !!(query.match(artsdataIdPattern) ||
+      (this.isValidURI(query) && query.startsWith("http://kg.artsdata.ca/resource/K")));
+
   }
 }

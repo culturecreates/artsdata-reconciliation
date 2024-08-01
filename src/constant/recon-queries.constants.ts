@@ -52,7 +52,7 @@ WHERE
 } group by ?entity ?score ?type_label ?type
 `,
 
-  RECONCILIATION_BY_ID_QUERY: `
+  RECONCILIATION_QUERY_BY_URI: `
 
 PREFIX schema: <http://schema.org/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -72,23 +72,23 @@ SELECT DISTINCT
  ?type
 WHERE
 {
-    values ?entity { URI_PLACEHOLDER }
-    ?entity a ?type.    
+    BIND(URI_PLACEHOLDER as ?entity)
+#?entity a ?type.
   #NAME
   OPTIONAL { ?entity schema:name ?name_en. FILTER( LANG(?name_en) = "en")  }
   OPTIONAL {  ?entity schema:name ?name_fr.  FILTER( LANG(?name_fr) = "fr")}
   OPTIONAL {  ?entity schema:name ?name_no. FILTER ( LANG(?name_no) = "")}
 
   #TYPE
- OPTIONAL { ?type_additional rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "") } 
- OPTIONAL { ?type_additional rdfs:label ?type_label_en filter(lang(?type_label_en) = "en") } 
- BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?type_label)
+#OPTIONAL { ?type_additional rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "") } 
+# OPTIONAL { ?type_additional rdfs:label ?type_label_en filter(lang(?type_label_en) = "en") } 
+#BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?type_label)
 
   #DISAMBIGUATING DESCRIPTION
  OPTIONAL { ?entity schema:disambiguatingDescription ?description_en. FILTER( LANG(?description_en) = "en")  }
  OPTIONAL {  ?entity schema:disambiguatingDescription ?description_fr.  FILTER( LANG(?description_fr) = "fr")}
  OPTIONAL {  ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
 } group by ?entity ?score ?type_label ?type
-LIMIT 1
+
 `
 };
