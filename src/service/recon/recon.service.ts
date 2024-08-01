@@ -70,11 +70,10 @@ export class ReconciliationService {
     const graphdbIndex: string = ReconciliationServiceHelper.getGraphdbIndex(type);
 
     const rawQuery = isQueryByURI ? QUERIES.RECONCILIATION_QUERY_BY_URI : QUERIES.RECONCILIATION_QUERY;
-    if (isQueryByURI && name.startsWith("K")) {
-      name = `<http://kg.artsdata.ca/resource/${name}>`;
-    }else{
-      name = `<${name}>`;
-    }
+    name = isQueryByURI ? (name.startsWith("K") ?
+        "<http://kg.artsdata.ca/resource/" + name + ">" :
+        "<" + name + ">") :
+      "\"" + name + "\"";
 
     const queryReplacementString: string = name ? `values ?query { ${name}  }` : "";
     const queryFilterReplacementString: string = name ? `      luc:query ?query ;` : "";
