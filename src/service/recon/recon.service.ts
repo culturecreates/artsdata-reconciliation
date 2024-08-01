@@ -4,8 +4,8 @@ import { ManifestService } from "../manifest";
 import { QueryCondition, ReconciliationRequest, ReconciliationResponse, ReconciliationResults } from "../../dto";
 import { Exception, ReconciliationServiceHelper } from "../../helper";
 import { ReconRequestMatchTypeEnum } from "../../enum";
-import { ArtsdataProperties } from "../../constant/properties.constants";
 import { QUERIES } from "../../constant/recon-queries.constants";
+import { ArtsdataProperties } from "../../constant/properties.constants";
 
 @Injectable()
 export class ReconciliationService {
