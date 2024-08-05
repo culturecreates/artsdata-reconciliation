@@ -34,8 +34,7 @@ describe("Recon Service tests", () => {
         ],
         expectedName: "Place des Arts - Théâtre Maisonneuve",
         expectedCount: 1
-      },
-      {
+      }, {
         description: "It should search for uris by matching name in substring",
         queries: [
           {
@@ -52,8 +51,7 @@ describe("Recon Service tests", () => {
         expectedName: "St. Lawrence Centre for the Arts - Bluma Appel Theatre",
         expectedCount: 1
 
-      },
-      {
+      }, {
         description: "It should search for VaughnCo Entertainment presents",
         queries: [
           {
@@ -69,8 +67,7 @@ describe("Recon Service tests", () => {
         ],
         expectedName: "VaughnCo Entertainment",
         expectedCount: 1
-      },
-      {
+      }, {
         description: "It should search for Wajdi Mouawad",
         queries: [
           {
@@ -86,8 +83,7 @@ describe("Recon Service tests", () => {
         ],
         expectedName: "Wajdi Mouawad",
         expectedCount: 1
-      },
-      {
+      }, {
         description: "It should search for nowhere",
         queries: [
           {
@@ -103,8 +99,7 @@ describe("Recon Service tests", () => {
         ],
         expectedName: undefined,
         expectedCount: 0
-      },
-      {
+      }, {
         description: "It should remove duplicates",
         queries: [
           {
@@ -121,8 +116,7 @@ describe("Recon Service tests", () => {
         expectedName: "Canadian Stage - Berkeley Street Theatre",
         expectedCount: 2,
         duplicateCheck: true
-      },
-      {
+      }, {
         description: "It should match names with single neutral quote",
         queries: [
           {
@@ -138,8 +132,7 @@ describe("Recon Service tests", () => {
         ],
         expectedName: "La P'tite Église (Shippagan)",
         expectedCount: 1
-      },
-      {
+      }, {
         description: "It should match names with single curved quote",
         queries: [
           {
@@ -155,8 +148,7 @@ describe("Recon Service tests", () => {
         ],
         expectedName: "Emily D’Angelo",
         expectedCount: 1
-      },
-      {
+      }, {
         description: "It should match names with &",
         queries: [
           {
@@ -172,8 +164,7 @@ describe("Recon Service tests", () => {
         ],
         expectedName: "meagan&amy",
         expectedCount: 1
-      },
-      {
+      }, {
         description: "It should match places with title in French",
         queries: [
           {
@@ -189,8 +180,7 @@ describe("Recon Service tests", () => {
         ],
         expectedName: "le Marc Lescarbot (Pointe-de-l’église)",
         expectedCount: 1
-      },
-      {
+      }, {
         description: "It should find alternate names",
         queries: [
           {
@@ -206,8 +196,7 @@ describe("Recon Service tests", () => {
         ],
         expectedName: "Dow Centennial Centre - Shell Theatre",
         expectedCount: 1
-      },
-      {
+      }, {
         description: "It should find additional type using artsdata",
         queries: [
           {
@@ -223,8 +212,7 @@ describe("Recon Service tests", () => {
         ],
         expectedName: "Dance",
         expectedCount: 1
-      },
-      {
+      }, {
         description: "Reconcile a Place with Artsdata ID",
         queries: [
           {
@@ -275,8 +263,7 @@ describe("Recon Service tests", () => {
         expectedId: "K11-19",
         expectedName: "Roy Thomson Hall",
         expectedCount: 1
-      },
-      {
+      }, {
         description: "Reconcile Place with Name",
         queries: [
           {
@@ -315,8 +302,7 @@ describe("Recon Service tests", () => {
         expectedId: "K11-19",
         expectedName: "Roy Thomson Hall",
         expectedCount: 1
-      },
-      {
+      }, {
         description: "Reconcile Place with Name and Street Address",
         queries:
           [
@@ -398,9 +384,7 @@ describe("Recon Service tests", () => {
         ], expectedId: "K11-19",
         expectedName: "Roy Thomson Hall",
         expectedCount: 1
-      },
-
-      {
+      }, {
         description: "Reconcile Place with only sameAs",
         queries: [
           {
@@ -420,7 +404,6 @@ describe("Recon Service tests", () => {
         expectedName: "Roy Thomson Hall",
         expectedCount: 1
       }
-
     ];
 
     for (const test of testCases) {
@@ -445,10 +428,6 @@ describe("Recon Service tests", () => {
         }
       });
     }
+  });
 
-  })
-  ;
-
-
-})
-;
+});
