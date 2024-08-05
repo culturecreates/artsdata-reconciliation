@@ -5,65 +5,76 @@ import { GRAPHDB_INDEX } from "../config";
 export class ReconciliationServiceHelper {
 
   static formatReconciliationResponse(sparqlResponse: any, query?: string) {
+    const bindings = sparqlResponse?.results?.bindings;
+    const candidates: ResultCandidates[] = [];
 
-    return sparqlResponse?.results?.bindings?.map((binding: any) => {
-      const nameValues: MultilingualValues[] = [];
-      const descriptionValues: MultilingualValues[] = [];
-
-      const resultCandidate = new ResultCandidates();
-      const uri = binding["entity"].value;
-      resultCandidate.id = uri?.split("http://kg.artsdata.ca/resource/").pop();
-
-      //NAME
-      const name = binding["name"]?.value;
-      const nameEn = binding["nameEn"]?.value;
-      const nameFr = binding["nameFr"]?.value;
-      if (nameEn) {
-        nameValues.push({ str: nameEn, lang: LanguageTagEnum.ENGLISH });
-      }
-      if (nameFr) {
-        nameValues.push({ str: nameFr, lang: LanguageTagEnum.FRENCH });
-      }
-      if (name && !nameEn || !nameFr) {
-        nameValues.push({ str: name });
-      }
-      resultCandidate.name = { values: nameValues };
-
-      //DESCRIPTION
-      const description = binding["description"]?.value;
-      const descriptionEn = binding["descriptionEn"]?.value;
-      const descriptionFr = binding["descriptionFr"]?.value;
-      if (descriptionEn) {
-        descriptionValues.push({ str: descriptionEn, lang: LanguageTagEnum.ENGLISH });
-      }
-      if (descriptionFr) {
-        descriptionValues.push({ str: descriptionFr, lang: LanguageTagEnum.FRENCH });
-      }
-      if (description && !descriptionEn && !descriptionFr) {
-        descriptionValues.push({ str: description });
-      }
-      resultCandidate.description = { values: descriptionValues };
-
-      //SCORE
-      resultCandidate.score = binding["score"]?.value;
-
-      //TODO match is incorrect when query contains accented characters
-      if (query) {
-        resultCandidate.match = binding["name"]?.value.toLowerCase() === query.toLowerCase();
-      }
-      const typeUris = binding["type"]?.value.split("|");
-      const typeLabels = binding["type_label"]?.value.split("|");
-      const resultType: { id: string; name: string; }[] = [];
-      if (typeUris?.length > 1) {
-        for (let i = 0; typeUris?.length > i; i++) {
-          resultType.push({ id: typeUris[i], name: typeLabels[i] });
+    if (bindings?.length) {
+      const uniqueIds: string[] = [];
+      for (const binding of bindings) {
+        if (!uniqueIds.includes(binding["entity"].value)) {
+          uniqueIds.push(binding["entity"].value);
         }
-      } else {
-        resultType.push({ id: typeUris?.[0], name: typeLabels?.[0] });
       }
-      resultCandidate.type = resultType;
-      return resultCandidate;
-    });
+
+      for (const currentId of uniqueIds) {
+        const currentBinding = bindings.filter((binding: any) => binding["entity"].value === currentId);
+
+        const nameValues: MultilingualValues[] = [];
+        const descriptionValues: MultilingualValues[] = [];
+
+        const resultCandidate = new ResultCandidates();
+        const uri = currentBinding.find((binding: any) => binding["entity"].value === currentId)["entity"].value;
+        resultCandidate.id = uri?.split("http://kg.artsdata.ca/resource/").pop();
+
+        //NAME
+        const name = currentBinding["name"]?.value;
+        const nameEn = currentBinding["nameEn"]?.value;
+        const nameFr = currentBinding["nameFr"]?.value;
+        if (nameEn) {
+          nameValues.push({ str: nameEn, lang: LanguageTagEnum.ENGLISH });
+        }
+        if (nameFr) {
+          nameValues.push({ str: nameFr, lang: LanguageTagEnum.FRENCH });
+        }
+        if (name && !nameEn || !nameFr) {
+          nameValues.push({ str: name });
+        }
+        resultCandidate.name = { values: nameValues };
+
+        //DESCRIPTION
+        const description = currentBinding["description"]?.value;
+        const descriptionEn = currentBinding["descriptionEn"]?.value;
+        const descriptionFr = currentBinding["descriptionFr"]?.value;
+        if (descriptionEn) {
+          descriptionValues.push({ str: descriptionEn, lang: LanguageTagEnum.ENGLISH });
+        }
+        if (descriptionFr) {
+          descriptionValues.push({ str: descriptionFr, lang: LanguageTagEnum.FRENCH });
+        }
+        if (description && !descriptionEn && !descriptionFr) {
+          descriptionValues.push({ str: description });
+        }
+        resultCandidate.description = { values: descriptionValues };
+
+        //SCORE
+        resultCandidate.score = currentBinding["score"]?.value;
+
+        //TODO match is incorrect when query contains accented characters
+        if (query) {
+          resultCandidate.match = currentBinding["name"]?.value.toLowerCase() === query.toLowerCase();
+        }
+
+        const types: { id: string; name: string; }[] = currentBinding.map((binding: any) => ({
+          id: binding["type_additional"]?.value,
+          name: binding["type_label"]?.value
+        }));
+
+        resultCandidate.type = types;
+        candidates.push(resultCandidate);
+
+      }
+    }
+    return candidates;
 
   }
 

@@ -1,7 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
 import { ManifestService } from "../manifest";
-import { QueryCondition, ReconciliationRequest, ReconciliationResponse, ReconciliationResults } from "../../dto";
+import {
+  QueryCondition,
+  ReconciliationRequest,
+  ReconciliationResponse,
+  ReconciliationResults,
+  ResultCandidates
+} from "../../dto";
 import { Exception, ReconciliationServiceHelper } from "../../helper";
 import { ReconRequestMatchTypeEnum } from "../../enum";
 import { ArtsdataProperties, QUERIES } from "../../constant";
@@ -41,9 +47,10 @@ export class ReconciliationService {
       const isQueryByURI = !!name && ReconciliationServiceHelper.isQueryByURI(name);
       const rawSparqlQuery: string = this._getSparqlQuery(name, isQueryByURI, type, limit);
       const rawSparqlQueryWithPropertyFilters = this._resolvePropertyConditions(rawSparqlQuery, propertyConditions);
-      const sparqlQuery: string = "query=" + encodeURIComponent(rawSparqlQueryWithPropertyFilters);
-      const candidates = await this._artsdataService.getReconciliationResult(sparqlQuery, name as string);
-      results.push({ candidates: candidates });
+      const sparqlQuery: string = "query=" + encodeURIComponent(rawSparqlQueryWithPropertyFilters) + "&infer=false";
+
+      const candidates: ResultCandidates[] = await this._artsdataService.getReconciliationResult(sparqlQuery, name as string);
+      results.push({ candidates });
     }
     return { results };
   }
@@ -85,11 +92,9 @@ export class ReconciliationService {
       .replace("QUERY_PLACE_HOLDER", queryReplacementString)
       .replace("QUERY_FILTER_PLACE_HOLDER", queryFilterReplacementString)
       .replace("TYPE_PLACE_HOLDER", typePlaceholderReplace)
-      .replace("URI_PLACEHOLDER", `${name}`);
+      .replace("URI_PLACEHOLDER", `${name}`)
+      .replace("LIMIT_PLACE_HOLDER", limit ? `LIMIT ${limit}` : "");
 
-    if (limit && limit > 0) {
-      rawSparqlQuery = rawSparqlQuery + " LIMIT " + limit;
-    }
     return rawSparqlQuery;
   }
 
@@ -99,13 +104,6 @@ export class ReconciliationService {
     const propertyConditions = conditions
       .filter(condition => condition.matchType == ReconRequestMatchTypeEnum.PROPERTY);
     return { name, propertyConditions };
-  }
-
-  async reconcileById(id: string) {
-    if (id?.trim()) {
-      return await this._artsdataService.getReconcileResultById(id);
-    }
-    return undefined;
   }
 
   private _resolvePropertyValue(value: string, property: string) {

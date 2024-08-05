@@ -9,7 +9,24 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ado: <http://kg.artsdata.ca/ontology/>
 PREFIX onto: <http://www.ontotext.com/>
 
-SELECT DISTINCT
+SELECT DISTINCT ?entity 
+ ?score 
+  ?nameEn
+ ?nameFr
+  ?name
+ ?description
+ ?descriptionEn
+?descriptionFr 
+?type_additional
+?type_label
+WHERE{
+    ?entity    a ?type_additional.
+  #TYPE
+ OPTIONAL { ?type_additional rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "") } 
+ OPTIONAL { ?type_additional rdfs:label ?type_label_en filter(lang(?type_label_en) = "en") } 
+ BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?type_label)
+    
+{SELECT DISTINCT
  ?entity 
  ?score 
  (SAMPLE(?name_en) as ?nameEn)
@@ -18,8 +35,6 @@ SELECT DISTINCT
  (SAMPLE(?description_no) as ?description) 
  (SAMPLE(?description_en) as ?descriptionEn)
  (SAMPLE(?description_fr) as ?descriptionFr)
- ?type_label
- ?type
 WHERE
 {
     QUERY_PLACE_HOLDER
@@ -50,6 +65,8 @@ WHERE
  OPTIONAL {  ?entity schema:disambiguatingDescription ?description_fr.  FILTER( LANG(?description_fr) = "fr")}
  OPTIONAL {  ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
 } group by ?entity ?score ?type_label ?type
+LIMIT_PLACE_HOLDER   }
+}
 `,
 
   RECONCILIATION_QUERY_BY_URI: `
@@ -59,7 +76,24 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ado: <http://kg.artsdata.ca/ontology/>
 PREFIX onto: <http://www.ontotext.com/>
 
-SELECT DISTINCT
+SELECT DISTINCT ?entity 
+ ?score 
+  ?nameEn
+ ?nameFr
+  ?name
+ ?description
+ ?descriptionEn
+?descriptionFr 
+?type_additional
+?type_label
+WHERE{
+    ?entity    a ?type_additional.
+  #TYPE
+ OPTIONAL { ?type_additional rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "") } 
+ OPTIONAL { ?type_additional rdfs:label ?type_label_en filter(lang(?type_label_en) = "en") } 
+ BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?type_label)
+    
+{SELECT DISTINCT
  ?entity 
  ?score 
  (SAMPLE(?name_en) as ?nameEn)
@@ -68,8 +102,6 @@ SELECT DISTINCT
  (SAMPLE(?description_no) as ?description) 
  (SAMPLE(?description_en) as ?descriptionEn)
  (SAMPLE(?description_fr) as ?descriptionFr)
- ?type_label
- ?type
 WHERE
 {
     BIND(URI_PLACEHOLDER as ?entity)
@@ -88,7 +120,9 @@ WHERE
  OPTIONAL { ?entity schema:disambiguatingDescription ?description_en. FILTER( LANG(?description_en) = "en")  }
  OPTIONAL {  ?entity schema:disambiguatingDescription ?description_fr.  FILTER( LANG(?description_fr) = "fr")}
  OPTIONAL {  ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
-} group by ?entity ?score ?type_label ?type
+} group by ?entity ?score ?type_label ?type 
+LIMIT_PLACE_HOLDER  }
+}
 
 `
 };

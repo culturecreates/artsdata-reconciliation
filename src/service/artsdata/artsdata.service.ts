@@ -3,6 +3,7 @@ import { ARTSDATA } from "../../config";
 import { QUERIES } from "../../constant/recon-queries.constants";
 import { HttpService } from "../http";
 import { ReconciliationServiceHelper } from "../../helper";
+import { ReconciliationResponse } from "../../dto";
 
 @Injectable()
 export class ArtsdataService {
