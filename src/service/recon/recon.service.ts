@@ -38,7 +38,7 @@ export class ReconciliationService {
     for (const reconciliationQuery of queries) {
       const { type, limit, conditions } = reconciliationQuery;
       const { name, propertyConditions } = this._resolveConditions(conditions);
-      const isQueryByURI = ReconciliationServiceHelper.isQueryByURI(name as string);
+      const isQueryByURI = !!name && ReconciliationServiceHelper.isQueryByURI(name as string);
       const rawSparqlQuery: string = this._getSparqlQuery(name as string, isQueryByURI, type, limit);
       const rawSparqlQueryWithPropertyFilters = this._resolvePropertyConditions(rawSparqlQuery, propertyConditions);
       const sparqlQuery: string = "query=" + encodeURIComponent(rawSparqlQueryWithPropertyFilters);

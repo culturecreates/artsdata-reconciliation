@@ -238,6 +238,7 @@ describe("Recon Service tests", () => {
             ]
           }
         ],
+        expectedId: "K11-19",
         expectedName: "Roy Thomson Hall",
         expectedCount: 1
       }, {
@@ -254,6 +255,7 @@ describe("Recon Service tests", () => {
             ]
           }]
         ,
+        expectedId: "K11-19",
         expectedName: "Roy Thomson Hall",
         expectedCount: 1
       }, {
@@ -270,6 +272,7 @@ describe("Recon Service tests", () => {
             ]
           }
         ],
+        expectedId: "K11-19",
         expectedName: "Roy Thomson Hall",
         expectedCount: 1
       },
@@ -287,6 +290,7 @@ describe("Recon Service tests", () => {
             ]
           }
         ],
+        expectedId: "K11-19",
         expectedName: "Roy Thomson Hall",
         expectedCount: 1
       }, {
@@ -308,6 +312,7 @@ describe("Recon Service tests", () => {
             ]
           }
         ],
+        expectedId: "K11-19",
         expectedName: "Roy Thomson Hall",
         expectedCount: 1
       },
@@ -331,10 +336,53 @@ describe("Recon Service tests", () => {
               ]
             }
           ],
+        expectedId: "K11-19",
         expectedName: "Roy Thomson Hall",
         expectedCount: 1
-      }
+      }, {
+        description: "Reconcile Event with Name",
+        "queries": [
+          {
+            "type": "schema:Event",
+            "limit": 1,
+            "conditions": [
+              {
+                "matchType": "name",
+                "v": "Matilda - Citadel Theatre"
+              }
+            ]
+          }
+        ],
+        expectedId: "citadeltheatre-com_2018-2019_matilda",
+        expectedName: "Matilda - Citadel Theatre",
+        expectedCount: 1
+      }, {
+        description: "Reconcile Event with Name and startDate",
 
+        "queries": [
+          {
+            "type": "schema:Event",
+            "limit": 1,
+            "conditions": [
+              {
+                "matchType": "name",
+                "v": "Matilda - Citadel Theatre",
+                "pid": "string",
+                "required": true
+              },
+              {
+                "matchType": "property",
+                "v": "2019-03-17T13:30:00-04:00",
+                "pid": "schema:startDate",
+                "required": true
+              }
+            ]
+          }
+        ],
+        expectedId: "citadeltheatre-com_2018-2019_matilda#2019-03-17T133000-0400",
+        expectedName: "Matilda - Citadel Theatre",
+        expectedCount: 1
+      }
     ];
 
     for (const test of testCases) {
@@ -342,6 +390,7 @@ describe("Recon Service tests", () => {
         const result = await reconService
           .reconcileByQueries({ queries: test.queries });
         let title = result.results?.[0]?.candidates?.[0]?.name;
+        const id = result.results?.[0]?.candidates?.[0]?.id;
         title = title instanceof String ? title : (title as any)?.values.find((value: {
           lang: string;
           str: string
@@ -352,7 +401,9 @@ describe("Recon Service tests", () => {
         expect(result.results?.[0].candidates.length).toBe(test.expectedCount);
         if (test.duplicateCheck) {
           expect(result.results[0]?.candidates?.[0].name === result.results[0]?.candidates?.[1].name).toBeFalsy();
-
+        }
+        if (test.expectedId) {
+          expect(id).toBe(test.expectedId);
         }
       });
     }
