@@ -17,13 +17,14 @@ export class ReconciliationServiceHelper {
       }
 
       for (const currentId of uniqueIds) {
-        const currentBinding = bindings.filter((binding: any) => binding["entity"].value === currentId);
+        const currentBindings = bindings.filter((binding: any) => binding["entity"].value === currentId);
 
         const nameValues: MultilingualValues[] = [];
         const descriptionValues: MultilingualValues[] = [];
 
         const resultCandidate = new ResultCandidates();
-        const uri = currentBinding.find((binding: any) => binding["entity"].value === currentId)["entity"].value;
+        const currentBinding = currentBindings.find((binding: any) => binding["entity"].value === currentId);
+        const uri = currentBinding["entity"].value;
         resultCandidate.id = uri?.split("http://kg.artsdata.ca/resource/").pop();
 
         //NAME
@@ -64,14 +65,11 @@ export class ReconciliationServiceHelper {
           resultCandidate.match = currentBinding["name"]?.value.toLowerCase() === query.toLowerCase();
         }
 
-        const types: { id: string; name: string; }[] = currentBinding.map((binding: any) => ({
+        resultCandidate.type = currentBindings.map((binding: any) => ({
           id: binding["type_additional"]?.value,
           name: binding["type_label"]?.value
         }));
-
-        resultCandidate.type = types;
         candidates.push(resultCandidate);
-
       }
     }
     return candidates;
