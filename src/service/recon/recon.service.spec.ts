@@ -223,7 +223,118 @@ describe("Recon Service tests", () => {
         ],
         expectedName: "Dance",
         expectedCount: 1
+      },
+      {
+        description: "Reconcile a Place with Artsdata ID",
+        "queries": [
+          {
+            "type": "schema:Place",
+            "limit": 1,
+            "conditions": [
+              {
+                "matchType": "name",
+                "v": "K11-19"
+              }
+            ]
+          }
+        ],
+        expectedName: "Roy Thomson Hall",
+        expectedCount: 1
+      }, {
+        description: "Reconcile Place with Artsdata URI",
+        "queries": [
+          {
+            "type": "schema:Place",
+            "limit": 1,
+            "conditions": [
+              {
+                "matchType": "name",
+                "v": "http://kg.artsdata.ca/resource/K11-19"
+              }
+            ]
+          }]
+        ,
+        expectedName: "Roy Thomson Hall",
+        expectedCount: 1
+      }, {
+        description: "Reconcile Place with Name",
+        "queries": [
+          {
+            "type": "schema:Place",
+            "limit": 1,
+            "conditions": [
+              {
+                "matchType": "name",
+                "v": "Roy Thomson Hall"
+              }
+            ]
+          }
+        ],
+        expectedName: "Roy Thomson Hall",
+        expectedCount: 1
+      },
+      {
+        description: "Reconcile Place with Name",
+        "queries": [
+          {
+            "type": "schema:Place",
+            "limit": 1,
+            "conditions": [
+              {
+                "matchType": "name",
+                "v": "Roy Thomson Hall"
+              }
+            ]
+          }
+        ],
+        expectedName: "Roy Thomson Hall",
+        expectedCount: 1
+      }, {
+        description: "Reconcile Place with Name and Postal code",
+        "queries": [
+          {
+            "type": "schema:Place",
+            "limit": 1,
+            "conditions": [
+              {
+                "matchType": "name",
+                "v": "Roy Thomson"
+              }, {
+                "matchType": "property",
+                "v": "M5J 2H5",
+                "pid": "schema:address/schema:postalCode",
+                "required": true
+              }
+            ]
+          }
+        ],
+        expectedName: "Roy Thomson Hall",
+        expectedCount: 1
+      },
+      {
+        description: "Reconcile Place with Name and Street Address",
+        queries:
+          [
+            {
+              "type": "schema:Place",
+              "limit": 1,
+              "conditions": [
+                {
+                  "matchType": "name",
+                  "v": "Roy Thomson"
+                }, {
+                  "matchType": "property",
+                  "v": "60 Simcoe Street",
+                  "pid": "schema:address/schema:streetAddress",
+                  "required": true
+                }
+              ]
+            }
+          ],
+        expectedName: "Roy Thomson Hall",
+        expectedCount: 1
       }
+
     ];
 
     for (const test of testCases) {
@@ -246,7 +357,9 @@ describe("Recon Service tests", () => {
       });
     }
 
-  });
+  })
+  ;
 
 
-});
+})
+;
