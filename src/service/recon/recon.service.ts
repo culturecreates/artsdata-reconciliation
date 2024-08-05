@@ -38,8 +38,8 @@ export class ReconciliationService {
     for (const reconciliationQuery of queries) {
       const { type, limit, conditions } = reconciliationQuery;
       const { name, propertyConditions } = this._resolveConditions(conditions);
-      const isQueryByURI = !!name && ReconciliationServiceHelper.isQueryByURI(name as string);
-      const rawSparqlQuery: string = this._getSparqlQuery(name as string, isQueryByURI, type, limit);
+      const isQueryByURI = !!name && ReconciliationServiceHelper.isQueryByURI(name);
+      const rawSparqlQuery: string = this._getSparqlQuery(name, isQueryByURI, type, limit);
       const rawSparqlQueryWithPropertyFilters = this._resolvePropertyConditions(rawSparqlQuery, propertyConditions);
       const sparqlQuery: string = "query=" + encodeURIComponent(rawSparqlQueryWithPropertyFilters);
       const candidates = await this._artsdataService.getReconciliationResult(sparqlQuery, name as string);
@@ -66,15 +66,16 @@ export class ReconciliationService {
     return rawSparqlQuery;
   }
 
-  private _getSparqlQuery(name: string, isQueryByURI: boolean, type: string, limit: number | undefined): string {
+  private _getSparqlQuery(name: string | undefined, isQueryByURI: boolean, type: string, limit: number | undefined): string {
     const graphdbIndex: string = ReconciliationServiceHelper.getGraphdbIndex(type);
 
     const rawQuery = isQueryByURI ? QUERIES.RECONCILIATION_QUERY_BY_URI : QUERIES.RECONCILIATION_QUERY;
-    name = isQueryByURI ? (name.startsWith("K") ?
-        "<http://kg.artsdata.ca/resource/" + name + ">" :
-        "<" + name + ">") :
-      "\"" + name + "\"";
-
+    if (name) {
+      name = isQueryByURI ? (name?.startsWith("K") ?
+          "<http://kg.artsdata.ca/resource/" + name + ">" :
+          "<" + name + ">") :
+        "\"" + name + "\"";
+    }
     const queryReplacementString: string = name ? `values ?query { ${name}  }` : "";
     const queryFilterReplacementString: string = name ? `      luc:query ?query ;` : "";
     const typePlaceholderReplace: string = type ? `values ?type { ${type} }` : "";
