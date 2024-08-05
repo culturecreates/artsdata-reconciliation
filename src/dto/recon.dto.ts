@@ -61,7 +61,7 @@ class ReconciliationQuery {
   @ApiProperty()
   type: string;
   @ApiProperty()
-  limit: number;
+  limit?: number;
   @ApiProperty({ type: [QueryCondition] })
   conditions: QueryCondition[];
 }

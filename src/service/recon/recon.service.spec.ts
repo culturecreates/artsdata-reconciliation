@@ -226,7 +226,7 @@ describe("Recon Service tests", () => {
       },
       {
         description: "Reconcile a Place with Artsdata ID",
-        "queries": [
+        queries: [
           {
             "type": "schema:Place",
             "limit": 1,
@@ -243,7 +243,7 @@ describe("Recon Service tests", () => {
         expectedCount: 1
       }, {
         description: "Reconcile Place with Artsdata URI",
-        "queries": [
+        queries: [
           {
             "type": "schema:Place",
             "limit": 1,
@@ -260,7 +260,7 @@ describe("Recon Service tests", () => {
         expectedCount: 1
       }, {
         description: "Reconcile Place with Name",
-        "queries": [
+        queries: [
           {
             "type": "schema:Place",
             "limit": 1,
@@ -278,7 +278,7 @@ describe("Recon Service tests", () => {
       },
       {
         description: "Reconcile Place with Name",
-        "queries": [
+        queries: [
           {
             "type": "schema:Place",
             "limit": 1,
@@ -295,7 +295,7 @@ describe("Recon Service tests", () => {
         expectedCount: 1
       }, {
         description: "Reconcile Place with Name and Postal code",
-        "queries": [
+        queries: [
           {
             "type": "schema:Place",
             "limit": 1,
@@ -341,7 +341,7 @@ describe("Recon Service tests", () => {
         expectedCount: 1
       }, {
         description: "Reconcile Event with Name",
-        "queries": [
+        queries: [
           {
             "type": "schema:Event",
             "limit": 1,
@@ -358,8 +358,7 @@ describe("Recon Service tests", () => {
         expectedCount: 1
       }, {
         description: "Reconcile Event with Name and startDate",
-
-        "queries": [
+        queries: [
           {
             "type": "schema:Event",
             "limit": 1,
@@ -382,7 +381,46 @@ describe("Recon Service tests", () => {
         expectedId: "citadeltheatre-com_2018-2019_matilda#2019-03-17T133000-0400",
         expectedName: "Matilda - Citadel Theatre",
         expectedCount: 1
+      }, {
+        description: "Reconcile Place with only URL",
+        queries: [
+          {
+            "type": "schema:Place",
+            "conditions": [
+              {
+                "matchType": "property",
+                "v": "https://www.roythomsonhall.com",
+                "pid": "schema:url",
+                "required": true
+              }
+            ]
+          }
+        ], expectedId: "K11-19",
+        expectedName: "Roy Thomson Hall",
+        expectedCount: 1
+      },
+
+      {
+        description: "Reconcile Place with only sameAs",
+        queries: [
+          {
+            "type": "schema:Place",
+            "conditions": [
+
+              {
+                "matchType": "property",
+                "v": "https://en.wikipedia.org/wiki/Roy_Thomson_Hall",
+                "pid": "schema:sameAs",
+                "required": true
+              }
+            ]
+          }
+        ],
+        expectedId: "K11-19",
+        expectedName: "Roy Thomson Hall",
+        expectedCount: 1
       }
+
     ];
 
     for (const test of testCases) {
