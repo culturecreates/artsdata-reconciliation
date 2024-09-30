@@ -22,13 +22,13 @@ jobs:
 
       - name: Import repository configuration
         run: |
-            curl 'http://localhost:7200/rest/repositories' \
+            curl 'http://127.0.0.1:7200/rest/repositories' \
             --header 'Content-Type: multipart/form-data' \
             --form 'config=@"./test/config.ttl"'
 
       - name: Import repository data
         run: |
-            curl 'http://localhost:7200/repositories/artsdata/statements' \
+            curl 'http://127.0.0.1:7200/repositories/artsdata/statements' \
             --header 'Content-Type: application/n-quads' \
             --data-binary '@./test/statements.nq'
 
@@ -36,12 +36,12 @@ jobs:
         run: |
             for file in ./src/sparql/index/*.sparql; do
                 echo "Running query from file: $file"
-                curl -X POST -H "Content-Type: text/plain" -d @"$file" "http://localhost:7200/rest/connectors/check"
+                curl -X POST -H "Content-Type: text/plain" -d @"$file" "http://127.0.0.1:7200/rest/connectors/check"
             done
 
       - name: Update env to point to local graphdb
         run: |
-            sed -i 's|^ARTSDATA_ENDPOINT=.*|ARTSDATA_ENDPOINT="http://localhost:7200/"|' .env
+            sed -i 's|^ARTSDATA_ENDPOINT=.*|ARTSDATA_ENDPOINT="http://127.0.0.1:7200/"|' .env
 
       - name: Setup Node
         uses: actions/setup-node@v1
