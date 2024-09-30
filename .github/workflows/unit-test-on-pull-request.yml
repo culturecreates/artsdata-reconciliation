@@ -20,6 +20,13 @@ jobs:
       - name: Run GraphDB
         run: docker compose -f "graph-db/docker-compose.yml" up -d --build
 
+      - name: Wait for GraphDB to be ready
+        run: |
+          until curl -s http://127.0.0.1:7200/rest/repositories > /dev/null; do
+            echo "Waiting for GraphDB to start..."
+            sleep 5
+          done
+
       - name: Import repository configuration
         run: |
             curl 'http://127.0.0.1:7200/rest/repositories' \
