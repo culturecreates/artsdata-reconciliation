@@ -1,23 +1,56 @@
-name: Run unit test on pull request
+name: Run unit tests on pull request
 
 on:
   pull_request:
     branches: [ 'main' ]
+  workflow_dispatch:
 
 jobs:
   run-unit-tests:
-    name: run-unit-tests
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Extract statements file
+        run: |
+          unzip ./test/statements.nq.zip -d ./test/
+    
+      - name: Run GraphDB
+        run: docker-compose -f "graph-db/docker-compose.yml" up -d --build
+
+      - name: Import repository configuration
+        run: |
+            curl 'http://localhost:7200/rest/repositories' \
+            --header 'Content-Type: multipart/form-data' \
+            --form 'config=@"./test/config.ttl"'
+
+      - name: Import repository data
+        run: |
+            curl 'http://localhost:7200/repositories/artsdata/statements' \
+            --header 'Content-Type: application/n-quads' \
+            --data-binary '@./test/statements.nq'
+
+      - name: Create index
+        run: |
+            for file in ./src/sparql/index/*.sparql; do
+                echo "Running query from file: $file"
+                curl -X POST -H "Content-Type: text/plain" -d @"$file" "http://localhost:7200/rest/connectors/check"
+            done
+
+      - name: Update env to point to local graphdb
+        run: |
+            sed -i 's|^ARTSDATA_ENDPOINT=.*|ARTSDATA_ENDPOINT="http://localhost:7200/"|' .env
+
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
-          node-version: 16.20.1
+            node-version: 16.20.1
+
       - name: Install dependencies
         run: npm install
+
       - name: Run unit tests
         run: npm test
 
@@ -28,8 +61,11 @@ jobs:
     steps:
       - name: Check unit test status
         run: |
-          if [ ${{ needs.run-unit-tests.result }} != 'success' ]; then
+            if [ ${{ needs.run-unit-tests.result }} != 'success' ]; then
             exit 1
-          else
+            else
             exit 0
-          fi
+            fi
+
+
+
