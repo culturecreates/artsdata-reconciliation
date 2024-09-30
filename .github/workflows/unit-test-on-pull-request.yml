@@ -18,7 +18,7 @@ jobs:
           unzip ./test/statements.nq.zip -d ./test/
     
       - name: Run GraphDB
-        run: docker-compose -f "graph-db/docker-compose.yml" up -d --build
+        run: docker compose -f "graph-db/docker-compose.yml" up -d --build
 
       - name: Import repository configuration
         run: |
