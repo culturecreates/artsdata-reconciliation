@@ -42,8 +42,7 @@ jobs:
       - name: Create index
         run: |
             for file in ./src/sparql/index/*.sparql; do
-                echo "Running query from file: $file"
-                curl -X POST -H "Content-Type: text/plain" -d @"$file" "http://127.0.0.1:7200/rest/connectors/check"
+                curl -X POST -H "Content-Type: application/sparql-update" --data-binary @"$file" "http://localhost:7200/repositories/artsdata/statements"
             done
 
       - name: Update env to point to local graphdb
