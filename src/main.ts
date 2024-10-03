@@ -27,7 +27,7 @@ async function bootstrap() {
       "      - [ Source code for Reconciliation API ](https://github.com/reconciliation-api/specs)<br>" +
       "      - [ List of known public endpoints ](https://reconciliation-api.github.io/testbench/)<br>" +
       "      - [ OpenRefine wiki list of reconcilable data sources ](https://github.com/OpenRefine/OpenRefine/wiki/Reconciliable-Data-Sources)")
-    .setVersion("0.0.1")
+    .setVersion("v1.0-draft")
     .setContact("W3C Entity Reconciliation Community Group", "https://www.w3.org/community/reconciliation/",
       "public-reconciliation@w3.org")
     .setLicense("W3C Community Final Specification Agreement (FSA)",
