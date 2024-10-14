@@ -86,6 +86,8 @@ export class ReconciliationServiceHelper {
         return GRAPHDB_INDEX.ORGANIZATION;
       case "schema:Person":
         return GRAPHDB_INDEX.PERSON;
+      case "dbo:Agent":
+        return GRAPHDB_INDEX.AGENT;
       case "skos:Concept":
         return GRAPHDB_INDEX.CONCEPT;
       case "ado:EventType":

@@ -53,6 +53,10 @@ export class ServiceManifestResponse {
         "name": "Person"
       },
       {
+        "id": "dbo:Agent",
+        "name": "Agent"
+      },
+      {
         "id": "schema:Place",
         "name": "Place"
       },

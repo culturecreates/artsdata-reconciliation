@@ -8,6 +8,7 @@ export const GRAPHDB_INDEX  = {
   PLACE: env.PLACE || "place-index",
   ORGANIZATION: env.ORGANIZATION || "organization-index",
   PERSON: env.PERSON || "person-index",
+  AGENT: env.AGENT || "agent-index",
   CONCEPT: env.CONCEPT || "concept-index",
   EVENT_TYPE: env.EVENT_TYPE || "event-type-index",
   DEFAULT: env.DEFAULT || "resource-index",
