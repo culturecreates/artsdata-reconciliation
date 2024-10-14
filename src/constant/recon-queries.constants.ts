@@ -8,6 +8,7 @@ PREFIX schema: <http://schema.org/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ado: <http://kg.artsdata.ca/ontology/>
 PREFIX onto: <http://www.ontotext.com/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
 
 SELECT DISTINCT ?entity 
  ?score 
@@ -75,6 +76,7 @@ PREFIX schema: <http://schema.org/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ado: <http://kg.artsdata.ca/ontology/>
 PREFIX onto: <http://www.ontotext.com/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
 
 SELECT DISTINCT ?entity 
  ?score 
