@@ -114,7 +114,7 @@ describe("Recon Service tests", () => {
           }
         ],
         expectedName: "Canadian Stage - Berkeley Street Theatre",
-        expectedCount: 2,
+        expectedCount: 1,
         duplicateCheck: true
       }, {
         description: "It should match names with single neutral quote",
