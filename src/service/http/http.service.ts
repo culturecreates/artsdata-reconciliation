@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import axios from "axios";
+import { Exception } from "../../helper";
 
 @Injectable()
 export class HttpService {
@@ -19,6 +20,7 @@ export class HttpService {
       return response?.data;
     } catch (e) {
       console.log(e);
+      return Exception.internalServerError(e.message);
     }
   }
 
