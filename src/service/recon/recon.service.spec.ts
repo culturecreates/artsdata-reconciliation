@@ -421,7 +421,7 @@ describe("Recon Service tests", () => {
           expect(title).toBe(test.expectedName);
         expect(result.results?.[0].candidates.length).toBe(test.expectedCount);
         if (test.duplicateCheck) {
-          expect(result.results[0]?.candidates?.[0].name === result.results[0]?.candidates?.[1].name).toBeFalsy();
+          expect(result.results[0]?.candidates?.[0]?.name === result.results[0]?.candidates?.[1]?.name).toBeFalsy();
         }
         if (test.expectedId) {
           expect(id).toBe(test.expectedId);
