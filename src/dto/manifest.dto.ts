@@ -79,6 +79,4 @@ export class ServiceManifestResponse {
   view: View;
   @ApiProperty({ type: Preview })
   preview: Preview;
-  @ApiProperty({ type: Suggest })
-  suggest: Suggest;
 }
