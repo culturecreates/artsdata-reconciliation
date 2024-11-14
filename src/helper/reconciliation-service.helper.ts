@@ -58,7 +58,8 @@ export class ReconciliationServiceHelper {
         resultCandidate.description = { values: descriptionValues };
 
         //SCORE
-        resultCandidate.score = currentBinding["score"]?.value;
+        const score = currentBinding["score"]?.value;
+        resultCandidate.score = Number(score);
 
         //TODO match is incorrect when query contains accented characters
         if (query) {
