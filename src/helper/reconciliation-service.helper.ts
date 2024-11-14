@@ -67,7 +67,7 @@ export class ReconciliationServiceHelper {
         }
 
         resultCandidate.type = currentBindings.map((binding: any) => ({
-          id: binding["type_additional"]?.value,
+          id: binding["type_label"]?.value,
           name: binding["type_label"]?.value
         }));
         candidates.push(resultCandidate);
