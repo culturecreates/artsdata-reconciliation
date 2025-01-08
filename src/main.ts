@@ -4,15 +4,14 @@ import { ExpressAdapter } from "@nestjs/platform-express";
 import { AppModule } from "./app.module";
 import { APPLICATION } from "./config/system.config";
 import * as express from "express";
-import * as fs from "node:fs";
-import * as https from "node:https";
+import * as http from "http";
 
 
 async function bootstrap() {
-  const httpsOptions = {
-    key: fs.readFileSync("./secrets/private-key.pem"),
-    cert: fs.readFileSync("./secrets/public-certificate.pem")
-  };
+  // const httpsOptions = {
+  //   key: fs.readFileSync("./secrets/private-key.pem"),
+  //   cert: fs.readFileSync("./secrets/public-certificate.pem")
+  // };
 
   const server = express();
   const app = await NestFactory.create(
@@ -40,7 +39,8 @@ async function bootstrap() {
 
   app.enableCors();
   await app.init();
-  https.createServer(httpsOptions, server).listen(APPLICATION.HTTPS_PORT);
+  http.createServer(server).listen(APPLICATION.HTTP_PORT);
+  // https.createServer(httpsOptions, server).listen(APPLICATION.HTTPS_PORT);
 
 }
 
