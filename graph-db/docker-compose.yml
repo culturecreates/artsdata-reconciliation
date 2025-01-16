@@ -2,7 +2,13 @@ services:
   graphdb:
     image: ontotext/graphdb:10.6.3
     container_name: graphdb
+    volumes:
+      - graphdb-data:/opt/graphdb/dist
     ports:
       - "7200:7200"
     restart: always
     command: -Xms2048M -XX:MaxDirectMemorySize=2g
+
+volumes:
+  graphdb-data:
+    external: true
