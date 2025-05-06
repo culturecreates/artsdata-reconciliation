@@ -1,14 +1,13 @@
 import { Body , Controller , Get , Post , Query } from "@nestjs/common";
 import { ApiOperation , ApiQuery , ApiResponse , ApiTags } from "@nestjs/swagger";
-import { ReconciliationService } from "../../service";
-import { ReconciliationResponse } from "../../dto";
-import { ReconciliationRequest } from "../../dto";
+import { MatchService } from "../../service";
+import { ReconciliationRequest , ReconciliationResponse } from "../../dto";
 
 @Controller()
 
 @ApiTags("Match Service APIs")
-export class ReconciliationController {
-  constructor(private readonly _reconciliationService: ReconciliationService) {
+export class MatchController {
+  constructor(private readonly _matchService: MatchService) {
   }
 
   @Get("/match")
@@ -32,7 +31,7 @@ export class ReconciliationController {
   async reconcileByQuery(
     @Query("queries") rawQueries: string
   ): Promise<ReconciliationResponse[]> {
-    return await this._reconciliationService.reconcileByRawQueries(rawQueries);
+    return await this._matchService.reconcileByRawQueries(rawQueries);
   }
 
   @Post("/match")
@@ -47,7 +46,7 @@ export class ReconciliationController {
       "is provided in the [service manifest](#/components/schemas/manifest)"
   })
   async reconcileByQueries(@Body() reconciliationRequest: ReconciliationRequest): Promise<ReconciliationResponse> {
-    return await this._reconciliationService.reconcileByQueries(reconciliationRequest);
+    return await this._matchService.reconcileByQueries(reconciliationRequest);
   }
 
 

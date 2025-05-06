@@ -1,19 +1,17 @@
 import { Module } from "@nestjs/common";
-import { ManifestController, ReconciliationController } from "./controller";
-import { ManifestService, ReconciliationService } from "./service";
-import { ArtsdataService } from "./service/artsdata";
-import { HttpService } from "./service/http";
+import { ManifestController , MatchController } from "./controller";
+import { ArtsdataService , HttpService , ManifestService , MatchService } from "./service";
 
 @Module({
-  imports: [],
+  imports: [] ,
   controllers: [
-    ManifestController,
-    ReconciliationController
-  ],
+    ManifestController ,
+    MatchController
+  ] ,
   providers: [
-    ManifestService,
-    ReconciliationService,
-    ArtsdataService,
+    ManifestService ,
+    MatchService ,
+    ArtsdataService ,
     HttpService
 
   ]

@@ -1,18 +1,18 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { ArtsdataService, HttpService, ManifestService, ReconciliationService } from "../../service";
-import { ManifestController, ReconciliationController } from "../../controller";
+import { ArtsdataService, HttpService, ManifestService, MatchService } from "../../service";
+import { ManifestController, MatchController } from "../../controller";
 import { LanguageTagEnum } from "../../enum";
 
 describe("Recon Service tests", () => {
-  let reconService: ReconciliationService;
+  let reconService: MatchService;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
-      controllers: [ManifestController, ReconciliationController],
-      providers: [ManifestService, ReconciliationService, ArtsdataService, HttpService]
+      controllers: [ManifestController, MatchController],
+      providers: [ManifestService, MatchService, ArtsdataService, HttpService]
     }).compile();
 
-    reconService = app.get<ReconciliationService>(ReconciliationService);
+    reconService = app.get<MatchService>(MatchService);
   });
 
   describe("Recon API Tests", () => {

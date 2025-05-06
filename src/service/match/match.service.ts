@@ -15,7 +15,7 @@ import {
 
 
 @Injectable()
-export class ReconciliationService {
+export class MatchService {
 
   constructor(private readonly _artsdataService: ArtsdataService ,
               private readonly _manifestService: ManifestService) {
