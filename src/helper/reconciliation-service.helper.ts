@@ -1,10 +1,10 @@
-import { MultilingualValues, ResultCandidates } from "../dto";
 import { LanguageTagEnum } from "../enum";
 import { GRAPHDB_INDEX } from "../config";
+import { MultilingualValues , ResultCandidates } from "../dto";
 
 export class ReconciliationServiceHelper {
 
-  static formatReconciliationResponse(sparqlResponse: any, query?: string) {
+  static formatReconciliationResponse(sparqlResponse: any , query?: string) {
     const bindings = sparqlResponse?.results?.bindings;
     const candidates: ResultCandidates[] = [];
 
@@ -32,10 +32,10 @@ export class ReconciliationServiceHelper {
         const nameEn = currentBinding["nameEn"]?.value;
         const nameFr = currentBinding["nameFr"]?.value;
         if (nameEn) {
-          nameValues.push({ str: nameEn, lang: LanguageTagEnum.ENGLISH });
+          nameValues.push({ str: nameEn , lang: LanguageTagEnum.ENGLISH });
         }
         if (nameFr) {
-          nameValues.push({ str: nameFr, lang: LanguageTagEnum.FRENCH });
+          nameValues.push({ str: nameFr , lang: LanguageTagEnum.FRENCH });
         }
         if (name && !nameEn || !nameFr) {
           nameValues.push({ str: name });
@@ -47,10 +47,10 @@ export class ReconciliationServiceHelper {
         const descriptionEn = currentBinding["descriptionEn"]?.value;
         const descriptionFr = currentBinding["descriptionFr"]?.value;
         if (descriptionEn) {
-          descriptionValues.push({ str: descriptionEn, lang: LanguageTagEnum.ENGLISH });
+          descriptionValues.push({ str: descriptionEn , lang: LanguageTagEnum.ENGLISH });
         }
         if (descriptionFr) {
-          descriptionValues.push({ str: descriptionFr, lang: LanguageTagEnum.FRENCH });
+          descriptionValues.push({ str: descriptionFr , lang: LanguageTagEnum.FRENCH });
         }
         if (description && !descriptionEn && !descriptionFr) {
           descriptionValues.push({ str: description });
@@ -67,7 +67,7 @@ export class ReconciliationServiceHelper {
         }
 
         resultCandidate.type = currentBindings.map((binding: any) => ({
-          id: binding["type_label"]?.value,
+          id: binding["type_label"]?.value ,
           name: binding["type_label"]?.value
         }));
         candidates.push(resultCandidate);

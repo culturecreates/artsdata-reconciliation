@@ -1,22 +1,23 @@
 import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
 import { ManifestService } from "../manifest";
+
+import { Exception , ReconciliationServiceHelper } from "../../helper";
+import { ReconRequestMatchTypeEnum } from "../../enum";
+import { ArtsdataProperties , QUERIES } from "../../constant";
 import {
-  QueryCondition,
-  ReconciliationRequest,
-  ReconciliationResponse,
-  ReconciliationResults,
+  QueryCondition ,
+  ReconciliationRequest ,
+  ReconciliationResponse ,
+  ReconciliationResults ,
   ResultCandidates
 } from "../../dto";
-import { Exception, ReconciliationServiceHelper } from "../../helper";
-import { ReconRequestMatchTypeEnum } from "../../enum";
-import { ArtsdataProperties, QUERIES } from "../../constant";
 
 
 @Injectable()
 export class ReconciliationService {
 
-  constructor(private readonly _artsdataService: ArtsdataService,
+  constructor(private readonly _artsdataService: ArtsdataService ,
               private readonly _manifestService: ManifestService) {
   }
 
@@ -42,38 +43,38 @@ export class ReconciliationService {
       return { results: [] };
     }
     for (const reconciliationQuery of queries) {
-      const { type, limit, conditions } = reconciliationQuery;
-      const { name, propertyConditions } = this._resolveConditions(conditions);
+      const { type , limit , conditions } = reconciliationQuery;
+      const { name , propertyConditions } = this._resolveConditions(conditions);
       const isQueryByURI = !!name && ReconciliationServiceHelper.isQueryByURI(name);
-      const rawSparqlQuery: string = this._getSparqlQuery(name, isQueryByURI, type, limit);
-      const rawSparqlQueryWithPropertyFilters = this._resolvePropertyConditions(rawSparqlQuery, propertyConditions);
+      const rawSparqlQuery: string = this._getSparqlQuery(name , isQueryByURI , type , limit);
+      const rawSparqlQueryWithPropertyFilters = this._resolvePropertyConditions(rawSparqlQuery , propertyConditions);
       const sparqlQuery: string = "query=" + encodeURIComponent(rawSparqlQueryWithPropertyFilters) + "&infer=false";
 
-      const candidates: ResultCandidates[] = await this._artsdataService.getReconciliationResult(sparqlQuery, name as string);
+      const candidates: ResultCandidates[] = await this._artsdataService.getReconciliationResult(sparqlQuery , name as string);
       results.push({ candidates });
     }
     return { results };
   }
 
-  private _resolvePropertyConditions(rawSparqlQuery: string, propertyConditions: QueryCondition[]) {
+  private _resolvePropertyConditions(rawSparqlQuery: string , propertyConditions: QueryCondition[]) {
     let propertyTriples: string = "";
     let rawConditionValue: string;
     let formattedConditionValue: string;
     propertyConditions.forEach((condition) => {
       rawConditionValue = condition.v;
       formattedConditionValue = ReconciliationServiceHelper.isValidURI(rawConditionValue) ? `<${rawConditionValue}>` : `"${rawConditionValue}"`;
-      formattedConditionValue = this._resolvePropertyValue(rawConditionValue, condition.pid as string);
+      formattedConditionValue = this._resolvePropertyValue(rawConditionValue , condition.pid as string);
       if (condition.required) {
         propertyTriples = propertyTriples.concat(`?entity ${condition.pid} ${formattedConditionValue} .`);
       } else {
         propertyTriples = propertyTriples.concat(`OPTIONAL {?entity ${condition.pid} ${formattedConditionValue} .}`);
       }
     });
-    rawSparqlQuery = rawSparqlQuery.replace("PROPERTY_PLACE_HOLDER", propertyTriples);
+    rawSparqlQuery = rawSparqlQuery.replace("PROPERTY_PLACE_HOLDER" , propertyTriples);
     return rawSparqlQuery;
   }
 
-  private _getSparqlQuery(name: string | undefined, isQueryByURI: boolean, type: string, limit: number | undefined): string {
+  private _getSparqlQuery(name: string | undefined , isQueryByURI: boolean , type: string , limit: number | undefined): string {
     const graphdbIndex: string = ReconciliationServiceHelper.getGraphdbIndex(type);
 
     const rawQuery = isQueryByURI ? QUERIES.RECONCILIATION_QUERY_BY_URI : QUERIES.RECONCILIATION_QUERY;
@@ -87,15 +88,13 @@ export class ReconciliationService {
     const queryFilterReplacementString: string = name ? `      luc:query ?query ;` : "";
     const typePlaceholderReplace: string = type ? `values ?type { ${type} }` : "";
 
-    let rawSparqlQuery: string = rawQuery
-      .replace("INDEX_PLACE_HOLDER", graphdbIndex)
-      .replace("QUERY_PLACE_HOLDER", queryReplacementString)
-      .replace("QUERY_FILTER_PLACE_HOLDER", queryFilterReplacementString)
-      .replace("TYPE_PLACE_HOLDER", typePlaceholderReplace)
-      .replace("URI_PLACEHOLDER", `${name}`)
-      .replace("LIMIT_PLACE_HOLDER", limit ? `LIMIT ${limit}` : "");
-
-    return rawSparqlQuery;
+    return rawQuery
+      .replace("INDEX_PLACE_HOLDER" , graphdbIndex)
+      .replace("QUERY_PLACE_HOLDER" , queryReplacementString)
+      .replace("QUERY_FILTER_PLACE_HOLDER" , queryFilterReplacementString)
+      .replace("TYPE_PLACE_HOLDER" , typePlaceholderReplace)
+      .replace("URI_PLACEHOLDER" , `${name}`)
+      .replace("LIMIT_PLACE_HOLDER" , limit ? `LIMIT ${limit}` : "");
   }
 
   private _resolveConditions(conditions: QueryCondition[]) {
@@ -103,10 +102,10 @@ export class ReconciliationService {
       .find(condition => condition.matchType == ReconRequestMatchTypeEnum.NAME)?.v;
     const propertyConditions = conditions
       .filter(condition => condition.matchType == ReconRequestMatchTypeEnum.PROPERTY);
-    return { name, propertyConditions };
+    return { name , propertyConditions };
   }
 
-  private _resolvePropertyValue(value: string, property: string) {
+  private _resolvePropertyValue(value: string , property: string) {
     switch (property) {
       case ArtsdataProperties.START_DATE:
       case ArtsdataProperties.END_DATE:
