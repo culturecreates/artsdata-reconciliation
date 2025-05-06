@@ -41,7 +41,7 @@ jobs:
 
       - name: Create index
         run: |
-            for file in ./src/sparql/index/*.sparql; do
+            for file in ./seed/sparql/index/*.sparql; do
                 curl -X POST -H "Content-Type: application/sparql-update" --data-binary @"$file" "http://localhost:7200/repositories/artsdata/statements"
             done
 

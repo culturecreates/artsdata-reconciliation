@@ -1,3 +1,2 @@
-export * from "./manifest.dto";
+export * from "./manifest";
 export * from "./match";
-
