@@ -11,8 +11,7 @@ import {
   ReconciliationResults ,
   ResultCandidates
 } from "../../dto";
-import { MatchTypeEnum } from "../../enum";
-
+import { MatchQualifierEnum , MatchTypeEnum } from "../../enum";
 
 @Injectable()
 export class MatchService {
@@ -57,21 +56,13 @@ export class MatchService {
   }
 
   private _resolvePropertyConditions(rawSparqlQuery: string , propertyConditions: QueryCondition[]) {
-    let propertyTriples: string = "";
-    let rawConditionValue: string;
-    let formattedConditionValue: string;
-    propertyConditions.forEach((condition) => {
-      rawConditionValue = condition.v;
-      formattedConditionValue = ReconciliationServiceHelper.isValidURI(rawConditionValue) ? `<${rawConditionValue}>` : `"${rawConditionValue}"`;
-      formattedConditionValue = this._resolvePropertyValue(rawConditionValue , condition.pid as string);
-      if (condition.required) {
-        propertyTriples = propertyTriples.concat(`?entity ${condition.pid} ${formattedConditionValue} .`);
-      } else {
-        propertyTriples = propertyTriples.concat(`OPTIONAL {?entity ${condition.pid} ${formattedConditionValue} .}`);
-      }
-    });
-    rawSparqlQuery = rawSparqlQuery.replace("PROPERTY_PLACE_HOLDER" , propertyTriples);
-    return rawSparqlQuery;
+      let propertyTriples: string = "";
+      propertyConditions.forEach((condition , index) => {
+        propertyTriples = propertyTriples.concat(this._generateTripleForCondition(condition , index));
+      });
+      rawSparqlQuery = rawSparqlQuery.replace("PROPERTY_PLACE_HOLDER" , propertyTriples);
+      return rawSparqlQuery;
+
   }
 
   private _getSparqlQuery(name: string | undefined , isQueryByURI: boolean , type: string , limit: number | undefined): string {
@@ -120,9 +111,24 @@ export class MatchService {
       case ArtsdataProperties.EVENT_STATUS:
       case ArtsdataProperties.IN_LANGUAGE:
       case ArtsdataProperties.SUB_EVENT:
-        return `<${value}>`;
+        return ReconciliationServiceHelper.isValidURI(value) ? `<${value}>` : `"${value}"`;
       default:
-        return `'${value}'`;
+        return `"${value}"`;
     }
+  }
+
+  private _generateTripleForCondition(condition: QueryCondition , index: number): string {
+    const { required , pid , v: rawConditionValue , matchQualifier } = condition;
+    const formattedConditionValue = this._resolvePropertyValue(rawConditionValue , pid as string);
+
+    let triple;
+    if (matchQualifier !== MatchQualifierEnum.WILDCARD_MATCH) {
+      triple = `?entity ${condition.pid} ${formattedConditionValue} .`;
+    } else {
+      const objectId = `?obj_${index + 1}`;
+      triple = `?entity ${condition.pid} ${objectId}
+        FILTER REGEX(${objectId}, ${formattedConditionValue}, "i").`;
+    }
+    return required ? triple : `OPTIONAL { ${triple} }`;
   }
 }
