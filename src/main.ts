@@ -7,6 +7,7 @@ import * as express from "express";
 import * as http from "http";
 import * as fs from "node:fs";
 import * as https from "node:https";
+import { ValidationPipe } from "@nestjs/common";
 
 
 async function bootstrap() {
@@ -20,6 +21,8 @@ async function bootstrap() {
     AppModule,
     new ExpressAdapter(server)
   );
+  app.useGlobalPipes(new ValidationPipe());
+
 
   const config = new DocumentBuilder()
     .setTitle("Reconciliation API - OpenAPI 3.1")

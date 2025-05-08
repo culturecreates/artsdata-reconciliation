@@ -11,19 +11,20 @@ export enum LanguageTagEnum {
   FRENCH = "fr"
 }
 
-
-export enum ReconRequestMatchTypeEnum {
+export enum MatchTypeEnum {
   NAME = "name",
   PROPERTY = "property"
 }
 
+
 export enum MatchQuantifierEnum {
-  // ANY = "any",
+  ANY = "any",
   ALL = "all",
   NONE = "none"
 }
 
 export enum MatchQualifierEnum {
   WILDCARD_MATCH = "WildcardMatch",
+  EXACT_MATCH ="ExactMatch"
 
 }

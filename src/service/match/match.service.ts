@@ -3,7 +3,6 @@ import { ArtsdataService } from "../artsdata";
 import { ManifestService } from "../manifest";
 
 import { Exception , ReconciliationServiceHelper } from "../../helper";
-import { ReconRequestMatchTypeEnum } from "../../enum";
 import { ArtsdataProperties , QUERIES } from "../../constant";
 import {
   QueryCondition ,
@@ -12,6 +11,7 @@ import {
   ReconciliationResults ,
   ResultCandidates
 } from "../../dto";
+import { MatchTypeEnum } from "../../enum";
 
 
 @Injectable()
@@ -99,9 +99,9 @@ export class MatchService {
 
   private _resolveConditions(conditions: QueryCondition[]) {
     const name = conditions
-      .find(condition => condition.matchType == ReconRequestMatchTypeEnum.NAME)?.v;
+      .find(condition => condition.matchType == MatchTypeEnum.NAME)?.v;
     const propertyConditions = conditions
-      .filter(condition => condition.matchType == ReconRequestMatchTypeEnum.PROPERTY);
+      .filter(condition => condition.matchType == MatchTypeEnum.PROPERTY);
     return { name , propertyConditions };
   }
 

@@ -28,9 +28,7 @@ export class MatchController {
     explode: false ,
     example: "{ \"queries\": [ { \"type\": \"schema:Place\", \"limit\": 2, \"conditions\": [ { \"matchType\": \"name\", \"v\": \"Roy Thomson hall\" } ] } ] }"
   })
-  async reconcileByQuery(
-    @Query("queries") rawQueries: string
-  ): Promise<ReconciliationResponse[]> {
+  async reconcileByQuery(@Query("queries") rawQueries: string): Promise<ReconciliationResponse[]> {
     return await this._matchService.reconcileByRawQueries(rawQueries);
   }
 
