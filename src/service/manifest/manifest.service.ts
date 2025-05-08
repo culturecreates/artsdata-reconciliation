@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import * as MANIFEST from "../../constant/manifest.constant.json";
-import { ServiceManifestResponse } from "../../dto/manifest/manifest.dto";
+import { ServiceManifestResponse } from "../../dto";
 
 @Injectable()
 export class ManifestService {

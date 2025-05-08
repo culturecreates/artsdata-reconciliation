@@ -1,0 +1,52 @@
+{
+  "versions": [
+    "0.2"
+  ],
+  "name": "Artsdata.ca Reconciliation Service",
+  "identifierSpace": "http://kg.artsdata.ca/resource/",
+  "schemaSpace": "http://schema.org/",
+  "defaultTypes": [
+    {
+      "id": "schema:Event",
+      "name": "Event"
+    },
+    {
+      "id": "schema:Person",
+      "name": "Person"
+    },
+    {
+      "id": "schema:Place",
+      "name": "Place"
+    },
+    {
+      "id": "schema:Organization",
+      "name": "Organization"
+    },
+    {
+      "id": "dbo:Agent",
+      "name": "Person or Organization/Group"
+    },
+    {
+      "id": "skos:Concept",
+      "name": "Concept"
+    },
+    {
+      "id": "ado:EventType",
+      "name": "Artsdata Event Type"
+    }
+  ],
+  "view": {
+    "url": "http://kg.artsdata.ca/resource/{{id}}"
+  },
+  "preview": {
+    "height": 200,
+    "width": 350,
+    "url": "https://api.artsdata.ca/preview?id={{id}}"
+  },
+  "suggest": {
+    "type": {
+      "service_path": "/en/suggest/type",
+      "service_url": "https://wikidata.reconci.link"
+    }
+  }
+}

@@ -4,13 +4,7 @@ import { ManifestService } from "../manifest";
 
 import { Exception , ReconciliationServiceHelper } from "../../helper";
 import { ArtsdataProperties , QUERIES } from "../../constant";
-import {
-  QueryCondition ,
-  ReconciliationRequest ,
-  ReconciliationResponse ,
-  ReconciliationResults ,
-  ResultCandidates
-} from "../../dto";
+import { QueryCondition , ReconciliationRequest , ReconciliationResults , ResultCandidates } from "../../dto";
 import { MatchQualifierEnum , MatchTypeEnum } from "../../enum";
 
 @Injectable()
@@ -20,8 +14,7 @@ export class MatchService {
               private readonly _manifestService: ManifestService) {
   }
 
-  async reconcileByRawQueries(version: string , rawQueries: string): Promise<any> {
-
+  async reconcileByRawQueries(rawQueries: string): Promise<any> {
     if (!rawQueries) {
       return this._manifestService.getServiceManifest();
     }
@@ -31,15 +24,7 @@ export class MatchService {
     } catch (e) {
       return Exception.badRequest("The request is not a valid JSON object.");
     }
-    return await this.reconcileByQueries(version , queries);
-  }
-
-  async reconcileByQueries(version: string , reconciliationRequest: ReconciliationRequest): Promise<ReconciliationResponse | undefined> {
-    if (version === "1.0") {
-      const result = await this._reconcileQueryVersion1_0(reconciliationRequest);
-      return result;
-    }
-    Exception.badRequest("The version is not supported.");
+    return await this.reconcileByQueries(queries);
   }
 
   private _resolvePropertyConditions(rawSparqlQuery: string , propertyConditions: QueryCondition[]) {
@@ -108,7 +93,7 @@ export class MatchService {
     const { required , pid , v: rawConditionValue , matchQualifier } = condition;
     const formattedConditionValue = this._resolvePropertyValue(rawConditionValue , pid as string);
 
-    const formattedPropertyId = ReconciliationServiceHelper.isValidURI(pid as string) ? `<${pid}>` : `"${pid}"`;
+    const formattedPropertyId = ReconciliationServiceHelper.isValidURI(pid as string) ? `<${pid}>` : `${pid}`;
 
     let triple;
     if (matchQualifier !== MatchQualifierEnum.WILDCARD_MATCH) {
@@ -121,7 +106,8 @@ export class MatchService {
     return required ? triple : `OPTIONAL { ${triple} }`;
   }
 
-  private async _reconcileQueryVersion1_0(reconciliationRequest: ReconciliationRequest) {
+  async reconcileByQueries(reconciliationRequest: ReconciliationRequest) {
+
     const { queries } = reconciliationRequest;
     const results: ReconciliationResults[] = [];
     if (!queries) {

@@ -1,501 +1,481 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { ArtsdataService, HttpService, ManifestService, MatchService } from "../../service";
-import { ManifestController, MatchController } from "../../controller";
+import { Test , TestingModule } from "@nestjs/testing";
+import { ArtsdataService , HttpService , ManifestService , MatchService } from "../../service";
+import { ManifestController , MatchController } from "../../controller";
 import { LanguageTagEnum } from "../../enum";
 
-describe("Recon Service tests", () => {
+describe("Recon Service tests" , () => {
   let reconService: MatchService;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
-      controllers: [ManifestController, MatchController],
-      providers: [ManifestService, MatchService, ArtsdataService, HttpService]
+      controllers: [ManifestController , MatchController] ,
+      providers: [ManifestService , MatchService , ArtsdataService , HttpService]
     }).compile();
 
     reconService = app.get<MatchService>(MatchService);
   });
 
-  describe("Recon API Tests", () => {
+  describe("Recon API Tests" , () => {
     jest.setTimeout(200000);
     const testCases = [
       {
-        description: "It should search for uris that match 100%",
+        description: "It should search for uris that match 100%" ,
         queries: [
           {
-            type: "schema:Place",
-            limit: 1,
+            type: "schema:Place" ,
+            limit: 1 ,
             conditions: [
               {
-                matchType: "name",
+                matchType: "name" ,
                 v: "Théâtre Maisonneuve"
               }
             ]
           }
-        ],
-        expectedName: "Place des Arts - Théâtre Maisonneuve",
+        ] ,
+        expectedName: "Place des Arts - Théâtre Maisonneuve" ,
         expectedCount: 1
-      }, {
-        description: "It should search for uris by matching name in substring",
+      } , {
+        description: "It should search for uris by matching name in substring" ,
         queries: [
           {
-            type: "schema:Place",
-            limit: 1,
+            type: "schema:Place" ,
+            limit: 1 ,
             conditions: [
               {
-                matchType: "name",
+                matchType: "name" ,
                 v: "The locations is in the lovely Bluma Appel Theatre and Berkeley Street Theatre."
               }
             ]
           }
-        ],
-        expectedName: "St. Lawrence Centre for the Arts - Bluma Appel Theatre",
+        ] ,
+        expectedName: "St. Lawrence Centre for the Arts - Bluma Appel Theatre" ,
         expectedCount: 1
 
-      }, {
-        description: "It should search for VaughnCo Entertainment presents",
+      } , {
+        description: "It should search for VaughnCo Entertainment presents" ,
         queries: [
           {
-            type: "schema:Organization",
-            limit: 1,
+            type: "schema:Organization" ,
+            limit: 1 ,
             conditions: [
               {
-                matchType: "name",
+                matchType: "name" ,
                 v: "VaughnCo Entertainment presents"
               }
             ]
           }
-        ],
-        expectedName: "VaughnCo Entertainment",
+        ] ,
+        expectedName: "VaughnCo Entertainment" ,
         expectedCount: 1
-      }, {
-        description: "It should search for Wajdi Mouawad",
+      } , {
+        description: "It should search for Wajdi Mouawad" ,
         queries: [
           {
-            type: "schema:Person",
-            limit: 1,
+            type: "schema:Person" ,
+            limit: 1 ,
             conditions: [
               {
-                matchType: "name",
+                matchType: "name" ,
                 v: "Wajdi Mouawad"
               }
             ]
           }
-        ],
-        expectedName: "Wajdi Mouawad",
+        ] ,
+        expectedName: "Wajdi Mouawad" ,
         expectedCount: 1
-      }, {
-        description: "It should search for nowhere",
+      } , {
+        description: "It should search for nowhere" ,
         queries: [
           {
-            type: "schema:Place",
-            limit: 1,
+            type: "schema:Place" ,
+            limit: 1 ,
             conditions: [
               {
-                matchType: "name",
+                matchType: "name" ,
                 v: "Show is nowhere"
               }
             ]
           }
-        ],
-        expectedName: undefined,
+        ] ,
+        expectedName: undefined ,
         expectedCount: 0
-      }, {
-        description: "It should remove duplicates",
+      } , {
+        description: "It should remove duplicates" ,
         queries: [
           {
-            type: "schema:Place",
-            limit: 2,
+            type: "schema:Place" ,
+            limit: 2 ,
             conditions: [
               {
-                matchType: "name",
+                matchType: "name" ,
                 v: "The locations is in the lovely Berkeley Street Theatre and Canadian Stage - Berkeley Street Theatre."
               }
             ]
           }
-        ],
-        expectedName: "Canadian Stage - Berkeley Street Theatre",
-        expectedCount: 1,
+        ] ,
+        expectedName: "Canadian Stage - Berkeley Street Theatre" ,
+        expectedCount: 1 ,
         duplicateCheck: true
-      }, {
-        description: "It should match names with single neutral quote",
+      } , {
+        description: "It should match names with single neutral quote" ,
         queries: [
           {
-            type: "schema:Place",
-            limit: 1,
+            type: "schema:Place" ,
+            limit: 1 ,
             conditions: [
               {
-                matchType: "name",
+                matchType: "name" ,
                 v: "Shippagan 20 h 00 La P'tite Église (Shippagan)"
               }
             ]
           }
-        ],
-        expectedName: "La P'tite Église (Shippagan)",
+        ] ,
+        expectedName: "La P'tite Église (Shippagan)" ,
         expectedCount: 1
-      }, {
-        description: "It should match names with single curved quote",
+      } , {
+        description: "It should match names with single curved quote" ,
         queries: [
           {
-            type: "schema:Person",
-            limit: 1,
+            type: "schema:Person" ,
+            limit: 1 ,
             conditions: [
               {
-                matchType: "name",
+                matchType: "name" ,
                 v: "Emily D’Angelo"
               }
             ]
           }
-        ],
-        expectedName: "Emily D’Angelo",
+        ] ,
+        expectedName: "Emily D’Angelo" ,
         expectedCount: 1
-      }, {
-        description: "It should match names with &",
+      } , {
+        description: "It should match names with &" ,
         queries: [
           {
-            type: "schema:Organization",
-            limit: 1,
+            type: "schema:Organization" ,
+            limit: 1 ,
             conditions: [
               {
-                matchType: "name",
+                matchType: "name" ,
                 v: "meagan&amp;amy"
               }
             ]
           }
-        ],
-        expectedName: "meagan&amy",
+        ] ,
+        expectedName: "meagan&amy" ,
         expectedCount: 1
-      }, {
-        description: "It should match places with title in French",
+      } , {
+        description: "It should match places with title in French" ,
         queries: [
           {
-            type: "schema:Place",
-            limit: 1,
+            type: "schema:Place" ,
+            limit: 1 ,
             conditions: [
               {
-                matchType: "name",
+                matchType: "name" ,
                 v: "Théâtre Marc Lescarbot"
               }
             ]
           }
-        ],
-        expectedName: "le Marc Lescarbot (Pointe-de-l’église)",
+        ] ,
+        expectedName: "le Marc Lescarbot (Pointe-de-l’église)" ,
         expectedCount: 1
-      }, {
-        description: "It should find alternate names",
+      } , {
+        description: "It should find alternate names" ,
         queries: [
           {
-            type: "schema:Place",
-            limit: 1,
+            type: "schema:Place" ,
+            limit: 1 ,
             conditions: [
               {
-                matchType: "name",
+                matchType: "name" ,
                 v: "Shell Theatre"
               }
             ]
           }
-        ],
-        expectedName: "Dow Centennial Centre - Shell Theatre",
+        ] ,
+        expectedName: "Dow Centennial Centre - Shell Theatre" ,
         expectedCount: 1
-      }, {
-        description: "It should find additional type using artsdata",
+      } , {
+        description: "It should find additional type using artsdata" ,
         queries: [
           {
-            type: "ado:EventType",
-            limit: 1,
+            type: "ado:EventType" ,
+            limit: 1 ,
             conditions: [
               {
-                matchType: "name",
+                matchType: "name" ,
                 v: "Dance"
               }
             ]
           }
-        ],
-        expectedName: "Dance",
+        ] ,
+        expectedName: "Dance" ,
         expectedCount: 1
-      }, {
-        description: "Reconcile a Place with Artsdata ID",
+      } , {
+        description: "Reconcile a Place with Artsdata ID" ,
         queries: [
           {
-            "type": "schema:Place",
-            "limit": 1,
+            "type": "schema:Place" ,
+            "limit": 1 ,
             "conditions": [
               {
-                "matchType": "name",
+                "matchType": "name" ,
                 "v": "K11-19"
               }
             ]
           }
-        ],
-        expectedId: "K11-19",
-        expectedName: "Roy Thomson Hall",
+        ] ,
+        expectedId: "K11-19" ,
+        expectedName: "Roy Thomson Hall" ,
         expectedCount: 1
-      }, {
-        description: "Reconcile Place with Artsdata URI",
+      } , {
+        description: "Reconcile Place with Artsdata URI" ,
         queries: [
           {
-            "type": "schema:Place",
-            "limit": 1,
+            "type": "schema:Place" ,
+            "limit": 1 ,
             "conditions": [
               {
-                "matchType": "name",
+                "matchType": "name" ,
                 "v": "http://kg.artsdata.ca/resource/K11-19"
               }
             ]
           }]
         ,
-        expectedId: "K11-19",
-        expectedName: "Roy Thomson Hall",
+        expectedId: "K11-19" ,
+        expectedName: "Roy Thomson Hall" ,
         expectedCount: 1
-      }, {
-        description: "Reconcile Place with Name",
+      } , {
+        description: "Reconcile Place with Name" ,
         queries: [
           {
-            "type": "schema:Place",
-            "limit": 1,
+            "type": "schema:Place" ,
+            "limit": 1 ,
             "conditions": [
               {
-                "matchType": "name",
+                "matchType": "name" ,
                 "v": "Roy Thomson Hall"
               }
             ]
           }
-        ],
-        expectedId: "K11-19",
-        expectedName: "Roy Thomson Hall",
+        ] ,
+        expectedId: "K11-19" ,
+        expectedName: "Roy Thomson Hall" ,
         expectedCount: 1
-      }, {
-        description: "Reconcile Place with Name",
+      } , {
+        description: "Reconcile Place with Name" ,
         queries: [
           {
-            "type": "schema:Place",
-            "limit": 1,
+            "type": "schema:Place" ,
+            "limit": 1 ,
             "conditions": [
               {
-                "matchType": "name",
+                "matchType": "name" ,
                 "v": "Roy Thomson Hall"
               }
             ]
           }
-        ],
-        expectedId: "K11-19",
-        expectedName: "Roy Thomson Hall",
+        ] ,
+        expectedId: "K11-19" ,
+        expectedName: "Roy Thomson Hall" ,
         expectedCount: 1
-      }, {
-        description: "Reconcile Place with Name and Postal code",
+      } , {
+        description: "Reconcile Place with Name and Postal code" ,
         queries: [
           {
-            "type": "schema:Place",
-            "limit": 1,
+            "type": "schema:Place" ,
+            "limit": 1 ,
             "conditions": [
               {
-                "matchType": "name",
+                "matchType": "name" ,
                 "v": "Roy Thomson"
-              }, {
-                "matchType": "property",
-                "v": "M5J 2H5",
-                "pid": "schema:address/schema:postalCode",
+              } , {
+                "matchType": "property" ,
+                "v": "M5J 2H5" ,
+                "pid": "schema:address/schema:postalCode" ,
                 "required": true
               }
             ]
           }
-        ],
-        expectedId: "K11-19",
-        expectedName: "Roy Thomson Hall",
+        ] ,
+        expectedId: "K11-19" ,
+        expectedName: "Roy Thomson Hall" ,
         expectedCount: 1
-      }, {
-        description: "Reconcile Place with Name and Street Address",
+      } , {
+        description: "Reconcile Place with Name and Street Address" ,
         queries:
           [
             {
-              "type": "schema:Place",
-              "limit": 1,
+              "type": "schema:Place" ,
+              "limit": 1 ,
               "conditions": [
                 {
-                  "matchType": "name",
+                  "matchType": "name" ,
                   "v": "Roy Thomson"
-                }, {
-                  "matchType": "property",
-                  "v": "60 Simcoe Street",
-                  "pid": "schema:address/schema:streetAddress",
+                } , {
+                  "matchType": "property" ,
+                  "v": "60 Simcoe Street" ,
+                  "pid": "schema:address/schema:streetAddress" ,
                   "required": true
                 }
               ]
             }
-          ],
-        expectedId: "K11-19",
-        expectedName: "Roy Thomson Hall",
+          ] ,
+        expectedId: "K11-19" ,
+        expectedName: "Roy Thomson Hall" ,
         expectedCount: 1
-      }, {
-        description: "Reconcile Event with Name",
+      } , {
+        description: "Reconcile Event with Name" ,
         queries: [
           {
-            "type": "schema:Event",
-            "limit": 1,
+            "type": "schema:Event" ,
+            "limit": 1 ,
             "conditions": [
               {
-                "matchType": "name",
+                "matchType": "name" ,
                 "v": "Matilda - Citadel Theatre"
               }
             ]
           }
-        ],
-        expectedId: "citadeltheatre-com_2018-2019_matilda",
-        expectedName: "Matilda - Citadel Theatre",
+        ] ,
+        expectedId: "citadeltheatre-com_2018-2019_matilda" ,
+        expectedName: "Matilda - Citadel Theatre" ,
         expectedCount: 1
-      }, {
-        description: "Reconcile Event with Name and startDate",
+      } , {
+        description: "Reconcile Event with Name and startDate" ,
         queries: [
           {
-            "type": "schema:Event",
-            "limit": 1,
+            "type": "schema:Event" ,
+            "limit": 1 ,
             "conditions": [
               {
-                "matchType": "name",
-                "v": "Matilda - Citadel Theatre",
-                "pid": "string",
+                "matchType": "name" ,
+                "v": "Matilda - Citadel Theatre" ,
+                "pid": "string" ,
                 "required": true
-              },
+              } ,
               {
-                "matchType": "property",
-                "v": "2019-03-17T13:30:00-04:00",
-                "pid": "schema:startDate",
+                "matchType": "property" ,
+                "v": "2019-03-17T13:30:00-04:00" ,
+                "pid": "schema:startDate" ,
                 "required": true
               }
             ]
           }
-        ],
-        expectedId: "citadeltheatre-com_2018-2019_matilda#2019-03-17T133000-0400",
-        expectedName: "Matilda - Citadel Theatre",
+        ] ,
+        expectedId: "citadeltheatre-com_2018-2019_matilda#2019-03-17T133000-0400" ,
+        expectedName: "Matilda - Citadel Theatre" ,
         expectedCount: 1
-      }, {
-        description: "Reconcile Place with only URL",
+      } , {
+        description: "Reconcile Place with only URL" ,
         queries: [
           {
-            "type": "schema:Place",
+            "type": "schema:Place" ,
             "conditions": [
               {
-                "matchType": "property",
-                "v": "https://www.roythomsonhall.com",
-                "pid": "schema:url",
+                "matchType": "property" ,
+                "v": "https://www.roythomsonhall.com" ,
+                "pid": "schema:url" ,
                 "required": true
               }
             ]
           }
-        ], expectedId: "K11-19",
-        expectedName: "Roy Thomson Hall",
+        ] , expectedId: "K11-19" ,
+        expectedName: "Roy Thomson Hall" ,
         expectedCount: 1
-      }, {
-        description: "Reconcile Place with only sameAs",
+      } , {
+        description: "Reconcile Place with only sameAs" ,
         queries: [
           {
-            "type": "schema:Place",
+            "type": "schema:Place" ,
             "conditions": [
 
               {
-                "matchType": "property",
-                "v": "https://en.wikipedia.org/wiki/Roy_Thomson_Hall",
-                "pid": "schema:sameAs",
+                "matchType": "property" ,
+                "v": "https://en.wikipedia.org/wiki/Roy_Thomson_Hall" ,
+                "pid": "schema:sameAs" ,
                 "required": true
               }
             ]
           }
-        ],
-        expectedId: "K11-19",
-        expectedName: "Roy Thomson Hall",
+        ] ,
+        expectedId: "K11-19" ,
+        expectedName: "Roy Thomson Hall" ,
         expectedCount: 1
-      }, {
-        description: "Reconcile Place with required as TRUE",
+      } , {
+        description: "Reconcile Place with required as TRUE" ,
         queries: [
           {
-            "type": "schema:Place",
+            "type": "schema:Place" ,
+            "limit": 1 ,
+            "conditions": [
+              {
+                "matchType": "name" ,
+                "v": "Roy Thomson"
+              } ,
+              {
+                "matchType": "property" ,
+                "v": "https://en.wikipedia.org/wiki/Roy_Thomson_Hall" ,
+                "pid": "schema:sameAs" ,
+                "required": true
+              }
+            ]
+          }
+        ] ,
+        expectedId: "K11-19" ,
+        expectedName: "Roy Thomson Hall" ,
+        expectedCount: 1
+      } , {
+        description: "Reconcile Place with required param as FALSE" ,
+        queries: [
+          {
+            "type": "schema:Place" ,
             "limit":1,
             "conditions": [
               {
-                "matchType": "name",
+                "matchType": "name" ,
                 "v": "Roy Thomson"
-              },
+              } ,
               {
-                "matchType": "property",
-                "v": "https://en.wikipedia.org/wiki/Roy_Thomson_Hall",
-                "pid": "schema:sameAs",
-                "required": true
-              }
-            ]
-          }
-        ],
-        expectedId: "K11-19",
-        expectedName: "Roy Thomson Hall",
-        expectedCount: 1
-      }, {
-        description: "Reconcile Place with required param as FALSE",
-        queries: [
-          {
-            "type": "schema:Place",
-            "conditions": [
-              {
-                "matchType": "name",
-                "v": "Roy Thomson"
-              },
-              {
-                "matchType": "property",
-                "v": "https://some.wrong.url",
-                "pid": "schema:url",
+                "matchType": "property" ,
+                "v": "https://some.wrong.url" ,
+                "pid": "schema:url" ,
                 "required": false
               }
             ]
           }
-        ],
-        expectedId: "K11-19",
-        expectedName: "Roy Thomson Hall",
+        ] ,
+        expectedId: "K11-19" ,
+        expectedName: "Roy Thomson Hall" ,
         expectedCount: 1
-      }, {
-        description: "Reconcile Place with NO required param",
+      } , {
+        description: "Reconcile Place with NO required param" ,
         queries: [
           {
-            "type": "schema:Place",
+            "type": "schema:Place" ,
+            "limit":1,
             "conditions": [
               {
-                "matchType": "name",
+                "matchType": "name" ,
                 "v": "Roy Thomson"
-              },
+              } ,
               {
-                "matchType": "property",
-                "v": "https://some.wrong.url",
-                "pid": "schema:url",
+                "matchType": "property" ,
+                "v": "https://some.wrong.url" ,
+                "pid": "schema:url"
               }
             ]
           }
-        ],
-        expectedId: "K11-19",
-        expectedName: "Roy Thomson Hall",
+        ] ,
+        expectedId: "K11-19" ,
+        expectedName: "Roy Thomson Hall" ,
         expectedCount: 1
-      },{
-        description: "Reconcile Place with NO required param",
-        queries: [
-          {
-            "type": "schema:Place",
-            "conditions": [
-              {
-                "matchType": "name",
-                "v": "Roy Thomson"
-              },
-              {
-                "matchType": "property",
-                "v": "Toronto",
-                "pid": "http://dbpedia.org/ontology/timeZone",
-                "required" : true
-              }
-            ]
-          }
-        ],
-        expectedId: "K11-19",
-        expectedName: "Roy Thomson Hall",
-        expectedCount: 1
-      },
+      }
     ];
 
     for (const test of testCases) {
-      it(test.description, async () => {
+      it(test.description , async () => {
         const result = await reconService
           .reconcileByQueries({ queries: test.queries });
         let title = result.results?.[0]?.candidates?.[0]?.name;

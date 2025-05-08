@@ -1,6 +1,7 @@
 import { LanguageTagEnum } from "../enum";
 import { GRAPHDB_INDEX } from "../config";
 import { MultilingualValues , ResultCandidates } from "../dto";
+import { isURL } from "validator";
 
 export class ReconciliationServiceHelper {
 
@@ -100,12 +101,7 @@ export class ReconciliationServiceHelper {
   }
 
   static isValidURI(text: string) {
-    try {
-      new URL(text);
-      return true;
-    } catch (e) {
-      return false;
-    }
+    return isURL(text);
   }
 
   static isQueryByURI(query: string) {
