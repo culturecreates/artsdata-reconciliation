@@ -20,7 +20,7 @@ export class MatchService {
               private readonly _manifestService: ManifestService) {
   }
 
-  async reconcileByRawQueries(rawQueries: string): Promise<any> {
+  async reconcileByRawQueries(version: string , rawQueries: string): Promise<any> {
 
     if (!rawQueries) {
       return this._manifestService.getServiceManifest();
@@ -31,28 +31,15 @@ export class MatchService {
     } catch (e) {
       return Exception.badRequest("The request is not a valid JSON object.");
     }
-    return await this.reconcileByQueries(queries);
+    return await this.reconcileByQueries(version , queries);
   }
 
-  async reconcileByQueries(reconciliationRequest: ReconciliationRequest): Promise<ReconciliationResponse> {
-
-    const { queries } = reconciliationRequest;
-    const results: ReconciliationResults[] = [];
-    if (!queries) {
-      return { results: [] };
+  async reconcileByQueries(version: string , reconciliationRequest: ReconciliationRequest): Promise<ReconciliationResponse | undefined> {
+    if (version === "1.0") {
+      const result = await this._reconcileQueryVersion1_0(reconciliationRequest);
+      return result;
     }
-    for (const reconciliationQuery of queries) {
-      const { type , limit , conditions } = reconciliationQuery;
-      const { name , propertyConditions } = this._resolveConditions(conditions);
-      const isQueryByURI = !!name && ReconciliationServiceHelper.isQueryByURI(name);
-      const rawSparqlQuery: string = this._getSparqlQuery(name , isQueryByURI , type , limit);
-      const rawSparqlQueryWithPropertyFilters = this._resolvePropertyConditions(rawSparqlQuery , propertyConditions);
-      const sparqlQuery: string = "query=" + encodeURIComponent(rawSparqlQueryWithPropertyFilters) + "&infer=false";
-
-      const candidates: ResultCandidates[] = await this._artsdataService.getReconciliationResult(sparqlQuery , name as string);
-      results.push({ candidates });
-    }
-    return { results };
+    Exception.badRequest("The version is not supported.");
   }
 
   private _resolvePropertyConditions(rawSparqlQuery: string , propertyConditions: QueryCondition[]) {
@@ -132,5 +119,25 @@ export class MatchService {
         FILTER REGEX(${objectId}, ${formattedConditionValue}, "i").`;
     }
     return required ? triple : `OPTIONAL { ${triple} }`;
+  }
+
+  private async _reconcileQueryVersion1_0(reconciliationRequest: ReconciliationRequest) {
+    const { queries } = reconciliationRequest;
+    const results: ReconciliationResults[] = [];
+    if (!queries) {
+      return { results: [] };
+    }
+    for (const reconciliationQuery of queries) {
+      const { type , limit , conditions } = reconciliationQuery;
+      const { name , propertyConditions } = this._resolveConditions(conditions);
+      const isQueryByURI = !!name && ReconciliationServiceHelper.isQueryByURI(name);
+      const rawSparqlQuery: string = this._getSparqlQuery(name , isQueryByURI , type , limit);
+      const rawSparqlQueryWithPropertyFilters = this._resolvePropertyConditions(rawSparqlQuery , propertyConditions);
+      const sparqlQuery: string = "query=" + encodeURIComponent(rawSparqlQueryWithPropertyFilters) + "&infer=false";
+
+      const candidates: ResultCandidates[] = await this._artsdataService.getReconciliationResult(sparqlQuery , name as string);
+      results.push({ candidates });
+    }
+    return { results };
   }
 }
