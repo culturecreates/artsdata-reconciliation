@@ -1,11 +1,13 @@
-import { Body , Controller , Get , Headers , Post , Query } from "@nestjs/common";
-import { ApiHeader , ApiOperation , ApiQuery , ApiResponse , ApiTags } from "@nestjs/swagger";
+import { Body , Controller , Get , Post , Query , UseInterceptors } from "@nestjs/common";
+import { ApiOperation , ApiProduces , ApiQuery , ApiResponse , ApiTags } from "@nestjs/swagger";
 import { MatchService } from "../../service";
 import { ReconciliationRequest , ReconciliationResponse } from "../../dto";
+import { HeaderValidationInterceptor } from "../../header-validation/header-validation.interceptor";
 
 @Controller()
 
 @ApiTags("Match Service APIs")
+@UseInterceptors(new HeaderValidationInterceptor("accept" , ["application/reconciliation.v1+json"]))
 export class MatchController {
   constructor(private readonly _matchService: MatchService) {
   }
@@ -28,9 +30,8 @@ export class MatchController {
     explode: false ,
     example: "{ \"queries\": [ { \"type\": \"schema:Place\", \"limit\": 2, \"conditions\": [ { \"matchType\": \"name\", \"v\": \"Roy Thomson hall\" } ] } ] }"
   })
-  @ApiHeader({ name: "Accept" , description: "The version supported is 1.0" , required: true })
-  async reconcileByQuery(@Headers("Accept") accept: string ,
-                         @Query("queries") rawQueries: string): Promise<ReconciliationResponse[]> {
+  @ApiProduces("application/reconciliation.v1+json")
+  async reconcileByQuery(@Query("queries") rawQueries: string): Promise<ReconciliationResponse[]> {
     return await this._matchService.reconcileByRawQueries(rawQueries);
   }
 
@@ -45,9 +46,8 @@ export class MatchController {
     description: "Authentication failure, when a [security scheme](https://spec.openapis.org/oas/latest.html#security-scheme-object) " +
       "is provided in the [service manifest](#/components/schemas/manifest)"
   })
-  @ApiHeader({ name: "Accept" , description: "The version supported is 1.0" , required: true })
-  async reconcileByQueries(@Headers("Accept") accept: string ,
-                           @Body() reconciliationRequest: ReconciliationRequest) {
+  @ApiProduces("application/reconciliation.v1+json")
+  async reconcileByQueries(@Body() reconciliationRequest: ReconciliationRequest) {
     return await this._matchService.reconcileByQueries(reconciliationRequest);
   }
 

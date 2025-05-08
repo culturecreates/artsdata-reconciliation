@@ -1,20 +1,22 @@
-import { Controller , Get , Headers } from "@nestjs/common";
+import { Controller , Get , UseInterceptors } from "@nestjs/common";
 import { ManifestService } from "../../service";
-import { ApiHeader , ApiOperation , ApiResponse , ApiTags } from "@nestjs/swagger";
+import { ApiOperation , ApiProduces , ApiResponse , ApiTags } from "@nestjs/swagger";
 import { ServiceManifestResponse } from "../../dto";
+import { HeaderValidationInterceptor } from "../../header-validation/header-validation.interceptor";
 
 @Controller()
+@UseInterceptors(new HeaderValidationInterceptor("accept" , ["application/reconciliation.v1+json"]))
 export class ManifestController {
   constructor(private readonly appService: ManifestService) {
   }
 
   @Get()
   @ApiTags("Service Definition")
-  @ApiHeader({ name: "Accept" , description: "The version supported is 1.0" , required: true })
   @ApiOperation({ summary: "Get service manifest" })
   @ApiResponse({ status: 200 , type: ServiceManifestResponse })
   @ApiResponse({ status: 500 , description: "Internal server error" })
-  getServiceManifest(@Headers("Accept") accept: string): ServiceManifestResponse | undefined {
+  @ApiProduces("application/reconciliation.v1+json")
+  getServiceManifest(): ServiceManifestResponse | undefined {
     return this.appService.getServiceManifest();
   }
 }
