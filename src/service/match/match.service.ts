@@ -56,12 +56,12 @@ export class MatchService {
   }
 
   private _resolvePropertyConditions(rawSparqlQuery: string , propertyConditions: QueryCondition[]) {
-      let propertyTriples: string = "";
-      propertyConditions.forEach((condition , index) => {
-        propertyTriples = propertyTriples.concat(this._generateTripleForCondition(condition , index));
-      });
-      rawSparqlQuery = rawSparqlQuery.replace("PROPERTY_PLACE_HOLDER" , propertyTriples);
-      return rawSparqlQuery;
+    let propertyTriples: string = "";
+    propertyConditions.forEach((condition , index) => {
+      propertyTriples = propertyTriples.concat(this._generateTripleForCondition(condition , index));
+    });
+    rawSparqlQuery = rawSparqlQuery.replace("PROPERTY_PLACE_HOLDER" , propertyTriples);
+    return rawSparqlQuery;
 
   }
 
@@ -121,12 +121,14 @@ export class MatchService {
     const { required , pid , v: rawConditionValue , matchQualifier } = condition;
     const formattedConditionValue = this._resolvePropertyValue(rawConditionValue , pid as string);
 
+    const formattedPropertyId = ReconciliationServiceHelper.isValidURI(pid as string) ? `<${pid}>` : `"${pid}"`;
+
     let triple;
     if (matchQualifier !== MatchQualifierEnum.WILDCARD_MATCH) {
-      triple = `?entity ${condition.pid} ${formattedConditionValue} .`;
+      triple = `?entity ${formattedPropertyId} ${formattedConditionValue} .`;
     } else {
       const objectId = `?obj_${index + 1}`;
-      triple = `?entity ${condition.pid} ${objectId}
+      triple = `?entity ${formattedPropertyId} ${objectId}
         FILTER REGEX(${objectId}, ${formattedConditionValue}, "i").`;
     }
     return required ? triple : `OPTIONAL { ${triple} }`;

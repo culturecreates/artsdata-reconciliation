@@ -403,7 +403,95 @@ describe("Recon Service tests", () => {
         expectedId: "K11-19",
         expectedName: "Roy Thomson Hall",
         expectedCount: 1
-      }
+      }, {
+        description: "Reconcile Place with required as TRUE",
+        queries: [
+          {
+            "type": "schema:Place",
+            "limit":1,
+            "conditions": [
+              {
+                "matchType": "name",
+                "v": "Roy Thomson"
+              },
+              {
+                "matchType": "property",
+                "v": "https://en.wikipedia.org/wiki/Roy_Thomson_Hall",
+                "pid": "schema:sameAs",
+                "required": true
+              }
+            ]
+          }
+        ],
+        expectedId: "K11-19",
+        expectedName: "Roy Thomson Hall",
+        expectedCount: 1
+      }, {
+        description: "Reconcile Place with required param as FALSE",
+        queries: [
+          {
+            "type": "schema:Place",
+            "conditions": [
+              {
+                "matchType": "name",
+                "v": "Roy Thomson"
+              },
+              {
+                "matchType": "property",
+                "v": "https://some.wrong.url",
+                "pid": "schema:url",
+                "required": false
+              }
+            ]
+          }
+        ],
+        expectedId: "K11-19",
+        expectedName: "Roy Thomson Hall",
+        expectedCount: 1
+      }, {
+        description: "Reconcile Place with NO required param",
+        queries: [
+          {
+            "type": "schema:Place",
+            "conditions": [
+              {
+                "matchType": "name",
+                "v": "Roy Thomson"
+              },
+              {
+                "matchType": "property",
+                "v": "https://some.wrong.url",
+                "pid": "schema:url",
+              }
+            ]
+          }
+        ],
+        expectedId: "K11-19",
+        expectedName: "Roy Thomson Hall",
+        expectedCount: 1
+      },{
+        description: "Reconcile Place with NO required param",
+        queries: [
+          {
+            "type": "schema:Place",
+            "conditions": [
+              {
+                "matchType": "name",
+                "v": "Roy Thomson"
+              },
+              {
+                "matchType": "property",
+                "v": "Toronto",
+                "pid": "http://dbpedia.org/ontology/timeZone",
+                "required" : true
+              }
+            ]
+          }
+        ],
+        expectedId: "K11-19",
+        expectedName: "Roy Thomson Hall",
+        expectedCount: 1
+      },
     ];
 
     for (const test of testCases) {
