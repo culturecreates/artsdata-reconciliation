@@ -4,8 +4,15 @@ import { ManifestService } from "../manifest";
 
 import { Exception , ReconciliationServiceHelper } from "../../helper";
 import { ArtsdataProperties , QUERIES } from "../../constant";
-import { QueryCondition , ReconciliationRequest , ReconciliationResults , ResultCandidates } from "../../dto";
+import {
+  QueryCondition ,
+  ReconciliationRequest ,
+  ReconciliationResponse ,
+  ReconciliationResults ,
+  ResultCandidates
+} from "../../dto";
 import { MatchQualifierEnum , MatchQuantifierEnum , MatchTypeEnum } from "../../enum";
+
 
 @Injectable()
 export class MatchService {
@@ -18,6 +25,7 @@ export class MatchService {
    * @name reconcileByRawQueries
    * @description Reconcile by raw queries
    * @param rawQueries
+   * @returns {Promise<any>}
    */
   async reconcileByRawQueries(rawQueries: string): Promise<any> {
     if (!rawQueries) {
@@ -38,8 +46,9 @@ export class MatchService {
    * @description Resolve property conditions
    * @param rawSparqlQuery
    * @param propertyConditions
+   * @returns {string}
    */
-  private _resolvePropertyConditions(rawSparqlQuery: string , propertyConditions: QueryCondition[]) {
+  private _resolvePropertyConditions(rawSparqlQuery: string , propertyConditions: QueryCondition[]): string {
     let propertyTriples: string = "";
     propertyConditions.forEach((condition , index) => {
       propertyTriples = propertyTriples.concat(this._generateTripleFromCondition(condition , index));
@@ -57,6 +66,7 @@ export class MatchService {
    * @param isQueryByURI
    * @param type
    * @param limit
+   * @return {string}
    */
   private _getSparqlQuery(name: string | undefined , isQueryByURI: boolean , type: string , limit: number | undefined): string {
     const graphdbIndex: string = ReconciliationServiceHelper.getGraphdbIndex(type);
@@ -86,8 +96,12 @@ export class MatchService {
    * @name _resolveConditions
    * @description Resolve conditions
    * @param conditions
+   * @return {{name: string | undefined, propertyConditions: QueryCondition[]}}
    */
-  private _resolveConditions(conditions: QueryCondition[]) {
+  private _resolveConditions(conditions: QueryCondition[]): {
+    name: string | undefined;
+    propertyConditions: QueryCondition[];
+  } {
     const name = conditions
       .find(condition => condition.matchType == MatchTypeEnum.NAME)?.v;
     const propertyConditions = conditions
@@ -101,8 +115,9 @@ export class MatchService {
    * @description Resolve property value
    * @param value
    * @param property
+   * @return {string}
    */
-  private _resolvePropertyValue(value: string , property: string) {
+  private _resolvePropertyValue(value: string , property: string): string {
     switch (property) {
       case ArtsdataProperties.START_DATE:
       case ArtsdataProperties.END_DATE:
@@ -148,22 +163,16 @@ export class MatchService {
    * @description Reconcile by queries
    * @param reconciliationRequest
    */
-  async reconcileByQueries(reconciliationRequest: ReconciliationRequest) {
+  async reconcileByQueries(reconciliationRequest: ReconciliationRequest): Promise<ReconciliationResponse> {
 
     const { queries } = reconciliationRequest;
     const results: ReconciliationResults[] = [];
-    if (!queries) {
-      return { results: [] };
-    }
     for (const reconciliationQuery of queries) {
       const { type , limit , conditions } = reconciliationQuery;
       const { name , propertyConditions } = this._resolveConditions(conditions);
-      const isQueryByURI = !!name && ReconciliationServiceHelper.isQueryByURI(name);
-      const rawSparqlQuery: string = this._getSparqlQuery(name , isQueryByURI , type , limit);
-      const rawSparqlQueryWithPropertyFilters = this._resolvePropertyConditions(rawSparqlQuery , propertyConditions);
-      const sparqlQuery: string = "query=" + encodeURIComponent(rawSparqlQueryWithPropertyFilters) + "&infer=false";
-
-      const candidates: ResultCandidates[] = await this._artsdataService.getReconciliationResult(sparqlQuery , name as string);
+      const sparqlQuery = this._generateSparqlQuery(name , type , limit , propertyConditions);
+      const candidates: ResultCandidates[] =
+        await this._artsdataService.getReconciliationResult(sparqlQuery , name as string);
       results.push({ candidates });
     }
     return { results };
@@ -227,5 +236,15 @@ export class MatchService {
         Exception.badRequest("Unsupported match quantifier");
     }
     return "";
+  }
+
+  private _generateSparqlQuery(name: string | undefined , type: string , limit: number | undefined ,
+                               propertyConditions: QueryCondition[]) {
+
+    const isQueryByURI = !!name && ReconciliationServiceHelper.isQueryByURI(name);
+    const rawSparqlQuery: string = this._getSparqlQuery(name , isQueryByURI , type , limit);
+    const rawSparqlQueryWithPropertyFilters =
+      this._resolvePropertyConditions(rawSparqlQuery , propertyConditions);
+    return "query=" + encodeURIComponent(rawSparqlQueryWithPropertyFilters) + "&infer=false";
   }
 }

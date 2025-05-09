@@ -54,7 +54,7 @@ export class QueryCondition {
   matchQualifier?: MatchQualifierEnum;
 }
 
-class ReconciliationQuery {
+export class ReconciliationQuery {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

@@ -4,6 +4,12 @@ import { ServiceManifestResponse } from "../../dto";
 
 @Injectable()
 export class ManifestService {
+
+  /**
+   * @name getServiceManifest
+   * @description Get service manifest
+   * @returns {ServiceManifestResponse}
+   */
   getServiceManifest(): ServiceManifestResponse {
     return MANIFEST;
   }
