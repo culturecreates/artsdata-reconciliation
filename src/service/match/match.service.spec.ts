@@ -1,7 +1,7 @@
 import { Test , TestingModule } from "@nestjs/testing";
 import { ArtsdataService , HttpService , ManifestService , MatchService } from "../../service";
 import { ManifestController , MatchController } from "../../controller";
-import { LanguageTagEnum , MatchQualifierEnum } from "../../enum";
+import { LanguageTagEnum , MatchQualifierEnum , MatchQuantifierEnum } from "../../enum";
 
 describe("Recon Service tests" , () => {
   let reconService: MatchService;
@@ -487,7 +487,7 @@ describe("Recon Service tests" , () => {
                 "v": "https://www.roythomson.*" ,
                 "pid": "schema:url" ,
                 "required": true ,
-                "matchQualifier":  MatchQualifierEnum.REGEX_MATCH
+                "matchQualifier": MatchQualifierEnum.REGEX_MATCH
               }
             ]
           }
@@ -495,7 +495,7 @@ describe("Recon Service tests" , () => {
         expectedId: "K11-19" ,
         expectedName: "Roy Thomson Hall" ,
         expectedCount: 1
-      },{
+      } , {
         description: "Reconcile Place with required param as TRUE and matchQualifier as RegexMatch" ,
         queries: [
           {
@@ -517,6 +517,54 @@ describe("Recon Service tests" , () => {
           }
         ] ,
         expectedCount: 0
+      } , {
+        description: "Reconcile Place with required param as TRUE and matchQuantifier as none" ,
+        queries: [
+          {
+            "type": "schema:Place" ,
+            "limit": 2 ,
+            "conditions": [
+              {
+                "matchType": "name" ,
+                "v": "Roy Thomson Hall"
+              } ,
+              {
+                "matchType": "property" ,
+                "v": "https://www.roythomsonhall.com" ,
+                "pid": "schema:url" ,
+                "required": true ,
+                "matchQuantifier": MatchQuantifierEnum.NONE
+              }
+            ]
+          }
+        ] ,
+        expectedId: "K11-239" ,
+        expectedCount: 1 ,
+        expectedName: "Roy Barnett Recital Hall"
+      }, {
+        description: "Reconcile Place with required param as TRUE and matchQuantifier as ANY" ,
+        queries: [
+          {
+            "type": "schema:Place" ,
+            "limit": 2 ,
+            "conditions": [
+              {
+                "matchType": "name" ,
+                "v": "Roy Thomson Hall"
+              } ,
+              {
+                "matchType": "property" ,
+                "v": "https://www.roythomsonhall.com" ,
+                "pid": "schema:url" ,
+                "required": true ,
+                "matchQuantifier": MatchQuantifierEnum.ALL
+              }
+            ]
+          }
+        ] ,
+        expectedId: "K11-19" ,
+        expectedName: "Roy Thomson Hall" ,
+        expectedCount: 1
       }
     ];
 

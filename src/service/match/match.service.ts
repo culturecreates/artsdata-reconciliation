@@ -5,7 +5,7 @@ import { ManifestService } from "../manifest";
 import { Exception , ReconciliationServiceHelper } from "../../helper";
 import { ArtsdataProperties , QUERIES } from "../../constant";
 import { QueryCondition , ReconciliationRequest , ReconciliationResults , ResultCandidates } from "../../dto";
-import { MatchQualifierEnum , MatchTypeEnum } from "../../enum";
+import { MatchQualifierEnum , MatchQuantifierEnum , MatchTypeEnum } from "../../enum";
 
 @Injectable()
 export class MatchService {
@@ -30,7 +30,7 @@ export class MatchService {
   private _resolvePropertyConditions(rawSparqlQuery: string , propertyConditions: QueryCondition[]) {
     let propertyTriples: string = "";
     propertyConditions.forEach((condition , index) => {
-      propertyTriples = propertyTriples.concat(this._generateTripleForCondition(condition , index));
+      propertyTriples = propertyTriples.concat(this._generateTripleFromCondition(condition , index));
     });
     rawSparqlQuery = rawSparqlQuery.replace("PROPERTY_PLACE_HOLDER" , propertyTriples);
     return rawSparqlQuery;
@@ -89,14 +89,15 @@ export class MatchService {
     }
   }
 
-  private _generateTripleForCondition(condition: QueryCondition , index: number): string {
-    const { required , pid , v: rawConditionValue , matchQualifier } = condition;
+  private _generateTripleFromCondition(condition: QueryCondition , index: number): string {
+    const { required , pid , v: rawConditionValue , matchQualifier , matchQuantifier } = condition;
     const formattedConditionValue = this._resolvePropertyValue(rawConditionValue , pid as string);
     const formattedPropertyId = ReconciliationServiceHelper.isValidURI(pid as string) ? `<${pid}>` : `${pid}`;
 
     let triple = "";
     triple = this._resolveMatchQualifier(matchQualifier as MatchQualifierEnum , formattedPropertyId ,
       formattedConditionValue , index);
+    triple = this._resolveMatchQuantifier(matchQuantifier as MatchQuantifierEnum , triple);
     triple = this._resolveRequired(triple , required as boolean);
 
     return triple;
@@ -142,5 +143,20 @@ export class MatchService {
 
   private _resolveRequired(triple: string , required: boolean) {
     return required ? triple : `OPTIONAL { ${triple} }`;
+  }
+
+  private _resolveMatchQuantifier(matchQuantifier: MatchQuantifierEnum , triple: string) {
+    if (!matchQuantifier) {
+      matchQuantifier = MatchQuantifierEnum.ALL;
+    }
+    switch (matchQuantifier) {
+      case MatchQuantifierEnum.ALL:
+        return triple;
+      case MatchQuantifierEnum.NONE:
+        return `FILTER NOT EXISTS { ${triple} }.`;
+      default:
+        Exception.badRequest("Unsupported match quantifier");
+    }
+    return "";
   }
 }
