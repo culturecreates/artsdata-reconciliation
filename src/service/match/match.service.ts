@@ -92,18 +92,14 @@ export class MatchService {
   private _generateTripleForCondition(condition: QueryCondition , index: number): string {
     const { required , pid , v: rawConditionValue , matchQualifier } = condition;
     const formattedConditionValue = this._resolvePropertyValue(rawConditionValue , pid as string);
-
     const formattedPropertyId = ReconciliationServiceHelper.isValidURI(pid as string) ? `<${pid}>` : `${pid}`;
 
-    let triple;
-    if (matchQualifier !== MatchQualifierEnum.WILDCARD_MATCH) {
-      triple = `?entity ${formattedPropertyId} ${formattedConditionValue} .`;
-    } else {
-      const objectId = `?obj_${index + 1}`;
-      triple = `?entity ${formattedPropertyId} ${objectId}
-        FILTER REGEX(${objectId}, ${formattedConditionValue}, "i").`;
-    }
-    return required ? triple : `OPTIONAL { ${triple} }`;
+    let triple = "";
+    triple = this._resolveMatchQualifier(matchQualifier as MatchQualifierEnum , formattedPropertyId ,
+      formattedConditionValue , index);
+    triple = this._resolveRequired(triple , required as boolean);
+
+    return triple;
   }
 
   async reconcileByQueries(reconciliationRequest: ReconciliationRequest) {
@@ -125,5 +121,26 @@ export class MatchService {
       results.push({ candidates });
     }
     return { results };
+  }
+
+  private _resolveMatchQualifier(matchQualifier: MatchQualifierEnum , formattedPropertyId: string ,
+                                 formattedConditionValue: string , index: number) {
+    if (!matchQualifier) {
+      matchQualifier = MatchQualifierEnum.EXACT_MATCH;
+    }
+    if (matchQualifier === MatchQualifierEnum.EXACT_MATCH) {
+      return `?entity ${formattedPropertyId} ${formattedConditionValue} .`;
+    } else if (matchQualifier == MatchQualifierEnum.REGEX_MATCH) {
+      const objectId = `?obj_${index + 1}`;
+      return `?entity ${formattedPropertyId} ${objectId}
+        FILTER REGEX(${objectId}, ${formattedConditionValue}, "i").`;
+    } else {
+      Exception.badRequest("Unsupported match qualifier");
+    }
+    return "";
+  }
+
+  private _resolveRequired(triple: string , required: boolean) {
+    return required ? triple : `OPTIONAL { ${triple} }`;
   }
 }

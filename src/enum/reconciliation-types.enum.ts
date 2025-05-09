@@ -24,7 +24,7 @@ export enum MatchQuantifierEnum {
 }
 
 export enum MatchQualifierEnum {
-  WILDCARD_MATCH = "WildcardMatch",
+  REGEX_MATCH = "RegexMatch",
   EXACT_MATCH ="ExactMatch"
 
 }
