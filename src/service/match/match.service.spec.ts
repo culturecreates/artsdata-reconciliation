@@ -1,7 +1,7 @@
 import { Test , TestingModule } from "@nestjs/testing";
 import { ArtsdataService , HttpService , ManifestService , MatchService } from "../../service";
 import { ManifestController , MatchController } from "../../controller";
-import { LanguageTagEnum } from "../../enum";
+import { LanguageTagEnum , MatchQualifierEnum } from "../../enum";
 
 describe("Recon Service tests" , () => {
   let reconService: MatchService;
@@ -431,7 +431,7 @@ describe("Recon Service tests" , () => {
         queries: [
           {
             "type": "schema:Place" ,
-            "limit":1,
+            "limit": 1 ,
             "conditions": [
               {
                 "matchType": "name" ,
@@ -454,7 +454,7 @@ describe("Recon Service tests" , () => {
         queries: [
           {
             "type": "schema:Place" ,
-            "limit":1,
+            "limit": 1 ,
             "conditions": [
               {
                 "matchType": "name" ,
@@ -471,6 +471,52 @@ describe("Recon Service tests" , () => {
         expectedId: "K11-19" ,
         expectedName: "Roy Thomson Hall" ,
         expectedCount: 1
+      } , {
+        description: "Reconcile Place with required param as TRUE and matchQualifier as RegexMatch" ,
+        queries: [
+          {
+            "type": "schema:Place" ,
+            "limit": 1 ,
+            "conditions": [
+              {
+                "matchType": "name" ,
+                "v": "Roy Thomson"
+              } ,
+              {
+                "matchType": "property" ,
+                "v": "https://www.roythomson.*" ,
+                "pid": "schema:url" ,
+                "required": true ,
+                "matchQualifier":  MatchQualifierEnum.REGEX_MATCH
+              }
+            ]
+          }
+        ] ,
+        expectedId: "K11-19" ,
+        expectedName: "Roy Thomson Hall" ,
+        expectedCount: 1
+      },{
+        description: "Reconcile Place with required param as TRUE and matchQualifier as RegexMatch" ,
+        queries: [
+          {
+            "type": "schema:Place" ,
+            "limit": 1 ,
+            "conditions": [
+              {
+                "matchType": "name" ,
+                "v": "Roy Thomson"
+              } ,
+              {
+                "matchType": "property" ,
+                "v": "https://www.roythomson.*" ,
+                "pid": "schema:url" ,
+                "required": true ,
+                "matchQualifier": MatchQualifierEnum.EXACT_MATCH
+              }
+            ]
+          }
+        ] ,
+        expectedCount: 0
       }
     ];
 
