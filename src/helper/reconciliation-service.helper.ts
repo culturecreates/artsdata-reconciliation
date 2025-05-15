@@ -1,11 +1,12 @@
-import { LanguageTagEnum } from "../enum";
+import { MatchRequestLanguageEnum } from "../enum";
 import { GRAPHDB_INDEX } from "../config";
-import { MultilingualValues , ResultCandidates } from "../dto";
+import { ResultCandidates } from "../dto";
 import { isURL } from "validator";
 
 export class ReconciliationServiceHelper {
 
-  static formatReconciliationResponse(sparqlResponse: any , query?: string) {
+  static formatReconciliationResponse(responseLanguage: MatchRequestLanguageEnum , sparqlResponse: any , query?: string)
+    : ResultCandidates[] {
     const bindings = sparqlResponse?.results?.bindings;
     const candidates: ResultCandidates[] = [];
 
@@ -20,43 +21,24 @@ export class ReconciliationServiceHelper {
       for (const currentId of uniqueIds) {
         const currentBindings = bindings.filter((binding: any) => binding["entity"].value === currentId);
 
-        const nameValues: MultilingualValues[] = [];
-        const descriptionValues: MultilingualValues[] = [];
-
         const resultCandidate = new ResultCandidates();
         const currentBinding = currentBindings.find((binding: any) => binding["entity"].value === currentId);
         const uri = currentBinding["entity"].value;
         resultCandidate.id = uri?.split("http://kg.artsdata.ca/resource/").pop();
 
-        //NAME
-        const name = currentBinding["name"]?.value;
-        const nameEn = currentBinding["nameEn"]?.value;
-        const nameFr = currentBinding["nameFr"]?.value;
-        if (nameEn) {
-          nameValues.push({ str: nameEn , lang: LanguageTagEnum.ENGLISH });
+        switch (responseLanguage) {
+          case MatchRequestLanguageEnum.ENGLISH:
+            resultCandidate.name = currentBinding["nameEn"]?.value;
+            resultCandidate.description = currentBinding["descriptionEn"]?.value;
+            break;
+          case MatchRequestLanguageEnum.FRENCH:
+            resultCandidate.name = currentBinding["nameFr"]?.value;
+            resultCandidate.description = currentBinding["descriptionFr"]?.value;
+            break;
+          default:
+            resultCandidate.name = currentBinding["name"]?.value;
+            resultCandidate.description = currentBinding["description"]?.value;
         }
-        if (nameFr) {
-          nameValues.push({ str: nameFr , lang: LanguageTagEnum.FRENCH });
-        }
-        if (name && !nameEn || !nameFr) {
-          nameValues.push({ str: name });
-        }
-        resultCandidate.name = { values: nameValues };
-
-        //DESCRIPTION
-        const description = currentBinding["description"]?.value;
-        const descriptionEn = currentBinding["descriptionEn"]?.value;
-        const descriptionFr = currentBinding["descriptionFr"]?.value;
-        if (descriptionEn) {
-          descriptionValues.push({ str: descriptionEn , lang: LanguageTagEnum.ENGLISH });
-        }
-        if (descriptionFr) {
-          descriptionValues.push({ str: descriptionFr , lang: LanguageTagEnum.FRENCH });
-        }
-        if (description && !descriptionEn && !descriptionFr) {
-          descriptionValues.push({ str: description });
-        }
-        resultCandidate.description = { values: descriptionValues };
 
         //SCORE
         const score = currentBinding["score"]?.value;

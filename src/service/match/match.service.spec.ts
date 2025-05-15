@@ -1,7 +1,7 @@
 import { Test , TestingModule } from "@nestjs/testing";
 import { ArtsdataService , HttpService , ManifestService , MatchService } from "../../service";
 import { ManifestController , MatchController } from "../../controller";
-import { LanguageTagEnum , MatchQualifierEnum , MatchQuantifierEnum } from "../../enum";
+import { MatchQualifierEnum , MatchQuantifierEnum , MatchRequestLanguageEnum } from "../../enum";
 
 describe("Recon Service tests" , () => {
   let reconService: MatchService;
@@ -541,7 +541,7 @@ describe("Recon Service tests" , () => {
         expectedId: "K11-239" ,
         expectedCount: 1 ,
         expectedName: "Roy Barnett Recital Hall"
-      }, {
+      } , {
         description: "Reconcile Place with required param as TRUE and matchQuantifier as ANY" ,
         queries: [
           {
@@ -571,13 +571,14 @@ describe("Recon Service tests" , () => {
     for (const test of testCases) {
       it(test.description , async () => {
         const result = await reconService
-          .reconcileByQueries({ queries: test.queries });
+          .reconcileByQueries(MatchRequestLanguageEnum.ENGLISH , { queries: test.queries });
         let title = result.results?.[0]?.candidates?.[0]?.name;
         const id = result.results?.[0]?.candidates?.[0]?.id;
-        title = title instanceof String ? title : (title as any)?.values.find((value: {
-          lang: string;
-          str: string
-        }) => value.lang === LanguageTagEnum.ENGLISH || value.lang === LanguageTagEnum.FRENCH || value.lang === undefined).str;
+        // const name = result.results?.[0]?.candidates?.[0]?.name;
+        // title = title instanceof String ? title : (title as any)?.values.find((value: {
+        //   lang: string;
+        //   str: string
+        // }) => value.lang === LanguageTagEnum.ENGLISH || value.lang === LanguageTagEnum.FRENCH || value.lang === undefined).str;
         //TODO the ado:EventType query is not returning schema:name instead it is returning skos:prefLabel
         if (title)
           expect(title).toBe(test.expectedName);

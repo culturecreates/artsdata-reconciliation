@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
 import { ManifestService } from "../manifest";
-
 import { Exception , ReconciliationServiceHelper } from "../../helper";
 import { ArtsdataProperties , QUERIES } from "../../constant";
 import {
@@ -11,7 +10,7 @@ import {
   ReconciliationResults ,
   ResultCandidates
 } from "../../dto";
-import { MatchQualifierEnum , MatchQuantifierEnum , MatchTypeEnum } from "../../enum";
+import { MatchQualifierEnum , MatchQuantifierEnum , MatchRequestLanguageEnum , MatchTypeEnum } from "../../enum";
 
 
 @Injectable()
@@ -24,10 +23,12 @@ export class MatchService {
   /**
    * @name reconcileByRawQueries
    * @description Reconcile by raw queries
+   * @param acceptLanguage
    * @param rawQueries
+   * @param response
    * @returns {Promise<any>}
    */
-  async reconcileByRawQueries(rawQueries: string): Promise<any> {
+  async reconcileByRawQueries(acceptLanguage: MatchRequestLanguageEnum , rawQueries: string): Promise<any> {
     if (!rawQueries) {
       return this._manifestService.getServiceManifest();
     }
@@ -37,7 +38,7 @@ export class MatchService {
     } catch (e) {
       return Exception.badRequest("The request is not a valid JSON object.");
     }
-    return await this.reconcileByQueries(queries);
+    return await this.reconcileByQueries(acceptLanguage , queries);
   }
 
   /**
@@ -161,10 +162,10 @@ export class MatchService {
   /**
    * @name reconcileByQueries
    * @description Reconcile by queries
+   * @param requestLanguage
    * @param reconciliationRequest
    */
-  async reconcileByQueries(reconciliationRequest: ReconciliationRequest): Promise<ReconciliationResponse> {
-
+  async reconcileByQueries(requestLanguage: MatchRequestLanguageEnum , reconciliationRequest: ReconciliationRequest): Promise<ReconciliationResponse> {
     const { queries } = reconciliationRequest;
     const results: ReconciliationResults[] = [];
     for (const reconciliationQuery of queries) {
@@ -172,10 +173,11 @@ export class MatchService {
       const { name , propertyConditions } = this._resolveConditions(conditions);
       const sparqlQuery = this._generateSparqlQuery(name , type , limit , propertyConditions);
       const candidates: ResultCandidates[] =
-        await this._artsdataService.getReconciliationResult(sparqlQuery , name as string);
+        await this._artsdataService.getReconciliationResult(requestLanguage , sparqlQuery , name as string);
       results.push({ candidates });
     }
     return { results };
+
   }
 
   /**
