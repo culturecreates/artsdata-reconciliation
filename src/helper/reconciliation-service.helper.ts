@@ -26,18 +26,28 @@ export class ReconciliationServiceHelper {
         const uri = currentBinding["entity"].value;
         resultCandidate.id = uri?.split("http://kg.artsdata.ca/resource/").pop();
 
+        //NAME
+        const name = currentBinding["name"]?.value;
+        const nameEn = currentBinding["nameEn"]?.value;
+        const nameFr = currentBinding["nameFr"]?.value;
+
+        //DESCRIPTION
+        const description = currentBinding["description"]?.value;
+        const descriptionEn = currentBinding["descriptionEn"]?.value;
+        const descriptionFr = currentBinding["descriptionFr"]?.value;
+
         switch (responseLanguage) {
           case MatchRequestLanguageEnum.ENGLISH:
-            resultCandidate.name = currentBinding["nameEn"]?.value;
-            resultCandidate.description = currentBinding["descriptionEn"]?.value;
+            resultCandidate.name = nameEn || name || nameFr;
+            resultCandidate.description = descriptionEn || description || descriptionFr;
             break;
           case MatchRequestLanguageEnum.FRENCH:
-            resultCandidate.name = currentBinding["nameFr"]?.value;
-            resultCandidate.description = currentBinding["descriptionFr"]?.value;
+            resultCandidate.name = nameFr || name || nameEn;
+            resultCandidate.description = descriptionFr || description || descriptionEn;
             break;
           default:
-            resultCandidate.name = currentBinding["name"]?.value;
-            resultCandidate.description = currentBinding["description"]?.value;
+            resultCandidate.name = nameEn || name || nameFr;
+            resultCandidate.description = descriptionEn || description || descriptionFr;
         }
 
         //SCORE
