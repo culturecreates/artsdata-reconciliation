@@ -1,11 +1,11 @@
-import { MatchRequestLanguageEnum } from "../enum";
+import { LanguageEnum } from "../enum";
 import { GRAPHDB_INDEX } from "../config";
 import { ResultCandidates } from "../dto";
 import { isURL } from "validator";
 
 export class ReconciliationServiceHelper {
 
-  static formatReconciliationResponse(responseLanguage: MatchRequestLanguageEnum , sparqlResponse: any , query?: string)
+  static formatReconciliationResponse(responseLanguage: LanguageEnum , sparqlResponse: any , query?: string)
     : ResultCandidates[] {
     const bindings = sparqlResponse?.results?.bindings;
     const candidates: ResultCandidates[] = [];
@@ -37,11 +37,11 @@ export class ReconciliationServiceHelper {
         const descriptionFr = currentBinding["descriptionFr"]?.value;
 
         switch (responseLanguage) {
-          case MatchRequestLanguageEnum.ENGLISH:
+          case LanguageEnum.ENGLISH:
             resultCandidate.name = nameEn || name || nameFr;
             resultCandidate.description = descriptionEn || description || descriptionFr;
             break;
-          case MatchRequestLanguageEnum.FRENCH:
+          case LanguageEnum.FRENCH:
             resultCandidate.name = nameFr || name || nameEn;
             resultCandidate.description = descriptionFr || description || descriptionEn;
             break;

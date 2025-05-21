@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ARTSDATA } from "../../config";
 import { HttpService } from "../http";
 import { ReconciliationServiceHelper } from "../../helper";
-import { MatchRequestLanguageEnum } from "../../enum";
+import { LanguageEnum } from "../../enum";
 import { QUERIES } from "../../constant";
 import { ResultCandidates } from "../../dto";
 
@@ -12,20 +12,29 @@ export class ArtsdataService {
   constructor(private readonly httpService: HttpService) {
   }
 
+  /**
+   * @name _getArtsdataEndPoint
+   * @description Get the Artsdata endpoint
+   * @returns {string}
+   */
   private _getArtsdataEndPoint(): string {
     const route = "repositories/" + ARTSDATA.REPOSITORY;
     const sparqlEndpoint = new URL(route , ARTSDATA.ENDPOINT);
     return sparqlEndpoint.toString();
   }
 
-  async getReconciliationResult(responseLanguage: MatchRequestLanguageEnum , sparqlQuery: string , name: string) {
-
+  /**
+   * @name executeSparqlQuery
+   * @description Get raw result for sparql query from Artsdata
+   * @param sparqlQuery
+   */
+  async executeSparqlQuery(sparqlQuery: string): Promise<any> {
     const sparqlEndpoint: string = this._getArtsdataEndPoint();
-    const response = await this.httpService.postRequest(sparqlEndpoint , sparqlQuery);
-    return ReconciliationServiceHelper.formatReconciliationResponse(responseLanguage , response , name);
+    const queryParam = "query=" + encodeURIComponent(sparqlQuery) + "&infer=false";
+    return await this.httpService.postRequest(sparqlEndpoint , queryParam);
   }
 
-  async getReconcileResultById(responseLanguage: MatchRequestLanguageEnum , id: string): Promise<ResultCandidates[]> {
+  async getReconcileResultById(responseLanguage: LanguageEnum , id: string): Promise<ResultCandidates[]> {
     const uri = id.startsWith("http://kg.artsdata.ca/resource/") ? `<id>` : `<http://kg.artsdata.ca/resource/${id}>`;
     const rawSparqlQuery = QUERIES.RECONCILIATION_QUERY_BY_URI
       .replace("URI_PLACEHOLDER" , uri);

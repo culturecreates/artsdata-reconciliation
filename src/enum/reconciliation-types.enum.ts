@@ -5,7 +5,7 @@ export enum ReconciliationTypesEnum {
   ORGANIZATION = "schema:Organization"
 }
 
-export enum MatchRequestLanguageEnum {
+export enum LanguageEnum {
   ENGLISH = "en" ,
   FRENCH = "fr"
 }

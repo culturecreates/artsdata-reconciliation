@@ -1,7 +1,7 @@
 import { Test , TestingModule } from "@nestjs/testing";
 import { ArtsdataService , HttpService , ManifestService , MatchService } from "../../service";
 import { ManifestController , MatchController } from "../../controller";
-import { MatchQualifierEnum , MatchQuantifierEnum , MatchRequestLanguageEnum } from "../../enum";
+import { LanguageEnum , MatchQualifierEnum , MatchQuantifierEnum } from "../../enum";
 
 describe("Recon Service tests" , () => {
   let reconService: MatchService;
@@ -571,7 +571,7 @@ describe("Recon Service tests" , () => {
     for (const test of testCases) {
       it(test.description , async () => {
         const result = await reconService
-          .reconcileByQueries(MatchRequestLanguageEnum.ENGLISH , { queries: test.queries });
+          .reconcileByQueries(LanguageEnum.ENGLISH , { queries: test.queries });
         let title = result.results?.[0]?.candidates?.[0]?.name;
         const id = result.results?.[0]?.candidates?.[0]?.id;
         // const name = result.results?.[0]?.candidates?.[0]?.name;

@@ -3,14 +3,8 @@ import { ArtsdataService } from "../artsdata";
 import { ManifestService } from "../manifest";
 import { Exception , ReconciliationServiceHelper } from "../../helper";
 import { ArtsdataProperties , QUERIES } from "../../constant";
-import {
-  QueryCondition ,
-  ReconciliationRequest ,
-  ReconciliationResponse ,
-  ReconciliationResults ,
-  ResultCandidates
-} from "../../dto";
-import { MatchQualifierEnum , MatchQuantifierEnum , MatchRequestLanguageEnum , MatchTypeEnum } from "../../enum";
+import { QueryCondition , ReconciliationRequest , ReconciliationResponse , ReconciliationResults } from "../../dto";
+import { LanguageEnum , MatchQualifierEnum , MatchQuantifierEnum , MatchTypeEnum } from "../../enum";
 
 
 @Injectable()
@@ -25,10 +19,9 @@ export class MatchService {
    * @description Reconcile by raw queries
    * @param acceptLanguage
    * @param rawQueries
-   * @param response
    * @returns {Promise<any>}
    */
-  async reconcileByRawQueries(acceptLanguage: MatchRequestLanguageEnum , rawQueries: string): Promise<any> {
+  async reconcileByRawQueries(acceptLanguage: LanguageEnum , rawQueries: string): Promise<any> {
     if (!rawQueries) {
       return this._manifestService.getServiceManifest();
     }
@@ -165,15 +158,16 @@ export class MatchService {
    * @param requestLanguage
    * @param reconciliationRequest
    */
-  async reconcileByQueries(requestLanguage: MatchRequestLanguageEnum , reconciliationRequest: ReconciliationRequest): Promise<ReconciliationResponse> {
+  async reconcileByQueries(requestLanguage: LanguageEnum , reconciliationRequest: ReconciliationRequest): Promise<ReconciliationResponse> {
     const { queries } = reconciliationRequest;
     const results: ReconciliationResults[] = [];
     for (const reconciliationQuery of queries) {
       const { type , limit , conditions } = reconciliationQuery;
       const { name , propertyConditions } = this._resolveConditions(conditions);
       const sparqlQuery = this._generateSparqlQuery(name , type , limit , propertyConditions);
-      const candidates: ResultCandidates[] =
-        await this._artsdataService.getReconciliationResult(requestLanguage , sparqlQuery , name as string);
+      const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
+      const candidates = ReconciliationServiceHelper
+        .formatReconciliationResponse(requestLanguage , response , name);
       results.push({ candidates });
     }
     return { results };
@@ -240,13 +234,20 @@ export class MatchService {
     return "";
   }
 
+  /**
+   * @private
+   * @name _generateSparqlQuery
+   * @description Generate SPARQL query
+   * @param name
+   * @param type
+   * @param limit
+   * @param propertyConditions
+   */
   private _generateSparqlQuery(name: string | undefined , type: string , limit: number | undefined ,
-                               propertyConditions: QueryCondition[]) {
+                               propertyConditions: QueryCondition[]): string {
 
     const isQueryByURI = !!name && ReconciliationServiceHelper.isQueryByURI(name);
     const rawSparqlQuery: string = this._getSparqlQuery(name , isQueryByURI , type , limit);
-    const rawSparqlQueryWithPropertyFilters =
-      this._resolvePropertyConditions(rawSparqlQuery , propertyConditions);
-    return "query=" + encodeURIComponent(rawSparqlQueryWithPropertyFilters) + "&infer=false";
+    return this._resolvePropertyConditions(rawSparqlQuery , propertyConditions);
   }
 }

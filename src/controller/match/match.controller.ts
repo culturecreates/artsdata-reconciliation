@@ -2,7 +2,7 @@ import { Body , Controller , Get , Headers , Post , Query , Res } from "@nestjs/
 import { ApiHeader , ApiOperation , ApiQuery , ApiResponse , ApiTags } from "@nestjs/swagger";
 import { MatchService } from "../../service";
 import { ReconciliationRequest , ReconciliationResponse } from "../../dto";
-import { MatchRequestLanguageEnum } from "../../enum";
+import { LanguageEnum } from "../../enum";
 import { Response } from "express";
 
 @Controller()
@@ -42,10 +42,10 @@ export class MatchController {
     example: "en" // Optional: Example value
   })
   // @ApiProduces("application/reconciliation.v1+json")
-  async reconcileByQuery(@Headers("accept-language") acceptLanguage: MatchRequestLanguageEnum ,
+  async reconcileByQuery(@Headers("accept-language") acceptLanguage: LanguageEnum ,
                          @Query("queries") rawQueries: string ,
                          @Res({ passthrough: true }) response: Response): Promise<ReconciliationResponse[]> {
-    acceptLanguage = acceptLanguage || MatchRequestLanguageEnum.ENGLISH;
+    acceptLanguage = acceptLanguage || LanguageEnum.ENGLISH;
     response.setHeader("Content-Language" , acceptLanguage);
     return await this._matchService.reconcileByRawQueries(acceptLanguage , rawQueries);
   }
@@ -69,10 +69,10 @@ export class MatchController {
     example: "en" // Optional: Example value
   })
   // @ApiProduces("application/reconciliation.v1+json")
-  async reconcileByQueries(@Headers("accept-language") acceptLanguage: MatchRequestLanguageEnum ,
+  async reconcileByQueries(@Headers("accept-language") acceptLanguage: LanguageEnum ,
                            @Body() reconciliationRequest: ReconciliationRequest ,
                            @Res({ passthrough: true }) response: Response) {
-    acceptLanguage = acceptLanguage || MatchRequestLanguageEnum.ENGLISH;
+    acceptLanguage = acceptLanguage || LanguageEnum.ENGLISH;
     response.setHeader("Content-Language" , acceptLanguage);
     return await this._matchService.reconcileByQueries(acceptLanguage , reconciliationRequest);
   }

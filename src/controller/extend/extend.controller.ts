@@ -1,8 +1,8 @@
-import { Controller , Get , Query } from "@nestjs/common";
+import { Body , Controller , Get , Post , Query } from "@nestjs/common";
 import { ApiOperation , ApiQuery , ApiResponse , ApiTags } from "@nestjs/swagger";
 import { EntityClassEnum } from "../../enum/entity-class.enum";
 import { ExtendService } from "../../service/extend";
-import { ProposedExtendProperty } from "../../dto/extend";
+import { DataExtensionQueryDTO , DataExtensionResponseDTO , ProposedExtendProperty } from "../../dto/extend";
 
 @Controller("/extend")
 
@@ -28,6 +28,16 @@ export class ExtendController {
   })
   getProposedProperties(@Query("type") type: EntityClassEnum): ProposedExtendProperty {
     return this._extendService.getProposedProperties(type);
+  }
+
+  @Post()
+  @ApiOperation({ summary: "Get Data extension result" })
+  @ApiResponse({
+    status: 200 , type: DataExtensionResponseDTO , isArray: true ,
+    description: "Reconciliation candidates for each query"
+  })
+  async getDataExtension(@Body() dataExtensionQuery: DataExtensionQueryDTO): Promise<DataExtensionResponseDTO> {
+    return await this._extendService.getDataExtension(dataExtensionQuery);
   }
 
 }
