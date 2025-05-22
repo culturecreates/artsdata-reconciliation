@@ -64,8 +64,9 @@
       }
     ],
     "propose_properties": {
-      "service_path": "/propose",
-      "service_url": "https://staging.recon.artsdata.ca/"
+      "service_url": "https://staging.recon.artsdata.ca",
+      "service_path": "/extend/propose"
+
     }
   },
   "view": {
