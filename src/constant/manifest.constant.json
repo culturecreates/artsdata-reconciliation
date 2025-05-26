@@ -74,7 +74,7 @@
   },
   "preview": {
     "height": 200,
-    "width": 350,
-    "url": "http://api.artsdata.ca/resource/{{id}}"
+    "width": 400,
+    "url": "http://localhost:3000/preview?id={{id}}"
   }
 }
