@@ -41,7 +41,7 @@ export class PreviewService {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clay and Friends Profile</title>
+    <title>${name}</title>
     <style>
         body {
             margin: 0;
