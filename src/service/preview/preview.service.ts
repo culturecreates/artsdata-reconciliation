@@ -102,9 +102,10 @@ export class PreviewService {
 <body>
 
 <div class="container">
-    <div class="image-wrapper">
-        <img src=${image} alt="${name}">
-    </div>
+   <div class="image-wrapper">
+    ${image ? `<img src=${image} alt="${name}">` : "" }
+    </div> 
+    
     <div class="details-wrapper">
         <a href="${uri}" target="_blank">${name}</a> <span class="id-code">(${entityId})</span>
         <p>${typeLabels || ""}</p>
