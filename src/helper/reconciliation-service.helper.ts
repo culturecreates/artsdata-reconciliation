@@ -30,6 +30,7 @@ export class ReconciliationServiceHelper {
         const name = currentBinding["name"]?.value;
         const nameEn = currentBinding["nameEn"]?.value;
         const nameFr = currentBinding["nameFr"]?.value;
+        const allNamesInLowerCase = [name, nameEn, nameFr].map(name=> name?.toLowerCase()).filter(name => !!name);
 
         //DESCRIPTION
         const description = currentBinding["description"]?.value;
@@ -56,7 +57,7 @@ export class ReconciliationServiceHelper {
 
         //TODO match is incorrect when query contains accented characters
         if (query) {
-          resultCandidate.match = currentBinding["name"]?.value.toLowerCase() === query.toLowerCase();
+          resultCandidate.match = allNamesInLowerCase.includes( query.toLowerCase());
         }
 
         resultCandidate.type = currentBindings.map((binding: any) => ({
