@@ -75,6 +75,6 @@
   "preview": {
     "height": 200,
     "width": 400,
-    "url": "http://localhost:3000/preview?id={{id}}"
+    "url": "https://staging.recon.artsdata.ca/preview?id={{id}}"
   }
 }
