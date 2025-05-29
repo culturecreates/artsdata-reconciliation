@@ -11,7 +11,7 @@ export class PreviewController {
   }
 
   @Get()
-  @ApiOperation({ summary: "Provide ¸" })
+  @ApiOperation({ summary: "Preview entity" })
   @ApiQuery({
     name: "id" ,
     type: String ,
