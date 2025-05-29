@@ -80,7 +80,6 @@ export class MatchService {
       .replace("INDEX_PLACE_HOLDER" , graphdbIndex)
       .replace("QUERY_PLACE_HOLDER" , queryReplacementString)
       .replace("QUERY_FILTER_PLACE_HOLDER" , queryFilterReplacementString)
-      .replace("TYPE_PLACE_HOLDER" , typePlaceholderReplace)
       .replace("URI_PLACEHOLDER" , `${name}`)
       .replace("LIMIT_PLACE_HOLDER" , `LIMIT ${limit}`);
   }
