@@ -9,6 +9,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ado: <http://kg.artsdata.ca/ontology/>
 PREFIX onto: <http://www.ontotext.com/>
 PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
 SELECT DISTINCT
    ?entity
@@ -61,6 +62,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ado: <http://kg.artsdata.ca/ontology/>
 PREFIX onto: <http://www.ontotext.com/>
 PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
 SELECT DISTINCT
    ?entity
