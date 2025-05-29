@@ -62,7 +62,7 @@ export class MatchService {
    * @param limit
    * @return {string}
    */
-  private _getSparqlQuery(name: string | undefined , isQueryByURI: boolean , type: string , limit: number | undefined): string {
+  private _getSparqlQuery(name: string | undefined , isQueryByURI: boolean , type: string , limit: number): string {
     const graphdbIndex: string = ReconciliationServiceHelper.getGraphdbIndex(type);
 
     const rawQuery = isQueryByURI ? QUERIES.RECONCILIATION_QUERY_BY_URI : QUERIES.RECONCILIATION_QUERY;
@@ -82,7 +82,7 @@ export class MatchService {
       .replace("QUERY_FILTER_PLACE_HOLDER" , queryFilterReplacementString)
       .replace("TYPE_PLACE_HOLDER" , typePlaceholderReplace)
       .replace("URI_PLACEHOLDER" , `${name}`)
-      .replace("LIMIT_PLACE_HOLDER" , limit ? `LIMIT ${limit}` : "");
+      .replace("LIMIT_PLACE_HOLDER" , `LIMIT ${limit}`);
   }
 
   /**
@@ -164,7 +164,7 @@ export class MatchService {
     for (const reconciliationQuery of queries) {
       const { type , limit , conditions } = reconciliationQuery;
       const { name , propertyConditions } = this._resolveConditions(conditions);
-      const sparqlQuery = this._generateSparqlQuery(name , type , limit , propertyConditions);
+      const sparqlQuery = this._generateSparqlQuery(name , type , limit || 25 , propertyConditions);
       const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
       const candidates = ReconciliationServiceHelper
         .formatReconciliationResponse(requestLanguage , response , name);
@@ -243,7 +243,7 @@ export class MatchService {
    * @param limit
    * @param propertyConditions
    */
-  private _generateSparqlQuery(name: string | undefined , type: string , limit: number | undefined ,
+  private _generateSparqlQuery(name: string | undefined , type: string , limit: number ,
                                propertyConditions: QueryCondition[]): string {
 
     const isQueryByURI = !!name && ReconciliationServiceHelper.isQueryByURI(name);
