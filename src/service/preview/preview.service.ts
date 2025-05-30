@@ -50,7 +50,7 @@ export class PreviewService {
   private _generateErrorPage(uri: string , entityId: string) {
     const body = `<div class="container">
         <div class="details-wrapper">
-        <h1 align="center">Preview Unavailable</h1>
+        <h3 align="center">Preview Unavailable</h3>
         <p align="center">The entity <a href="${uri}" >${entityId}</a> is not in the Artsdata database</p>
     </div>
     </div>`
