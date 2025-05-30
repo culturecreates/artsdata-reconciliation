@@ -18,17 +18,14 @@ export const PREVIEW_HTML = `
             overflow: hidden;
             font-size: 0.9em;
             display: flex;
-            align-items: center;
             border: 1px solid #ddd;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-            padding: 10px;
             box-sizing: border-box;
         }
         .image-wrapper {
-            width: 100px;
             text-align: center;
             overflow: hidden;
-            margin-right: 15px;
+            margin-right: 5px;
             flex-shrink: 0;
         }
         .image-wrapper img {
