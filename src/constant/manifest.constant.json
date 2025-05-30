@@ -73,7 +73,7 @@
     "url": "http://kg.artsdata.ca/resource/{{id}}"
   },
   "preview": {
-    "height": 200,
+    "height": 100,
     "width": 400,
     "url": "https://staging.recon.artsdata.ca/preview?id={{id}}"
   }

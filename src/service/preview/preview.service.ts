@@ -36,9 +36,7 @@ export class PreviewService {
 
   private _generateHtmlContent(uri: string , entityId:string, name: any , description: any , typeLabels: any , image: any) {
     const body = `<div class="container">
-   <div class="image-wrapper">
-    ${image ? `<img src=${image} alt="${name}">` : "" }
-    </div> 
+      ${image? `<div class="image-wrapper"> <img src=${image} alt="${name}"> </div> `:""} 
     
     <div class="details-wrapper">
         <a href="${uri}" target="_blank">${name}</a> <span class="id-code">(${entityId})</span>
