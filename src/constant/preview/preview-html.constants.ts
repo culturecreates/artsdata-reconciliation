@@ -13,7 +13,7 @@ export const PREVIEW_HTML = `
             line-height: 1.6;
         }
         .container {
-            height: 200px;
+            height: 100px;
             width: 400px;
             overflow: hidden;
             font-size: 0.9em;
