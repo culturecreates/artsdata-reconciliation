@@ -1,6 +1,6 @@
 export const PREVIEW_QUERY = `
  PREFIX schema: <http://schema.org/>
- SELECT ?name (GROUP_CONCAT(?type_label; SEPARATOR=", ") AS ?type_labels) ?description ?image WHERE {   
+ SELECT ?name (GROUP_CONCAT(?type_label; SEPARATOR=", ") AS ?typeLabels) ?description ?image WHERE {   
  
  VALUES (?entity) { (<URI_PLACE_HOLDER>) } 
   
