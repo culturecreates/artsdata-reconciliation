@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ARTSDATA } from "../../config";
 import { HttpService } from "../http";
-import { ReconciliationServiceHelper } from "../../helper";
+import { MatchServiceHelper } from "../../helper";
 import { LanguageEnum } from "../../enum";
 import { QUERIES } from "../../constant";
 import { ResultCandidates } from "../../dto";
@@ -41,6 +41,6 @@ export class ArtsdataService {
     const sparqlQuery: string = "query=" + encodeURIComponent(rawSparqlQuery) + "&infer=false";
     const sparqlEndpoint: string = this._getArtsdataEndPoint();
     const response = await this.httpService.postRequest(sparqlEndpoint , sparqlQuery);
-    return ReconciliationServiceHelper.formatReconciliationResponse(responseLanguage , response);
+    return MatchServiceHelper.formatReconciliationResponse(responseLanguage , response);
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
 import { ManifestService } from "../manifest";
-import { Exception , ReconciliationServiceHelper } from "../../helper";
+import { Exception , MatchServiceHelper } from "../../helper";
 import { ArtsdataProperties , QUERIES } from "../../constant";
 import { QueryCondition , ReconciliationRequest , ReconciliationResponse , ReconciliationResults } from "../../dto";
 import { LanguageEnum , MatchQualifierEnum , MatchQuantifierEnum , MatchTypeEnum } from "../../enum";
@@ -63,7 +63,7 @@ export class MatchService {
    * @return {string}
    */
   private _getSparqlQuery(name: string | undefined , isQueryByURI: boolean , type: string , limit: number): string {
-    const graphdbIndex: string = ReconciliationServiceHelper.getGraphdbIndex(type);
+    const graphdbIndex: string = MatchServiceHelper.getGraphdbIndex(type);
 
     const rawQuery = isQueryByURI ? QUERIES.RECONCILIATION_QUERY_BY_URI : QUERIES.RECONCILIATION_QUERY;
     if (name) {
@@ -99,7 +99,8 @@ export class MatchService {
       .find(condition => condition.matchType == MatchTypeEnum.NAME)?.v;
     const propertyConditions = conditions
       .filter(condition => condition.matchType == MatchTypeEnum.PROPERTY);
-    return { name , propertyConditions };
+    const nameEscapedSpecialChars = name ? MatchServiceHelper.prependDoubleSlashToSpecialChars(name) : undefined;
+    return { name: nameEscapedSpecialChars , propertyConditions };
   }
 
   /**
@@ -125,7 +126,7 @@ export class MatchService {
       case ArtsdataProperties.EVENT_STATUS:
       case ArtsdataProperties.IN_LANGUAGE:
       case ArtsdataProperties.SUB_EVENT:
-        return ReconciliationServiceHelper.isValidURI(value) ? `<${value}>` : `"${value}"`;
+        return MatchServiceHelper.isValidURI(value) ? `<${value}>` : `"${value}"`;
       default:
         return `"${value}"`;
     }
@@ -141,7 +142,7 @@ export class MatchService {
   private _generateTripleFromCondition(condition: QueryCondition , index: number): string {
     const { required , pid , v: rawConditionValue , matchQualifier , matchQuantifier } = condition;
     const formattedConditionValue = this._resolvePropertyValue(rawConditionValue , pid as string);
-    const formattedPropertyId = ReconciliationServiceHelper.isValidURI(pid as string) ? `<${pid}>` : `${pid}`;
+    const formattedPropertyId = MatchServiceHelper.isValidURI(pid as string) ? `<${pid}>` : `${pid}`;
 
     let triple = this._resolveMatchQualifier(matchQualifier as MatchQualifierEnum , formattedPropertyId ,
       formattedConditionValue , index);
@@ -165,7 +166,7 @@ export class MatchService {
       const { name , propertyConditions } = this._resolveConditions(conditions);
       const sparqlQuery = this._generateSparqlQuery(name , type , limit || 25 , propertyConditions);
       const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
-      const candidates = ReconciliationServiceHelper
+      const candidates = MatchServiceHelper
         .formatReconciliationResponse(requestLanguage , response , name);
       results.push({ candidates });
     }
@@ -245,7 +246,7 @@ export class MatchService {
   private _generateSparqlQuery(name: string | undefined , type: string , limit: number ,
                                propertyConditions: QueryCondition[]): string {
 
-    const isQueryByURI = !!name && ReconciliationServiceHelper.isQueryByURI(name);
+    const isQueryByURI = !!name && MatchServiceHelper.isQueryByURI(name);
     const rawSparqlQuery: string = this._getSparqlQuery(name , isQueryByURI , type , limit);
     return this._resolvePropertyConditions(rawSparqlQuery , propertyConditions);
   }

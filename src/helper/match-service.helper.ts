@@ -3,7 +3,18 @@ import { GRAPHDB_INDEX } from "../config";
 import { ResultCandidates } from "../dto";
 import { isURL } from "validator";
 
-export class ReconciliationServiceHelper {
+export class MatchServiceHelper {
+
+  static prependDoubleSlashToSpecialChars(inputString: string) {
+    const luceneSpecialChars = ["+" , "-" , "!" , "(" , ")" , "{" , "}" , "[" , "]" , "^" , "\"" , "~" , "*" , "?" , ":" , "\\" , "/"];
+    return Array.from(inputString)
+      .map(char =>
+        luceneSpecialChars.includes(char)
+          ? (char === "\\" ? `\\${char}` : `\\\\${char}`)
+          : char
+      )
+      .join("");
+  }
 
   static formatReconciliationResponse(responseLanguage: LanguageEnum , sparqlResponse: any , query?: string)
     : ResultCandidates[] {
@@ -30,7 +41,7 @@ export class ReconciliationServiceHelper {
         const name = currentBinding["name"]?.value;
         const nameEn = currentBinding["nameEn"]?.value;
         const nameFr = currentBinding["nameFr"]?.value;
-        const allNamesInLowerCase = [name, nameEn, nameFr].map(name=> name?.toLowerCase()).filter(name => !!name);
+        const allNamesInLowerCase = [name , nameEn , nameFr].map(name => name?.toLowerCase()).filter(name => !!name);
 
         //DESCRIPTION
         const description = currentBinding["description"]?.value;
@@ -57,7 +68,7 @@ export class ReconciliationServiceHelper {
 
         //TODO match is incorrect when query contains accented characters
         if (query) {
-          resultCandidate.match = allNamesInLowerCase.includes( query.toLowerCase());
+          resultCandidate.match = allNamesInLowerCase.includes(query.toLowerCase());
         }
 
         resultCandidate.type = currentBindings.map((binding: any) => ({
