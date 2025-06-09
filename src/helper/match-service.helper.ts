@@ -111,7 +111,7 @@ export class MatchServiceHelper {
   static isQueryByURI(query: string) {
     const artsdataIdPattern = "^K[0-9]+-[0-9]+$";
     return !!(query?.match(artsdataIdPattern) ||
-      (this.isValidURI(query) && query.startsWith("http://kg.artsdata.ca/resource/K")));
+      (this.isValidURI(query) && query.startsWith("http://kg.artsdata.ca/resource/")));
 
   }
 }

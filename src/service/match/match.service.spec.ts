@@ -32,6 +32,7 @@ describe("Recon Service tests" , () => {
             ]
           }
         ] ,
+        expectedId: "K11-11" ,
         expectedName: "Place des Arts - Théâtre Maisonneuve" ,
         expectedCount: 1
       } , {

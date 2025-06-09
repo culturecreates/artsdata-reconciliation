@@ -30,7 +30,7 @@ WHERE
   luc:entities ?entity .
   PROPERTY_PLACE_HOLDER
    
-  FILTER (CONTAINS(STR(?entity),"kg.artsdata.ca/resource/K")) 
+  FILTER (CONTAINS(STR(?entity),"kg.artsdata.ca/resource/")) 
  
   ?entity luc:score ?score;
     

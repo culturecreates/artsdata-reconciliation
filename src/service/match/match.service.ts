@@ -70,8 +70,10 @@ export class MatchService {
       name = isQueryByURI ? (name?.startsWith("K") ?
           "<http://kg.artsdata.ca/resource/" + name + ">" :
           "<" + name + ">") :
-        "\"" + name + "\"";
+        "\"" + MatchServiceHelper.prependDoubleSlashToSpecialChars(name as string) + "\"";
     }
+
+
     const queryReplacementString: string = name ? `values ?query { ${name}  }` : "";
     const queryFilterReplacementString: string = name ? `      luc:query ?query ;` : "";
     const typePlaceholderReplace: string = type ? `values ?type { ${type} }` : "";
@@ -99,8 +101,7 @@ export class MatchService {
       .find(condition => condition.matchType == MatchTypeEnum.NAME)?.v;
     const propertyConditions = conditions
       .filter(condition => condition.matchType == MatchTypeEnum.PROPERTY);
-    const nameEscapedSpecialChars = name ? MatchServiceHelper.prependDoubleSlashToSpecialChars(name) : undefined;
-    return { name: nameEscapedSpecialChars , propertyConditions };
+    return { name , propertyConditions };
   }
 
   /**
