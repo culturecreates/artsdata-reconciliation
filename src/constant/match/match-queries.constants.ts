@@ -30,7 +30,7 @@ WHERE
   luc:entities ?entity .
   PROPERTY_PLACE_HOLDER
    
-  FILTER (CONTAINS(STR(?entity),"kg.artsdata.ca/resource/")) 
+  FILTER (CONTAINS(STR(?entity),"kg.artsdata.ca/resource/K")) 
  
   ?entity luc:score ?score;
     
@@ -79,12 +79,6 @@ WHERE
   OPTIONAL { ?entity schema:name | skos:prefLabel  ?name_en. FILTER( LANG(?name_en) = "en")}
   OPTIONAL { ?entity schema:name | skos:prefLabel  ?name_fr. FILTER( LANG(?name_fr) = "fr")}
   OPTIONAL { ?entity schema:name | skos:prefLabel  ?name_no. FILTER ( LANG(?name_no) = "")}
-  
- #TYPE
- ?entity a ?type_additional.
- OPTIONAL { ?type_additional rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "")}
- OPTIONAL { ?type_additional rdfs:label ?type_label_en filter(lang(?type_label_en) = "en")}
- BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?type_label)
 
  #DISAMBIGUATING DESCRIPTION
  OPTIONAL { ?entity schema:disambiguatingDescription ?description_en. FILTER( LANG(?description_en) = "en")}

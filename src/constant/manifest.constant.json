@@ -76,5 +76,10 @@
     "height": 100,
     "width": 400,
     "url": "https://staging.recon.artsdata.ca/preview?id={{id}}"
+  },
+  "suggest": {
+    "entity": true,
+    "property": true,
+    "type": true
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ARTSDATA } from "../../config";
 import { HttpService } from "../http";
-import { MatchServiceHelper } from "../../helper";
+import { Exception , MatchServiceHelper } from "../../helper";
 import { LanguageEnum } from "../../enum";
 import { QUERIES } from "../../constant";
 import { ResultCandidates } from "../../dto";
@@ -31,7 +31,13 @@ export class ArtsdataService {
   async executeSparqlQuery(sparqlQuery: string): Promise<any> {
     const sparqlEndpoint: string = this._getArtsdataEndPoint();
     const queryParam = "query=" + encodeURIComponent(sparqlQuery) + "&infer=false";
-    return await this.httpService.postRequest(sparqlEndpoint , queryParam);
+
+    try {
+      return await this.httpService.postRequest(sparqlEndpoint , queryParam);
+    } catch (error) {
+      console.error("Error executing SPARQL query:" , error);
+      throw Exception.internalServerError("Error executing SPARQL query" + error.message);
+    }
   }
 
   async getReconcileResultById(responseLanguage: LanguageEnum , id: string): Promise<ResultCandidates[]> {

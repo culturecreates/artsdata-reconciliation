@@ -5,6 +5,8 @@ import { ExtendController } from "./controller/extend";
 import { ExtendService } from "./service/extend";
 import { PreviewService } from "./service/preview";
 import { PreviewController } from "./controller/preview";
+import { SuggestController } from "./controller/suggest";
+import { SuggestService } from "./service/suggest";
 
 @Module({
   imports: [] ,
@@ -12,7 +14,8 @@ import { PreviewController } from "./controller/preview";
     ManifestController ,
     MatchController ,
     ExtendController,
-    PreviewController
+    PreviewController,
+    SuggestController
   ] ,
   providers: [
     ExtendService,
@@ -20,6 +23,7 @@ import { PreviewController } from "./controller/preview";
     MatchService ,
     ArtsdataService ,
     PreviewService,
+    SuggestService,
     HttpService
   ]
 })
