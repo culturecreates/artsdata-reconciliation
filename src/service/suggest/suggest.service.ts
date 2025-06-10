@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
 import { SUGGEST_QUERY } from "../../constant/suggest/suggest-queries.constants";
 import { ArtsdataConstants } from "../../constant";
+import { GRAPHDB_INDEX } from "../../config";
 
 @Injectable()
 export class SuggestService {
@@ -9,8 +10,10 @@ export class SuggestService {
   constructor(private readonly _artsdataService: ArtsdataService) {
   }
 
-  private _generateSparqlQuery(query: string , cursor: number) {
-    const sparqlQuery = SUGGEST_QUERY.ENTITY.replace("QUERY_PLACE_HOLDER" , query);
+  private _generateSparqlQueryForEntitySuggestion(query: string , cursor: number) {
+    const sparqlQuery = SUGGEST_QUERY.ENTITY.replace("QUERY_PLACE_HOLDER" , query)
+      .replace("INDEX_PLACE_HOLDER" , GRAPHDB_INDEX.DEFAULT)
+      .replace("  FILTER_BY_ENTITY_PLACEHOLDER" , "FILTER (CONTAINS(STR(?entity),\"kg.artsdata.ca/resource/K\")) ");
     if (cursor) {
       return `${sparqlQuery} OFFSET ${cursor}`;
     }
@@ -18,7 +21,7 @@ export class SuggestService {
   }
 
   async getSuggestedEntities(prefix: string , cursor: number) {
-    const sparqlQuery = this._generateSparqlQuery(prefix , cursor);
+    const sparqlQuery = this._generateSparqlQueryForEntitySuggestion(prefix , cursor);
     const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
     return this._formatResult(result);
   }
@@ -33,5 +36,21 @@ export class SuggestService {
       }
       return { id , name , description };
     });
+  }
+
+  async getSuggestedProperties(prefix: string , cursor: number) {
+    const sparqlQuery = this._generateSparqlQueryForPropertySuggestion(prefix , cursor);
+    const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
+    return this._formatResult(result);
+  }
+
+  private _generateSparqlQueryForPropertySuggestion(query: string , cursor: number) {
+    const sparqlQuery = SUGGEST_QUERY.ENTITY.replace("QUERY_PLACE_HOLDER" , query)
+      .replace("INDEX_PLACE_HOLDER" , GRAPHDB_INDEX.PROPERTY)
+      .replace("FILTER_BY_ENTITY_PLACEHOLDER" , "FILTER (CONTAINS(STR(?entity),\"schema.org\")) ");
+    if (cursor) {
+      return `${sparqlQuery} OFFSET ${cursor}`;
+    }
+    return sparqlQuery;
   }
 }

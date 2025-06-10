@@ -15,11 +15,11 @@ WHERE
 {
   values ?query { "QUERY_PLACE_HOLDER"  }
     
-    ?search a luc-index:resource-index;
+    ?search a luc-index:INDEX_PLACE_HOLDER;
             luc:query ?query ;
             luc:entities ?entity .
   
-  FILTER (CONTAINS(STR(?entity),"kg.artsdata.ca/resource/K")) 
+  FILTER_BY_ENTITY_PLACEHOLDER
  
 #NAME
   OPTIONAL { ?entity schema:name ?name_en. FILTER( LANG(?name_en) = "en")  }

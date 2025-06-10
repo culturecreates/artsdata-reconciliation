@@ -159,7 +159,8 @@ export class MatchService {
    * @param requestLanguage
    * @param reconciliationRequest
    */
-  async reconcileByQueries(requestLanguage: LanguageEnum , reconciliationRequest: ReconciliationRequest): Promise<ReconciliationResponse> {
+  async reconcileByQueries(requestLanguage: LanguageEnum , reconciliationRequest: ReconciliationRequest)
+    : Promise<ReconciliationResponse> {
     const { queries } = reconciliationRequest;
     const results: ReconciliationResults[] = [];
     for (const reconciliationQuery of queries) {

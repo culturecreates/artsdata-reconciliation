@@ -31,4 +31,24 @@ export class SuggestController {
     return await this._suggestService.getSuggestedEntities(prefix, cursor);
   }
 
+  @Get("property")
+  @ApiOperation({ summary: "Suggest entity" })
+  @ApiQuery({
+    name: "prefix" ,
+    type: String ,
+    description: "The string input by the user in the auto-suggest-enabled field" ,
+    required: true ,
+    explode: false
+  })
+  @ApiQuery({
+    name: "cursor" ,
+    type: Number ,
+    description: "The string input by the user in the auto-suggest-enabled field" ,
+    required: false ,
+    explode: false
+  })
+  async getSuggestedProperties(@Query("prefix") prefix: string, @Query("cursor") cursor: number) {
+    return await this._suggestService.getSuggestedProperties(prefix, cursor);
+  }
+
 }
