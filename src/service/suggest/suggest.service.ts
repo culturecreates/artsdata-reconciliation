@@ -27,15 +27,17 @@ export class SuggestService {
   }
 
   private _formatResult(result: any) {
-    return result.results.bindings?.map((item: any) => {
-      let name , description , id;
-      if (item) {
-        name = item.name?.value;
-        description = item.description?.value;
-        id = item.entity?.value?.split(ArtsdataConstants.PREFIX).pop();
-      }
-      return { id , name , description };
-    });
+    return {
+      result: result.results.bindings?.map((item: any) => {
+        let name , description , id;
+        if (item) {
+          name = item.name?.value;
+          description = item.description?.value;
+          id = item.entity?.value?.split(ArtsdataConstants.PREFIX).pop();
+        }
+        return { id , name , description };
+      })
+    };
   }
 
   async getSuggestedProperties(prefix: string , cursor: number) {
