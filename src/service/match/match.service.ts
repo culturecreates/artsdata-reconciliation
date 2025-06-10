@@ -76,7 +76,6 @@ export class MatchService {
 
     const queryReplacementString: string = name ? `values ?query { ${name}  }` : "";
     const queryFilterReplacementString: string = name ? `      luc:query ?query ;` : "";
-    const typePlaceholderReplace: string = type ? `values ?type { ${type} }` : "";
 
     return rawQuery
       .replace("INDEX_PLACE_HOLDER" , graphdbIndex)

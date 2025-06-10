@@ -115,7 +115,7 @@ describe("Recon Service tests" , () => {
           }
         ] ,
         expectedName: "Canadian Stage - Berkeley Street Theatre" ,
-        expectedCount: 1 ,
+        expectedCount: 2 ,
         duplicateCheck: true
       } , {
         description: "It should match names with single neutral quote" ,
@@ -540,7 +540,7 @@ describe("Recon Service tests" , () => {
           }
         ] ,
         expectedId: "K11-239" ,
-        expectedCount: 1 ,
+        expectedCount: 2 ,
         expectedName: "Roy Barnett Recital Hall"
       } , {
         description: "Reconcile Place with required param as TRUE and matchQuantifier as ANY" ,

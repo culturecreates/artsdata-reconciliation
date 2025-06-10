@@ -23,16 +23,16 @@ SELECT DISTINCT
    ?type_label
 WHERE
 {
+{
+  SELECT ?entity ?score WHERE{
   QUERY_PLACE_HOLDER
-    
   ?search a luc-index:INDEX_PLACE_HOLDER ;
   QUERY_FILTER_PLACE_HOLDER
   luc:entities ?entity .
   PROPERTY_PLACE_HOLDER
-   
   FILTER (CONTAINS(STR(?entity),"kg.artsdata.ca/resource/")) 
- 
   ?entity luc:score ?score;
+  } LIMIT_PLACE_HOLDER}
     
 #NAME
   OPTIONAL { ?entity schema:name | skos:prefLabel ?name_en. FILTER( LANG(?name_en) = "en")}
@@ -50,7 +50,6 @@ WHERE
    OPTIONAL { ?entity schema:disambiguatingDescription ?description_fr. FILTER( LANG(?description_fr) = "fr")}
    OPTIONAL { ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
 } group by ?entity ?score ?type_label
-LIMIT_PLACE_HOLDER
 `,
 
   RECONCILIATION_QUERY_BY_URI: `
