@@ -32,7 +32,7 @@ export class SuggestController {
   }
 
   @Get("property")
-  @ApiOperation({ summary: "Suggest entity" })
+  @ApiOperation({ summary: "Suggest property" })
   @ApiQuery({
     name: "prefix" ,
     type: String ,
@@ -51,4 +51,24 @@ export class SuggestController {
     return await this._suggestService.getSuggestedProperties(prefix, cursor);
   }
 
+
+  @Get("type")
+  @ApiOperation({ summary: "Suggest type" })
+  @ApiQuery({
+    name: "prefix" ,
+    type: String ,
+    description: "The string input by the user in the auto-suggest-enabled field" ,
+    required: true ,
+    explode: false
+  })
+  @ApiQuery({
+    name: "cursor" ,
+    type: Number ,
+    description: "The string input by the user in the auto-suggest-enabled field" ,
+    required: false ,
+    explode: false
+  })
+  async getSuggestedTypes(@Query("prefix") prefix: string, @Query("cursor") cursor: number) {
+    return await this._suggestService.getSuggestedTypes(prefix, cursor);
+  }
 }

@@ -22,9 +22,10 @@ WHERE
   FILTER_BY_ENTITY_PLACEHOLDER
  
 #NAME
-  OPTIONAL { ?entity schema:name ?name_en. FILTER( LANG(?name_en) = "en")  }
-  OPTIONAL {  ?entity schema:name ?name_fr.  FILTER( LANG(?name_fr) = "fr")}
-  OPTIONAL {  ?entity schema:name ?name_no. FILTER ( LANG(?name_no) = "")}
+  OPTIONAL { ?entity schema:name|rdfs:label ?name_en. FILTER( LANG(?name_en) = "en")  }
+  OPTIONAL {  ?entity schema:name|rdfs:label ?name_fr.  FILTER( LANG(?name_fr) = "fr")}
+  OPTIONAL {  ?entity schema:name|rdfs:label ?name_no. FILTER ( LANG(?name_no) = "")}
+  
    BIND(COALESCE(?name_en, ?name_fr, ?name_no) as ?name)
 
 #DISAMBIGUATING DESCRIPTION

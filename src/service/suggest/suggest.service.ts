@@ -52,5 +52,22 @@ export class SuggestService {
       return `${sparqlQuery} OFFSET ${cursor}`;
     }
     return sparqlQuery;
+
+  }
+
+  private _generateSparqlQueryForPropertyType(query: string , cursor: number) {
+    const sparqlQuery = SUGGEST_QUERY.ENTITY.replace("QUERY_PLACE_HOLDER" , query)
+      .replace("INDEX_PLACE_HOLDER" , GRAPHDB_INDEX.TYPE)
+      .replace("FILTER_BY_ENTITY_PLACEHOLDER" , "");
+    if (cursor) {
+      return `${sparqlQuery} OFFSET ${cursor}`;
+    }
+    return sparqlQuery;
+  }
+
+  async getSuggestedTypes(query: string , cursor: number) {
+    const sparqlQuery = this._generateSparqlQueryForPropertyType(query , cursor);
+    const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
+    return this._formatResult(result);
   }
 }
