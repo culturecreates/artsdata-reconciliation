@@ -43,7 +43,7 @@ export class SuggestController {
   @ApiQuery({
     name: "cursor" ,
     type: Number ,
-    description: "The string input by the user in the auto-suggest-enabled field" ,
+    description: "The offset value for pagination. If not provided, defaults to 0" ,
     required: false ,
     explode: false
   })
@@ -64,7 +64,7 @@ export class SuggestController {
   @ApiQuery({
     name: "cursor" ,
     type: Number ,
-    description: "The string input by the user in the auto-suggest-enabled field" ,
+    description: "The offset value for pagination. If not provided, defaults to 0" ,
     required: false ,
     explode: false
   })
