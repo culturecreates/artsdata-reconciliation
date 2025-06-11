@@ -12,7 +12,7 @@ export class SuggestService {
 
   private _generateSparqlQueryForEntitySuggestion(query: string , cursor: number) {
     const sparqlQuery = SUGGEST_QUERY.ENTITY.replace("QUERY_PLACE_HOLDER" , query)
-      .replace("INDEX_PLACE_HOLDER" , GRAPHDB_INDEX.DEFAULT)
+      .replace("INDEX_PLACE_HOLDER" , GRAPHDB_INDEX.ENTITY)
       .replace("  FILTER_BY_ENTITY_PLACEHOLDER" , "FILTER (CONTAINS(STR(?entity),\"kg.artsdata.ca/resource/K\")) ");
     if (cursor) {
       return `${sparqlQuery} OFFSET ${cursor}`;
@@ -36,7 +36,7 @@ export class SuggestService {
           image = item.image?.value;
           id = item.entity?.value?.split(ArtsdataConstants.PREFIX).pop();
         }
-        return { id , name , description, image };
+        return { id , name , description , image };
       })
     };
   }

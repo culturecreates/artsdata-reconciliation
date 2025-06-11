@@ -13,7 +13,8 @@ export const GRAPHDB_INDEX  = {
   EVENT_TYPE: env.EVENT_TYPE || "event-type-index",
   DEFAULT: env.DEFAULT || "resource-index",
   PROPERTY: env.PROPERTY || "property-index",
-  TYPE: env.TYPE || "type-index"
+  TYPE: env.TYPE || "type-index",
+  ENTITY: env.TYPE || "entity-index"
 };
 
 
