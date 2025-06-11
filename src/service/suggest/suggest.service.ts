@@ -29,13 +29,14 @@ export class SuggestService {
   private _formatResult(result: any) {
     return {
       result: result.results.bindings?.map((item: any) => {
-        let name , description , id;
+        let name , description , id , image;
         if (item) {
           name = item.name?.value;
           description = item.description?.value;
+          image = item.image?.value;
           id = item.entity?.value?.split(ArtsdataConstants.PREFIX).pop();
         }
-        return { id , name , description };
+        return { id , name , description, image };
       })
     };
   }

@@ -11,6 +11,7 @@ SELECT DISTINCT
    ?entity
    ?name
    ?description
+   ?image
 WHERE
 {
   values ?query { "QUERY_PLACE_HOLDER"  }
@@ -33,12 +34,11 @@ WHERE
    OPTIONAL {  ?entity schema:disambiguatingDescription ?description_fr.  FILTER( LANG(?description_fr) = "fr")}
    OPTIONAL {  ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
       BIND(COALESCE(?description_en, ?description_fr, ?description_no) as ?description)
+      
+      OPTIONAL {?entity schema:image/schema:url|schema:image ?image}
 
-}  group by ?entity ?name ?description
-LIMIT 10` ,
-
-    TYPE: `` ,
-    PROPERTY: ``
+}  group by ?entity ?name ?description ?image
+LIMIT 10`
   }
 
 ;
