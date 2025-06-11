@@ -50,7 +50,7 @@ export class SuggestService {
   private _generateSparqlQueryForPropertySuggestion(query: string , cursor: number) {
     const sparqlQuery = SUGGEST_QUERY.ENTITY.replace("QUERY_PLACE_HOLDER" , query)
       .replace("INDEX_PLACE_HOLDER" , GRAPHDB_INDEX.PROPERTY)
-      .replace("FILTER_BY_ENTITY_PLACEHOLDER" , "FILTER (CONTAINS(STR(?entity),\"schema.org\")) ");
+      .replace("FILTER_BY_ENTITY_PLACEHOLDER" , "");
     if (cursor) {
       return `${sparqlQuery} OFFSET ${cursor}`;
     }
