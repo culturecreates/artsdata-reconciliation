@@ -1,11 +1,15 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { ArrayMinSize , IsString , ValidateNested } from "class-validator";
+import { ApiProperty , ApiPropertyOptional } from "@nestjs/swagger";
+import { ArrayMinSize , IsBoolean , IsOptional , IsString , ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
 export class ExtendQueryProperty {
   @ApiProperty({ type: String })
   @IsString()
   id: string;
+  @ApiPropertyOptional({ type: Boolean , default: false })
+  @IsOptional()
+  @IsBoolean()
+  expand: boolean;
 }
 
 export class DataExtensionQueryDTO {

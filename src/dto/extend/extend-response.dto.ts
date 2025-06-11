@@ -14,11 +14,13 @@ class DataExtensionResponseMetaData extends IdAndName {
   type: IdAndName;
 }
 
-class DataExtensionResultProperties {
+export class DataExtensionResultProperties {
   @ApiProperty()
   id: string;
   @ApiProperty()
-  values: MultiLingualValues[];
+  values?: MultiLingualValues[];
+  @ApiPropertyOptional({ type: [DataExtensionResultProperties] })
+  properties?: DataExtensionResultProperties[];
 }
 
 class DataExtensionResultRow {

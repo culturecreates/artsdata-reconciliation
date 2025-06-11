@@ -36,7 +36,7 @@ export class ExtendController {
     status: 200 , type: DataExtensionResponseDTO , isArray: true ,
     description: "Reconciliation candidates for each query"
   })
-  async getDataExtension(@Body() dataExtensionQuery: DataExtensionQueryDTO): Promise<DataExtensionResponseDTO> {
+  async getDataExtension(@Body() dataExtensionQuery: DataExtensionQueryDTO) {
     return await this._extendService.getDataExtension(dataExtensionQuery);
   }
 

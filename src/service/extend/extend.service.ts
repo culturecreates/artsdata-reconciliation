@@ -17,12 +17,34 @@ export class ExtendService {
   }
 
 
-  async getDataExtension(dataExtensionQuery: DataExtensionQueryDTO): Promise<DataExtensionResponseDTO> {
+  async getDataExtension(dataExtensionQuery: DataExtensionQueryDTO) {
     //Get the query
     const sparqlQuery: string = this._generateQuery(dataExtensionQuery);
+    const expandProperties = dataExtensionQuery.properties.filter((property) => property.expand);
     const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
+    const formattedResult = this._formatResult(dataExtensionQuery.ids , result);
 
-    return this._formatResult(dataExtensionQuery.ids , result);
+    if (expandProperties.length > 0) {
+      const properties: { id: any; values: any; }[] = [];
+      formattedResult.rows.forEach((row) => {
+        expandProperties.forEach((property) => {
+          const expandedPropertyId = property.id;
+          const propertyPrefix = `${expandedPropertyId}_`;
+          const expandedProperty = row?.properties.filter((item: any) => item.id.startsWith(propertyPrefix));
+          if (expandedProperty?.length) {
+            for (const prop of expandedProperty) {
+              const propertyId = prop.id;
+              //Remove the property with propertyId from the row properties
+              row.properties = row.properties.filter((item: any) => item.id !== propertyId);
+              properties.push({ id: prop.id.split(propertyPrefix).pop() , values: prop.values });
+            }
+            const expandingProperties = row.properties.find((item) => item.id === expandedPropertyId);
+            (expandingProperties?.values?.[0] as any)["properties"] = properties || [];
+          }
+        });
+      });
+    }
+    return formattedResult;
   }
 
   getProposedProperties(entityType: EntityClassEnum): ProposedExtendProperty {
@@ -57,7 +79,16 @@ export class ExtendService {
   }
 
   private _generateTripleFromCondition(property: ExtendQueryProperty) {
-    return `?uri schema:${property.id} ?${property.id}.\n`;
+    const { id , expand } = property;
+    const triple = `OPTIONAL {?uri schema:${id} ?${id}.}\n`;
+    if (expand) {
+      if (id === "address") {
+        return triple + `OPTIONAL {?${id} schema:postalCode ?${id}_postalCode;
+            schema:addressLocality ?${id}_addressLocality;
+            schema:addressCountry ?${id}_addressCountry.}\n`;
+      }
+    }
+    return triple;
   }
 
   private _formatResult(ids: string[] , result: any): DataExtensionResponseDTO {
@@ -93,6 +124,8 @@ export class ExtendService {
             const valueExists = existingValue.some((item: any) => {
               if (item.str && values.str && item.lang && values.lang) {
                 return item.str === values.str && item.lang === values.lang;
+              } else if (item.str && values.str) {
+                return item.str === values.str;
               } else if (item.id && values.id) {
                 return item.id === values.id;
               }
