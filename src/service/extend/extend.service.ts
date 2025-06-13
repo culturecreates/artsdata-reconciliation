@@ -20,18 +20,21 @@ export class ExtendService {
   async getDataExtension(dataExtensionQuery: DataExtensionQueryDTO) {
     //Get the query
     const sparqlQuery: string = this._generateQuery(dataExtensionQuery);
-    const expandProperties = dataExtensionQuery.properties.filter((property) => property.expand);
+    const expandProperties = dataExtensionQuery.properties
+      .filter((property) => property.expand);
     const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
     const formattedResult = this._formatResult(dataExtensionQuery.ids , result);
 
     if (expandProperties.length > 0) {
       const properties: { id: any; values: any; }[] = [];
-      const expandedPropertyPrefixes = expandProperties.map((property) => `${property.id}_`);
+      const expandedPropertyPrefixes = expandProperties
+        .map((property) => `${property.id}_`);
       formattedResult.rows.forEach((row) => {
         expandProperties.forEach((property) => {
           const expandedPropertyId = property.id;
           const propertyPrefix = `${expandedPropertyId}_`;
-          const expandedProperty = row?.properties.filter((item: any) => item.id.startsWith(propertyPrefix));
+          const expandedProperty = row?.properties
+            .filter((item: any) => item.id.startsWith(propertyPrefix));
           if (expandedProperty?.length) {
             for (const prop of expandedProperty) {
               const propertyId = prop.id;
@@ -39,7 +42,8 @@ export class ExtendService {
               row.properties = row.properties.filter((item: any) => item.id !== propertyId);
               properties.push({ id: prop.id.split(propertyPrefix).pop() , values: prop.values });
             }
-            const expandingProperties = row.properties.find((item) => item.id === expandedPropertyId);
+            const expandingProperties = row.properties
+              .find((item) => item.id === expandedPropertyId);
             (expandingProperties?.values?.[0] as any)["properties"] = properties || [];
           }
         });
@@ -91,7 +95,7 @@ export class ExtendService {
       if (id === "address") {
         const expandedProperties = this._getExpandedPropertiesForAddress();
         const expandedTriples = expandedProperties.map(prop => `?${id} schema:${prop} ?${id}_${prop}.`).join("\n");
-        return `${triple} OPTIONAL {${expandedTriples} }`
+        return `${triple} OPTIONAL {${expandedTriples} }`;
       }
     }
     return triple;
@@ -118,7 +122,12 @@ export class ExtendService {
           }
 
           if (row[key].type === "uri") {
-            values = { "id": row[key].value?.split(ArtsdataConstants.PREFIX)?.[1] };
+            const value = row[key].value;
+            if (value.startsWith(ArtsdataConstants.PREFIX)) {
+              values = { "id": value.split(ArtsdataConstants.PREFIX)[1] };
+            } else {
+              values = { "id": value };
+            }
           }
 
           const existingValues: any = formattedRow[id].properties.find((item: any) => item.id === key);
