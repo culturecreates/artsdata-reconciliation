@@ -46,7 +46,9 @@ WHERE
    BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?typeLabel)
 
 #IMAGE
-      OPTIONAL {?entity schema:image/schema:url|schema:image ?image}
+      OPTIONAL {?entity schema:image ?imageURL}
+      OPTIONAL {?entity schema:image/schema:url ?imageURLFromObject}
+         BIND(COALESCE(?imageURLFromObject, ?imageURL) as ?image)
 
 }  group by ?entity ?name ?description ?image ?typeLabel`
   }

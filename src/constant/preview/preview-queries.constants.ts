@@ -22,7 +22,10 @@ export const PREVIEW_QUERY = `
    OPTIONAL {  ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
    BIND(COALESCE(?description_en, ?description_fr, ?description_no, "") as ?description)
    
-   OPTIONAL {?entity schema:image/schema:url|schema:image ?image}
+#IMAGE
+      OPTIONAL {?entity schema:image ?imageURL}
+      OPTIONAL {?entity schema:image/schema:url ?imageURLFromObject}
+         BIND(COALESCE(?imageURLFromObject, ?imageURL) as ?image)
 
     }GROUP BY ?name ?description ?image`
 ;
