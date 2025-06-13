@@ -33,7 +33,7 @@ class DataExtensionResultRow {
 
 export class DataExtensionResponseDTO {
   @ApiProperty()
-  meta: DataExtensionResponseMetaData;
+  meta: IdAndName[];
   @ApiProperty()
   rows: DataExtensionResultRow[];
 }

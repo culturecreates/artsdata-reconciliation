@@ -26,6 +26,7 @@ export class ExtendService {
 
     if (expandProperties.length > 0) {
       const properties: { id: any; values: any; }[] = [];
+      const expandedPropertyPrefixes = expandProperties.map((property) => `${property.id}_`);
       formattedResult.rows.forEach((row) => {
         expandProperties.forEach((property) => {
           const expandedPropertyId = property.id;
@@ -42,6 +43,11 @@ export class ExtendService {
             (expandingProperties?.values?.[0] as any)["properties"] = properties || [];
           }
         });
+      });
+      expandedPropertyPrefixes.forEach((prefix) => {
+        formattedResult.meta = formattedResult.meta.filter(
+          item => !item.id.startsWith(prefix)
+        );
       });
     }
     return formattedResult;
@@ -83,9 +89,9 @@ export class ExtendService {
     const triple = `OPTIONAL {?uri schema:${id} ?${id}.}\n`;
     if (expand) {
       if (id === "address") {
-        return triple + `OPTIONAL {?${id} schema:postalCode ?${id}_postalCode;
-            schema:addressLocality ?${id}_addressLocality;
-            schema:addressCountry ?${id}_addressCountry.}\n`;
+        const expandedProperties = this._getExpandedPropertiesForAddress();
+        const expandedTriples = expandedProperties.map(prop => `?${id} schema:${prop} ?${id}_${prop}.`).join("\n");
+        return `${triple} OPTIONAL {${expandedTriples} }`
       }
     }
     return triple;
@@ -150,5 +156,9 @@ export class ExtendService {
       meta ,
       rows
     };
+  }
+
+  private _getExpandedPropertiesForAddress() {
+    return ["postalCode" , "addressLocality" , "addressCountry"];
   }
 }
