@@ -12,8 +12,11 @@ SELECT DISTINCT
    ?name
    ?description
    ?image
+    ?typeLabel
 WHERE
 {
+  
+  {SELECT ?entity WHERE {
   values ?query { "QUERY_PLACE_HOLDER"  }
     
     ?search a luc-index:INDEX_PLACE_HOLDER;
@@ -21,6 +24,7 @@ WHERE
             luc:entities ?entity .
   
   FILTER_BY_ENTITY_PLACEHOLDER
+  }LIMIT 10}
  
 #NAME
   OPTIONAL { ?entity schema:name|rdfs:label ?name_en. FILTER( LANG(?name_en) = "en")  }
@@ -34,11 +38,17 @@ WHERE
    OPTIONAL {  ?entity schema:disambiguatingDescription ?description_fr.  FILTER( LANG(?description_fr) = "fr")}
    OPTIONAL {  ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
       BIND(COALESCE(?description_en, ?description_fr, ?description_no) as ?description)
-      
+   
+#TYPE
+   ?entity a ?type_additional.
+   OPTIONAL { ?type_additional rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "")}
+   OPTIONAL { ?type_additional rdfs:label ?type_label_en filter(lang(?type_label_en) = "en")}
+   BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?typeLabel)
+
+#IMAGE
       OPTIONAL {?entity schema:image/schema:url|schema:image ?image}
 
-}  group by ?entity ?name ?description ?image
-LIMIT 10`
+}  group by ?entity ?name ?description ?image ?typeLabel`
   }
 
 ;

@@ -27,18 +27,20 @@ export class SuggestService {
   }
 
   private _formatResult(result: any) {
-    return {
-      result: result.results.bindings?.map((item: any) => {
-        let name , description , id , image;
-        if (item) {
-          name = item.name?.value;
-          description = item.description?.value;
-          image = item.image?.value;
-          id = item.entity?.value?.split(ArtsdataConstants.PREFIX).pop();
-        }
-        return { id , name , description , image };
-      })
-    };
+    const results: any[] = [];
+    result.results.bindings?.forEach((item: any) => {
+      const id = item.entity?.value?.split(ArtsdataConstants.PREFIX).pop();
+      const name = item.name?.value;
+      const description = item.description?.value;
+      const image = item.image?.value;
+      const type = item.typeLabel?.value;
+      if (!results.filter((r) => r.id === id).length) {
+        results.push({ id , name , description , image , type });
+      } else {
+        //Skipping duplicate entries
+      }
+    });
+    return results;
   }
 
   async getSuggestedProperties(prefix: string , cursor: number) {
