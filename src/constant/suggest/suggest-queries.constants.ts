@@ -43,7 +43,7 @@ WHERE
    ?entity a ?type_additional.
    OPTIONAL { ?type_additional rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "")}
    OPTIONAL { ?type_additional rdfs:label ?type_label_en filter(lang(?type_label_en) = "en")}
-   BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?typeLabel)
+   BIND(COALESCE(?type_label_en, ?type_label_raw) as ?typeLabel)
 
 #IMAGE
       OPTIONAL {?entity schema:image ?imageURL}

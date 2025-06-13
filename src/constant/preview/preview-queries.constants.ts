@@ -14,13 +14,13 @@ export const PREVIEW_QUERY = `
    ?entity    a ?type_additional.
    OPTIONAL { ?type_additional rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "") }
    OPTIONAL { ?type_additional rdfs:label ?type_label_en filter(lang(?type_label_en) = "en") }
-   BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?type_label)
+   BIND(COALESCE(?type_label_en, ?type_label_raw) as ?type_label)
 
 #DISAMBIGUATING DESCRIPTION
    OPTIONAL { ?entity schema:disambiguatingDescription ?description_en. FILTER( LANG(?description_en) = "en")  }
    OPTIONAL {  ?entity schema:disambiguatingDescription ?description_fr.  FILTER( LANG(?description_fr) = "fr")}
    OPTIONAL {  ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
-   BIND(COALESCE(?description_en, ?description_fr, ?description_no, "") as ?description)
+   BIND(COALESCE(?description_en, ?description_fr, ?description_no) as ?description)
    
 #IMAGE
       OPTIONAL {?entity schema:image ?imageURL}
