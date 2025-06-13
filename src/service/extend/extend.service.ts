@@ -114,41 +114,42 @@ export class ExtendService {
       }
       for (const key in row) {
         const valueId = key;
-        let values: any;
+        let currentValue: any;
 
         if (key !== "uri") {
           if (row[key].type === "literal") {
-            values = { "str": row[key].value , lang: row[key]["xml:lang"] };
+            currentValue = { "str": row[key].value , lang: row[key]["xml:lang"] };
           }
 
           if (row[key].type === "uri") {
             const value = row[key].value;
             if (value.startsWith(ArtsdataConstants.PREFIX)) {
-              values = { "id": value.split(ArtsdataConstants.PREFIX)[1] };
+              currentValue = { "id": value.split(ArtsdataConstants.PREFIX)[1] };
             } else {
-              values = { "id": value };
+              currentValue = { "id": value };
             }
           }
 
           const existingValues: any = formattedRow[id].properties.find((item: any) => item.id === key);
           if (!existingValues) {
-            formattedRow[id].properties.push({ id: valueId , values: [values] });
+            formattedRow[id].properties.push({ id: valueId , values: [currentValue] });
           } else {
             const existingValue = existingValues.values;
             // Check if the value already exists
-            const valueExists = existingValue.some((item: any) => {
-              if (item.str && values.str && item.lang && values.lang) {
-                return item.str === values.str && item.lang === values.lang;
-              } else if (item.str && values.str) {
-                return item.str === values.str;
-              } else if (item.id && values.id) {
-                return item.id === values.id;
+            const valueExists = existingValue.some((existingItem: any) => {
+              if(existingItem.id && currentValue.id){
+                return existingItem.id === currentValue.id;
+              }
+              else if (existingItem.str && currentValue.str ) {
+                return existingItem.str === currentValue.str && existingItem.lang === currentValue.lang;
+              } else if (existingItem.str && currentValue.str) {
+                return existingItem.str === currentValue.str;
               }
               return false;
             });
 
             if (!valueExists) {
-              existingValues.values.push(values);
+              existingValues.values.push(currentValue);
             }
 
           }
