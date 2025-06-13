@@ -40,7 +40,7 @@ export class SuggestService {
         //Skipping duplicate entries
       }
     });
-    return results;
+    return {result: results};
   }
 
   async getSuggestedProperties(prefix: string , cursor: number) {
