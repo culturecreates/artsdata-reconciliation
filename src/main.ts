@@ -11,10 +11,10 @@ import { ValidationPipe } from "@nestjs/common";
 
 
 async function bootstrap() {
-  const httpsOptions = {
-    key: fs.readFileSync("/home/ubuntu/secrets/staging-reconciliation/privatekey.pem"),
-    cert: fs.readFileSync("/home/ubuntu/secrets/staging-reconciliation/fullchain.pem")
-  };
+  // const httpsOptions = {
+  //   key: fs.readFileSync("/home/ubuntu/secrets/staging-reconciliation/privatekey.pem"),
+  //   cert: fs.readFileSync("/home/ubuntu/secrets/staging-reconciliation/fullchain.pem")
+  // };
 
   const server = express();
   const app = await NestFactory.create(
@@ -45,7 +45,7 @@ async function bootstrap() {
   app.enableCors();
   await app.init();
   http.createServer(server).listen(APPLICATION.HTTP_PORT);
-  https.createServer(httpsOptions, server).listen(APPLICATION.HTTPS_PORT);
+  // https.createServer(httpsOptions, server).listen(APPLICATION.HTTPS_PORT);
 
 }
 
