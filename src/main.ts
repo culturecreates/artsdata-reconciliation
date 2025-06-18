@@ -12,8 +12,8 @@ import { ValidationPipe } from "@nestjs/common";
 
 async function bootstrap() {
   const httpsOptions = {
-    key: fs.readFileSync("/etc/letsencrypt/live/staging.recon.artsdata.ca/privkey.pem"),
-    cert: fs.readFileSync("/etc/letsencrypt/live/staging.recon.artsdata.ca/fullchain.pem")
+    key: fs.readFileSync("/home/ubuntu/secrets/staging-reconciliation/privatekey.pem"),
+    cert: fs.readFileSync("/home/ubuntu/secrets/staging-reconciliation/fullchain.pem")
   };
 
   const server = express();
