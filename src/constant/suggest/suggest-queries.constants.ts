@@ -3,6 +3,7 @@ export const SUGGEST_QUERY = {
 PREFIX luc-index: <http://www.ontotext.com/connectors/lucene/instance#>
 PREFIX schema: <http://schema.org/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ado: <http://kg.artsdata.ca/ontology/>
 PREFIX onto: <http://www.ontotext.com/>
 PREFIX dbo: <http://dbpedia.org/ontology/>
@@ -22,28 +23,31 @@ WHERE
     ?search a luc-index:INDEX_PLACE_HOLDER;
             luc:query ?query ;
             luc:entities ?entity .
+           ?entity schema:name|rdfs:label ?entityName.
+            FILTER(STRSTARTS(LCASE(?entityName), "QUERY_PLACEHOLDER"))
   
-  FILTER_BY_ENTITY_PLACEHOLDER
+  FILTER_CONDITION_PLACEHOLDER
   }LIMIT 10}
  
 #NAME
-  OPTIONAL { ?entity schema:name|rdfs:label ?name_en. FILTER( LANG(?name_en) = "en")  }
-  OPTIONAL {  ?entity schema:name|rdfs:label ?name_fr.  FILTER( LANG(?name_fr) = "fr")}
-  OPTIONAL {  ?entity schema:name|rdfs:label ?name_no. FILTER ( LANG(?name_no) = "")}
+  OPTIONAL { ?entity schema:name|rdfs:label ?name_en. FILTER( LANG(?name_en) = "en" )  }
+  OPTIONAL {  ?entity schema:name|rdfs:label ?name_fr.  FILTER( LANG(?name_fr) = "fr" )}
+  OPTIONAL {  ?entity schema:name|rdfs:label ?name_raw. FILTER ( LANG(?name_raw) = "" )}
   
-   BIND(COALESCE(?name_en, ?name_fr, ?name_no) as ?name)
+   BIND(COALESCE(?name_en, ?name_fr, ?name_raw) as ?name)
 
 #DISAMBIGUATING DESCRIPTION
    OPTIONAL { ?entity schema:disambiguatingDescription ?description_en. FILTER( LANG(?description_en) = "en")  }
    OPTIONAL {  ?entity schema:disambiguatingDescription ?description_fr.  FILTER( LANG(?description_fr) = "fr")}
-   OPTIONAL {  ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
-      BIND(COALESCE(?description_en, ?description_fr, ?description_no) as ?description)
+   OPTIONAL {  ?entity schema:disambiguatingDescription ?description_raw. FILTER ( LANG(?description_raw) = "")}
+      BIND(COALESCE(?description_en, ?description_fr, ?description_raw) as ?description)
    
 #TYPE
    ?entity a ?type_additional.
    OPTIONAL { ?type_additional rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "")}
    OPTIONAL { ?type_additional rdfs:label ?type_label_en filter(lang(?type_label_en) = "en")}
-   BIND(COALESCE(?type_label_en, ?type_label_raw) as ?typeLabel)
+   OPTIONAL { ?type_additional rdfs:label ?type_label_fr filter(lang(?type_label_fr) = "fr")}
+   BIND(COALESCE(?type_label_en, ?type_label_fr, ?type_label_raw) as ?typeLabel)
 
 #IMAGE
       OPTIONAL {?entity schema:image ?imageURL}
