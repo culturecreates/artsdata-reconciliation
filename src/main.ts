@@ -12,8 +12,8 @@ import { ValidationPipe } from "@nestjs/common";
 
 async function bootstrap() {
   const httpsOptions = {
-    key: fs.readFileSync("./secrets/private-key.pem"),
-    cert: fs.readFileSync("./secrets/public-certificate.pem")
+    key: fs.readFileSync("/etc/letsencrypt/live/staging.recon.artsdata.ca/privkey.pem"),
+    cert: fs.readFileSync("/etc/letsencrypt/live/staging.recon.artsdata.ca/fullchain.pem")
   };
 
   const server = express();
@@ -44,7 +44,7 @@ async function bootstrap() {
 
   app.enableCors();
   await app.init();
-  // http.createServer(server).listen(APPLICATION.HTTP_PORT);
+  http.createServer(server).listen(APPLICATION.HTTP_PORT);
   https.createServer(httpsOptions, server).listen(APPLICATION.HTTPS_PORT);
 
 }
