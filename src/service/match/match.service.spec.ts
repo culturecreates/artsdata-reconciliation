@@ -27,7 +27,7 @@ describe("Recon Service tests" , () => {
             conditions: [
               {
                 matchType: "name" ,
-                v: "Théâtre Maisonneuve"
+                propertyValue: "Théâtre Maisonneuve"
               }
             ]
           }
@@ -44,7 +44,7 @@ describe("Recon Service tests" , () => {
             conditions: [
               {
                 matchType: "name" ,
-                v: "The locations is in the lovely Bluma Appel Theatre and Berkeley Street Theatre."
+                propertyValue: "The locations is in the lovely Bluma Appel Theatre and Berkeley Street Theatre."
               }
             ]
           }
@@ -61,7 +61,7 @@ describe("Recon Service tests" , () => {
             conditions: [
               {
                 matchType: "name" ,
-                v: "VaughnCo Entertainment presents"
+                propertyValue: "VaughnCo Entertainment presents"
               }
             ]
           }
@@ -77,7 +77,7 @@ describe("Recon Service tests" , () => {
             conditions: [
               {
                 matchType: "name" ,
-                v: "Wajdi Mouawad"
+                propertyValue: "Wajdi Mouawad"
               }
             ]
           }
@@ -93,7 +93,7 @@ describe("Recon Service tests" , () => {
             conditions: [
               {
                 matchType: "name" ,
-                v: "Show is nowhere"
+                propertyValue: "Show is nowhere"
               }
             ]
           }
@@ -109,7 +109,7 @@ describe("Recon Service tests" , () => {
             conditions: [
               {
                 matchType: "name" ,
-                v: "The locations is in the lovely Berkeley Street Theatre and Canadian Stage - Berkeley Street Theatre."
+                propertyValue: "The locations is in the lovely Berkeley Street Theatre and Canadian Stage - Berkeley Street Theatre."
               }
             ]
           }
@@ -126,7 +126,7 @@ describe("Recon Service tests" , () => {
             conditions: [
               {
                 matchType: "name" ,
-                v: "Shippagan 20 h 00 La P'tite Église (Shippagan)"
+                propertyValue: "Shippagan 20 h 00 La P'tite Église (Shippagan)"
               }
             ]
           }
@@ -142,7 +142,7 @@ describe("Recon Service tests" , () => {
             conditions: [
               {
                 matchType: "name" ,
-                v: "Emily D’Angelo"
+                propertyValue: "Emily D’Angelo"
               }
             ]
           }
@@ -158,7 +158,7 @@ describe("Recon Service tests" , () => {
             conditions: [
               {
                 matchType: "name" ,
-                v: "meagan&amp;amy"
+                propertyValue: "meagan&amp;amy"
               }
             ]
           }
@@ -174,7 +174,7 @@ describe("Recon Service tests" , () => {
             conditions: [
               {
                 matchType: "name" ,
-                v: "Théâtre Marc Lescarbot"
+                propertyValue: "Théâtre Marc Lescarbot"
               }
             ]
           }
@@ -190,7 +190,7 @@ describe("Recon Service tests" , () => {
             conditions: [
               {
                 matchType: "name" ,
-                v: "Shell Theatre"
+                propertyValue: "Shell Theatre"
               }
             ]
           }
@@ -206,7 +206,7 @@ describe("Recon Service tests" , () => {
             conditions: [
               {
                 matchType: "name" ,
-                v: "Dance"
+                propertyValue: "Dance"
               }
             ]
           }
@@ -222,7 +222,7 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "v": "K11-19"
+                "propertyValue": "K11-19"
               }
             ]
           }
@@ -239,7 +239,7 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "v": "http://kg.artsdata.ca/resource/K11-19"
+                "propertyValue": "http://kg.artsdata.ca/resource/K11-19"
               }
             ]
           }]
@@ -256,7 +256,7 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "v": "Roy Thomson Hall"
+                "propertyValue": "Roy Thomson Hall"
               }
             ]
           }
@@ -273,7 +273,7 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "v": "Roy Thomson Hall"
+                "propertyValue": "Roy Thomson Hall"
               }
             ]
           }
@@ -290,11 +290,11 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "v": "Roy Thomson"
+                "propertyValue": "Roy Thomson"
               } , {
                 "matchType": "property" ,
-                "v": "M5J 2H5" ,
-                "pid": "schema:address/schema:postalCode" ,
+                "propertyValue": "M5J 2H5" ,
+                "propertyId": "schema:address/schema:postalCode" ,
                 "required": true
               }
             ]
@@ -313,11 +313,11 @@ describe("Recon Service tests" , () => {
               "conditions": [
                 {
                   "matchType": "name" ,
-                  "v": "Roy Thomson"
+                  "propertyValue": "Roy Thomson"
                 } , {
                   "matchType": "property" ,
-                  "v": "60 Simcoe Street" ,
-                  "pid": "schema:address/schema:streetAddress" ,
+                  "propertyValue": "60 Simcoe Street" ,
+                  "propertyId": "schema:address/schema:streetAddress" ,
                   "required": true
                 }
               ]
@@ -335,7 +335,7 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "v": "Matilda - Citadel Theatre"
+                "propertyValue": "Matilda - Citadel Theatre"
               }
             ]
           }
@@ -352,14 +352,14 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "v": "Matilda - Citadel Theatre" ,
-                "pid": "string" ,
+                "propertyValue": "Matilda - Citadel Theatre" ,
+                "propertyId": "string" ,
                 "required": true
               } ,
               {
                 "matchType": "property" ,
-                "v": "2019-03-17T13:30:00-04:00" ,
-                "pid": "schema:startDate" ,
+                "propertyValue": "2019-03-17T13:30:00-04:00" ,
+                "propertyId": "schema:startDate" ,
                 "required": true
               }
             ]
@@ -376,8 +376,8 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "property" ,
-                "v": "https://www.roythomsonhall.com" ,
-                "pid": "schema:url" ,
+                "propertyValue": "https://www.roythomsonhall.com" ,
+                "propertyId": "schema:url" ,
                 "required": true
               }
             ]
@@ -394,8 +394,8 @@ describe("Recon Service tests" , () => {
 
               {
                 "matchType": "property" ,
-                "v": "https://en.wikipedia.org/wiki/Roy_Thomson_Hall" ,
-                "pid": "schema:sameAs" ,
+                "propertyValue": "https://en.wikipedia.org/wiki/Roy_Thomson_Hall" ,
+                "propertyId": "schema:sameAs" ,
                 "required": true
               }
             ]
@@ -413,12 +413,12 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "v": "Roy Thomson"
+                "propertyValue": "Roy Thomson"
               } ,
               {
                 "matchType": "property" ,
-                "v": "https://en.wikipedia.org/wiki/Roy_Thomson_Hall" ,
-                "pid": "schema:sameAs" ,
+                "propertyValue": "https://en.wikipedia.org/wiki/Roy_Thomson_Hall" ,
+                "propertyId": "schema:sameAs" ,
                 "required": true
               }
             ]
@@ -436,12 +436,12 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "v": "Roy Thomson"
+                "propertyValue": "Roy Thomson"
               } ,
               {
                 "matchType": "property" ,
-                "v": "https://some.wrong.url" ,
-                "pid": "schema:url" ,
+                "propertyValue": "https://some.wrong.url" ,
+                "propertyId": "schema:url" ,
                 "required": false
               }
             ]
@@ -459,12 +459,12 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "v": "Roy Thomson"
+                "propertyValue": "Roy Thomson"
               } ,
               {
                 "matchType": "property" ,
-                "v": "https://some.wrong.url" ,
-                "pid": "schema:url"
+                "propertyValue": "https://some.wrong.url" ,
+                "propertyId": "schema:url"
               }
             ]
           }
@@ -481,12 +481,12 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "v": "Roy Thomson"
+                "propertyValue": "Roy Thomson"
               } ,
               {
                 "matchType": "property" ,
-                "v": "https://www.roythomson.*" ,
-                "pid": "schema:url" ,
+                "propertyValue": "https://www.roythomson.*" ,
+                "propertyId": "schema:url" ,
                 "required": true ,
                 "matchQualifier": MatchQualifierEnum.REGEX_MATCH
               }
@@ -505,12 +505,12 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "v": "Roy Thomson"
+                "propertyValue": "Roy Thomson"
               } ,
               {
                 "matchType": "property" ,
-                "v": "https://www.roythomson.*" ,
-                "pid": "schema:url" ,
+                "propertyValue": "https://www.roythomson.*" ,
+                "propertyId": "schema:url" ,
                 "required": true ,
                 "matchQualifier": MatchQualifierEnum.EXACT_MATCH
               }
@@ -527,12 +527,12 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "v": "Roy Thomson Hall"
+                "propertyValue": "Roy Thomson Hall"
               } ,
               {
                 "matchType": "property" ,
-                "v": "https://www.roythomsonhall.com" ,
-                "pid": "schema:url" ,
+                "propertyValue": "https://www.roythomsonhall.com" ,
+                "propertyId": "schema:url" ,
                 "required": true ,
                 "matchQuantifier": MatchQuantifierEnum.NONE
               }
@@ -551,12 +551,12 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "v": "Roy Thomson Hall"
+                "propertyValue": "Roy Thomson Hall"
               } ,
               {
                 "matchType": "property" ,
-                "v": "https://www.roythomsonhall.com" ,
-                "pid": "schema:url" ,
+                "propertyValue": "https://www.roythomsonhall.com" ,
+                "propertyId": "schema:url" ,
                 "required": true ,
                 "matchQuantifier": MatchQuantifierEnum.ALL
               }

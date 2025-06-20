@@ -97,7 +97,7 @@ export class MatchService {
     propertyConditions: QueryCondition[];
   } {
     const name = conditions
-      .find(condition => condition.matchType == MatchTypeEnum.NAME)?.v;
+      .find(condition => condition.matchType == MatchTypeEnum.NAME)?.propertyValue;
     const propertyConditions = conditions
       .filter(condition => condition.matchType == MatchTypeEnum.PROPERTY);
     return { name , propertyConditions };
@@ -140,9 +140,9 @@ export class MatchService {
    * @param index
    */
   private _generateTripleFromCondition(condition: QueryCondition , index: number): string {
-    const { required , pid , v: rawConditionValue , matchQualifier , matchQuantifier } = condition;
-    const formattedConditionValue = this._resolvePropertyValue(rawConditionValue , pid as string);
-    const formattedPropertyId = MatchServiceHelper.isValidURI(pid as string) ? `<${pid}>` : `${pid}`;
+    const { required , propertyId , propertyValue: rawConditionValue , matchQualifier , matchQuantifier } = condition;
+    const formattedConditionValue = this._resolvePropertyValue(rawConditionValue , propertyId as string);
+    const formattedPropertyId = MatchServiceHelper.isValidURI(propertyId as string) ? `<${propertyId}>` : `${propertyId}`;
 
     let triple = this._resolveMatchQualifier(matchQualifier as MatchQualifierEnum , formattedPropertyId ,
       formattedConditionValue , index);
