@@ -25,18 +25,18 @@ export class QueryCondition {
   @IsNotEmpty()
   matchType: MatchTypeEnum|String;
 
-  //TODO Add support to nested v
+  //TODO Add support to nested propertyValue
   @ApiProperty({ required: true })
   @IsString()
   @IsNotEmpty()
-  @Matches(/\S/ , { message: "v must not be empty or contain only whitespace" })
-  v: string;
+  @Matches(/\S/ , { message: "propertyValue must not be empty or contain only whitespace" })
+  propertyValue: string;
 
   @ApiPropertyOptional()
   @ValidateIf((o) => o.matchType === "property")
   @IsString()
   @IsNotEmpty()
-  pid?: string;
+  propertyId?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
