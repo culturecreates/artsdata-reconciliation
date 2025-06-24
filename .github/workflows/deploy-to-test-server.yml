@@ -52,6 +52,17 @@ jobs:
         with:
           envkey_ARTSDATA_ENDPOINT: ${{ secrets.ARTSDATA_ENDPOINT }}
           envkey_REPOSITORY: artsdata
+          envkey_EVENT: event-index
+          envkey_PLACE: place-index
+          envkey_ORGANIZATION: organization-index
+          envkey_PERSON: person-index
+          envkey_AGENT: agent-index
+          envkey_CONCEPT: concept-index
+          envkey_EVENT_TYPE: event-type-index
+          envkey_DEFAULT: resource-index
+          envkey_PROPERTY: property-index
+          envkey_TYPE: type-index
+          envkey_ENTITY: entity-index
           file_name: .env
           fail_on_empty: false
 
