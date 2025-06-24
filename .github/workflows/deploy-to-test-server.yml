@@ -50,7 +50,7 @@ jobs:
       - name: Make environment file
         uses: SpicyPizza/create-envfile@v1.3
         with:
-          envkey_DATABASE_URL: ${{ secrets.ARTSDATA_ENDPOINT }}
+          envkey_ARTSDATA_ENDPOINT: ${{ secrets.ARTSDATA_ENDPOINT }}
           envkey_REPOSITORY: artsdata
           file_name: .env
           fail_on_empty: false

@@ -32,7 +32,7 @@ export class MatchController {
     description: "Queries" ,
     required: false ,
     explode: false ,
-    example: "{ \"queries\": [ { \"type\": \"schema:Place\", \"limit\": 2, \"conditions\": [ { \"matchType\": \"name\", \"v\": \"Roy Thomson hall\" } ] } ] }"
+    example: "{ \"queries\": [ { \"type\": \"schema:Place\", \"limit\": 2, \"conditions\": [ { \"matchType\": \"name\", \"propertyValue\": \"Roy Thomson hall\" } ] } ] }"
   })
   @ApiHeader({
     name: "accept-language" ,
