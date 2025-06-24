@@ -4,7 +4,7 @@ dotenv.config();
 const { env } = process;
 
 export const ARTSDATA: { ENDPOINT: string, REPOSITORY: string } = {
-  ENDPOINT: env.ARTSDATA_ENDPOINT || "https://db.artsdata.ca/",
+  ENDPOINT: env.ARTSDATA_ENDPOINT || "https://staging.recon.artsdata.ca:7200/",
   REPOSITORY: env.REPOSITORY || "artsdata"
 };
 
