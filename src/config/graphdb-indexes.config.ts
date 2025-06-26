@@ -14,7 +14,7 @@ export const GRAPHDB_INDEX  = {
   DEFAULT: env.DEFAULT || "resource-index",
   PROPERTY: env.PROPERTY || "property-index",
   TYPE: env.TYPE || "type-index",
-  ENTITY: env.TYPE || "entity-index"
+  ENTITY: env.ENTITY || "entity-index"
 };
 
 
