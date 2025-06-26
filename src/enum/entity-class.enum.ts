@@ -1,6 +1,6 @@
 export enum EntityClassEnum {
-  EVENT = "event" ,
-  PLACE = "place" ,
-  PERSON = "person" ,
-  ORGANIZATION = "organization"
+  EVENT = "Event" ,
+  PLACE = "Place" ,
+  PERSON = "Person" ,
+  ORGANIZATION = "Organization"
 }

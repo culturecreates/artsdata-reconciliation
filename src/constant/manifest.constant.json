@@ -46,6 +46,13 @@
         "helpText": "Maximum number of values to return per row (0 for no limit)"
       },
       {
+        "id": "expand",
+        "name": "Expand",
+        "type": "boolean",
+        "default": false,
+        "helpText": "Set 'expand' to true to include entity properties"
+      },
+      {
         "id": "content",
         "name": "Content",
         "type": "select",
