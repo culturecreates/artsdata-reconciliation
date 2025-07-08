@@ -227,6 +227,8 @@ export class MatchService {
     switch (matchQuantifier) {
       case MatchQuantifierEnum.ALL:
         return triple;
+      case MatchQuantifierEnum.ANY:
+        return triple;
       case MatchQuantifierEnum.NONE:
         return `FILTER NOT EXISTS { ${triple} }.`;
       default:
