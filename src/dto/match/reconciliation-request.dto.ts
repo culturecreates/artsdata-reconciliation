@@ -26,11 +26,12 @@ export class QueryCondition {
   matchType: MatchTypeEnum|String;
 
   //TODO Add support to nested propertyValue
-  @ApiProperty({ required: true })
-  @IsString()
+  @ApiProperty({ required: true, type: [String] })
   @IsNotEmpty()
-  @Matches(/\S/ , { message: "propertyValue must not be empty or contain only whitespace" })
-  propertyValue: string;
+  @ValidateIf((o) => typeof o.propertyValue === "string" || Array.isArray(o.propertyValue))
+  @IsString({ each: true })
+  @Matches(/\S/, { each: true, message: "propertyValue must not be empty or contain only whitespace" })
+  propertyValue: string | string[];
 
   @ApiPropertyOptional()
   @ValidateIf((o) => o.matchType === "property")

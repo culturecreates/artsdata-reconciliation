@@ -93,7 +93,7 @@ export class MatchService {
    * @return {{name: string | undefined, propertyConditions: QueryCondition[]}}
    */
   private _resolveConditions(conditions: QueryCondition[]): {
-    name: string | undefined;
+    name: string | string[] | undefined;
     propertyConditions: QueryCondition[];
   } {
     const name = conditions
@@ -111,7 +111,12 @@ export class MatchService {
    * @param property
    * @return {string}
    */
-  private _resolvePropertyValue(value: string , property: string): string {
+  private _resolvePropertyValue(value: string | string [] , property: string): (string | string[]) {
+    // if value is an array then using iteration to resolve each value and put the values in an array
+    if (Array.isArray(value)) {
+      return value.flatMap(val => this._resolvePropertyValue(val , property));
+    }
+
     switch (property) {
       case ArtsdataProperties.START_DATE:
       case ArtsdataProperties.END_DATE:
@@ -144,9 +149,9 @@ export class MatchService {
     const formattedConditionValue = this._resolvePropertyValue(rawConditionValue , propertyId as string);
     const formattedPropertyId = MatchServiceHelper.isValidURI(propertyId as string) ? `<${propertyId}>` : `${propertyId}`;
 
-    let triple = this._resolveMatchQualifier(matchQualifier as MatchQualifierEnum , formattedPropertyId ,
-      formattedConditionValue , index);
-    triple = this._resolveMatchQuantifier(matchQuantifier as MatchQuantifierEnum , triple);
+    let triple = this._resolveMatchQualifierAndQuantifier(matchQualifier as MatchQualifierEnum , formattedPropertyId ,
+      matchQuantifier as MatchQuantifierEnum , formattedConditionValue , index);
+    // triple = this._resolveMatchQuantifier(matchQuantifier as MatchQuantifierEnum , triple);
     triple = this._resolveRequired(triple , required as boolean);
 
     return triple;
@@ -165,10 +170,10 @@ export class MatchService {
     for (const reconciliationQuery of queries) {
       const { type , limit , conditions } = reconciliationQuery;
       const { name , propertyConditions } = this._resolveConditions(conditions);
-      const sparqlQuery = this._generateSparqlQuery(name , type , limit || 25 , propertyConditions);
+      const sparqlQuery = this._generateSparqlQuery(name as string , type , limit || 25 , propertyConditions);
       const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
       const candidates = MatchServiceHelper
-        .formatReconciliationResponse(requestLanguage , response , name);
+        .formatReconciliationResponse(requestLanguage , response , name as string);
       results.push({ candidates });
     }
     return { results };
@@ -177,29 +182,72 @@ export class MatchService {
 
   /**
    * @private
-   * @name _resolveMatchQualifier
+   * @name _resolveMatchQualifierAndQuantifier
    * @description Resolve match qualifier, matchQualifier is defaulted to exact match
    * @param matchQualifier
    * @param formattedPropertyId
    * @param formattedConditionValue
    * @param index
    */
-  private _resolveMatchQualifier(matchQualifier: MatchQualifierEnum , formattedPropertyId: string ,
-                                 formattedConditionValue: string , index: number) {
+  private _resolveMatchQualifierAndQuantifier(matchQualifier: MatchQualifierEnum , formattedPropertyId: string ,
+                                              matchQuantifier: MatchQuantifierEnum ,
+                                              formattedConditionValue: string | string[] , index: number) {
+    if (!matchQuantifier) {
+      matchQuantifier = MatchQuantifierEnum.ALL;
+    }
     if (!matchQualifier) {
       matchQualifier = MatchQualifierEnum.EXACT_MATCH;
     }
-    switch (matchQualifier) {
-      case MatchQualifierEnum.EXACT_MATCH:
-        return `?entity ${formattedPropertyId} ${formattedConditionValue} .`;
-      case MatchQualifierEnum.REGEX_MATCH:
-        const objectId = `?obj_${index + 1}`;
-        return `?entity ${formattedPropertyId} ${objectId}
+
+    const isConditionValueArray = Array.isArray(formattedConditionValue);
+    let triple: string = "";
+    if (isConditionValueArray) {
+      const objectId = `?obj_${index + 1}`;
+      switch (matchQualifier) {
+        case MatchQualifierEnum.EXACT_MATCH:
+          if (matchQuantifier === MatchQuantifierEnum.ANY) {
+            triple = `?entity ${formattedPropertyId} ${objectId} FILTER (${objectId} IN (${(formattedConditionValue as string[]).join(" , ")})).`;
+          } else if (matchQuantifier === MatchQuantifierEnum.ALL) {
+            triple = `${(formattedConditionValue as string[])
+              .map(v => ` FILTER EXISTS {?entity ${formattedPropertyId} ${v}}`).join("\n")}`;
+          } else if (matchQuantifier === MatchQuantifierEnum.NONE) {
+            triple = `${(formattedConditionValue as string[])
+              .map(v => ` FILTER NOT EXISTS {?entity ${formattedPropertyId} ${v}}`).join("\n")}`;
+          } else {
+            Exception.badRequest("Unsupported match qualifier");
+          }
+          break;
+        case MatchQualifierEnum.REGEX_MATCH:
+          triple = `?entity ${formattedPropertyId} ${objectId}
+          FILTER ( ${(formattedConditionValue as string[]).map(v => `REGEX (${objectId}, ${v}, "i")`).join(" || ")} ;`;
+          break;
+        default:
+          Exception.badRequest("Unsupported match qualifier");
+          break;
+      }
+    } else {
+      switch (matchQualifier) {
+        case MatchQualifierEnum.EXACT_MATCH:
+          triple = `?entity ${formattedPropertyId} ${formattedConditionValue} .`;
+          break;
+        case MatchQualifierEnum.REGEX_MATCH:
+          const objectId = `?obj_${index + 1}`;
+          triple = `?entity ${formattedPropertyId} ${objectId}
           FILTER REGEX(${objectId}, ${formattedConditionValue}, "i").`;
-      default:
-        Exception.badRequest("Unsupported match qualifier");
-        return "";
+          break;
+        default:
+          Exception.badRequest("Unsupported match qualifier");
+          triple = "";
+          break;
+      }
+      if (matchQuantifier === MatchQuantifierEnum.NONE) {
+        return `FILTER NOT EXISTS { ${triple} }.`;
+      }
     }
+
+
+    return triple;
+
   }
 
   /**
