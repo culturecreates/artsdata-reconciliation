@@ -155,7 +155,6 @@ export class MatchService {
 
     let triple = this._resolveMatchQualifierAndQuantifier(matchQualifier as MatchQualifierEnum , formattedPropertyId ,
       matchQuantifier as MatchQuantifierEnum , formattedConditionValue , index);
-    // triple = this._resolveMatchQuantifier(matchQuantifier as MatchQuantifierEnum , triple);
     triple = this._resolveRequired(triple , required as boolean);
 
     return triple;
@@ -190,6 +189,7 @@ export class MatchService {
    * @description Resolve match qualifier, matchQualifier is defaulted to exact match
    * @param matchQualifier
    * @param formattedPropertyId
+   * @param matchQuantifier
    * @param formattedConditionValue
    * @param index
    */
