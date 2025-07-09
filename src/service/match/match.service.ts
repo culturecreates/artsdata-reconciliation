@@ -117,6 +117,10 @@ export class MatchService {
       return value.flatMap(val => this._resolvePropertyValue(val , property));
     }
 
+    if (MatchServiceHelper.isValidURI(value)) {
+      return `<${value}>`;
+    }
+
     switch (property) {
       case ArtsdataProperties.START_DATE:
       case ArtsdataProperties.END_DATE:
