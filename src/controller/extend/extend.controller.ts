@@ -42,10 +42,6 @@ export class ExtendController {
 
   @Post(":graph_name/:entity_class")
   @ApiOperation({ summary: "Get Data from a given graph" })
-  // @ApiResponse({
-  //   status: 200 , type: DataExtensionResponseDTO , isArray: true ,
-  //   description: "Reconciliation candidates for each query"
-  // })
   @ApiQuery({
     name: "entity_class" ,
     description: "**entity-class**" ,
