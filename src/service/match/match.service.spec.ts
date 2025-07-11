@@ -49,7 +49,7 @@ describe("Recon Service tests" , () => {
             ]
           }
         ] ,
-        expectedName: "St. Lawrence Centre for the Arts - Bluma Appel Theatre" ,
+        expectedName: "Bluma Appel Theatre" ,
         expectedCount: 1
 
       } , {
@@ -179,7 +179,7 @@ describe("Recon Service tests" , () => {
             ]
           }
         ] ,
-        expectedName: "le Marc Lescarbot (Pointe-de-l’église)" ,
+        expectedName: "Salle Marc Lescarbot" ,
         expectedCount: 1
       } , {
         description: "It should find alternate names" ,
@@ -340,8 +340,8 @@ describe("Recon Service tests" , () => {
             ]
           }
         ] ,
-        expectedId: "citadeltheatre-com_2018-2019_matilda" ,
-        expectedName: "Matilda - Citadel Theatre" ,
+        expectedId: "K43-1701" ,
+        expectedName: "Dufflebag Theatre" ,
         expectedCount: 1
       } , {
         description: "Reconcile Event with Name and startDate" ,
@@ -358,15 +358,15 @@ describe("Recon Service tests" , () => {
               } ,
               {
                 "matchType": "property" ,
-                "propertyValue": "2019-03-17T13:30:00-04:00" ,
+                "propertyValue": "2025-12-28T13:00:00-04:00" ,
                 "propertyId": "schema:startDate" ,
                 "required": true
               }
             ]
           }
         ] ,
-        expectedId: "citadeltheatre-com_2018-2019_matilda#2019-03-17T133000-0400" ,
-        expectedName: "Matilda - Citadel Theatre" ,
+        expectedId: "K43-1701" ,
+        expectedName: "Dufflebag Theatre" ,
         expectedCount: 1
       } ,
       //TODO this should eventually pass when all the URLs are converted to URLS in graphdb
@@ -488,8 +488,8 @@ describe("Recon Service tests" , () => {
               } ,
               {
                 "matchType": "property" ,
-                "propertyValue": "https://www.roythomson.*" ,
-                "propertyId": "schema:url" ,
+                "propertyValue": "Toronto.*" ,
+                "propertyId": "schema:disambiguatingDescription" ,
                 "required": true ,
                 "matchQualifier": MatchQualifierEnum.REGEX_MATCH
               }
