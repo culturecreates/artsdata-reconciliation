@@ -1,5 +1,5 @@
-import { Body , Controller , Get , Param , Post , Query } from "@nestjs/common";
-import { ApiOperation , ApiQuery , ApiResponse , ApiTags } from "@nestjs/swagger";
+import { Body , Controller , Get , Param , ParseIntPipe , Post , Query } from "@nestjs/common";
+import { ApiOperation , ApiParam , ApiQuery , ApiResponse , ApiTags } from "@nestjs/swagger";
 import { EntityClassEnum } from "../../enum/entity-class.enum";
 import { ExtendService } from "../../service/extend";
 import { DataExtensionQueryDTO , DataExtensionResponseDTO , ProposedExtendProperty } from "../../dto/extend";
@@ -42,14 +42,33 @@ export class ExtendController {
 
   @Get(":graph_name/:entity_class")
   @ApiOperation({ summary: "Get Data from a given graph" })
-  @ApiQuery({
+  @ApiParam({
     name: "entity_class" ,
     description: "**entity-class**" ,
     required: true ,
     enum: Object.values(EntityClassEnum)
   })
-  async getDataFromGraph(@Param("graph_name") id: string , @Param("entity_class") entityClass: EntityClassEnum) {
-    return await this._extendService.getDataFromGraph(id , entityClass);
+  @ApiQuery({
+    name: "page" ,
+    description: "The page number." ,
+    required: true ,
+    explode: false ,
+    type: Number ,
+    example: 1
+  })
+  @ApiQuery({
+    name: "limit" ,
+    description: "The page size." ,
+    required: true ,
+    explode: false ,
+    type: Number ,
+    example: 10
+  })
+  async getDataFromGraph(@Param("graph_name") id: string ,
+                         @Param("entity_class") entityClass: EntityClassEnum ,
+                         @Query("page" , ParseIntPipe) page: number ,
+                         @Query("limit" , ParseIntPipe) limit: number) {
+    return await this._extendService.getDataFromGraph(id , entityClass , page , limit);
   }
 
 }
