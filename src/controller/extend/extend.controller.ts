@@ -40,7 +40,7 @@ export class ExtendController {
     return await this._extendService.getDataExtension(dataExtensionQuery);
   }
 
-  @Post(":graph_name/:entity_class")
+  @Get(":graph_name/:entity_class")
   @ApiOperation({ summary: "Get Data from a given graph" })
   @ApiQuery({
     name: "entity_class" ,
