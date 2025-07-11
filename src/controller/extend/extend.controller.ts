@@ -1,4 +1,4 @@
-import { Body , Controller , Get , Post , Query } from "@nestjs/common";
+import { Body , Controller , Get , Param , Post , Query } from "@nestjs/common";
 import { ApiOperation , ApiQuery , ApiResponse , ApiTags } from "@nestjs/swagger";
 import { EntityClassEnum } from "../../enum/entity-class.enum";
 import { ExtendService } from "../../service/extend";
@@ -38,6 +38,22 @@ export class ExtendController {
   })
   async getDataExtension(@Body() dataExtensionQuery: DataExtensionQueryDTO) {
     return await this._extendService.getDataExtension(dataExtensionQuery);
+  }
+
+  @Post(":graph_name/:entity_class")
+  @ApiOperation({ summary: "Get Data from a given graph" })
+  // @ApiResponse({
+  //   status: 200 , type: DataExtensionResponseDTO , isArray: true ,
+  //   description: "Reconciliation candidates for each query"
+  // })
+  @ApiQuery({
+    name: "entity_class" ,
+    description: "**entity-class**" ,
+    required: true ,
+    enum: Object.values(EntityClassEnum)
+  })
+  async getDataFromGraph(@Param("graph_name") id: string , @Param("entity_class") entityClass: EntityClassEnum) {
+    return await this._extendService.getDataFromGraph(id , entityClass);
   }
 
 }

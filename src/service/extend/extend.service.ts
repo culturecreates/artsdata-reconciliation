@@ -9,6 +9,7 @@ import {
   ExtendQueryProperty ,
   ProposedExtendProperty
 } from "../../dto/extend";
+import { QUERY_BY_GRAPH } from "../../constant/extend/query-by-graph.constants";
 
 @Injectable()
 export class ExtendService {
@@ -137,10 +138,9 @@ export class ExtendService {
             const existingValue = existingValues.values;
             // Check if the value already exists
             const valueExists = existingValue.some((existingItem: any) => {
-              if(existingItem.id && currentValue.id){
+              if (existingItem.id && currentValue.id) {
                 return existingItem.id === currentValue.id;
-              }
-              else if (existingItem.str && currentValue.str ) {
+              } else if (existingItem.str && currentValue.str) {
                 return existingItem.str === currentValue.str && existingItem.lang === currentValue.lang;
               } else if (existingItem.str && currentValue.str) {
                 return existingItem.str === currentValue.str;
@@ -170,5 +170,54 @@ export class ExtendService {
 
   private _getExpandedPropertiesForAddress() {
     return ["postalCode" , "addressLocality" , "addressCountry"];
+  }
+
+  async getDataFromGraph(id: string , entityClass: EntityClassEnum) {
+    const sparqlQuery = this._getSparqlQueryByTypeAndGraph(id , entityClass);
+    const result = await this._artsdataService.executeSparqlQuery(sparqlQuery , true);
+    return this._formatResults(result);
+  }
+
+  private _getSparqlQueryByTypeAndGraph(graphUrl: string , entityClass: EntityClassEnum) {
+    let query: string;
+    switch (entityClass) {
+      case EntityClassEnum.EVENT:
+        query = QUERY_BY_GRAPH.EVENT.replace("TYPE_PLACEHOLDER" , "Event");
+        break;
+      case EntityClassEnum.PLACE:
+        query = QUERY_BY_GRAPH.PLACE.replace("TYPE_PLACEHOLDER" , "Place");
+        break;
+      case EntityClassEnum.ORGANIZATION:
+        query = QUERY_BY_GRAPH.ORGANIZATION.replace("TYPE_PLACEHOLDER" , "Organization");
+        break;
+      case EntityClassEnum.PERSON:
+        query = QUERY_BY_GRAPH.PERSON.replace("TYPE_PLACEHOLDER" , "Person");
+        break;
+      default:
+        throw Exception.badRequest("Invalid type provided");
+    }
+    return query.replace("GRAPH_URI_PLACEHOLDER" , graphUrl);
+  }
+
+  /**
+   * @name _formatResults
+   * @description Format the results from the SPARQL query for query by graph id
+   * @param result
+   * @private
+   */
+  private _formatResults(result: any) {
+    return result.results.bindings.map((row: any) => {
+      const formattedRow: { [key: string]: any } = {};
+      for (const key in row) {
+        if (row[key].type === "literal") {
+          formattedRow[key] = row[key].value;
+        } else if (row[key].type === "uri") {
+          formattedRow[key] = row[key].value;
+        } else if (row[key].type === "bnode") {
+          formattedRow[key] = `_:${row[key].value}`;
+        }
+      }
+      return formattedRow;
+    });
   }
 }
