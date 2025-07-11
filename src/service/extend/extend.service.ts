@@ -172,13 +172,13 @@ export class ExtendService {
     return ["postalCode" , "addressLocality" , "addressCountry"];
   }
 
-  async getDataFromGraph(id: string , entityClass: EntityClassEnum , page: number = 1 , limit: number = 10) {
-    const sparqlQuery = this._getSparqlQueryByTypeAndGraph(id , entityClass , page , limit);
+  async getDataFromGraph(graphURI: string , entityClass: EntityClassEnum , page: number = 1 , limit: number = 10) {
+    const sparqlQuery = this._getSparqlQueryByTypeAndGraph(graphURI , entityClass , page , limit);
     const result = await this._artsdataService.executeSparqlQuery(sparqlQuery , true);
     return this._formatResults(result);
   }
 
-  private _getSparqlQueryByTypeAndGraph(graphUrl: string , entityClass: EntityClassEnum , page: number , limit: number): string {
+  private _getSparqlQueryByTypeAndGraph(graphURI: string , entityClass: EntityClassEnum , page: number , limit: number): string {
     let query: string;
     switch (entityClass) {
       case EntityClassEnum.EVENT:
@@ -196,7 +196,7 @@ export class ExtendService {
       default:
         throw Exception.badRequest("Invalid type provided");
     }
-    return query.replace("GRAPH_URI_PLACEHOLDER" , graphUrl)
+    return query.replace("GRAPH_URI_PLACEHOLDER" , graphURI)
       .replace("LIMIT_PLACEHOLDER" , limit.toString())
       .replace("OFFSET_PLACEHOLDER" , ((page - 1) * limit).toString());
   }

@@ -40,7 +40,7 @@ export class ExtendController {
     return await this._extendService.getDataExtension(dataExtensionQuery);
   }
 
-  @Get(":graph_name/:entity_class")
+  @Get(":graph_uri/:entity_class")
   @ApiOperation({ summary: "Get Data from a given graph" })
   @ApiParam({
     name: "entity_class" ,
@@ -64,11 +64,11 @@ export class ExtendController {
     type: Number ,
     example: 10
   })
-  async getDataFromGraph(@Param("graph_name") id: string ,
+  async getDataFromGraph(@Param("graph_uri") graphURI: string ,
                          @Param("entity_class") entityClass: EntityClassEnum ,
                          @Query("page" , ParseIntPipe) page: number ,
                          @Query("limit" , ParseIntPipe) limit: number) {
-    return await this._extendService.getDataFromGraph(id , entityClass , page , limit);
+    return await this._extendService.getDataFromGraph(graphURI , entityClass , page , limit);
   }
 
 }
