@@ -179,19 +179,20 @@ export class ExtendService {
   }
 
   private _getSparqlQueryByTypeAndGraph(graphURI: string , entityClass: EntityClassEnum , page: number , limit: number): string {
-    let query: string;
+    let query: string = QUERY_BY_GRAPH.GENERIC;
+
     switch (entityClass) {
       case EntityClassEnum.EVENT:
-        query = QUERY_BY_GRAPH.EVENT.replace("TYPE_PLACEHOLDER" , "Event");
+        query = query.replace("TYPE_PLACEHOLDER" , "Event");
         break;
       case EntityClassEnum.PLACE:
-        query = QUERY_BY_GRAPH.PLACE.replace("TYPE_PLACEHOLDER" , "Place");
+        query = query.replace("TYPE_PLACEHOLDER" , "Place");
         break;
       case EntityClassEnum.ORGANIZATION:
-        query = QUERY_BY_GRAPH.ORGANIZATION.replace("TYPE_PLACEHOLDER" , "Organization");
+        query = query.replace("TYPE_PLACEHOLDER" , "Organization");
         break;
       case EntityClassEnum.PERSON:
-        query = QUERY_BY_GRAPH.PERSON.replace("TYPE_PLACEHOLDER" , "Person");
+        query = query.replace("TYPE_PLACEHOLDER" , "Person");
         break;
       default:
         throw Exception.badRequest("Invalid type provided");
