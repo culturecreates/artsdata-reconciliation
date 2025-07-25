@@ -17,6 +17,7 @@ WHERE {
     }
     
     ?uri a schema:TYPE_PLACEHOLDER . 
+    FILTER(!isBlank(?uri))
     OPTIONAL {
       ?adids schema:sameAs ?uri .
       FILTER(contains(str(?adids),"http://kg.artsdata.ca/resource/K"))
