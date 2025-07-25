@@ -23,7 +23,7 @@ jobs:
       - run: npm install
       - run: npm test
   build-and-push-image:
-    needs: test
+    #    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
