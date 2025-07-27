@@ -29,7 +29,8 @@ WHERE {
     }
     BIND(COALESCE(?adid_obj, ?adid_sub) as ?artsdata_uris)
 
-    OPTIONAL {?uri schema:url ?urls}
+    OPTIONAL {?uri schema:url ?urls
+    FILTER(!isBlank(?urls))}
 
     OPTIONAL {
       ?uri schema:sameAs ?wikidata_ids .
