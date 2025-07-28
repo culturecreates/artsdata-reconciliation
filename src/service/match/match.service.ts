@@ -151,7 +151,7 @@ export class MatchService {
   private _generateTripleFromCondition(condition: QueryCondition , index: number): string {
     const { required , propertyId , propertyValue: rawConditionValue , matchQualifier , matchQuantifier } = condition;
     const formattedConditionValue = this._resolvePropertyValue(rawConditionValue , propertyId as string);
-    const formattedPropertyId = MatchServiceHelper.isValidURI(propertyId as string) ? `<${propertyId}>` : `${propertyId}`;
+    const formattedPropertyId: string = MatchServiceHelper.isValidURI(propertyId as string) ? this._resolvePropertyPath(propertyId as string) : `${propertyId}`;
 
     let triple = this._resolveMatchQualifierAndQuantifier(matchQualifier as MatchQualifierEnum , formattedPropertyId ,
       matchQuantifier as MatchQuantifierEnum , formattedConditionValue , index);
@@ -304,5 +304,18 @@ export class MatchService {
     const isQueryByURI = !!name && MatchServiceHelper.isQueryByURI(name);
     const rawSparqlQuery: string = this._getSparqlQuery(name , isQueryByURI , type , limit);
     return this._resolvePropertyConditions(rawSparqlQuery , propertyConditions);
+  }
+
+  private _resolvePropertyPath(propertyId: string) {
+    const parts = propertyId.trim().split("/http");
+    let propertyPath = "";
+
+    for (let i = 0; i < parts.length; i++) {
+      const part = i === 0 ? parts[i] : "http" + parts[i];
+      propertyPath += (part.startsWith("http") ? `<${part}>` : part);
+      if (i < parts.length - 1) propertyPath += "/";
+    }
+
+    return propertyPath;
   }
 }
