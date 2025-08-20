@@ -5,7 +5,7 @@ import { isURL } from "validator";
 
 export class MatchServiceHelper {
 
-  static prependDoubleSlashToSpecialChars(inputString: string) {
+  static escapeSpecialCharacters(inputString: string) {
     const luceneSpecialChars = ["+" , "-" , "!" , "(" , ")" , "{" , "}" , "[" , "]" , "^" , "\"" , "~" , "*" , "?" , ":" , "\\" , "/"];
     return Array.from(inputString)
       .map(char =>
