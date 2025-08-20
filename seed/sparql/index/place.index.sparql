@@ -15,7 +15,42 @@ INSERT DATA {
       "multivalued": true,
       "ignoreInvalidValues": false,
       "facet": true
-    }
+    },
+    {
+      "fieldName": "sameAs",
+      "propertyChain": [
+        "http://schema.org/sameAs"
+      ],
+      "indexed": true,
+      "stored": true,
+      "analyzed": true,
+      "multivalued": true,
+      "ignoreInvalidValues": true,
+      "facet": true
+    },
+    {
+      "fieldName": "url",
+      "propertyChain": [
+        "http://schema.org/url"
+      ],
+      "indexed": true,
+      "stored": true,
+      "analyzed": true,
+      "multivalued": true,
+      "ignoreInvalidValues": true,
+      "facet": true
+    }, {
+      "fieldName": "url",
+      "propertyChain": [
+        "http://schema.org/postalAddress/http://schema.org/postalCode"
+      ],
+      "indexed": true,
+      "stored": true,
+      "analyzed": true,
+      "multivalued": true,
+      "ignoreInvalidValues": true,
+      "facet": true
+    },
   ],
   "languages": [],
   "types": [

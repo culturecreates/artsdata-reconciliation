@@ -68,6 +68,8 @@ export class ExtendService {
         return PROPOSED_EXTEND_PROPERTIES_METADATA.PERSON;
       case EntityClassEnum.ORGANIZATION:
         return PROPOSED_EXTEND_PROPERTIES_METADATA.ORGANIZATION;
+      case EntityClassEnum.AGENT:
+        return PROPOSED_EXTEND_PROPERTIES_METADATA.AGENT;
       default:
         throw Exception.badRequest("Invalid entity type");
     }
@@ -183,16 +185,19 @@ export class ExtendService {
 
     switch (entityClass) {
       case EntityClassEnum.EVENT:
-        query = query.replace("TYPE_PLACEHOLDER" , "Event");
+        query = query.replace("TYPE_PLACEHOLDER" , "schema:Event");
         break;
       case EntityClassEnum.PLACE:
-        query = query.replace("TYPE_PLACEHOLDER" , "Place");
+        query = query.replace("TYPE_PLACEHOLDER" , "schema:Place");
         break;
       case EntityClassEnum.ORGANIZATION:
-        query = query.replace("TYPE_PLACEHOLDER" , "Organization");
+        query = query.replace("TYPE_PLACEHOLDER" , "schema:Organization");
         break;
       case EntityClassEnum.PERSON:
-        query = query.replace("TYPE_PLACEHOLDER" , "Person");
+        query = query.replace("TYPE_PLACEHOLDER" , "schema:Person");
+        break;
+      case EntityClassEnum.AGENT:
+        query = query.replace("TYPE_PLACEHOLDER" , "dbo:Agent");
         break;
       default:
         throw Exception.badRequest("Invalid type provided");

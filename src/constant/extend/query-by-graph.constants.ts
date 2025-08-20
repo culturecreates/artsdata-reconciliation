@@ -16,7 +16,7 @@ WHERE {
                  a ?types  .
     }
     
-    ?uri a schema:TYPE_PLACEHOLDER . 
+    ?uri a TYPE_PLACEHOLDER . 
     FILTER(!isBlank(?uri))
     OPTIONAL {
       ?adids schema:sameAs ?uri .
