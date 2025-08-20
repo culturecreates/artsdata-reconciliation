@@ -54,39 +54,6 @@ export class MatchService {
 
   /**
    * @private
-   * @name _getSparqlQuery
-   * @description Get SPARQL query
-   * @param name
-   * @param isQueryByURI
-   * @param type
-   * @param limit
-   * @return {string}
-   */
-  private _getSparqlQuery(name: string | undefined , isQueryByURI: boolean , type: string , limit: number): string {
-    const graphdbIndex: string = MatchServiceHelper.getGraphdbIndex(type);
-
-    const rawQuery = isQueryByURI ? QUERIES.RECONCILIATION_QUERY_BY_URI : QUERIES.RECONCILIATION_QUERY;
-    if (name) {
-      name = isQueryByURI ? (name?.startsWith("K") ?
-          "<http://kg.artsdata.ca/resource/" + name + ">" :
-          "<" + name + ">") :
-        "\"" + MatchServiceHelper.prependDoubleSlashToSpecialChars(name as string) + "\"";
-    }
-
-
-    const queryReplacementString: string = name ? `values ?query { ${name}  }` : "";
-    const queryFilterReplacementString: string = name ? `      luc:query ?query ;` : "";
-
-    return rawQuery
-      .replace("INDEX_PLACE_HOLDER" , graphdbIndex)
-      .replace("QUERY_PLACE_HOLDER" , queryReplacementString)
-      .replace("QUERY_FILTER_PLACE_HOLDER" , queryFilterReplacementString)
-      .replace("URI_PLACEHOLDER" , `${name}`)
-      .replace("LIMIT_PLACE_HOLDER" , `LIMIT ${limit}`);
-  }
-
-  /**
-   * @private
    * @name _resolveConditions
    * @description Resolve conditions
    * @param conditions
@@ -301,8 +268,28 @@ export class MatchService {
   private _generateSparqlQuery(name: string | undefined , type: string , limit: number ,
                                propertyConditions: QueryCondition[]): string {
 
-    const isQueryByURI = !!name && MatchServiceHelper.isQueryByURI(name);
-    const rawSparqlQuery: string = this._getSparqlQuery(name , isQueryByURI , type , limit);
+    const graphdbIndex = MatchServiceHelper.getGraphdbIndex(type);
+
+    const isQueryByURI = name && MatchServiceHelper.isQueryByURI(name);
+    const rawQuery = isQueryByURI ? QUERIES.RECONCILIATION_QUERY_BY_URI : QUERIES.RECONCILIATION_QUERY;
+
+    if (name) {
+      name = isQueryByURI
+        ? `<http://kg.artsdata.ca/resource/${name.startsWith("K") ? name : name}>`
+        : `${MatchServiceHelper.prependDoubleSlashToSpecialChars(name)}`;
+      name = !isQueryByURI ? this._modifyNameForLuceneScore(name as string , propertyConditions) : name;
+    }
+
+    const queryReplacementString = name ? `values ?query { "${name}" }` : "";
+    const queryFilterReplacementString = name ? "luc:query ?query ;" : "";
+
+    const rawSparqlQuery = rawQuery
+      .replace("INDEX_PLACE_HOLDER" , graphdbIndex)
+      .replace("QUERY_PLACE_HOLDER" , queryReplacementString)
+      .replace("QUERY_FILTER_PLACE_HOLDER" , queryFilterReplacementString)
+      .replace("URI_PLACEHOLDER" , name || "")
+      .replace("LIMIT_PLACE_HOLDER" , `LIMIT ${limit}`);
+
     return this._resolvePropertyConditions(rawSparqlQuery , propertyConditions);
   }
 
@@ -317,5 +304,35 @@ export class MatchService {
     }
 
     return propertyPath;
+  }
+
+  private _modifyNameForLuceneScore(name: string , propertyConditions: QueryCondition[]) {
+
+    let luceneQuery = `name: ${name}`;
+    if (propertyConditions.length > 0) {
+      propertyConditions.forEach(condition => {
+        if (condition.matchType === MatchTypeEnum.PROPERTY) {
+          if (condition.propertyId === "http://schema.org/url") {
+            luceneQuery = luceneQuery + this.resolvePropertyValueForLucene(condition.propertyValue , "url");
+          }
+          if (condition.propertyId === "http://schema.org/sameAs") {
+            luceneQuery = luceneQuery + this.resolvePropertyValueForLucene(condition.propertyValue , "sameAs");
+          }
+        }
+      });
+    }
+    return luceneQuery;
+  }
+
+  private resolvePropertyValueForLucene(propertyValue: string | string[] , propertyId: string) {
+    let luceneQuery: string = "";
+    if (Array.isArray(propertyValue)) {
+      propertyValue.forEach(value => {
+        luceneQuery = luceneQuery + ` ${propertyId}: ${value}`;
+      });
+    } else {
+      luceneQuery = luceneQuery + ` ${propertyId}: ${propertyValue}`;
+    }
+    return luceneQuery;
   }
 }
