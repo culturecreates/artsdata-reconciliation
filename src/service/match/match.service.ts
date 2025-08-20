@@ -276,7 +276,7 @@ export class MatchService {
     if (name) {
       name = isQueryByURI
         ? `<http://kg.artsdata.ca/resource/${name.startsWith("K") ? name : name}>`
-        : `${MatchServiceHelper.prependDoubleSlashToSpecialChars(name)}`;
+        : `${MatchServiceHelper.escapeSpecialCharacters(name)}`;
       name = !isQueryByURI ? this._modifyNameForLuceneScore(name as string , propertyConditions) : name;
     }
 
@@ -328,10 +328,10 @@ export class MatchService {
     let luceneQuery: string = "";
     if (Array.isArray(propertyValue)) {
       propertyValue.forEach(value => {
-        luceneQuery = luceneQuery + ` ${propertyId}: ${value}`;
+        luceneQuery = luceneQuery + ` ${propertyId}: ${MatchServiceHelper.escapeSpecialCharacters(value)}`;
       });
     } else {
-      luceneQuery = luceneQuery + ` ${propertyId}: ${propertyValue}`;
+      luceneQuery = luceneQuery + ` ${propertyId}: ${MatchServiceHelper.escapeSpecialCharacters(propertyValue)}`;
     }
     return luceneQuery;
   }
