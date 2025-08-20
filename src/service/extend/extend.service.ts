@@ -217,10 +217,14 @@ export class ExtendService {
     return result.results.bindings.map((row: any) => {
       const formattedRow: { [key: string]: any } = {};
       for (const key in row) {
-        if (row[key].type === "literal") {
+        if (row[key].datatype === "http://www.w3.org/2001/XMLSchema#boolean") {
+          formattedRow[key] = row[key].value === "true";
+        } else if (row[key].type === "literal") {
           formattedRow[key] = row[key].value;
         } else if (row[key].type === "uri") {
           formattedRow[key] = row[key].value;
+        } else if (row[key].type === "bnode") {
+          formattedRow[key] = `_:${row[key].value}`;
         } else if (row[key].type === "bnode") {
           formattedRow[key] = `_:${row[key].value}`;
         }

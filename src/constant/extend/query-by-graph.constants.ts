@@ -10,6 +10,7 @@ SELECT ?uri
 (sample(?artsdata_uris) as ?artsdata_uri)
 (sample (?wikidata_ids) as ?wikidata_uri)
 (GROUP_CONCAT(?types ; SEPARATOR = ", ") AS ?type)
+(MAX(?flaggedForReview) AS ?isFlaggedForReview)
 WHERE {
     graph <GRAPH_URI_PLACEHOLDER> {
         ?uri schema:name ?name_language;
@@ -22,6 +23,12 @@ WHERE {
       ?adids schema:sameAs ?uri .
       FILTER(contains(str(?adids),"http://kg.artsdata.ca/resource/K"))
     }
+    
+    OPTIONAL {
+    ?uri schema:additionalType ?additionalType .
+    FILTER(STR(?additionalType) = "http://kg.artsdata.ca/ontology/FlaggedForReview")
+    BIND(true AS ?flaggedForReview)
+  }
     
     OPTIONAL {
       ?uri schema:sameAs ?adid_obj .
