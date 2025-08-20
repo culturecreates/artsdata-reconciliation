@@ -185,10 +185,18 @@ export class ExtendService {
 
     switch (entityClass) {
       case EntityClassEnum.EVENT:
-        query = query.replace("TYPE_PLACEHOLDER" , "schema:Event");
+        query = query.replace("TYPE_PLACEHOLDER" , "schema:Event")
+          .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
+            `OPTIONAL {?uri schema:startDate ?startDate .}`)
+          .replace("<EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>" ,
+            "(sample(?startDate) as ?start_date)");
         break;
       case EntityClassEnum.PLACE:
-        query = query.replace("TYPE_PLACEHOLDER" , "schema:Place");
+        query = query.replace("TYPE_PLACEHOLDER" , "schema:Place")
+          .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
+            `OPTIONAL {?uri schema:address/schema:postalCode ?postalCode .}`)
+          .replace("<EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>" ,
+            "(sample(?postalCode) as ?postal_code)");
         break;
       case EntityClassEnum.ORGANIZATION:
         query = query.replace("TYPE_PLACEHOLDER" , "schema:Organization");
@@ -203,6 +211,8 @@ export class ExtendService {
         throw Exception.badRequest("Invalid type provided");
     }
     return query.replace("GRAPH_URI_PLACEHOLDER" , graphURI)
+      .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" , "")
+      .replace("<EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>" , "")
       .replace("LIMIT_PLACEHOLDER" , limit.toString())
       .replace("OFFSET_PLACEHOLDER" , ((page - 1) * limit).toString());
   }
