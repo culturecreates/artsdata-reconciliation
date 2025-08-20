@@ -10,7 +10,7 @@ SELECT ?uri
 (sample(?artsdata_uris) as ?artsdata_uri)
 (sample (?wikidata_ids) as ?wikidata_uri)
 (GROUP_CONCAT(?types ; SEPARATOR = ", ") AS ?type)
-(MAX(?flaggedForReview) AS ?isFlaggedForReview)
+(MAX(?flaggedForReview) AS ?is_flagged_for_review)
 <EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>
 WHERE {
     graph <GRAPH_URI_PLACEHOLDER> {
