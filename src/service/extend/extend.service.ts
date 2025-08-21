@@ -79,7 +79,7 @@ export class ExtendService {
     let query: string = EXTEND_QUERY;
     const { ids , properties } = dataExtensionQuery;
     const uris = ids.map(id => {
-      if (!MatchServiceHelper.isValidURI(id)) {
+      if (MatchServiceHelper.isValidURI(id)) {
         return id;
       } else
         return `${ArtsdataConstants.PREFIX}${id}`;
