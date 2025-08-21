@@ -27,7 +27,7 @@ export class ExtendService {
     const formattedResult = this._formatResult(dataExtensionQuery.ids , result);
 
     if (expandProperties.length > 0) {
-      const properties: { id: any; values: any; }[] = [];
+      let properties: { id: any; values: any; }[] = [];
       const expandedPropertyPrefixes = expandProperties
         .map((property) => `${property.id}_`);
       formattedResult.rows.forEach((row) => {
@@ -37,6 +37,7 @@ export class ExtendService {
           const expandedProperty = row?.properties
             .filter((item: any) => item.id.startsWith(propertyPrefix));
           if (expandedProperty?.length) {
+            properties = [];
             for (const prop of expandedProperty) {
               const propertyId = prop.id;
               //Remove the property with propertyId from the row properties
