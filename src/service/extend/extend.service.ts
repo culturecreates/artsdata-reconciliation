@@ -128,6 +128,9 @@ export class ExtendService {
           if (row[key].type === "literal") {
             currentValue = { "str": row[key].value , lang: row[key]["xml:lang"] };
           }
+          if (row[key].type === "bnode") {
+            currentValue = { "id": row[key].value };
+          }
 
           if (row[key].type === "uri") {
             const value = row[key].value;
