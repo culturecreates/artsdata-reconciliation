@@ -137,14 +137,20 @@ export class MatchService {
     : Promise<ReconciliationResponse> {
     const { queries } = reconciliationRequest;
     const results: ReconciliationResults[] = [];
+    let sparqlQuery;
     for (const reconciliationQuery of queries) {
-      const { type , limit , conditions } = reconciliationQuery;
-      const { name , propertyConditions } = this._resolveConditions(conditions);
-      const sparqlQuery = this._generateSparqlQuery(name as string , type , limit || 25 , propertyConditions);
-      const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
-      const candidates = MatchServiceHelper
-        .formatReconciliationResponse(requestLanguage , response , name as string);
-      results.push({ candidates });
+      try {
+        const { type , limit , conditions } = reconciliationQuery;
+        const { name , propertyConditions } = this._resolveConditions(conditions);
+        sparqlQuery = this._generateSparqlQuery(name as string , type , limit || 25 , propertyConditions);
+        const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
+        const candidates = MatchServiceHelper
+          .formatReconciliationResponse(requestLanguage , response , name as string);
+        results.push({ candidates });
+      } catch (error) {
+        console.error("Error in reconciliation query:" , error);
+        results.push({ candidates: [] });
+      }
     }
     return { results };
 

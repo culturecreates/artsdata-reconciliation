@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
 import { EntityClassEnum } from "../../enum/entity-class.enum";
 import { ArtsdataConstants , EXTEND_QUERY , PROPOSED_EXTEND_PROPERTIES_METADATA } from "../../constant";
-import { Exception } from "../../helper";
+import { Exception , MatchServiceHelper } from "../../helper";
 import {
   DataExtensionQueryDTO ,
   DataExtensionResponseDTO ,
@@ -78,7 +78,12 @@ export class ExtendService {
   private _generateQuery(dataExtensionQuery: DataExtensionQueryDTO) {
     let query: string = EXTEND_QUERY;
     const { ids , properties } = dataExtensionQuery;
-    const uris = ids.map(id => `${ArtsdataConstants.PREFIX}${id}`);
+    const uris = ids.map(id => {
+      if (!MatchServiceHelper.isValidURI(id)) {
+        return id;
+      } else
+        return `${ArtsdataConstants.PREFIX}${id}`;
+    });
     const uriPlaceholder = uris.map(item => `(<${item}>)`).join(" ");
     query = query.replace("<URI_PLACE_HOLDER>" , uriPlaceholder);
 
