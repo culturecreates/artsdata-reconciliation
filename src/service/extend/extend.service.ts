@@ -99,15 +99,15 @@ export class ExtendService {
 
   private _generateTripleFromCondition(property: ExtendQueryProperty) {
     const { id , expand } = property;
-    const triple = `OPTIONAL {?uri schema:${id} ?${id}.}\n`;
+    let expandedTriples;
     if (expand) {
       if (id === "address") {
         const expandedProperties = this._getExpandedPropertiesForAddress();
-        const expandedTriples = expandedProperties.map(prop => `?${id} schema:${prop} ?${id}_${prop}.`).join("\n");
-        return `${triple} OPTIONAL {${expandedTriples} }`;
+        expandedTriples = expandedProperties
+          .map(prop => `\t\tOPTIONAL {?${id} schema:${prop} ?${id}_${prop}.}`).join("\n");
       }
     }
-    return triple;
+    return `OPTIONAL {?uri schema:${id} ?${id}. ${expandedTriples ? `\n${expandedTriples}\n` : ""}}\n`;
   }
 
   private _formatResult(ids: string[] , result: any): DataExtensionResponseDTO {
