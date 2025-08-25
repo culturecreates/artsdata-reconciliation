@@ -40,19 +40,18 @@ export class ExtendController {
     return await this._extendService.getDataExtension(dataExtensionQuery);
   }
 
-  @Get(":graph_uri/:entity_class")
-  @ApiOperation({ summary: "Get Data from a given graph" })
+  @Get(":graph_uri/:entity_type")
+  @ApiOperation({ summary: "Get Data from a given graph and entity type" })
   @ApiParam({
-    name: "entity_class" ,
-    description: "**entity-class**" ,
+    name: "entity_type" ,
+    description: "**entity-type**" ,
     required: true ,
-    enum: Object.values(EntityClassEnum)
+    example: "https://schema.org/Event"
   })
   @ApiQuery({
     name: "page" ,
     description: "The page number." ,
     required: true ,
-    explode: false ,
     type: Number ,
     example: 1
   })
@@ -60,15 +59,14 @@ export class ExtendController {
     name: "limit" ,
     description: "The page size." ,
     required: true ,
-    explode: false ,
     type: Number ,
     example: 10
   })
   async getDataFromGraph(@Param("graph_uri") graphURI: string ,
-                         @Param("entity_class") entityClass: EntityClassEnum ,
+                         @Param("entity_type") entityType: string ,
                          @Query("page" , ParseIntPipe) page: number ,
                          @Query("limit" , ParseIntPipe) limit: number) {
-    return await this._extendService.getDataFromGraph(graphURI , entityClass , page , limit);
+    return await this._extendService.getDataFromGraph(graphURI , entityType , page , limit);
   }
 
 }

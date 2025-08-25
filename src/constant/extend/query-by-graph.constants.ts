@@ -17,43 +17,35 @@ WHERE {
         ?uri schema:name ?name_language;
                  a ?types  .
     }
-    
-    ?uri a TYPE_PLACEHOLDER . 
+    ?uri a <TYPE_PLACEHOLDER> . 
     FILTER(!isBlank(?uri))
     OPTIONAL {
       ?adids schema:sameAs ?uri .
       FILTER(contains(str(?adids),"http://kg.artsdata.ca/resource/K"))
     }
-    
     OPTIONAL {
     ?uri schema:additionalType ?additionalType .
     FILTER(STR(?additionalType) = "http://kg.artsdata.ca/ontology/FlaggedForReview")
     BIND(true AS ?flaggedForReview)
   }
 <EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>
-    
     OPTIONAL {
       ?uri schema:sameAs ?adid_obj .
       FILTER(contains(str(?adid_obj),"http://kg.artsdata.ca/resource/K"))
     }
     BIND(COALESCE(?adid_obj, ?adid_sub) as ?artsdata_uris)
-
     OPTIONAL {?uri schema:url ?urls
     FILTER(!isBlank(?urls))}
-
     OPTIONAL {
       ?uri schema:sameAs ?wikidata_ids .
       FILTER(contains(str(?wikidata_ids),"http://www.wikidata.org/entity/"))
     }
-    
     OPTIONAL {
       ?uri schema:sameAs ?isni_uris .
       FILTER(contains(str(?isni_uris),"https://isni.org/isni/"))
     }
-    
 } GROUP BY ?uri
 ORDER BY ?uri 
 LIMIT LIMIT_PLACEHOLDER
 OFFSET OFFSET_PLACEHOLDER` ,
-
 };

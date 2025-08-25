@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
-import { EntityClassEnum } from "../../enum/entity-class.enum";
+import { EntityClassEnum , EntityTypeURIEnum } from "../../enum/entity-class.enum";
 import { ArtsdataConstants , EXTEND_QUERY , PROPOSED_EXTEND_PROPERTIES_METADATA } from "../../constant";
 import { Exception , MatchServiceHelper } from "../../helper";
 import {
@@ -183,41 +183,39 @@ export class ExtendService {
     return ["postalCode" , "addressLocality" , "addressCountry"];
   }
 
-  async getDataFromGraph(graphURI: string , entityClass: EntityClassEnum , page: number = 1 , limit: number = 10) {
-    const sparqlQuery = this._getSparqlQueryByTypeAndGraph(graphURI , entityClass , page , limit);
-    const result = await this._artsdataService.executeSparqlQuery(sparqlQuery , true);
+  async getDataFromGraph(graphURI: string , entityType: string , page: number = 1 , limit: number = 10) {
+    if (!MatchServiceHelper.isValidURI(graphURI) || !MatchServiceHelper.isValidURI(entityType)) {
+      Exception.badRequest("Invalid graph URI or entity type provided");
+    }
+    const sparqlQuery = this._getSparqlQueryByTypeAndGraph(graphURI , entityType , page , limit);
+    const result = await this._artsdataService.executeSparqlQuery(sparqlQuery , false);
     return this._formatResults(result);
   }
 
-  private _getSparqlQueryByTypeAndGraph(graphURI: string , entityClass: EntityClassEnum , page: number , limit: number): string {
+  private _getSparqlQueryByTypeAndGraph(graphURI: string , entityType: string , page: number , limit: number): string {
     let query: string = QUERY_BY_GRAPH.GENERIC;
+    if (!MatchServiceHelper.isValidURI(graphURI)) {
+      throw Exception.badRequest("Invalid graph URI provided");
+    }
+    query = query.replace("TYPE_PLACEHOLDER" , entityType);
 
-    switch (entityClass) {
-      case EntityClassEnum.EVENT:
-        query = query.replace("TYPE_PLACEHOLDER" , "schema:Event")
-          .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
-            `OPTIONAL {?uri schema:startDate ?startDate .}`)
+
+    switch (entityType) {
+      case EntityTypeURIEnum.EVENT:
+        query = query.replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
+          `OPTIONAL {?uri schema:startDate ?startDate .}`)
           .replace("<EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>" ,
             "(sample(?startDate) as ?start_date)");
         break;
-      case EntityClassEnum.PLACE:
-        query = query.replace("TYPE_PLACEHOLDER" , "schema:Place")
-          .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
-            `OPTIONAL {?uri schema:address/schema:postalCode ?postalCode .}`)
+      case EntityTypeURIEnum.PLACE:
+        query = query.replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
+          `OPTIONAL {?uri schema:address/schema:postalCode ?postalCode .}`)
           .replace("<EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>" ,
             "(sample(?postalCode) as ?postal_code)");
         break;
-      case EntityClassEnum.ORGANIZATION:
-        query = query.replace("TYPE_PLACEHOLDER" , "schema:Organization");
-        break;
-      case EntityClassEnum.PERSON:
-        query = query.replace("TYPE_PLACEHOLDER" , "schema:Person");
-        break;
-      case EntityClassEnum.AGENT:
+      default:
         query = query.replace("TYPE_PLACEHOLDER" , "dbo:Agent");
         break;
-      default:
-        throw Exception.badRequest("Invalid type provided");
     }
     return query.replace("GRAPH_URI_PLACEHOLDER" , graphURI)
       .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" , "")

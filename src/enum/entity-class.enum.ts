@@ -5,3 +5,9 @@ export enum EntityClassEnum {
   ORGANIZATION = "Organization" ,
   AGENT = "Agent" ,
 }
+
+
+export enum EntityTypeURIEnum {
+  EVENT = "http://schema.org/Event" ,
+  PLACE = "http://schema.org/Place"
+}
