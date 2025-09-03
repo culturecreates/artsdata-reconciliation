@@ -312,8 +312,7 @@ export class MatchService {
     return propertyPath;
   }
 
-  private _modifyNameForLuceneScore(name: string , propertyConditions: QueryCondition[]) {
-
+  private _modifyNameForLuceneScore(name: string , propertyConditions: QueryCondition[]): string {
     let luceneQuery = `name: ${name}`;
     if (propertyConditions.length > 0) {
       propertyConditions.forEach(condition => {
