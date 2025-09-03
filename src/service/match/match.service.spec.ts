@@ -211,7 +211,7 @@ describe("Recon Service tests" , () => {
             ]
           }
         ] ,
-        expectedName: "Dance" ,
+        expectedName: "Social Dance" ,
         expectedCount: 1
       } , {
         description: "Reconcile a Place with Artsdata ID" ,
