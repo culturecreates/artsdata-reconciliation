@@ -314,18 +314,20 @@ export class MatchService {
 
   private _modifyNameForLuceneScore(name: string , propertyConditions: QueryCondition[]): string {
     let luceneQuery = `name: ${name}`;
-    if (propertyConditions.length > 0) {
-      propertyConditions.forEach(condition => {
-        if (condition.matchType === MatchTypeEnum.PROPERTY) {
-          if (condition.propertyId === "http://schema.org/url") {
-            luceneQuery = luceneQuery + this.resolvePropertyValueForLucene(condition.propertyValue , "url");
+    propertyConditions
+      .filter(condition => condition.matchType === MatchTypeEnum.PROPERTY)
+      .forEach(condition => {
+        const propertyMap = {
+          "http://schema.org/url": "url" ,
+          "http://schema.org/sameAs": "sameAs" ,
+          "http://schema.org/postalCode": "postalCode"
+        };
+        Object.entries(propertyMap).forEach(([key , value]) => {
+          if (condition.propertyId?.includes(key)) {
+            luceneQuery += this.resolvePropertyValueForLucene(condition.propertyValue , value);
           }
-          if (condition.propertyId === "http://schema.org/sameAs") {
-            luceneQuery = luceneQuery + this.resolvePropertyValueForLucene(condition.propertyValue , "sameAs");
-          }
-        }
+        });
       });
-    }
     return luceneQuery;
   }
 
