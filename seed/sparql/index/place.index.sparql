@@ -39,10 +39,12 @@ INSERT DATA {
       "multivalued": true,
       "ignoreInvalidValues": true,
       "facet": true
-    }, {
-      "fieldName": "url",
+    },
+    {
+      "fieldName": "postalCode",
       "propertyChain": [
-        "http://schema.org/postalAddress/http://schema.org/postalCode"
+        "http://schema.org/address",
+        "http://schema.org/postalCode"
       ],
       "indexed": true,
       "stored": true,
@@ -50,7 +52,7 @@ INSERT DATA {
       "multivalued": true,
       "ignoreInvalidValues": true,
       "facet": true
-    },
+    }
   ],
   "languages": [],
   "types": [
