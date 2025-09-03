@@ -83,6 +83,14 @@ WHERE
  OPTIONAL { ?entity schema:disambiguatingDescription ?description_en. FILTER( LANG(?description_en) = "en")}
  OPTIONAL { ?entity schema:disambiguatingDescription ?description_fr. FILTER( LANG(?description_fr) = "fr")}
  OPTIONAL { ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
+ 
+ #TYPE
+ OPTIONAL{
+   ?entity a ?type_additional.
+   OPTIONAL { ?type_additional rdfs:label ?type_label_raw filter(lang(?type_label_raw) = "")}
+   OPTIONAL { ?type_additional rdfs:label ?type_label_en filter(lang(?type_label_en) = "en")}
+   BIND(COALESCE(?type_label_en, ?type_label_raw, "") as ?type_label)}
+   
 } group by ?entity ?score ?type_label
 LIMIT_PLACE_HOLDER
 `
