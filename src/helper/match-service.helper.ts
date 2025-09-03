@@ -64,7 +64,7 @@ export class MatchServiceHelper {
 
         //SCORE
         const score = currentBinding["score"]?.value;
-        resultCandidate.score = Number(score);
+        resultCandidate.score = Math.round(Number(score));
 
         //TODO match is incorrect when query contains accented characters
         if (query) {
