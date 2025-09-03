@@ -85,5 +85,24 @@ export const PROPOSED_EXTEND_PROPERTIES_METADATA = {
         "id": "disambiguatingDescription" ,
         "name": "disambiguatingDescription"
       }]
+  } , AGENT: {
+    "type": "Agent" ,
+    "properties": [
+      {
+        "id": "name" ,
+        "name": "name"
+      } ,
+      {
+        "id": "url" ,
+        "name": "url"
+      } ,
+      {
+        "id": "sameAs" ,
+        "name": "sameAs"
+      } ,
+      {
+        "id": "disambiguatingDescription" ,
+        "name": "disambiguatingDescription"
+      }]
   }
 };

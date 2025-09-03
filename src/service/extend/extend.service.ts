@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
 import { EntityClassEnum } from "../../enum/entity-class.enum";
 import { ArtsdataConstants , EXTEND_QUERY , PROPOSED_EXTEND_PROPERTIES_METADATA } from "../../constant";
-import { Exception } from "../../helper";
+import { Exception , MatchServiceHelper } from "../../helper";
 import {
   DataExtensionQueryDTO ,
   DataExtensionResponseDTO ,
@@ -27,7 +27,7 @@ export class ExtendService {
     const formattedResult = this._formatResult(dataExtensionQuery.ids , result);
 
     if (expandProperties.length > 0) {
-      const properties: { id: any; values: any; }[] = [];
+      let properties: { id: any; values: any; }[] = [];
       const expandedPropertyPrefixes = expandProperties
         .map((property) => `${property.id}_`);
       formattedResult.rows.forEach((row) => {
@@ -37,6 +37,7 @@ export class ExtendService {
           const expandedProperty = row?.properties
             .filter((item: any) => item.id.startsWith(propertyPrefix));
           if (expandedProperty?.length) {
+            properties = [];
             for (const prop of expandedProperty) {
               const propertyId = prop.id;
               //Remove the property with propertyId from the row properties
@@ -68,6 +69,8 @@ export class ExtendService {
         return PROPOSED_EXTEND_PROPERTIES_METADATA.PERSON;
       case EntityClassEnum.ORGANIZATION:
         return PROPOSED_EXTEND_PROPERTIES_METADATA.ORGANIZATION;
+      case EntityClassEnum.AGENT:
+        return PROPOSED_EXTEND_PROPERTIES_METADATA.AGENT;
       default:
         throw Exception.badRequest("Invalid entity type");
     }
@@ -76,7 +79,12 @@ export class ExtendService {
   private _generateQuery(dataExtensionQuery: DataExtensionQueryDTO) {
     let query: string = EXTEND_QUERY;
     const { ids , properties } = dataExtensionQuery;
-    const uris = ids.map(id => `${ArtsdataConstants.PREFIX}${id}`);
+    const uris = ids.map(id => {
+      if (MatchServiceHelper.isValidURI(id)) {
+        return id;
+      } else
+        return `${ArtsdataConstants.PREFIX}${id}`;
+    });
     const uriPlaceholder = uris.map(item => `(<${item}>)`).join(" ");
     query = query.replace("<URI_PLACE_HOLDER>" , uriPlaceholder);
 
@@ -91,15 +99,15 @@ export class ExtendService {
 
   private _generateTripleFromCondition(property: ExtendQueryProperty) {
     const { id , expand } = property;
-    const triple = `OPTIONAL {?uri schema:${id} ?${id}.}\n`;
+    let expandedTriples;
     if (expand) {
       if (id === "address") {
         const expandedProperties = this._getExpandedPropertiesForAddress();
-        const expandedTriples = expandedProperties.map(prop => `?${id} schema:${prop} ?${id}_${prop}.`).join("\n");
-        return `${triple} OPTIONAL {${expandedTriples} }`;
+        expandedTriples = expandedProperties
+          .map(prop => `\t\tOPTIONAL {?${id} schema:${prop} ?${id}_${prop}.}`).join("\n");
       }
     }
-    return triple;
+    return `OPTIONAL {?uri schema:${id} ?${id}. ${expandedTriples ? `\n${expandedTriples}\n` : ""}}\n`;
   }
 
   private _formatResult(ids: string[] , result: any): DataExtensionResponseDTO {
@@ -120,6 +128,9 @@ export class ExtendService {
         if (key !== "uri") {
           if (row[key].type === "literal") {
             currentValue = { "str": row[key].value , lang: row[key]["xml:lang"] };
+          }
+          if (row[key].type === "bnode") {
+            currentValue = { "id": row[key].value };
           }
 
           if (row[key].type === "uri") {
@@ -183,21 +194,34 @@ export class ExtendService {
 
     switch (entityClass) {
       case EntityClassEnum.EVENT:
-        query = query.replace("TYPE_PLACEHOLDER" , "Event");
+        query = query.replace("TYPE_PLACEHOLDER" , "schema:Event")
+          .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
+            `OPTIONAL {?uri schema:startDate ?startDate .}`)
+          .replace("<EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>" ,
+            "(sample(?startDate) as ?start_date)");
         break;
       case EntityClassEnum.PLACE:
-        query = query.replace("TYPE_PLACEHOLDER" , "Place");
+        query = query.replace("TYPE_PLACEHOLDER" , "schema:Place")
+          .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
+            `OPTIONAL {?uri schema:address/schema:postalCode ?postalCode .}`)
+          .replace("<EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>" ,
+            "(sample(?postalCode) as ?postal_code)");
         break;
       case EntityClassEnum.ORGANIZATION:
-        query = query.replace("TYPE_PLACEHOLDER" , "Organization");
+        query = query.replace("TYPE_PLACEHOLDER" , "schema:Organization");
         break;
       case EntityClassEnum.PERSON:
-        query = query.replace("TYPE_PLACEHOLDER" , "Person");
+        query = query.replace("TYPE_PLACEHOLDER" , "schema:Person");
+        break;
+      case EntityClassEnum.AGENT:
+        query = query.replace("TYPE_PLACEHOLDER" , "dbo:Agent");
         break;
       default:
         throw Exception.badRequest("Invalid type provided");
     }
     return query.replace("GRAPH_URI_PLACEHOLDER" , graphURI)
+      .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" , "")
+      .replace("<EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>" , "")
       .replace("LIMIT_PLACEHOLDER" , limit.toString())
       .replace("OFFSET_PLACEHOLDER" , ((page - 1) * limit).toString());
   }
@@ -212,10 +236,14 @@ export class ExtendService {
     return result.results.bindings.map((row: any) => {
       const formattedRow: { [key: string]: any } = {};
       for (const key in row) {
-        if (row[key].type === "literal") {
+        if (row[key].datatype === "http://www.w3.org/2001/XMLSchema#boolean") {
+          formattedRow[key] = row[key].value === "true";
+        } else if (row[key].type === "literal") {
           formattedRow[key] = row[key].value;
         } else if (row[key].type === "uri") {
           formattedRow[key] = row[key].value;
+        } else if (row[key].type === "bnode") {
+          formattedRow[key] = `_:${row[key].value}`;
         } else if (row[key].type === "bnode") {
           formattedRow[key] = `_:${row[key].value}`;
         }

@@ -137,14 +137,20 @@ export class MatchService {
     : Promise<ReconciliationResponse> {
     const { queries } = reconciliationRequest;
     const results: ReconciliationResults[] = [];
+    let sparqlQuery;
     for (const reconciliationQuery of queries) {
-      const { type , limit , conditions } = reconciliationQuery;
-      const { name , propertyConditions } = this._resolveConditions(conditions);
-      const sparqlQuery = this._generateSparqlQuery(name as string , type , limit || 25 , propertyConditions);
-      const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
-      const candidates = MatchServiceHelper
-        .formatReconciliationResponse(requestLanguage , response , name as string);
-      results.push({ candidates });
+      try {
+        const { type , limit , conditions } = reconciliationQuery;
+        const { name , propertyConditions } = this._resolveConditions(conditions);
+        sparqlQuery = this._generateSparqlQuery(name as string , type , limit || 25 , propertyConditions);
+        const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
+        const candidates = MatchServiceHelper
+          .formatReconciliationResponse(requestLanguage , response , name as string);
+        results.push({ candidates });
+      } catch (error) {
+        console.error("Error in reconciliation query:" , error);
+        results.push({ candidates: [] });
+      }
     }
     return { results };
 
@@ -306,21 +312,22 @@ export class MatchService {
     return propertyPath;
   }
 
-  private _modifyNameForLuceneScore(name: string , propertyConditions: QueryCondition[]) {
-
+  private _modifyNameForLuceneScore(name: string , propertyConditions: QueryCondition[]): string {
     let luceneQuery = `name: ${name}`;
-    if (propertyConditions.length > 0) {
-      propertyConditions.forEach(condition => {
-        if (condition.matchType === MatchTypeEnum.PROPERTY) {
-          if (condition.propertyId === "http://schema.org/url") {
-            luceneQuery = luceneQuery + this.resolvePropertyValueForLucene(condition.propertyValue , "url");
+    propertyConditions
+      .filter(condition => condition.matchType === MatchTypeEnum.PROPERTY)
+      .forEach(condition => {
+        const propertyMap = {
+          "http://schema.org/url": "url" ,
+          "http://schema.org/sameAs": "sameAs" ,
+          "http://schema.org/postalCode": "postalCode"
+        };
+        Object.entries(propertyMap).forEach(([key , value]) => {
+          if (condition.propertyId?.includes(key)) {
+            luceneQuery += this.resolvePropertyValueForLucene(condition.propertyValue , value);
           }
-          if (condition.propertyId === "http://schema.org/sameAs") {
-            luceneQuery = luceneQuery + this.resolvePropertyValueForLucene(condition.propertyValue , "sameAs");
-          }
-        }
+        });
       });
-    }
     return luceneQuery;
   }
 

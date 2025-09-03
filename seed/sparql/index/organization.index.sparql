@@ -1,7 +1,7 @@
 PREFIX :<http://www.ontotext.com/connectors/lucene#>
 PREFIX inst:<http://www.ontotext.com/connectors/lucene/instance#>
 INSERT DATA {
-	inst:organization-index :createConnector '''
+    inst:organization-index :createConnector '''
 {
   "fields": [
     {
