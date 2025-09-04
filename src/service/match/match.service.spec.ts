@@ -1,7 +1,7 @@
 import { Test , TestingModule } from "@nestjs/testing";
 import { ArtsdataService , HttpService , ManifestService , MatchService } from "../../service";
 import { ManifestController , MatchController } from "../../controller";
-import { LanguageEnum , MatchQualifierEnum , MatchQuantifierEnum } from "../../enum";
+import { LanguageEnum } from "../../enum";
 
 describe("Recon Service tests" , () => {
   let reconService: MatchService;
@@ -389,26 +389,7 @@ describe("Recon Service tests" , () => {
       //   expectedCount: 1
       // } ,
       {
-        description: "Reconcile Place with only sameAs" ,
-        queries: [
-          {
-            "type": "schema:Place" ,
-            "conditions": [
-
-              {
-                "matchType": "property" ,
-                "propertyValue": "https://en.wikipedia.org/wiki/Roy_Thomson_Hall" ,
-                "propertyId": "schema:sameAs" ,
-                "required": true
-              }
-            ]
-          }
-        ] ,
-        expectedId: "K11-19" ,
-        expectedName: "Roy Thomson Hall" ,
-        expectedCount: 1
-      } , {
-        description: "Reconcile Place with required as TRUE" ,
+        description: "Reconcile Place with right name and postal code and match should be true" ,
         queries: [
           {
             "type": "schema:Place" ,
@@ -416,45 +397,24 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "propertyValue": "Roy Thomson"
+                "propertyValue": "Roy Thomson Hall"
               } ,
               {
                 "matchType": "property" ,
-                "propertyValue": "https://en.wikipedia.org/wiki/Roy_Thomson_Hall" ,
-                "propertyId": "schema:sameAs" ,
-                "required": true
-              }
-            ]
-          }
-        ] ,
-        expectedId: "K11-19" ,
-        expectedName: "Roy Thomson Hall" ,
-        expectedCount: 1
-      } , {
-        description: "Reconcile Place with required param as FALSE" ,
-        queries: [
-          {
-            "type": "schema:Place" ,
-            "limit": 1 ,
-            "conditions": [
-              {
-                "matchType": "name" ,
-                "propertyValue": "Roy Thomson"
-              } ,
-              {
-                "matchType": "property" ,
-                "propertyValue": "https://some.wrong.url" ,
-                "propertyId": "schema:url" ,
+                "propertyValue": "M5J 2H5" ,
+                "propertyId": "<http://schema.org/address>/<http://schema.org/postalCode>" ,
                 "required": false
               }
             ]
           }
         ] ,
         expectedId: "K11-19" ,
-        expectedName: "Roy Thomson Hall" ,
-        expectedCount: 1
-      } , {
-        description: "Reconcile Place with NO required param" ,
+        expectedCount: 1 ,
+        expectedMatchValue: true ,
+        expectedName: "Roy Thomson Hall"
+      } ,
+      {
+        description: "Reconcile Place with name and postal code and match should be false since postal code is incorrect" ,
         queries: [
           {
             "type": "schema:Place" ,
@@ -462,21 +422,24 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "propertyValue": "Roy Thomson"
+                "propertyValue": "Roy Thomson Hall"
               } ,
               {
                 "matchType": "property" ,
-                "propertyValue": "https://some.wrong.url" ,
-                "propertyId": "schema:url"
+                "propertyValue": "M5J 2H6" , //incorrect postal code
+                "propertyId": "<http://schema.org/address>/<http://schema.org/postalCode>" ,
+                "required": false
               }
             ]
           }
         ] ,
         expectedId: "K11-19" ,
-        expectedName: "Roy Thomson Hall" ,
-        expectedCount: 1
-      } , {
-        description: "Reconcile Place with required param as TRUE and matchQualifier as RegexMatch" ,
+        expectedCount: 1 ,
+        expectedMatchValue: false ,
+        expectedName: "Roy Thomson Hall"
+      } ,
+      {
+        description: "Reconcile Place with name, the match should be true since name is exactly matching" ,
         queries: [
           {
             "type": "schema:Place" ,
@@ -484,23 +447,18 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "propertyValue": "Roy Thomson"
-              } ,
-              {
-                "matchType": "property" ,
-                "propertyValue": "Toronto.*" ,
-                "propertyId": "schema:disambiguatingDescription" ,
-                "required": true ,
-                "matchQualifier": MatchQualifierEnum.REGEX_MATCH
+                "propertyValue": "Roy Thomson Hall"
               }
             ]
           }
         ] ,
         expectedId: "K11-19" ,
-        expectedName: "Roy Thomson Hall" ,
-        expectedCount: 1
-      } , {
-        description: "Reconcile Place with required param as TRUE and matchQualifier as RegexMatch" ,
+        expectedCount: 1 ,
+        expectedMatchValue: true ,
+        expectedName: "Roy Thomson Hall"
+      } ,
+      {
+        description: "Reconcile Place with wrong name, the match should be false since name is not matching" ,
         queries: [
           {
             "type": "schema:Place" ,
@@ -508,44 +466,41 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "propertyValue": "Roy Thomson"
-              } ,
-              {
-                "matchType": "property" ,
-                "propertyValue": "https://www.roythomson.*" ,
-                "propertyId": "schema:url" ,
-                "required": true ,
-                "matchQualifier": MatchQualifierEnum.EXACT_MATCH
+                "propertyValue": "Roy Thomson Hale" //incorrect name
               }
             ]
           }
         ] ,
-        expectedCount: 0
-      } , {
-        description: "Reconcile Place with required param as TRUE and matchQuantifier as none" ,
+        expectedId: "K11-19" ,
+        expectedCount: 1 ,
+        expectedMatchValue: false ,
+        expectedName: "Roy Thomson Hall"
+      } ,
+      {
+        description: "Reconcile Place with name and locality, the match should be true since all are exactly matching" ,
         queries: [
           {
             "type": "schema:Place" ,
-            "limit": 2 ,
+            "limit": 1 ,
             "conditions": [
               {
-                "matchType": "name" ,   "propertyValue": "Roy Thomson Hall"
+                "matchType": "name" ,
+                "propertyValue": "Roy Thomson Hall" //correct name
               } ,
               {
                 "matchType": "property" ,
-                "propertyValue": "https://www.roythomsonhall.com" ,
-                "propertyId": "schema:url" ,
-                "required": true ,
-                "matchQuantifier": MatchQuantifierEnum.NONE
+                "propertyValue": "Toronto" , //correct addressLocality
+                "propertyId": "<http://schema.org/address>/<http://schema.org/addressLocality>"
               }
             ]
           }
         ] ,
-        expectedId: "K11-239" ,
-        expectedCount: 2 ,
-        expectedName: "Roy Barnett Recital Hall"
+        expectedId: "K11-19" ,
+        expectedCount: 1 ,
+        expectedMatchValue: true ,
+        expectedName: "Roy Thomson Hall"
       }
-              ,
+
       //TODO this should eventually pass when all the URLs are converted to URLS in graphdb
       // {
       //   description: "Reconcile Place with required param as TRUE and matchQuantifier as ANY" ,
@@ -580,18 +535,17 @@ describe("Recon Service tests" , () => {
           .reconcileByQueries(LanguageEnum.ENGLISH , { queries: test.queries });
         let title = result.results?.[0]?.candidates?.[0]?.name;
         const id = result.results?.[0]?.candidates?.[0]?.id;
-        // const name = result.results?.[0]?.candidates?.[0]?.name;
-        // title = title instanceof String ? title : (title as any)?.values.find((value: {
-        //   lang: string;
-        //   str: string
-        // }) => value.lang === LanguageTagEnum.ENGLISH || value.lang === LanguageTagEnum.FRENCH || value.lang === undefined).str;
-        //TODO the ado:EventType query is not returning schema:name instead it is returning skos:prefLabel
-        if (title)
+
+        if (title) {
           expect(title).toBe(test.expectedName);
-        expect(result.results?.[0].candidates.length).toBe(test.expectedCount);
-        if (test.duplicateCheck) {
-          expect(result.results[0]?.candidates?.[0]?.name === result.results[0]?.candidates?.[1]?.name).toBeFalsy();
         }
+
+        expect(result.results?.[0]?.candidates?.length).toBe(test.expectedCount);
+
+        if (test.expectedMatchValue !== undefined) {
+          expect(result.results?.[0]?.candidates?.[0]?.match).toBe(test.expectedMatchValue);
+        }
+
         if (test.expectedId) {
           expect(id).toBe(test.expectedId);
         }

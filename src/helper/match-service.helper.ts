@@ -39,8 +39,7 @@ export class MatchServiceHelper {
       const additionalPropertiesForMatchCalculation = {
         url: currentBinding["url"]?.value ,
         postalCode: currentBinding["postalCode"]?.value ,
-        addressLocality: currentBinding["addressLocality"]?.value ,
-        addressRegion: currentBinding["addressRegion"]?.value
+        addressLocality: currentBinding["addressLocality"]?.value
       };
 
       if (responseLanguage === LanguageEnum.FRENCH) {
@@ -132,7 +131,6 @@ export class MatchServiceHelper {
       matchers.exact(additionalProperties.postalCode , recordFromQuery.postalCode) ,
       matchers.exact(additionalProperties.addressLocality , recordFromQuery.addressLocality) ,
       matchers.exact(recordFetched.url , recordFromQuery.url) ,
-      matchers.exact(additionalProperties.addressRegion , recordFromQuery.addressRegion) ,
       matchers.isniAndWikidataLogic(recordFetched.isni , recordFromQuery.isni , recordFetched.wikidata , recordFromQuery.wikidata)
     ];
 

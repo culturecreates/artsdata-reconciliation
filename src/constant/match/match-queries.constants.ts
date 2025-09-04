@@ -22,7 +22,6 @@ SELECT DISTINCT
    (SAMPLE(?description_fr) as ?descriptionFr)
    (SAMPLE(?postalCode) as ?postalCode)
    (SAMPLE(?addressLocality) as ?addressLocality)
-   (SAMPLE(?addressRegion) as ?addressRegion)
    (SAMPLE(?url) as ?url)
    ?type_label
 WHERE
@@ -59,8 +58,6 @@ WHERE
   OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode}
 #ADDRESS LOCALITY
   OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality}
-#ADDRESS REGION
-  OPTIONAL { ?entity schema:address/schema:addressRegion ?addressRegion}
  
 } group by ?entity ?score ?type_label
 `,
@@ -86,7 +83,6 @@ SELECT DISTINCT
     ?type_label
    (SAMPLE(?postalCode) as ?postalCode)
    (SAMPLE(?addressLocality) as ?addressLocality)
-   (SAMPLE(?addressRegion) as ?addressRegion)
    (SAMPLE(?url) as ?url)
 WHERE
 {
@@ -106,8 +102,6 @@ WHERE
   OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode}
 #ADDRESS LOCALITY
   OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality}
-#ADDRESS REGION
-  OPTIONAL { ?entity schema:address/schema:addressRegion ?addressRegion}
  
 } group by ?entity ?score ?type_label
 LIMIT_PLACE_HOLDER
