@@ -20,6 +20,10 @@ SELECT DISTINCT
    (SAMPLE(?description_no) as ?description)
    (SAMPLE(?description_en) as ?descriptionEn)
    (SAMPLE(?description_fr) as ?descriptionFr)
+   (SAMPLE(?postalCode) as ?postalCode)
+   (SAMPLE(?addressLocality) as ?addressLocality)
+   (SAMPLE(?addressRegion) as ?addressRegion)
+   (SAMPLE(?url) as ?url)
    ?type_label
 WHERE
 {
@@ -49,6 +53,15 @@ WHERE
    OPTIONAL { ?entity schema:disambiguatingDescription ?description_en. FILTER( LANG(?description_en) = "en")}
    OPTIONAL { ?entity schema:disambiguatingDescription ?description_fr. FILTER( LANG(?description_fr) = "fr")}
    OPTIONAL { ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
+#URL
+  OPTIONAL { ?entity schema:url ?url}
+#POSTAL CODE
+  OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode}
+#ADDRESS LOCALITY
+  OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality}
+#ADDRESS REGION
+  OPTIONAL { ?entity schema:address/schema:addressRegion ?addressRegion}
+ 
 } group by ?entity ?score ?type_label
 `,
 
@@ -71,6 +84,10 @@ SELECT DISTINCT
    (SAMPLE(?description_en) as ?descriptionEn)
    (SAMPLE(?description_fr) as ?descriptionFr)
     ?type_label
+   (SAMPLE(?postalCode) as ?postalCode)
+   (SAMPLE(?addressLocality) as ?addressLocality)
+   (SAMPLE(?addressRegion) as ?addressRegion)
+   (SAMPLE(?url) as ?url)
 WHERE
 {
     BIND(URI_PLACEHOLDER as ?entity)
@@ -83,6 +100,15 @@ WHERE
  OPTIONAL { ?entity schema:disambiguatingDescription ?description_en. FILTER( LANG(?description_en) = "en")}
  OPTIONAL { ?entity schema:disambiguatingDescription ?description_fr. FILTER( LANG(?description_fr) = "fr")}
  OPTIONAL { ?entity schema:disambiguatingDescription ?description_no. FILTER ( LANG(?description_no) = "")}
+ #URL
+  OPTIONAL { ?entity schema:url ?url}
+#POSTAL CODE
+  OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode}
+#ADDRESS LOCALITY
+  OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality}
+#ADDRESS REGION
+  OPTIONAL { ?entity schema:address/schema:addressRegion ?addressRegion}
+ 
 } group by ?entity ?score ?type_label
 LIMIT_PLACE_HOLDER
 `

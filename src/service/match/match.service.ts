@@ -145,7 +145,7 @@ export class MatchService {
         sparqlQuery = this._generateSparqlQuery(name as string , type , limit || 25 , propertyConditions);
         const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
         const candidates = MatchServiceHelper
-          .formatReconciliationResponse(requestLanguage , response , name as string);
+          .formatReconciliationResponse(requestLanguage , response , reconciliationQuery);
         results.push({ candidates });
       } catch (error) {
         console.error("Error in reconciliation query:" , error);

@@ -1,7 +1,8 @@
 import { LanguageEnum } from "../enum";
 import { GRAPHDB_INDEX } from "../config";
-import { ResultCandidates } from "../dto";
+import { ReconciliationQuery , ResultCandidates } from "../dto";
 import { isURL } from "validator";
+import { ArtsdataConstants } from "../constant";
 
 export class MatchServiceHelper {
 
@@ -16,70 +17,53 @@ export class MatchServiceHelper {
       .join("");
   }
 
-  static formatReconciliationResponse(responseLanguage: LanguageEnum , sparqlResponse: any , query?: string)
-    : ResultCandidates[] {
-    const bindings = sparqlResponse?.results?.bindings;
+  static formatReconciliationResponse(responseLanguage: LanguageEnum , sparqlResponse: any ,
+                                      reconciliationQuery: ReconciliationQuery): ResultCandidates[] {
+    const bindings = sparqlResponse?.results?.bindings || [];
+    const uniqueIds = [...new Set(bindings.map((binding: any) => binding["entity"].value))];
     const candidates: ResultCandidates[] = [];
 
-    if (bindings?.length) {
-      const uniqueIds: string[] = [];
-      for (const binding of bindings) {
-        if (!uniqueIds.includes(binding["entity"].value)) {
-          uniqueIds.push(binding["entity"].value);
-        }
+    for (const currentId of uniqueIds) {
+      const currentBindings = bindings.filter((binding: any) => binding["entity"].value === currentId);
+      const currentBinding = currentBindings[0];
+      const resultCandidate = new ResultCandidates();
+
+      resultCandidate.id = currentBinding["entity"].value?.split(ArtsdataConstants.PREFIX).pop();
+      const name = currentBinding["name"]?.value;
+      const nameEn = currentBinding["nameEn"]?.value;
+      const nameFr = currentBinding["nameFr"]?.value;
+      const description = currentBinding["description"]?.value;
+      const descriptionEn = currentBinding["descriptionEn"]?.value;
+      const descriptionFr = currentBinding["descriptionFr"]?.value;
+
+      const additionalPropertiesForMatchCalculation = {
+        url: currentBinding["url"]?.value ,
+        postalCode: currentBinding["postalCode"]?.value ,
+        addressLocality: currentBinding["addressLocality"]?.value ,
+        addressRegion: currentBinding["addressRegion"]?.value
+      };
+
+      if (responseLanguage === LanguageEnum.FRENCH) {
+        resultCandidate.name = nameFr || name || nameEn;
+        resultCandidate.description = descriptionFr || description || descriptionEn;
+      } else {
+        resultCandidate.name = nameEn || name || nameFr;
+        resultCandidate.description = descriptionEn || description || descriptionFr;
       }
 
-      for (const currentId of uniqueIds) {
-        const currentBindings = bindings.filter((binding: any) => binding["entity"].value === currentId);
+      resultCandidate.score = Math.round(Number(currentBinding["score"]?.value));
+      resultCandidate.match = MatchServiceHelper.calculateMatch(resultCandidate , reconciliationQuery ,
+        additionalPropertiesForMatchCalculation);
 
-        const resultCandidate = new ResultCandidates();
-        const currentBinding = currentBindings.find((binding: any) => binding["entity"].value === currentId);
-        const uri = currentBinding["entity"].value;
-        resultCandidate.id = uri?.split("http://kg.artsdata.ca/resource/").pop();
+      resultCandidate.type = currentBindings.map((binding: any) => ({
+        id: binding["type_label"]?.value ,
+        name: binding["type_label"]?.value
+      }));
 
-        //NAME
-        const name = currentBinding["name"]?.value;
-        const nameEn = currentBinding["nameEn"]?.value;
-        const nameFr = currentBinding["nameFr"]?.value;
-        const allNamesInLowerCase = [name , nameEn , nameFr].map(name => name?.toLowerCase()).filter(name => !!name);
-
-        //DESCRIPTION
-        const description = currentBinding["description"]?.value;
-        const descriptionEn = currentBinding["descriptionEn"]?.value;
-        const descriptionFr = currentBinding["descriptionFr"]?.value;
-
-        switch (responseLanguage) {
-          case LanguageEnum.ENGLISH:
-            resultCandidate.name = nameEn || name || nameFr;
-            resultCandidate.description = descriptionEn || description || descriptionFr;
-            break;
-          case LanguageEnum.FRENCH:
-            resultCandidate.name = nameFr || name || nameEn;
-            resultCandidate.description = descriptionFr || description || descriptionEn;
-            break;
-          default:
-            resultCandidate.name = nameEn || name || nameFr;
-            resultCandidate.description = descriptionEn || description || descriptionFr;
-        }
-
-        //SCORE
-        const score = currentBinding["score"]?.value;
-        resultCandidate.score = Math.round(Number(score));
-
-        //TODO match is incorrect when query contains accented characters
-        if (query) {
-          resultCandidate.match = allNamesInLowerCase.includes(query.toLowerCase());
-        }
-
-        resultCandidate.type = currentBindings.map((binding: any) => ({
-          id: binding["type_label"]?.value ,
-          name: binding["type_label"]?.value
-        }));
-        candidates.push(resultCandidate);
-      }
+      candidates.push(resultCandidate);
     }
-    return candidates;
 
+    return candidates;
   }
 
   static getGraphdbIndex(type: string): string {
@@ -111,7 +95,72 @@ export class MatchServiceHelper {
   static isQueryByURI(query: string) {
     const artsdataIdPattern = "^K[0-9]+-[0-9]+$";
     return !!(query?.match(artsdataIdPattern) ||
-      (this.isValidURI(query) && query.startsWith("http://kg.artsdata.ca/resource/")));
+      (this.isValidURI(query) && query.startsWith(ArtsdataConstants.PREFIX)));
 
+  }
+
+  static calculateMatch(recordFetched: { [key: string]: any } , reconciliationQuery: ReconciliationQuery ,
+                        additionalProperties: any): boolean {
+    const recordFromQuery = this.formatReconciliationQuery(reconciliationQuery);
+
+    const matchers = {
+      exactOrMissing: (a: string | undefined , b: string | undefined) => {
+        if (!a || !b) return true;
+        return a?.trim()?.toLowerCase() === b?.trim()?.toLowerCase();
+      } ,
+      exact: (a: string | undefined , b: string | undefined) => {
+        if (!b) return true;
+        return a?.trim()?.toLowerCase() === b?.trim()?.toLowerCase();
+      } ,
+      isniAndWikidataLogic: (aISNI: string | undefined , bISNI: string | undefined ,
+                             aWikidata: string | undefined , bWikidata: string | undefined) => {
+        const isniExists = aISNI && bISNI;
+        const wikidataExists = aWikidata && bWikidata;
+
+        if (isniExists && wikidataExists) {
+          return aISNI === bISNI && aWikidata === bWikidata;
+        }
+        if (aISNI && bISNI) return aISNI === bISNI;
+        if (aWikidata && bWikidata) return aWikidata === bWikidata;
+
+        return true; // One or both missing
+      }
+    };
+
+    const checks = [
+      matchers.exactOrMissing(recordFetched.name , recordFromQuery.name) ,
+      matchers.exact(additionalProperties.postalCode , recordFromQuery.postalCode) ,
+      matchers.exact(additionalProperties.addressLocality , recordFromQuery.addressLocality) ,
+      matchers.exact(recordFetched.url , recordFromQuery.url) ,
+      matchers.exact(additionalProperties.addressRegion , recordFromQuery.addressRegion) ,
+      matchers.isniAndWikidataLogic(recordFetched.isni , recordFromQuery.isni , recordFetched.wikidata , recordFromQuery.wikidata)
+    ];
+
+    return checks.every(Boolean);
+  }
+
+  private static formatReconciliationQuery(reconciliationQuery: ReconciliationQuery) {
+
+    const { conditions } = reconciliationQuery;
+    const name = conditions.find(condition => condition.matchType === "name")?.propertyValue as string | undefined;
+    const postalCode = conditions.find(condition => condition.propertyId?.includes("postalCode"))?.propertyValue as string | undefined;
+    const addressLocality = conditions.find(condition => condition.propertyId?.includes("addressLocality"))?.propertyValue as string | undefined;
+    const addressRegion = conditions.find(condition => condition.propertyId?.includes("addressRegion"))?.propertyValue as string | undefined;
+    const url = conditions.find(condition => condition.propertyId?.includes("url"))?.propertyValue as string | undefined;
+    const sameAs = conditions.filter(condition => condition.propertyId?.includes("sameAs"))
+      ?.map(sameAs => sameAs.propertyValue as string | undefined);
+
+    const wikidata = sameAs?.find((sameAs) => sameAs?.startsWith("http://www.wikidata.org/entity/"));
+    const isni = sameAs?.find((sameAs) => sameAs?.startsWith("https://isni.org/isni/"));
+
+    return {
+      name ,
+      postalCode ,
+      addressLocality ,
+      addressRegion ,
+      url ,
+      isni: isni?.length ? isni : undefined ,
+      wikidata: wikidata?.length ? wikidata : undefined
+    };
   }
 }
