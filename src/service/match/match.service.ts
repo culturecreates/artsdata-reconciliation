@@ -271,30 +271,28 @@ export class MatchService {
    * @param limit
    * @param propertyConditions
    */
-  private _generateSparqlQuery(name: string | undefined , type: string , limit: number ,
-                               propertyConditions: QueryCondition[]): string {
-
+  private _generateSparqlQuery(name: string | undefined , type: string , limit: number , propertyConditions: QueryCondition[]): string {
     const graphdbIndex = MatchServiceHelper.getGraphdbIndex(type);
-
     const isQueryByURI = name && MatchServiceHelper.isQueryByURI(name);
-    const rawQuery = isQueryByURI ? QUERIES.RECONCILIATION_QUERY_BY_URI : QUERIES.RECONCILIATION_QUERY;
+    let rawQuery = QUERIES.RECONCILIATION_QUERY;
 
     if (name) {
-      name = isQueryByURI ? `<${name}>` : `${MatchServiceHelper.escapeSpecialCharacters(name)}`;
-      name = !isQueryByURI ? this._modifyNameForLuceneScore(name as string , propertyConditions) : name;
+      name = isQueryByURI ? `<${name}>` : this._modifyNameForLuceneScore(MatchServiceHelper.escapeSpecialCharacters(name) , propertyConditions);
+    }
+    if (isQueryByURI) {
+      rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER" , `BIND(URI_PLACEHOLDER as ?entity)`);
+    } else {
+      rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER" , QUERIES.SELECT_ENTITY_QUERY_BY_KEYWORD);
     }
 
-    const queryReplacementString = name ? `values ?query { "${name}" }` : "";
-    const queryFilterReplacementString = name ? "luc:query ?query ;" : "";
-
-    const rawSparqlQuery = rawQuery
+    rawQuery = rawQuery
       .replace("INDEX_PLACE_HOLDER" , graphdbIndex)
-      .replace("QUERY_PLACE_HOLDER" , queryReplacementString)
-      .replace("QUERY_FILTER_PLACE_HOLDER" , queryFilterReplacementString)
+      .replace("QUERY_PLACE_HOLDER" , name ? `values ?query { "${name}" }` : "")
+      .replace("QUERY_FILTER_PLACE_HOLDER" , name ? "luc:query ?query ;" : "")
       .replace("URI_PLACEHOLDER" , name || "")
       .replace("LIMIT_PLACE_HOLDER" , `LIMIT ${limit}`);
 
-    return this._resolvePropertyConditions(rawSparqlQuery , propertyConditions);
+    return this._resolvePropertyConditions(rawQuery , propertyConditions);
   }
 
   private _resolvePropertyPath(propertyId: string) {
