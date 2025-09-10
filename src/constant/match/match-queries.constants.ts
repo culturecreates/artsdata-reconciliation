@@ -1,7 +1,6 @@
 export const QUERIES = {
 
   RECONCILIATION_QUERY: `
-
 PREFIX luc: <http://www.ontotext.com/connectors/lucene#>
 PREFIX luc-index: <http://www.ontotext.com/connectors/lucene/instance#>
 PREFIX schema: <http://schema.org/>
@@ -63,7 +62,6 @@ WHERE
 `,
 
   RECONCILIATION_QUERY_BY_URI: `
-
 PREFIX schema: <http://schema.org/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ado: <http://kg.artsdata.ca/ontology/>

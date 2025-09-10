@@ -31,6 +31,7 @@ export class ArtsdataService {
    */
   async executeSparqlQuery(sparqlQuery: string , infer?: boolean): Promise<any> {
     const sparqlEndpoint: string = this._getArtsdataEndPoint();
+    console.log(`Executing Sparql query:\n ${sparqlQuery}`);
     const queryParam = `query=${encodeURIComponent(sparqlQuery)}&infer=${infer ? "true" : "false"}`;
 
     try {
