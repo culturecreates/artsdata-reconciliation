@@ -222,7 +222,7 @@ describe("Recon Service tests" , () => {
             "conditions": [
               {
                 "matchType": "name" ,
-                "propertyValue": "K11-19"
+                "propertyValue": "http://kg.artsdata.ca/resource/K11-19"
               }
             ]
           }

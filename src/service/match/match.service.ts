@@ -280,9 +280,7 @@ export class MatchService {
     const rawQuery = isQueryByURI ? QUERIES.RECONCILIATION_QUERY_BY_URI : QUERIES.RECONCILIATION_QUERY;
 
     if (name) {
-      name = isQueryByURI
-        ? `<http://kg.artsdata.ca/resource/${name.startsWith("K") ? name : name}>`
-        : `${MatchServiceHelper.escapeSpecialCharacters(name)}`;
+      name = isQueryByURI ? `<${name}>` : `${MatchServiceHelper.escapeSpecialCharacters(name)}`;
       name = !isQueryByURI ? this._modifyNameForLuceneScore(name as string , propertyConditions) : name;
     }
 
