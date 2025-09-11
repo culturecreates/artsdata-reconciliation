@@ -196,9 +196,27 @@ export class ExtendService {
       case EntityClassEnum.EVENT:
         query = query.replace("TYPE_PLACEHOLDER" , "schema:Event")
           .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
-            `OPTIONAL {?uri schema:startDate ?startDate .}`)
+            `OPTIONAL {?uri schema:startDate ?startDate .}
+            OPTIONAL {?uri schema:endDate ?endDate .}
+            OPTIONAL {?uri schema:location ?location;
+                            schema:name ?location_name .
+                     OPTIONAL {?location schema:sameAs ?locationSameAs .
+                     FILTER(contains(str(?locationSameAs),"http://kg.artsdata.ca/resource/K"))
+                     }
+                     OPTIONAL {?location schema:address/schema:postalCode ?address .}
+            }
+            #Offer buy uri
+            OPTIONAL {?uri schema:eventStatus ?eventStatus .}
+            OPTIONAL {?uri schema:eventStatus ?eventAttendanceMode .}`)
           .replace("<EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>" ,
-            "(sample(?startDate) as ?start_date)");
+            `(sample(?startDate) as ?start_date)
+                  (sample(?endDate) as ?end_date)
+                  (sample(?location) as ?location_uri)
+                  (sample(?location_name) as ?location_name)
+                  (sample(?postal_code) as ?postal_code)
+                  (sample(?locationSameAs) as ?location_same_as)
+                  (GROUP_CONCAT(?eventStatus ; SEPARATOR = ", ") AS ?event_status)
+                  (GROUP_CONCAT(?eventAttendanceMode ; SEPARATOR = ", ") AS ?event_attendance_mode)`);
         break;
       case EntityClassEnum.PLACE:
         query = query.replace("TYPE_PLACEHOLDER" , "schema:Place")
