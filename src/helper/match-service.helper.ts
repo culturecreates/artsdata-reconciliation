@@ -18,7 +18,7 @@ export class MatchServiceHelper {
   }
 
   static formatReconciliationResponse(responseLanguage: LanguageEnum , sparqlResponse: any ,
-                                      reconciliationQuery: ReconciliationQuery): ResultCandidates[] {
+                                      reconciliationQuery: ReconciliationQuery , isQueryByURI: boolean): ResultCandidates[] {
     const bindings = sparqlResponse?.results?.bindings || [];
     const uniqueIds = [...new Set(bindings.map((binding: any) => binding["entity"].value))];
     const candidates: ResultCandidates[] = [];
@@ -51,7 +51,7 @@ export class MatchServiceHelper {
       }
 
       resultCandidate.score = Math.round(Number(currentBinding["score"]?.value));
-      resultCandidate.match = MatchServiceHelper.calculateMatch(resultCandidate , reconciliationQuery ,
+      resultCandidate.match = isQueryByURI || MatchServiceHelper.calculateMatch(resultCandidate , reconciliationQuery ,
         additionalPropertiesForMatchCalculation);
 
       resultCandidate.type = currentBindings.map((binding: any) => ({

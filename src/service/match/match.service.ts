@@ -142,10 +142,11 @@ export class MatchService {
       try {
         const { type , limit , conditions } = reconciliationQuery;
         const { name , propertyConditions } = this._resolveConditions(conditions);
-        sparqlQuery = this._generateSparqlQuery(name as string , type , limit || 25 , propertyConditions);
+        const isQueryByURI: boolean = name ? MatchServiceHelper.isQueryByURI(name as string) : false;
+        sparqlQuery = this._generateSparqlQuery(name as string , type , isQueryByURI , limit || 25 , propertyConditions);
         const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
         const candidates = MatchServiceHelper
-          .formatReconciliationResponse(requestLanguage , response , reconciliationQuery);
+          .formatReconciliationResponse(requestLanguage , response , reconciliationQuery , isQueryByURI);
         results.push({ candidates });
       } catch (error) {
         console.error("Error in reconciliation query:" , error);
