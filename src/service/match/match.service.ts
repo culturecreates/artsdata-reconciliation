@@ -269,12 +269,13 @@ export class MatchService {
    * @description Generate SPARQL query
    * @param name
    * @param type
+   * @param isQueryByURI
    * @param limit
    * @param propertyConditions
    */
-  private _generateSparqlQuery(name: string | undefined , type: string , limit: number , propertyConditions: QueryCondition[]): string {
+  private _generateSparqlQuery(name: string | undefined , type: string , isQueryByURI: boolean , limit: number ,
+                               propertyConditions: QueryCondition[]): string {
     const graphdbIndex = MatchServiceHelper.getGraphdbIndex(type);
-    const isQueryByURI = name && MatchServiceHelper.isQueryByURI(name);
     let rawQuery = QUERIES.RECONCILIATION_QUERY;
 
     if (name) {
