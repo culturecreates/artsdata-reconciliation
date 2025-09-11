@@ -203,9 +203,14 @@ export class ExtendService {
       case EntityClassEnum.PLACE:
         query = query.replace("TYPE_PLACEHOLDER" , "schema:Place")
           .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
-            `OPTIONAL {?uri schema:address/schema:postalCode ?postalCode .}`)
+            `OPTIONAL {?uri schema:address/schema:postalCode ?postalCode .}
+            OPTIONAL {?uri schema:address/schema:addressLocality ?addressLocality .}
+            OPTIONAL {?uri schema:address/schema:addressRegion ?addressRegion .}
+            `)
           .replace("<EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>" ,
-            "(sample(?postalCode) as ?postal_code)");
+            `(sample(?postalCode) as ?postal_code)
+            (sample(?addressLocality) as ?address_locality)
+            (sample(?addressRegion) as ?address_region)`);
         break;
       case EntityClassEnum.ORGANIZATION:
         query = query.replace("TYPE_PLACEHOLDER" , "schema:Organization");
