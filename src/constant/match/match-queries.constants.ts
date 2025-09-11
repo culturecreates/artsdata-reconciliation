@@ -51,8 +51,7 @@ WHERE
 #ADDRESS LOCALITY
   OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality}
  
-} group by ?entity ?score ?type_label
-` ,
+} group by ?entity ?score ?type_label` ,
   SELECT_ENTITY_QUERY_BY_KEYWORD: `
     SELECT ?entity ?score WHERE{
         QUERY_PLACE_HOLDER

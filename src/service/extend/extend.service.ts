@@ -201,6 +201,7 @@ export class ExtendService {
              (sample(?location) as ?location_uri)
              (sample(?location_name) as ?location_name)
              (sample(?postal_code) as ?postal_code)
+             (sample(?offer_url) as ?offer_url)
              (COALESCE(sample(?location_uri), sample(?locationSameAs)) as ?location_artsdata_uri)
              (GROUP_CONCAT(DISTINCT ?eventStatus ; SEPARATOR = ", ") AS ?event_status)
              (GROUP_CONCAT(DISTINCT ?eventAttendanceMode ; SEPARATOR = ", ") AS ?event_attendance_mode)`)
@@ -216,6 +217,7 @@ export class ExtendService {
                   OPTIONAL { ?location schema:address/schema:postalCode ?postal_code }
               }
             #Offer buy uri
+            OPTIONAL { ?uri schema:offers/schema:url ?offer_url }
             OPTIONAL { ?uri schema:eventStatus ?eventStatus }
             OPTIONAL { ?uri schema:eventAttendanceMode ?eventAttendanceMode }`);
         break;
