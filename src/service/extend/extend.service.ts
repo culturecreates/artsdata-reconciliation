@@ -180,7 +180,7 @@ export class ExtendService {
   }
 
   private _getExpandedPropertiesForAddress() {
-    return ["postalCode" , "addressLocality" , "addressCountry"];
+    return ["postalCode" , "addressLocality" , "addressCountry" , "addressRegion"];
   }
 
   async getDataFromGraph(graphURI: string , entityClass: EntityClassEnum , page: number = 1 , limit: number = 10) {
