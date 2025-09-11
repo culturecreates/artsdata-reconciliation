@@ -60,7 +60,7 @@ WHERE
         QUERY_FILTER_PLACE_HOLDER
               luc:entities ?entity .
          PROPERTY_PLACE_HOLDER
-      FILTER (CONTAINS(STR(?entity),"kg.artsdata.ca/resource/")) 
+      FILTER (STRSTARTS(STR(?entity),"kg.artsdata.ca/resource/")) 
         ?entity luc:score ?score;
   } LIMIT_PLACE_HOLDER `
 };

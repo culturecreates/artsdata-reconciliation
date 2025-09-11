@@ -195,40 +195,40 @@ export class ExtendService {
     switch (entityClass) {
       case EntityClassEnum.EVENT:
         query = query.replace("TYPE_PLACEHOLDER" , "schema:Event")
+          .replace("<EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>" ,
+            `(sample(?startDate) as ?start_date)
+             (sample(?endDate) as ?end_date)
+             (sample(?location) as ?location_uri)
+             (sample(?location_name) as ?location_name)
+             (sample(?postal_code) as ?postal_code)
+             (COALESCE(sample(?location_uri), sample(?locationSameAs)) as ?location_artsdata_uri)
+             (GROUP_CONCAT(DISTINCT ?eventStatus ; SEPARATOR = ", ") AS ?event_status)
+             (GROUP_CONCAT(DISTINCT ?eventAttendanceMode ; SEPARATOR = ", ") AS ?event_attendance_mode)`)
           .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
             `OPTIONAL {?uri schema:startDate ?startDate .}
             OPTIONAL {?uri schema:endDate ?endDate .}
-            OPTIONAL {?uri schema:location ?location;
-                            schema:name ?location_name .
-                     OPTIONAL {?location schema:sameAs ?locationSameAs .
-                     FILTER(contains(str(?locationSameAs),"http://kg.artsdata.ca/resource/K"))
-                     }
-                     OPTIONAL {?location schema:address/schema:postalCode ?address .}
-            }
+             # Location info
+             OPTIONAL { 
+                   ?uri schema:location ?location .
+                  OPTIONAL { ?location schema:name ?location_name }
+                  OPTIONAL { ?location schema:sameAs ?locationSameAs 
+                  FILTER(STRSTARTS(STR(?locationSameAs), "http://kg.artsdata.ca/resource/K")) }
+                  OPTIONAL { ?location schema:address/schema:postalCode ?postal_code }
+              }
             #Offer buy uri
-            OPTIONAL {?uri schema:eventStatus ?eventStatus .}
-            OPTIONAL {?uri schema:eventStatus ?eventAttendanceMode .}`)
-          .replace("<EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>" ,
-            `(sample(?startDate) as ?start_date)
-                  (sample(?endDate) as ?end_date)
-                  (sample(?location) as ?location_uri)
-                  (sample(?location_name) as ?location_name)
-                  (sample(?postal_code) as ?postal_code)
-                  (sample(?locationSameAs) as ?location_same_as)
-                  (GROUP_CONCAT(?eventStatus ; SEPARATOR = ", ") AS ?event_status)
-                  (GROUP_CONCAT(?eventAttendanceMode ; SEPARATOR = ", ") AS ?event_attendance_mode)`);
+            OPTIONAL { ?uri schema:eventStatus ?eventStatus }
+            OPTIONAL { ?uri schema:eventAttendanceMode ?eventAttendanceMode }`);
         break;
       case EntityClassEnum.PLACE:
         query = query.replace("TYPE_PLACEHOLDER" , "schema:Place")
-          .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
-            `OPTIONAL {?uri schema:address/schema:postalCode ?postalCode .}
-            OPTIONAL {?uri schema:address/schema:addressLocality ?addressLocality .}
-            OPTIONAL {?uri schema:address/schema:addressRegion ?addressRegion .}
-            `)
           .replace("<EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>" ,
             `(sample(?postalCode) as ?postal_code)
             (sample(?addressLocality) as ?address_locality)
-            (sample(?addressRegion) as ?address_region)`);
+            (sample(?addressRegion) as ?address_region)`)
+          .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
+            `OPTIONAL {?uri schema:address/schema:postalCode ?postalCode .}
+            OPTIONAL {?uri schema:address/schema:addressLocality ?addressLocality .}
+            OPTIONAL {?uri schema:address/schema:addressRegion ?addressRegion .}`);
         break;
       case EntityClassEnum.ORGANIZATION:
         query = query.replace("TYPE_PLACEHOLDER" , "schema:Organization");
