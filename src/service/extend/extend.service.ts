@@ -203,7 +203,7 @@ export class ExtendService {
              (sample(?postal_code) as ?postal_code)
              (sample(?offer_url) as ?offer_url)
              (COALESCE(sample(?location_uri), sample(?locationSameAs)) as ?location_artsdata_uri)
-             (GROUP_CONCAT(DISTINCT ?performer_name ; SEPARATOR = ", ") AS ?performer_name)
+             (GROUP_CONCAT(DISTINCT ?performerName ; SEPARATOR = ", ") AS ?performer_name)
              (GROUP_CONCAT(DISTINCT ?eventStatus ; SEPARATOR = ", ") AS ?event_status)
              (GROUP_CONCAT(DISTINCT ?eventAttendanceMode ; SEPARATOR = ", ") AS ?event_attendance_mode)`)
           .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
@@ -220,7 +220,10 @@ export class ExtendService {
               
              OPTIONAL { 
                    ?uri schema:performer ?performer .
-                  OPTIONAL { ?performer schema:name ?performer_name }
+                   OPTIONAL { ?performer schema:name   ?performer_name_en. FILTER( LANG(?performer_name_en) = "en")}
+                   OPTIONAL { ?performer schema:name  ?performer_name_fr. FILTER( LANG(?performer_name_fr) = "fr")}
+                   OPTIONAL { ?performer schema:name  ?performer_name_no. FILTER ( LANG(?performer_name_no) = "")}
+                  BIND(COALESCE(?performer_name_en, ?performer_name_fr, ?performer_name_no) as ?performerName)
               }
             #Offer buy uri
             OPTIONAL { ?uri schema:offers/schema:url ?offer_url }
