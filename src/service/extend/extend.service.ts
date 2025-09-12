@@ -10,6 +10,8 @@ import {
   ProposedExtendProperty
 } from "../../dto/extend";
 import { QUERY_BY_GRAPH } from "../../constant/extend/query-by-graph.constants";
+import { ExpandablePropertyEnum } from "../../enum/extend-service.enum";
+import { EXPANDABLE_PROPERTIES } from "../../constant/extend/expandable-properties.constants";
 
 @Injectable()
 export class ExtendService {
@@ -101,11 +103,27 @@ export class ExtendService {
     const { id , expand } = property;
     let expandedTriples;
     if (expand) {
-      if (id === "address") {
-        const expandedProperties = this._getExpandedPropertiesForAddress();
-        expandedTriples = expandedProperties
-          .map(prop => `\t\tOPTIONAL {?${id} schema:${prop} ?${id}_${prop}.}`).join("\n");
+      const expandedProperties = [];
+      switch (id as ExpandablePropertyEnum) {
+        case ExpandablePropertyEnum.ADDRESS:
+          expandedProperties.push(EXPANDABLE_PROPERTIES.ADDRESS);
+          break;
+        case ExpandablePropertyEnum.PERFORMER:
+          expandedProperties.push(EXPANDABLE_PROPERTIES.PERFORMER);
+          break;
+        case ExpandablePropertyEnum.ORGANIZER:
+          expandedProperties.push(EXPANDABLE_PROPERTIES.ORGANIZER);
+          break;
+        case ExpandablePropertyEnum.OFFERS:
+          expandedProperties.push(EXPANDABLE_PROPERTIES.OFFERS);
+          break;
+        default:
+          console.log("No expanded properties found for id: " , id);
+          break;
       }
+      expandedTriples = expandedProperties
+        .map(prop => `\t\tOPTIONAL {?${id} schema:${prop} ?${id}_${prop}.}`).join("\n");
+
     }
     return `OPTIONAL {?uri schema:${id} ?${id}. ${expandedTriples ? `\n${expandedTriples}\n` : ""}}\n`;
   }
@@ -179,9 +197,6 @@ export class ExtendService {
     };
   }
 
-  private _getExpandedPropertiesForAddress() {
-    return ["postalCode" , "addressLocality" , "addressCountry" , "addressRegion"];
-  }
 
   async getDataFromGraph(graphURI: string , entityClass: EntityClassEnum , page: number = 1 , limit: number = 10) {
     const sparqlQuery = this._getSparqlQueryByTypeAndGraph(graphURI , entityClass , page , limit);
@@ -284,5 +299,14 @@ export class ExtendService {
       }
       return formattedRow;
     });
+  }
+
+
+  private _getExpandedPropertiesForAddress() {
+    return ["postalCode" , "addressLocality" , "addressCountry" , "addressRegion"];
+  }
+
+  private _getExpandedPropertiesForPerformer() {
+    return ["name"];
   }
 }
