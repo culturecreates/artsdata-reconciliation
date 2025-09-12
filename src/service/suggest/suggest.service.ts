@@ -11,22 +11,22 @@ export class SuggestService {
   }
 
   async getSuggestedEntities(prefix: string , cursor: number) {
-    this._validatePrefix(prefix);
-    const sparqlQuery = this._generateSparqlQueryForEntitySuggestion(prefix , cursor);
-    const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
-    return this._formatResult(result);
+    return this._getSuggestions(prefix , cursor , this._generateSparqlQueryForEntitySuggestion.bind(this));
   }
 
   async getSuggestedProperties(prefix: string , cursor: number) {
-    this._validatePrefix(prefix);
-    const sparqlQuery = this._generateSparqlQueryForPropertySuggestion(prefix , cursor);
-    const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
-    return this._formatResult(result);
+    return this._getSuggestions(prefix , cursor , this._generateSparqlQueryForPropertySuggestion.bind(this));
   }
 
   async getSuggestedTypes(prefix: string , cursor: number) {
+    return this._getSuggestions(prefix , cursor , this._generateSparqlQueryForPropertyType.bind(this));
+  }
+
+  private async _getSuggestions(prefix: string , cursor: number ,
+                                queryGenerator: (prefix: string , cursor: number) => string
+  ) {
     this._validatePrefix(prefix);
-    const sparqlQuery = this._generateSparqlQueryForPropertyType(prefix , cursor);
+    const sparqlQuery = queryGenerator(prefix , cursor);
     const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
     return this._formatResult(result);
   }
@@ -69,29 +69,22 @@ export class SuggestService {
     const results: any[] = [];
     result.results.bindings?.forEach((item: any) => {
       const currentId = item.entity?.value?.split(ArtsdataConstants.PREFIX).pop();
-      const CurrentName = item.name?.value;
-      const currentDescription = item.description?.value;
-      const currentImage = item.image?.value;
-      const currentType = item.typeLabel?.value;
-      if (!results.filter((r) => r.id === currentId).length) {
+      const currentEntry = results.find((r) => r.id === currentId);
+
+      if (!currentEntry) {
         results.push({
           id: currentId ,
-          name: CurrentName ,
-          description: currentDescription ,
-          image: currentImage ,
-          type: currentType
+          name: item.name?.value ,
+          description: item.description?.value ,
+          image: item.image?.value ,
+          type: item.typeLabel?.value
         });
-      } else {
-        const existingEntry = results.find((r) => r.id === currentId);
-        const existingType = existingEntry.type;
-        if (currentType) {
-          if (existingEntry.type) {
-            if (existingType && typeof existingType === "string") {
-              existingEntry.type = [existingType , currentType];
-            } else {
-              existingEntry.type.push(currentType);
-            }
-          }
+      } else if (item.typeLabel?.value) {
+        const currentType = item.typeLabel.value;
+        if (typeof currentEntry.type === "string") {
+          currentEntry.type = [currentEntry.type , currentType];
+        } else {
+          currentEntry.type.push(currentType);
         }
       }
     });
@@ -99,7 +92,7 @@ export class SuggestService {
   }
 
   private _validatePrefix(prefix: string) {
-    if (prefix.trim().length === 0) {
+    if (!prefix.trim()) {
       Exception.badRequest("Prefix cannot be empty");
     }
   }

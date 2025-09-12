@@ -8,17 +8,24 @@ export class PreviewService {
   constructor(private readonly _artsdataService: ArtsdataService) {
   }
 
+  /**
+   * Get preview of an entity by its ID.
+   * @param entityId
+   */
   async getPreview(entityId: string): Promise<string> {
     const uri: string = `${ArtsdataConstants.PREFIX}${entityId}`;
-    const sparqlQuery = this._generateSparqlQuery(uri);
+    const sparqlQuery = PREVIEW_QUERY.replace("URI_PLACE_HOLDER" , uri);
     const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
     return this.formatResult(uri , entityId , result);
   }
 
-  private _generateSparqlQuery(uri: string) {
-    return PREVIEW_QUERY.replace("URI_PLACE_HOLDER" , uri);
-  }
-
+  /**
+   * Format the SPARQL query result into HTML content.
+   * @param uri
+   * @param entityId
+   * @param result
+   * @private
+   */
   private formatResult(uri: string , entityId: string , result: any) {
     const row = result.results.bindings?.[0];
     let name , description , typeLabels , image;
@@ -32,6 +39,16 @@ export class PreviewService {
     return this._generateErrorPage(uri , entityId);
   }
 
+  /**
+   * Generate HTML content for the preview.
+   * @param uri
+   * @param entityId
+   * @param name
+   * @param description
+   * @param typeLabels
+   * @param image
+   * @private
+   */
   private _generateHtmlContent(uri: string , entityId: string , name: any , description: any , typeLabels: any , image: any) {
     const body = `<div class="container">
       ${image ? `<div class="image-wrapper"> <img src="${image}" alt="${name}"> </div> ` : ""} 
