@@ -22,7 +22,9 @@ export const QUERIES = {
    (SAMPLE(?url) AS ?url)
    ?type_label
  WHERE {
+   {
    SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER
+   }
  
    OPTIONAL { ?entity schema:name | skos:prefLabel ?name_en. FILTER(LANG(?name_en) = "en") }
    OPTIONAL { ?entity schema:name | skos:prefLabel ?name_fr. FILTER(LANG(?name_fr) = "fr") }
