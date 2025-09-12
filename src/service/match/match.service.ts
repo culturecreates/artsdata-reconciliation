@@ -25,13 +25,13 @@ export class MatchService {
     if (!rawQueries) {
       return this._manifestService.getServiceManifest();
     }
-    let queries;
+
     try {
-      queries = JSON.parse(rawQueries);
-    } catch (e) {
+      const queries = JSON.parse(rawQueries);
+      return await this.reconcileByQueries(acceptLanguage , queries);
+    } catch {
       return Exception.badRequest("The request is not a valid JSON object.");
     }
-    return await this.reconcileByQueries(acceptLanguage , queries);
   }
 
   /**
@@ -43,13 +43,10 @@ export class MatchService {
    * @returns {string}
    */
   private _resolvePropertyConditions(rawSparqlQuery: string , propertyConditions: QueryCondition[]): string {
-    let propertyTriples: string = "";
-    propertyConditions.forEach((condition , index) => {
-      propertyTriples = propertyTriples.concat(this._generateTripleFromCondition(condition , index));
-    });
-    rawSparqlQuery = rawSparqlQuery.replace("PROPERTY_PLACE_HOLDER" , propertyTriples);
-    return rawSparqlQuery;
-
+    const propertyTriples = propertyConditions
+      .map((condition , index) => this._generateTripleFromCondition(condition , index))
+      .join("");
+    return rawSparqlQuery.replace("PROPERTY_PLACE_HOLDER" , propertyTriples);
   }
 
   /**
@@ -63,11 +60,10 @@ export class MatchService {
     name: string | string[] | undefined;
     propertyConditions: QueryCondition[];
   } {
-    const name = conditions
-      .find(condition => condition.matchType == MatchTypeEnum.NAME)?.propertyValue;
-    const propertyConditions = conditions
-      .filter(condition => condition.matchType == MatchTypeEnum.PROPERTY);
-    return { name , propertyConditions };
+    return {
+      name: conditions.find(({ matchType }) => matchType === MatchTypeEnum.NAME)?.propertyValue ,
+      propertyConditions: conditions.filter(({ matchType }) => matchType === MatchTypeEnum.PROPERTY)
+    };
   }
 
   /**
@@ -79,7 +75,6 @@ export class MatchService {
    * @return {string}
    */
   private _resolvePropertyValue(value: string | string [] , property: string): (string | string[]) {
-    // if value is an array then using iteration to resolve each value and put the values in an array
     if (Array.isArray(value)) {
       return value.flatMap(val => this._resolvePropertyValue(val , property));
     }
@@ -118,13 +113,12 @@ export class MatchService {
   private _generateTripleFromCondition(condition: QueryCondition , index: number): string {
     const { required , propertyId , propertyValue: rawConditionValue , matchQualifier , matchQuantifier } = condition;
     const formattedConditionValue = this._resolvePropertyValue(rawConditionValue , propertyId as string);
-    const formattedPropertyId: string = MatchServiceHelper.isValidURI(propertyId as string) ? this._resolvePropertyPath(propertyId as string) : `${propertyId}`;
+    const formattedPropertyId: string = MatchServiceHelper.isValidURI(propertyId as string) ?
+      this._resolvePropertyPath(propertyId as string) : `${propertyId}`;
 
-    let triple = this._resolveMatchQualifierAndQuantifier(matchQualifier as MatchQualifierEnum , formattedPropertyId ,
-      matchQuantifier as MatchQuantifierEnum , formattedConditionValue , index);
-    triple = this._resolveRequired(triple , required as boolean);
-
-    return triple;
+    let triple = this._resolveMatchQualifierAndQuantifier(matchQualifier as MatchQualifierEnum ,
+      formattedPropertyId , matchQuantifier as MatchQuantifierEnum , formattedConditionValue , index);
+    return required ? triple : `OPTIONAL { ${triple} }`;
   }
 
   /**
@@ -223,44 +217,8 @@ export class MatchService {
       }
     }
 
-
     return triple;
 
-  }
-
-  /**
-   * @private
-   * @name _resolveRequired
-   * @description  Resolve required, required is defaulted to true
-   * @param triple
-   * @param required
-   */
-  private _resolveRequired(triple: string , required: boolean) {
-    return required ? triple : `OPTIONAL { ${triple} }`;
-  }
-
-  /**
-   * @private
-   * @name _resolveMatchQuantifier
-   * @description Resolve match quantifier, matchQuantifier is defaulted to ALL
-   * @param matchQuantifier
-   * @param triple
-   */
-  private _resolveMatchQuantifier(matchQuantifier: MatchQuantifierEnum , triple: string) {
-    if (!matchQuantifier) {
-      matchQuantifier = MatchQuantifierEnum.ALL;
-    }
-    switch (matchQuantifier) {
-      case MatchQuantifierEnum.ALL:
-        return triple;
-      case MatchQuantifierEnum.ANY:
-        return triple;
-      case MatchQuantifierEnum.NONE:
-        return `FILTER NOT EXISTS { ${triple} }.`;
-      default:
-        Exception.badRequest("Unsupported match quantifier");
-    }
-    return "";
   }
 
   /**
@@ -311,33 +269,30 @@ export class MatchService {
   }
 
   private _modifyNameForLuceneScore(name: string , propertyConditions: QueryCondition[]): string {
-    let luceneQuery = `name: ${name}`;
-    propertyConditions
+    const propertyMap = {
+      "http://schema.org/url": "url" ,
+      "http://schema.org/sameAs": "sameAs" ,
+      "http://schema.org/postalCode": "postalCode"
+    };
+
+    const luceneQuery = propertyConditions
       .filter(condition => condition.matchType === MatchTypeEnum.PROPERTY)
-      .forEach(condition => {
-        const propertyMap = {
-          "http://schema.org/url": "url" ,
-          "http://schema.org/sameAs": "sameAs" ,
-          "http://schema.org/postalCode": "postalCode"
-        };
+      .reduce((query , condition) => {
         Object.entries(propertyMap).forEach(([key , value]) => {
           if (condition.propertyId?.includes(key)) {
-            luceneQuery += this.resolvePropertyValueForLucene(condition.propertyValue , value);
+            query += this.resolvePropertyValueForLucene(condition.propertyValue , value);
           }
         });
-      });
+        return query;
+      } , `name: ${name}`);
+
     return luceneQuery;
   }
 
-  private resolvePropertyValueForLucene(propertyValue: string | string[] , propertyId: string) {
-    let luceneQuery: string = "";
-    if (Array.isArray(propertyValue)) {
-      propertyValue.forEach(value => {
-        luceneQuery = luceneQuery + ` ${propertyId}: ${MatchServiceHelper.escapeSpecialCharacters(value)}`;
-      });
-    } else {
-      luceneQuery = luceneQuery + ` ${propertyId}: ${MatchServiceHelper.escapeSpecialCharacters(propertyValue)}`;
-    }
-    return luceneQuery;
+  private resolvePropertyValueForLucene(propertyValue: string | string[] , propertyId: string): string {
+    const values = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
+    return values
+      .map(value => ` ${propertyId}: ${MatchServiceHelper.escapeSpecialCharacters(value)}`)
+      .join(" ");
   }
 }
