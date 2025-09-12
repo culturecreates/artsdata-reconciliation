@@ -21,43 +21,38 @@ export class ExtendService {
 
 
   async getDataExtension(dataExtensionQuery: DataExtensionQueryDTO) {
-    //Get the query
     const sparqlQuery: string = this._generateQuery(dataExtensionQuery);
-    const expandProperties = dataExtensionQuery.properties
-      .filter((property) => property.expand);
+    const expandProperties = dataExtensionQuery.properties.filter(property => property.expand);
     const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
     const formattedResult = this._formatResult(dataExtensionQuery.ids , result);
 
     if (expandProperties.length > 0) {
-      let properties: { id: any; values: any; }[] = [];
-      const expandedPropertyPrefixes = expandProperties
-        .map((property) => `${property.id}_`);
-      formattedResult.rows.forEach((row) => {
-        expandProperties.forEach((property) => {
-          const expandedPropertyId = property.id;
-          const propertyPrefix = `${expandedPropertyId}_`;
-          const expandedProperty = row?.properties
-            .filter((item: any) => item.id.startsWith(propertyPrefix));
-          if (expandedProperty?.length) {
-            properties = [];
-            for (const prop of expandedProperty) {
-              const propertyId = prop.id;
-              //Remove the property with propertyId from the row properties
-              row.properties = row.properties.filter((item: any) => item.id !== propertyId);
-              properties.push({ id: prop.id.split(propertyPrefix).pop() , values: prop.values });
+      const expandedPropertyPrefixes = expandProperties.map(property => `${property.id}_`);
+
+      formattedResult.rows.forEach(row => {
+        expandProperties.forEach(property => {
+          const propertyPrefix = `${property.id}_`;
+          const expandedProperties = row?.properties.filter(item => item.id.startsWith(propertyPrefix));
+
+          if (expandedProperties?.length) {
+            const properties = expandedProperties.map(prop => {
+              row.properties = row.properties.filter(item => item.id !== prop.id);
+              return { id: prop.id.split(propertyPrefix).pop() , values: prop.values };
+            });
+
+            const expandingProperty = row.properties.find(item => item.id === property.id);
+            if (expandingProperty?.values?.[0]) {
+              (expandingProperty.values[0] as any)["properties"] = properties;
             }
-            const expandingProperties = row.properties
-              .find((item) => item.id === expandedPropertyId);
-            (expandingProperties?.values?.[0] as any)["properties"] = properties || [];
           }
         });
       });
-      expandedPropertyPrefixes.forEach((prefix) => {
-        formattedResult.meta = formattedResult.meta.filter(
-          item => !item.id.startsWith(prefix)
-        );
-      });
+
+      formattedResult.meta = formattedResult.meta.filter(
+        item => !expandedPropertyPrefixes.some(prefix => item.id.startsWith(prefix))
+      );
     }
+
     return formattedResult;
   }
 
@@ -79,21 +74,17 @@ export class ExtendService {
   }
 
   private _generateQuery(dataExtensionQuery: DataExtensionQueryDTO) {
-    let query: string = EXTEND_QUERY;
     const { ids , properties } = dataExtensionQuery;
-    const uris = ids.map(id => {
-      if (MatchServiceHelper.isValidURI(id)) {
-        return id;
-      } else
-        return `${ArtsdataConstants.PREFIX}${id}`;
-    });
-    const uriPlaceholder = uris.map(item => `(<${item}>)`).join(" ");
-    query = query.replace("<URI_PLACE_HOLDER>" , uriPlaceholder);
 
-    let propertyTriples: string = "";
-    properties.forEach((property) => {
-      propertyTriples = propertyTriples.concat(this._generateTripleFromCondition(property));
-    });
+    // Generate URIs with prefix if necessary
+    const uris = ids.map(id => MatchServiceHelper.isValidURI(id) ? id : `${ArtsdataConstants.PREFIX}${id}`);
+    const uriPlaceholder = uris.map(uri => `(<${uri}>)`).join(" ");
+
+    // Replace URI placeholder in the query
+    let query = EXTEND_QUERY.replace("<URI_PLACE_HOLDER>" , uriPlaceholder);
+
+    // Generate property triples and replace the placeholder
+    const propertyTriples = properties.map(this._generateTripleFromCondition).join("");
     query = query.replace("<TRIPLES_PLACE_HOLDER>" , propertyTriples);
 
     return query;
@@ -142,21 +133,21 @@ export class ExtendService {
       for (const key in row) {
         const valueId = key;
         let currentValue: any;
+        const rowValue = row[key].value;
 
         if (key !== "uri") {
           if (row[key].type === "literal") {
             currentValue = { "str": row[key].value , lang: row[key]["xml:lang"] };
           }
           if (row[key].type === "bnode") {
-            currentValue = { "id": row[key].value };
+            currentValue = { "id": rowValue };
           }
 
           if (row[key].type === "uri") {
-            const value = row[key].value;
-            if (value.startsWith(ArtsdataConstants.PREFIX)) {
-              currentValue = { "id": value.split(ArtsdataConstants.PREFIX)[1] };
+            if (rowValue.startsWith(ArtsdataConstants.PREFIX)) {
+              currentValue = { "id": rowValue.split(ArtsdataConstants.PREFIX)[1] };
             } else {
-              currentValue = { "id": value };
+              currentValue = { "id": rowValue };
             }
           }
 
