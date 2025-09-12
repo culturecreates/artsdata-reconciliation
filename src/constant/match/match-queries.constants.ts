@@ -1,3 +1,5 @@
+import { ArtsdataConstants } from "../shared";
+
 export const QUERIES = {
   RECONCILIATION_QUERY: `
  PREFIX luc: <http://www.ontotext.com/connectors/lucene#>
@@ -52,7 +54,7 @@ export const QUERIES = {
      QUERY_FILTER_PLACE_HOLDER
      luc:entities ?entity.
    PROPERTY_PLACE_HOLDER
-   FILTER(STRSTARTS(STR(?entity), "http://kg.artsdata.ca/resource/"))
+   FILTER(STRSTARTS(STR(?entity), "${ArtsdataConstants.PREFIX}"))
    ?entity luc:score ?score;
  } LIMIT_PLACE_HOLDER`
 };

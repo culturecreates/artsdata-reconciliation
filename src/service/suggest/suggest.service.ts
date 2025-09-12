@@ -35,7 +35,7 @@ export class SuggestService {
     const sparqlQuery = SUGGEST_QUERY.ENTITY.replace("QUERY_PLACE_HOLDER" , query + "*")
       .replace("INDEX_PLACE_HOLDER" , GRAPHDB_INDEX.ENTITY)
       .replace("QUERY_PLACEHOLDER" , query.toLowerCase())
-      .replace("FILTER_CONDITION_PLACEHOLDER" , "FILTER (CONTAINS(STR(?entity),\"kg.artsdata.ca/resource/K\")) ");
+      .replace("FILTER_CONDITION_PLACEHOLDER" , `FILTER (STRSTARTS(STR(?entity),"${ArtsdataConstants.PREFIX}")) `);
     if (cursor) {
       return `${sparqlQuery} OFFSET ${cursor}`;
     }

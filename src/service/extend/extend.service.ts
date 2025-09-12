@@ -220,7 +220,7 @@ export class ExtendService {
                    ?uri schema:location ?location .
                   OPTIONAL { ?location schema:name ?location_name }
                   OPTIONAL { ?location schema:sameAs ?locationSameAs 
-                  FILTER(STRSTARTS(STR(?locationSameAs), "http://kg.artsdata.ca/resource/K")) }
+                  FILTER(STRSTARTS(STR(?locationSameAs), "${ArtsdataConstants.PREFIX}")) }
                   OPTIONAL { ?location schema:address/schema:postalCode ?postal_code }
               }
               
