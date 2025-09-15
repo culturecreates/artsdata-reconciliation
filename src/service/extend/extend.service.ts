@@ -97,16 +97,16 @@ export class ExtendService {
       const expandedProperties = [];
       switch (id as ExpandablePropertyEnum) {
         case ExpandablePropertyEnum.ADDRESS:
-          expandedProperties.push(EXPANDABLE_PROPERTIES.ADDRESS);
+          expandedProperties.push(...EXPANDABLE_PROPERTIES.ADDRESS);
           break;
         case ExpandablePropertyEnum.PERFORMER:
-          expandedProperties.push(EXPANDABLE_PROPERTIES.PERFORMER);
+          expandedProperties.push(...EXPANDABLE_PROPERTIES.PERFORMER);
           break;
         case ExpandablePropertyEnum.ORGANIZER:
-          expandedProperties.push(EXPANDABLE_PROPERTIES.ORGANIZER);
+          expandedProperties.push(...EXPANDABLE_PROPERTIES.ORGANIZER);
           break;
         case ExpandablePropertyEnum.OFFERS:
-          expandedProperties.push(EXPANDABLE_PROPERTIES.OFFERS);
+          expandedProperties.push(...EXPANDABLE_PROPERTIES.OFFERS);
           break;
         default:
           console.log("No expanded properties found for id: " , id);
