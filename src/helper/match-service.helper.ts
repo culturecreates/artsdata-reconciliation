@@ -111,6 +111,22 @@ export class MatchServiceHelper {
         if (!b) return true;
         return a?.trim()?.toLowerCase() === b?.trim()?.toLowerCase();
       } ,
+      exactUrl: (a: string , b: string) => {
+        if (a && b) {
+          const urlA = new URL(a.toLowerCase());
+          const urlB = new URL(b.toLowerCase());
+
+          let hostA = urlA.hostname;
+          let hostB = urlB.hostname;
+          // Normalize path (remove trailing slash unless root)
+          let pathA = urlA.pathname.replace(/\/+$/ , "") || "/";
+          let pathB = urlB.pathname.replace(/\/+$/ , "") || "/";
+          return `${hostA}${pathA}` === `${hostB}${pathB}`;
+        } else {
+          return true;
+        }
+
+      } ,
       isniAndWikidataLogic: (aISNI: string | undefined , bISNI: string | undefined ,
                              aWikidata: string | undefined , bWikidata: string | undefined) => {
         const isniExists = aISNI && bISNI;
@@ -130,8 +146,9 @@ export class MatchServiceHelper {
       matchers.exactOrMissing(recordFetched.name , recordFromQuery.name) ,
       matchers.exact(additionalProperties.postalCode , recordFromQuery.postalCode) ,
       matchers.exact(additionalProperties.addressLocality , recordFromQuery.addressLocality) ,
-      matchers.exact(recordFetched.url , recordFromQuery.url) ,
-      matchers.isniAndWikidataLogic(recordFetched.isni , recordFromQuery.isni , recordFetched.wikidata , recordFromQuery.wikidata)
+      matchers.exactUrl(additionalProperties.url , recordFromQuery.url as string) ,
+      matchers.isniAndWikidataLogic(additionalProperties.isni , recordFromQuery.isni ,
+        additionalProperties.wikidata , recordFromQuery.wikidata)
     ];
 
     return checks.every(Boolean);
