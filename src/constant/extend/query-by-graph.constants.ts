@@ -18,6 +18,7 @@ WHERE {
     OPTIONAL { ?uri schema:name ?name_fr. FILTER(LANG(?name_fr) = "fr") }
     OPTIONAL { ?uri schema:name ?name_no. FILTER(LANG(?name_no) = "") }
     ?uri a ?types.
+    <FILTER_BY_REGION_PLACEHOLDER>
   }
   ?uri a TYPE_PLACEHOLDER.
   FILTER(!ISBLANK(?uri))
