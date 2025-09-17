@@ -17,9 +17,9 @@ INSERT DATA {
       "facet": true
     },
     {
-      "fieldName": “sameAs",
+      "fieldName": "sameAs",
       "propertyChain": [
-        "http://schema.org/sameAs”
+        "http://schema.org/sameAs"
       ],
       "indexed": true,
       "stored": true,
@@ -29,9 +29,9 @@ INSERT DATA {
       "facet": true
     },
     {
-      "fieldName": “url",
+      "fieldName": "url",
       "propertyChain": [
-        "http://schema.org/url”
+        "http://schema.org/url"
       ],
       "indexed": true,
       "stored": true,
