@@ -107,10 +107,6 @@ export class MatchServiceHelper {
         if (!a || !b) return true;
         return a?.trim()?.toLowerCase() === b?.trim()?.toLowerCase();
       } ,
-      exact: (a: string | undefined , b: string | undefined) => {
-        if (!b) return true;
-        return a?.trim()?.toLowerCase() === b?.trim()?.toLowerCase();
-      } ,
       exactUrl: (a: string , b: string) => {
         if (a && b) {
           const urlA = new URL(a.toLowerCase());
@@ -144,8 +140,8 @@ export class MatchServiceHelper {
 
     const checks = [
       matchers.exactOrMissing(recordFetched.name , recordFromQuery.name) ,
-      matchers.exact(additionalProperties.postalCode , recordFromQuery.postalCode) ,
-      matchers.exact(additionalProperties.addressLocality , recordFromQuery.addressLocality) ,
+      matchers.exactOrMissing(additionalProperties.postalCode , recordFromQuery.postalCode) ,
+      matchers.exactOrMissing(additionalProperties.addressLocality , recordFromQuery.addressLocality) ,
       matchers.exactUrl(additionalProperties.url , recordFromQuery.url as string) ,
       matchers.isniAndWikidataLogic(additionalProperties.isni , recordFromQuery.isni ,
         additionalProperties.wikidata , recordFromQuery.wikidata)
