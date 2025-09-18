@@ -93,7 +93,7 @@ describe("Recon Service tests" , () => {
             conditions: [
               {
                 matchType: "name" ,
-                propertyValue: "Show is nowhere"
+                propertyValue: "nowhere"
               }
             ]
           }
