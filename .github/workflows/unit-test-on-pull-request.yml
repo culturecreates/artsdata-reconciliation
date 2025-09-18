@@ -16,6 +16,10 @@ jobs:
       - name: Extract statements file
         run: |
           unzip ./test/statements.nq.zip -d ./test/
+
+      - name: Create directory
+        run: |
+          mkdir -p ./graphdb-data
     
       - name: Run GraphDB
         run: docker compose -f "graph-db/docker-compose.yml" up -d --build
