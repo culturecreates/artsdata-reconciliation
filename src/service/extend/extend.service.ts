@@ -247,8 +247,14 @@ export class ExtendService {
             (sample(?addressRegion) as ?address_region)`)
           .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
             `OPTIONAL {?uri schema:address/schema:postalCode ?postalCode .}
-            OPTIONAL {?uri schema:address/schema:addressLocality ?addressLocality .}
-            OPTIONAL {?uri schema:address/schema:addressRegion ?addressRegion .}`)
+                   OPTIONAL { ?uri schema:address/schema:addressLocality ?addressLocality_en. FILTER( LANG(?addressLocality_en) = "en")}
+                   OPTIONAL { ?uri schema:address/schema:addressLocality ?addressLocality_fr. FILTER( LANG(?addressLocality_fr) = "fr")}
+                   OPTIONAL { ?uri schema:address/schema:addressLocality ?addressLocality_no. FILTER ( LANG(?addressLocality_no) = "")}
+                  BIND(COALESCE(?addressLocality_en, ?addressLocality_fr, ?addressLocality_no) as ?addressLocality)
+                   OPTIONAL { ?uri schema:address/schema:addressRegion ?addressRegion_en. FILTER( LANG(?addressRegion_en) = "en")}
+                   OPTIONAL { ?uri schema:address/schema:addressRegion ?addressRegion_fr. FILTER( LANG(?addressRegion_fr) = "fr")}
+                   OPTIONAL { ?uri schema:address/schema:addressRegion ?addressRegion_no. FILTER ( LANG(?addressRegion_no) = "")}
+                  BIND(COALESCE(?addressRegion_en, ?addressRegion_fr, ?addressRegion_no) as ?addressRegion)`)
           .replace("<FILTER_BY_REGION_PLACEHOLDER>" ,
             region ? `?uri schema:address/schema:addressRegion ?region.
                    FILTER (LCASE(STR(?region)) = LCASE("${region}"))` : "");
