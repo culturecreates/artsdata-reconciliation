@@ -45,9 +45,10 @@ jobs:
                 curl -X POST -H "Content-Type: application/sparql-update" --data-binary @"$file" "http://localhost:7200/repositories/artsdata/statements"
             done
 
-      - name: Update env to point to local graphdb
+      - name: Ensure .env exists
         run: |
-            sed -i 's|^ARTSDATA_ENDPOINT=.*|ARTSDATA_ENDPOINT="http://127.0.0.1:7200/"|' .env
+          touch .env
+          echo 'ARTSDATA_ENDPOINT="http://127.0.0.1:7200/"' >> .env
 
       - name: Setup Node
         uses: actions/setup-node@v1
