@@ -5,7 +5,7 @@ PREFIX dbo: <http://dbpedia.org/ontology/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 SELECT ?uri 
   (SAMPLE(?urls) AS ?url)
-  (COALESCE(SAMPLE(?name_en), SAMPLE(?name_fr), SAMPLE(?name_no)) AS ?name)
+  (SAMPLE(?name) AS ?name)
   (SAMPLE(?isni_uris) AS ?isni_uri)
   (SAMPLE(?adid_obj) AS ?artsdata_uri)
   (SAMPLE(?wikidata_ids) AS ?wikidata_uri)
@@ -17,6 +17,8 @@ WHERE {
     OPTIONAL { ?uri schema:name ?name_en. FILTER(LANG(?name_en) = "en") }
     OPTIONAL { ?uri schema:name ?name_fr. FILTER(LANG(?name_fr) = "fr") }
     OPTIONAL { ?uri schema:name ?name_no. FILTER(LANG(?name_no) = "") }
+    BIND(COALESCE(?name_en, ?name_fr, ?name_no) AS ?name)
+    FILTER(!ISBLANK(STR(?name)))
     ?uri a ?types.
     <FILTER_BY_REGION_PLACEHOLDER>
   }
