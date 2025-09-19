@@ -64,11 +64,18 @@ export class ExtendController {
     type: Number ,
     example: 10
   })
+  @ApiQuery({
+    name: "region" ,
+    type: String ,
+    description: "Select region" ,
+    required: false
+  })
   async getDataFromGraph(@Param("graph_uri") graphURI: string ,
                          @Param("entity_class") entityClass: EntityClassEnum ,
+                         @Query("region") region: string ,
                          @Query("page" , ParseIntPipe) page: number ,
                          @Query("limit" , ParseIntPipe) limit: number) {
-    return await this._extendService.getDataFromGraph(graphURI , entityClass , page , limit);
+    return await this._extendService.getDataFromGraph(graphURI , entityClass , region , page , limit);
   }
 
 }

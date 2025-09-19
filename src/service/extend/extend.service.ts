@@ -189,13 +189,15 @@ export class ExtendService {
   }
 
 
-  async getDataFromGraph(graphURI: string , entityClass: EntityClassEnum , page: number = 1 , limit: number = 10) {
-    const sparqlQuery = this._getSparqlQueryByTypeAndGraph(graphURI , entityClass , page , limit);
+  async getDataFromGraph(graphURI: string , entityClass: EntityClassEnum , region: string , page: number = 1 ,
+                         limit: number = 10) {
+    const sparqlQuery = this._getSparqlQueryByTypeAndGraph(graphURI , entityClass , region , page , limit);
     const result = await this._artsdataService.executeSparqlQuery(sparqlQuery , true);
     return this._formatResults(result);
   }
 
-  private _getSparqlQueryByTypeAndGraph(graphURI: string , entityClass: EntityClassEnum , page: number , limit: number): string {
+  private _getSparqlQueryByTypeAndGraph(graphURI: string , entityClass: EntityClassEnum , region: string , page: number ,
+                                        limit: number): string {
     let query: string = QUERY_BY_GRAPH.GENERIC;
 
     switch (entityClass) {
@@ -234,7 +236,8 @@ export class ExtendService {
             #Offer buy uri
             OPTIONAL { ?uri schema:offers/schema:url ?offer_url }
             OPTIONAL { ?uri schema:eventStatus ?eventStatus }
-            OPTIONAL { ?uri schema:eventAttendanceMode ?eventAttendanceMode }`);
+            OPTIONAL { ?uri schema:eventAttendanceMode ?eventAttendanceMode }`)
+          .replace("<FILTER_BY_REGION_PLACEHOLDER>" , "");
         break;
       case EntityClassEnum.PLACE:
         query = query.replace("TYPE_PLACEHOLDER" , "schema:Place")
@@ -244,17 +247,41 @@ export class ExtendService {
             (sample(?addressRegion) as ?address_region)`)
           .replace("<EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>" ,
             `OPTIONAL {?uri schema:address/schema:postalCode ?postalCode .}
-            OPTIONAL {?uri schema:address/schema:addressLocality ?addressLocality .}
-            OPTIONAL {?uri schema:address/schema:addressRegion ?addressRegion .}`);
+                   OPTIONAL { ?uri schema:address/schema:addressLocality ?addressLocality_en. FILTER( LANG(?addressLocality_en) = "en")}
+                   OPTIONAL { ?uri schema:address/schema:addressLocality ?addressLocality_fr. FILTER( LANG(?addressLocality_fr) = "fr")}
+                   OPTIONAL { ?uri schema:address/schema:addressLocality ?addressLocality_no. FILTER ( LANG(?addressLocality_no) = "")}
+                  BIND(COALESCE(?addressLocality_en, ?addressLocality_fr, ?addressLocality_no) as ?addressLocality)
+                   OPTIONAL { ?uri schema:address/schema:addressRegion ?addressRegion_en. FILTER( LANG(?addressRegion_en) = "en")}
+                   OPTIONAL { ?uri schema:address/schema:addressRegion ?addressRegion_fr. FILTER( LANG(?addressRegion_fr) = "fr")}
+                   OPTIONAL { ?uri schema:address/schema:addressRegion ?addressRegion_no. FILTER ( LANG(?addressRegion_no) = "")}
+                  BIND(COALESCE(?addressRegion_en, ?addressRegion_fr, ?addressRegion_no) as ?addressRegion)`)
+          .replace("<FILTER_BY_REGION_PLACEHOLDER>" ,
+            region ? `?uri schema:address/schema:addressRegion ?region.
+                   FILTER (LCASE(STR(?region)) = LCASE("${region}"))` : "");
         break;
       case EntityClassEnum.ORGANIZATION:
-        query = query.replace("TYPE_PLACEHOLDER" , "schema:Organization");
+        query = query.replace("TYPE_PLACEHOLDER" , "schema:Organization")
+          .replace("<FILTER_BY_REGION_PLACEHOLDER>" ,
+            region ?
+              `OPTIONAL { ?uri schema:address/schema:addressRegion ?addressRegion.}
+               OPTIONAL {?uri schema:location/schema:address/schema:addressRegion ?locationRegion}
+              FILTER(LCASE(STR(?addressRegion)) = LCASE("${region}") || LCASE(STR(?locationRegion)) = LCASE("${region}"))`
+              : "");
         break;
       case EntityClassEnum.PERSON:
-        query = query.replace("TYPE_PLACEHOLDER" , "schema:Person");
+        query = query.replace("TYPE_PLACEHOLDER" , "schema:Person")
+          .replace("<FILTER_BY_REGION_PLACEHOLDER>" ,
+            region ? `?uri schema:workLocation/schema:address/schema:addressRegion ?region.
+        filter(LCASE(str(?region)) = LCASE("${region}"))` : "");
         break;
       case EntityClassEnum.AGENT:
-        query = query.replace("TYPE_PLACEHOLDER" , "dbo:Agent");
+        query = query.replace("TYPE_PLACEHOLDER" , "dbo:Agent")
+          .replace("<FILTER_BY_REGION_PLACEHOLDER>" ,
+            region ? `OPTIONAL { ?uri schema:address/schema:addressRegion ?addressRegion.}
+               OPTIONAL {?uri schema:location/schema:address/schema:addressRegion ?locationRegion}
+               OPTIONAL {?uri schema:workLocation/schema:address/schema:addressRegion ?region}
+              FILTER(LCASE(STR(?addressRegion)) = LCASE("${region}") || LCASE(STR(?locationRegion)) = LCASE(STR("${region}")) || LCASE(STR(?region)) = LCASE("${region}"))`
+              : "");
         break;
       default:
         throw Exception.badRequest("Invalid type provided");

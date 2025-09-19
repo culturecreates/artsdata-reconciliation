@@ -11,4 +11,3 @@ services:
 
 volumes:
   graphdb-data:
-    external: true

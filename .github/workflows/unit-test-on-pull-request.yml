@@ -16,7 +16,7 @@ jobs:
       - name: Extract statements file
         run: |
           unzip ./test/statements.nq.zip -d ./test/
-    
+
       - name: Run GraphDB
         run: docker compose -f "graph-db/docker-compose.yml" up -d --build
 
@@ -29,21 +29,21 @@ jobs:
 
       - name: Import repository configuration
         run: |
-            curl 'http://127.0.0.1:7200/rest/repositories' \
-            --header 'Content-Type: multipart/form-data' \
-            --form 'config=@"./test/config.ttl"'
+          curl 'http://127.0.0.1:7200/rest/repositories' \
+          --header 'Content-Type: multipart/form-data' \
+          --form 'config=@"./test/config.ttl"'
 
       - name: Import repository data
         run: |
-            curl 'http://127.0.0.1:7200/repositories/artsdata/statements' \
-            --header 'Content-Type: application/n-quads' \
-            --data-binary '@./test/statements.nq'
+          curl 'http://127.0.0.1:7200/repositories/artsdata/statements' \
+          --header 'Content-Type: application/n-quads' \
+          --data-binary '@./test/statements.nq'
 
       - name: Create index
         run: |
-            for file in ./seed/sparql/index/*.sparql; do
-                curl -X POST -H "Content-Type: application/sparql-update" --data-binary @"$file" "http://localhost:7200/repositories/artsdata/statements"
-            done
+          for file in ./seed/sparql/index/*.sparql; do
+              curl -X POST -H "Content-Type: application/sparql-update" --data-binary @"$file" "http://localhost:7200/repositories/artsdata/statements"
+          done
 
       - name: Ensure .env exists
         run: |
@@ -53,7 +53,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
-            node-version: 16.20.1
+          node-version: 16.20.1
 
       - name: Install dependencies
         run: npm install
