@@ -12,3 +12,7 @@ export const APPLICATION = {
   HTTP_PORT: Number(env.APP_PORT) || 3000,
   HTTPS_PORT: Number(env.APP_PORT) || 443
 };
+
+export const FEATURE_FLAG = {
+  ENABLE_EVENT_BATCH_RECONCILIATION: Boolean(env.ENABLE_EVENT_BATCH_RECONCILIATION) || false
+};

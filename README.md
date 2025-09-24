@@ -29,6 +29,10 @@ npm run build
 
 npm run seed:calendar-metadata
 
+# Run unit test.
+
+npm run test
+
 #### And you're ready to go :)
 
 [nestjs]: https://nestjs.com

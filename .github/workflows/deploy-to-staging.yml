@@ -1,4 +1,4 @@
-name: CI CD - Test Server
+name: CI CD - Staging Server
 
 on:
   workflow_dispatch:
