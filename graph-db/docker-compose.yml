@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   graphdb:
     image: ontotext/graphdb:10.6.3
@@ -7,16 +5,22 @@ services:
     restart: always
     ports:
       - "7200:7200"
-    environment:
-      JAVA_OPTS: >
-        -Xms4g
-        -Xmx6g
-        -XX:+UseG1GC
-        -Dgraphdb.workbench.maxUploadSize=809715200
+    command: >
+      -Dgraphdb.workbench.importDirectory=/opt/graphdb/home/graphdb-import
+      -Dgraphdb.workbench.cors.enable=true
+      -Dgraphdb.home=/opt/graphdb/home
+      -Xms2g
+      -Xmx5g
+      -XX:+UseG1GC
+      -Dgraphdb.workbench.maxUploadSize=809715200
     volumes:
-      - /home/ubuntu/graphdb-data:/opt/graphdb/home
+      - /home/ubuntu/graphdb/data:/opt/graphdb/home/data
+      - /home/ubuntu/graphdb/import:/root/graphdb-import
     logging:
       driver: "json-file"
       options:
         max-size: "100m"
         max-file: "5"
+volumes:
+  graphdb-data:
+  graphdb-import:
