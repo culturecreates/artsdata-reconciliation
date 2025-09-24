@@ -1,13 +1,22 @@
+version: "3.8"
+
 services:
   graphdb:
     image: ontotext/graphdb:10.6.3
     container_name: graphdb
-    volumes:
-      - graphdb-data:/opt/graphdb/dist
+    restart: always
     ports:
       - "7200:7200"
-    restart: always
-    command: -Xms2048M -XX:MaxDirectMemorySize=2g
-
-volumes:
-  graphdb-data:
+    environment:
+      JAVA_OPTS: >
+        -Xms4g
+        -Xmx6g
+        -XX:+UseG1GC
+        -Dgraphdb.workbench.maxUploadSize=809715200
+    volumes:
+      - /home/ubuntu/graphdb-data:/opt/graphdb/home
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
