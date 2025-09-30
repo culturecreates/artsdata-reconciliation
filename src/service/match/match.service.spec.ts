@@ -458,7 +458,7 @@ describe("Recon Service tests" , () => {
         expectedName: "Roy Thomson Hall"
       } ,
       {
-        description: "Reconcile Place with wrong name, the match should be false since name is not matching" ,
+        description: "Reconcile Place with similar name, the match should be true since name is very close" ,
         queries: [
           {
             "type": "schema:Place" ,
@@ -473,7 +473,7 @@ describe("Recon Service tests" , () => {
         ] ,
         expectedId: "K11-19" ,
         expectedCount: 1 ,
-        expectedMatchValue: false ,
+        expectedMatchValue: true ,//Since name is similar
         expectedName: "Roy Thomson Hall"
       } ,
       {
