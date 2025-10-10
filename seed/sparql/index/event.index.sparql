@@ -51,6 +51,45 @@ INSERT DATA {
       "multivalued": true,
       "ignoreInvalidValues": true,
       "facet": true
+    },
+    {
+      "fieldName": "endDate",
+      "propertyChain": [
+        "http://schema.org/endDate"
+      ],
+      "indexed": true,
+      "stored": true,
+      "analyzed": true,
+      "multivalued": true,
+      "ignoreInvalidValues": true,
+      "facet": true
+    },
+    {
+      "fieldName": "locationName",
+      "propertyChain": [
+        "http://schema.org/location",
+        "http://www.w3.org/2000/01/rdf-schema#label"
+      ],
+      "indexed": true,
+      "stored": true,
+      "analyzed": true,
+      "multivalued": true,
+      "ignoreInvalidValues": true,
+      "facet": true
+    },
+    {
+      "fieldName": "locationPostalCode",
+      "propertyChain": [
+        "http://schema.org/location",
+        "http://schema.org/address",
+        "http://schema.org/postalCode"
+      ],
+      "indexed": true,
+      "stored": true,
+      "analyzed": true,
+      "multivalued": true,
+      "ignoreInvalidValues": false,
+      "facet": true
     }
   ],
   "languages": [],

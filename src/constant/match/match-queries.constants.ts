@@ -42,10 +42,14 @@ export const QUERIES = {
    OPTIONAL { ?entity schema:disambiguatingDescription ?description_no. FILTER(LANG(?description_no) = "") }
  
    OPTIONAL { ?entity schema:url ?url }
-   OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode }
-   OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality }
+   OPTIONAL { 
+    ?entity schema:location ?place 
+   OPTIONAL { ?place schema:address/schema:postalCode ?postalCode }
+   OPTIONAL { ?place schema:address/schema:addressLocality ?addressLocality }
+   }
+   
  }
- GROUP BY ?entity ?score ?type_label` ,
+ GROUP BY ?entity ?score ?type_label`,
 
   SELECT_ENTITY_QUERY_BY_KEYWORD: `
  SELECT ?entity ?score WHERE {
@@ -56,5 +60,5 @@ export const QUERIES = {
    PROPERTY_PLACE_HOLDER
    FILTER(STRSTARTS(STR(?entity), "${ArtsdataConstants.PREFIX}"))
    ?entity luc:score ?score;
- } LIMIT_PLACE_HOLDER`
+ } LIMIT_PLACE_HOLDER`,
 };
