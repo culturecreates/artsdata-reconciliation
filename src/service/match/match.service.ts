@@ -118,7 +118,7 @@ export class MatchService {
 
     let triple = this._resolveMatchQualifierAndQuantifier(matchQualifier as MatchQualifierEnum ,
       formattedPropertyId , matchQuantifier as MatchQuantifierEnum , formattedConditionValue , index);
-    return required ? triple : `OPTIONAL { ${triple} }`;
+    return required ? triple : `OPTIONAL { ${triple} }\n`;
   }
 
   /**
