@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
 import { ManifestService } from "../manifest";
-import { Exception , MatchServiceHelper } from "../../helper";
-import { ArtsdataProperties , QUERIES } from "../../constant";
-import { QueryCondition , ReconciliationRequest , ReconciliationResponse , ReconciliationResults } from "../../dto";
-import { LanguageEnum , MatchQualifierEnum , MatchQuantifierEnum , MatchTypeEnum } from "../../enum";
+import { Exception, MatchServiceHelper } from "../../helper";
+import { ArtsdataProperties, QUERIES } from "../../constant";
+import { QueryCondition, ReconciliationRequest, ReconciliationResponse, ReconciliationResults } from "../../dto";
+import { LanguageEnum, MatchQualifierEnum, MatchQuantifierEnum, MatchTypeEnum } from "../../enum";
 
 
 @Injectable()
@@ -272,21 +272,23 @@ export class MatchService {
     const propertyMap = {
       "http://schema.org/url": "url" ,
       "http://schema.org/sameAs": "sameAs" ,
-      "http://schema.org/postalCode": "postalCode"
+      "http://schema.org/postalCode": "postalCode",
+      "http://schema.org/startDate": "startDate",
+      "http://schema.org/endDate": "endDate",
+      "<https://schema.org/location>/<https://schema.org/name>": "locationName",
+      "<https://schema.org/location>/<https://schema.org/address>/<https://schema.org/postalCode>": "locationPostalCode"
     };
 
-    const luceneQuery = propertyConditions
+    return propertyConditions
       .filter(condition => condition.matchType === MatchTypeEnum.PROPERTY)
-      .reduce((query , condition) => {
-        Object.entries(propertyMap).forEach(([key , value]) => {
+      .reduce((query, condition) => {
+        Object.entries(propertyMap).forEach(([key, value]) => {
           if (condition.propertyId?.includes(key)) {
-            query += this.resolvePropertyValueForLucene(condition.propertyValue , value);
+            query += this.resolvePropertyValueForLucene(condition.propertyValue, value);
           }
         });
         return query;
-      } , `name: ${name}`);
-
-    return luceneQuery;
+      }, `name: ${name}`);
   }
 
   private resolvePropertyValueForLucene(propertyValue: string | string[] , propertyId: string): string {
