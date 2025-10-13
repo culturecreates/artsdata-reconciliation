@@ -55,7 +55,6 @@ export class MatchController {
     enum: ["en", "fr"], // Optional: List of allowed values
     example: "en", // Optional: Example value
   })
-  // @ApiProduces("application/reconciliation.v1+json")
   async reconcileByQuery(
     @Headers("accept-language") acceptLanguage: LanguageEnum,
     @Query("queries") rawQueries: string,
@@ -63,10 +62,7 @@ export class MatchController {
   ): Promise<ReconciliationResponse[]> {
     acceptLanguage = acceptLanguage || LanguageEnum.ENGLISH;
     response.setHeader("Content-Language", acceptLanguage);
-    return await this._matchService.reconcileByRawQueries(
-      acceptLanguage,
-      rawQueries,
-    );
+    return await this._matchService.reconcileByRawQueries(acceptLanguage, rawQueries);
   }
 
   @Post("/match")
