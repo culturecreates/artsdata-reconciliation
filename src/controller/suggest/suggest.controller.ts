@@ -1,6 +1,5 @@
 import { Controller, Get, Query } from "@nestjs/common";
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { PreviewService } from "../../service/preview";
+import { ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { SuggestService } from "../../service/suggest";
 
 @Controller("/suggest")
