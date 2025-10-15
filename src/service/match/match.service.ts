@@ -1,18 +1,32 @@
 import { Injectable } from "@nestjs/common";
 import { ArtsdataService } from "../artsdata";
 import { ManifestService } from "../manifest";
-import { Exception , MatchServiceHelper } from "../../helper";
-import { ArtsdataProperties , QUERIES } from "../../constant";
-import { QueryCondition , ReconciliationRequest , ReconciliationResponse , ReconciliationResults } from "../../dto";
-import { LanguageEnum , MatchQualifierEnum , MatchQuantifierEnum , MatchTypeEnum } from "../../enum";
-
+import { Exception, MatchServiceHelper } from "../../helper";
+import {
+  ArtsdataConstants,
+  ArtsdataProperties,
+  Entities,
+  QUERIES,
+} from "../../constant";
+import {
+  QueryCondition,
+  ReconciliationRequest,
+  ReconciliationResponse,
+  ReconciliationResults,
+} from "../../dto";
+import {
+  LanguageEnum,
+  MatchQualifierEnum,
+  MatchQuantifierEnum,
+  MatchTypeEnum,
+} from "../../enum";
 
 @Injectable()
 export class MatchService {
-
-  constructor(private readonly _artsdataService: ArtsdataService ,
-              private readonly _manifestService: ManifestService) {
-  }
+  constructor(
+    private readonly _artsdataService: ArtsdataService,
+    private readonly _manifestService: ManifestService,
+  ) {}
 
   /**
    * @name reconcileByRawQueries
@@ -21,14 +35,14 @@ export class MatchService {
    * @param rawQueries
    * @returns {Promise<any>}
    */
-  async reconcileByRawQueries(acceptLanguage: LanguageEnum , rawQueries: string): Promise<any> {
+  async reconcileByRawQueries(acceptLanguage: LanguageEnum, rawQueries: string): Promise<any> {
     if (!rawQueries) {
       return this._manifestService.getServiceManifest();
     }
 
     try {
       const queries = JSON.parse(rawQueries);
-      return await this.reconcileByQueries(acceptLanguage , queries);
+      return await this.reconcileByQueries(acceptLanguage, queries);
     } catch {
       return Exception.badRequest("The request is not a valid JSON object.");
     }
@@ -42,11 +56,12 @@ export class MatchService {
    * @param propertyConditions
    * @returns {string}
    */
-  private _resolvePropertyConditions(rawSparqlQuery: string , propertyConditions: QueryCondition[]): string {
+  private _resolvePropertyConditions(rawSparqlQuery: string, propertyConditions: QueryCondition[]): string {
     const propertyTriples = propertyConditions
-      .map((condition , index) => this._generateTripleFromCondition(condition , index))
-      .join("");
-    return rawSparqlQuery.replace("PROPERTY_PLACE_HOLDER" , propertyTriples);
+      .map((condition, index) =>
+        this._generateTripleFromCondition(condition, index),
+      ).join("");
+    return rawSparqlQuery.replace("PROPERTY_PLACE_HOLDER", propertyTriples);
   }
 
   /**
@@ -56,14 +71,13 @@ export class MatchService {
    * @param conditions
    * @return {{name: string | undefined, propertyConditions: QueryCondition[]}}
    */
-  private _resolveConditions(conditions: QueryCondition[]): {
-    name: string | string[] | undefined;
-    propertyConditions: QueryCondition[];
-  } {
+  private _resolveConditions(conditions: QueryCondition[]):
+    { name: string | string[] | undefined;    propertyConditions: QueryCondition[]; } {
     return {
-      name: conditions.find(({ matchType }) => matchType === MatchTypeEnum.NAME)?.propertyValue ,
-      propertyConditions: conditions.filter(({ matchType }) => matchType === MatchTypeEnum.PROPERTY)
-    };
+      name: conditions.find(({ matchType }) => matchType === MatchTypeEnum.NAME)
+        ?.propertyValue,
+      propertyConditions: conditions
+        .filter(({ matchType }) => matchType === MatchTypeEnum.PROPERTY) };
   }
 
   /**
@@ -74,9 +88,9 @@ export class MatchService {
    * @param property
    * @return {string}
    */
-  private _resolvePropertyValue(value: string | string [] , property: string): (string | string[]) {
+  private _resolvePropertyValue(value: string | string[], property: string): string | string[] {
     if (Array.isArray(value)) {
-      return value.flatMap(val => this._resolvePropertyValue(val , property));
+      return value.flatMap((val) => this._resolvePropertyValue(val, property));
     }
 
     if (MatchServiceHelper.isValidURI(value)) {
@@ -110,15 +124,17 @@ export class MatchService {
    * @param condition
    * @param index
    */
-  private _generateTripleFromCondition(condition: QueryCondition , index: number): string {
-    const { required , propertyId , propertyValue: rawConditionValue , matchQualifier , matchQuantifier } = condition;
-    const formattedConditionValue = this._resolvePropertyValue(rawConditionValue , propertyId as string);
-    const formattedPropertyId: string = MatchServiceHelper.isValidURI(propertyId as string) ?
-      this._resolvePropertyPath(propertyId as string) : `${propertyId}`;
+  private _generateTripleFromCondition(condition: QueryCondition, index: number,): string {
+    const { required, propertyId, propertyValue: rawConditionValue, matchQualifier, matchQuantifier} = condition;
+    const formattedConditionValue =
+      this._resolvePropertyValue(rawConditionValue, propertyId as string,);
+    const formattedPropertyId: string = MatchServiceHelper.isValidURI(propertyId as string)
+      ? this._resolvePropertyPath(propertyId as string)
+      : `${propertyId}`;
 
-    let triple = this._resolveMatchQualifierAndQuantifier(matchQualifier as MatchQualifierEnum ,
-      formattedPropertyId , matchQuantifier as MatchQuantifierEnum , formattedConditionValue , index);
-    return required ? triple : `OPTIONAL { ${triple} }`;
+    let triple = this._resolveMatchQualifierAndQuantifier(matchQualifier as MatchQualifierEnum,
+      formattedPropertyId, matchQuantifier as MatchQuantifierEnum, formattedConditionValue, index);
+    return required ? triple : `OPTIONAL { ${triple} }\n`;
   }
 
   /**
@@ -127,28 +143,30 @@ export class MatchService {
    * @param requestLanguage
    * @param reconciliationRequest
    */
-  async reconcileByQueries(requestLanguage: LanguageEnum , reconciliationRequest: ReconciliationRequest)
+  async reconcileByQueries(requestLanguage: LanguageEnum, reconciliationRequest: ReconciliationRequest)
     : Promise<ReconciliationResponse> {
     const { queries } = reconciliationRequest;
     const results: ReconciliationResults[] = [];
     let sparqlQuery;
     for (const reconciliationQuery of queries) {
       try {
-        const { type , limit , conditions } = reconciliationQuery;
-        const { name , propertyConditions } = this._resolveConditions(conditions);
+        const { type, limit, conditions } = reconciliationQuery;
+        const { name, propertyConditions } =
+          this._resolveConditions(conditions);
         const isQueryByURI: boolean = name ? MatchServiceHelper.isQueryByURI(name as string) : false;
-        sparqlQuery = this._generateSparqlQuery(name as string , type , isQueryByURI , limit || 25 , propertyConditions);
-        const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
-        const candidates = MatchServiceHelper
-          .formatReconciliationResponse(requestLanguage , response , reconciliationQuery , isQueryByURI);
+        sparqlQuery = this._generateSparqlQuery(name as string, type, isQueryByURI, limit || 25,
+          propertyConditions);
+        const response =
+          await this._artsdataService.executeSparqlQuery(sparqlQuery);
+        const candidates = MatchServiceHelper.formatReconciliationResponse(requestLanguage,
+          response, reconciliationQuery, isQueryByURI);
         results.push({ candidates });
       } catch (error) {
-        console.error("Error in reconciliation query:" , error);
+        console.error("Error in reconciliation query:", error);
         results.push({ candidates: [] });
       }
     }
     return { results };
-
   }
 
   /**
@@ -161,9 +179,8 @@ export class MatchService {
    * @param formattedConditionValue
    * @param index
    */
-  private _resolveMatchQualifierAndQuantifier(matchQualifier: MatchQualifierEnum , formattedPropertyId: string ,
-                                              matchQuantifier: MatchQuantifierEnum ,
-                                              formattedConditionValue: string | string[] , index: number) {
+  private _resolveMatchQualifierAndQuantifier(matchQualifier: MatchQualifierEnum, formattedPropertyId: string,
+    matchQuantifier: MatchQuantifierEnum, formattedConditionValue: string | string[], index: number) {
     if (!matchQuantifier) {
       matchQuantifier = MatchQuantifierEnum.ALL;
     }
@@ -181,17 +198,20 @@ export class MatchService {
             triple = `?entity ${formattedPropertyId} ${objectId} FILTER (${objectId} IN (${(formattedConditionValue as string[]).join(" , ")})).`;
           } else if (matchQuantifier === MatchQuantifierEnum.ALL) {
             triple = `${(formattedConditionValue as string[])
-              .map(v => ` FILTER EXISTS {?entity ${formattedPropertyId} ${v}}`).join("\n")}`;
+              .map((v) => ` FILTER EXISTS {?entity ${formattedPropertyId} ${v}}`)
+              .join("\n")}`;
           } else if (matchQuantifier === MatchQuantifierEnum.NONE) {
             triple = `${(formattedConditionValue as string[])
-              .map(v => ` FILTER NOT EXISTS {?entity ${formattedPropertyId} ${v}}`).join("\n")}`;
+              .map((v) => ` FILTER NOT EXISTS {?entity ${formattedPropertyId} ${v}}`)
+              .join("\n")}`;
           } else {
             Exception.badRequest("Unsupported match qualifier");
           }
           break;
         case MatchQualifierEnum.REGEX_MATCH:
           triple = `?entity ${formattedPropertyId} ${objectId}
-          FILTER ( ${(formattedConditionValue as string[]).map(v => `REGEX (${objectId}, ${v}, "i")`).join(" || ")} ;`;
+          FILTER ( ${(formattedConditionValue as string[])
+            .map((v) => `REGEX (${objectId}, ${v}, "i")`).join(" || ")} ;`;
           break;
         default:
           Exception.badRequest("Unsupported match qualifier");
@@ -218,7 +238,6 @@ export class MatchService {
     }
 
     return triple;
-
   }
 
   /**
@@ -231,28 +250,70 @@ export class MatchService {
    * @param limit
    * @param propertyConditions
    */
-  private _generateSparqlQuery(name: string | undefined , type: string , isQueryByURI: boolean , limit: number ,
-                               propertyConditions: QueryCondition[]): string {
+  private _generateSparqlQuery(
+    name: string | undefined, type: string, isQueryByURI: boolean, limit: number,
+    propertyConditions: QueryCondition[]): string {
     const graphdbIndex = MatchServiceHelper.getGraphdbIndex(type);
     let rawQuery = QUERIES.RECONCILIATION_QUERY;
 
     if (name) {
-      name = isQueryByURI ? `<${name}>` : this._modifyNameForLuceneScore(MatchServiceHelper.escapeSpecialCharacters(name) , propertyConditions);
+      name = isQueryByURI
+        ? `<${name}>`
+        : this._modifyNameForLuceneScore(MatchServiceHelper.escapeSpecialCharacters(name), propertyConditions);
     }
     if (isQueryByURI) {
-      rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER" , `BIND(URI_PLACEHOLDER as ?entity)`);
+      rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER",
+        `BIND(URI_PLACEHOLDER as ?entity)`);
     } else {
-      rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER" , QUERIES.SELECT_ENTITY_QUERY_BY_KEYWORD);
+      rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER",
+        QUERIES.SELECT_ENTITY_QUERY_BY_KEYWORD);
+    }
+
+    if (type === Entities.PLACE) {
+      rawQuery = rawQuery.replace(
+        "ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
+        `(SAMPLE(?postalCode) AS ?postalCode) \n (SAMPLE(?addressLocality) AS ?addressLocality)`,
+      );
+
+      rawQuery = rawQuery.replace(
+        "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
+        `
+          OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode }
+          OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality }
+       `);
+    } else if (type === Entities.EVENT) {
+      rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
+        `(SAMPLE(?startDate) AS ?startDate)
+        (SAMPLE(?endDate) AS ?endDate)
+        (SAMPLE(?locationName) AS ?locationName)
+        (SAMPLE(?postalCode) AS ?postalCode)
+        (SAMPLE(?artsdataUri) AS ?locationUri)`,
+      );
+
+      rawQuery = rawQuery.replace(
+        "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
+        `OPTIONAL { ?entity schema:startDate ?startDate} 
+      OPTIONAL { ?entity schema:endDate ?endDate} 
+      OPTIONAL { ?entity schema:location ?location;
+      OPTIONAL { ?location schema:name ?locationName }
+      OPTIONAL { ?location schema:address/schema:postalCode ?postalCode }
+      OPTIONAL { ?location schema:sameAs ?artsdataUri
+        FILTER(STRSTARTS(STR(?artsdataUri), "${ArtsdataConstants.PREFIX_INCLUDING_K}")) }
+       }`,
+      );
+    } else {
+      rawQuery = rawQuery.replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER", "");
+      rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER", "");
     }
 
     rawQuery = rawQuery
-      .replace("INDEX_PLACE_HOLDER" , graphdbIndex)
-      .replace("QUERY_PLACE_HOLDER" , name ? `values ?query { "${name}" }` : "")
-      .replace("QUERY_FILTER_PLACE_HOLDER" , name ? "luc:query ?query ;" : "")
-      .replace("URI_PLACEHOLDER" , name || "")
-      .replace("LIMIT_PLACE_HOLDER" , `LIMIT ${limit}`);
+      .replace("INDEX_PLACE_HOLDER", graphdbIndex)
+      .replace("QUERY_PLACE_HOLDER", name ? `values ?query { "${name}" }` : "")
+      .replace("QUERY_FILTER_PLACE_HOLDER", name ? "luc:query ?query ;" : "")
+      .replace("URI_PLACEHOLDER", name || "")
+      .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
 
-    return this._resolvePropertyConditions(rawQuery , propertyConditions);
+    return this._resolvePropertyConditions(rawQuery, propertyConditions);
   }
 
   private _resolvePropertyPath(propertyId: string) {
@@ -261,38 +322,44 @@ export class MatchService {
 
     for (let i = 0; i < parts.length; i++) {
       const part = i === 0 ? parts[i] : "http" + parts[i];
-      propertyPath += (part.startsWith("http") ? `<${part}>` : part);
+      propertyPath += part.startsWith("http") ? `<${part}>` : part;
       if (i < parts.length - 1) propertyPath += "/";
     }
 
     return propertyPath;
   }
 
-  private _modifyNameForLuceneScore(name: string , propertyConditions: QueryCondition[]): string {
+  private _modifyNameForLuceneScore(name: string, propertyConditions: QueryCondition[]): string {
     const propertyMap = {
-      "http://schema.org/url": "url" ,
-      "http://schema.org/sameAs": "sameAs" ,
-      "http://schema.org/postalCode": "postalCode"
+      "http://schema.org/url": "url",
+      "http://schema.org/sameAs": "sameAs",
+      "http://schema.org/postalCode": "postalCode",
+      "http://schema.org/startDate": "startDate",
+      "http://schema.org/endDate": "endDate",
+      "<https://schema.org/location>/<https://schema.org/name>": "locationName",
+      "<https://schema.org/location>/<https://schema.org/address>/<https://schema.org/postalCode>": "locationPostalCode",
     };
 
-    const luceneQuery = propertyConditions
-      .filter(condition => condition.matchType === MatchTypeEnum.PROPERTY)
-      .reduce((query , condition) => {
-        Object.entries(propertyMap).forEach(([key , value]) => {
+    return propertyConditions
+      .filter((condition) => condition.matchType === MatchTypeEnum.PROPERTY)
+      .reduce((query, condition) => {
+        Object.entries(propertyMap).forEach(([key, value]) => {
           if (condition.propertyId?.includes(key)) {
-            query += this.resolvePropertyValueForLucene(condition.propertyValue , value);
+            query += this.resolvePropertyValueForLucene(
+              condition.propertyValue,
+              value,
+            );
           }
         });
         return query;
-      } , `name: ${name}`);
-
-    return luceneQuery;
+      }, `name: ${name}`);
   }
 
-  private resolvePropertyValueForLucene(propertyValue: string | string[] , propertyId: string): string {
+  private resolvePropertyValueForLucene(propertyValue: string | string[], propertyId: string): string {
     const values = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
     return values
-      .map(value => ` ${propertyId}: ${MatchServiceHelper.escapeSpecialCharacters(value)}`)
+      .map((value) =>
+          ` ${propertyId}: ${MatchServiceHelper.escapeSpecialCharacters(value)}`)
       .join(" ");
   }
 }

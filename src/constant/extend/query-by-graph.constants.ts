@@ -1,3 +1,5 @@
+import { ArtsdataConstants } from "../shared";
+
 export const QUERY_BY_GRAPH = {
   GENERIC: `PREFIX schema: <http://schema.org/>
 PREFIX sh: <http://www.w3.org/ns/shacl#>
@@ -26,7 +28,7 @@ WHERE {
   FILTER(!ISBLANK(?uri))
   OPTIONAL {
     ?adids schema:sameAs ?uri.
-    FILTER(STRSTARTS(STR(?adids), "http://kg.artsdata.ca/resource/K"))
+    FILTER(STRSTARTS(STR(?adids), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
   }
   OPTIONAL { 
     ?uri schema:additionalType <http://kg.artsdata.ca/ontology/FlaggedForReview>. 
@@ -35,7 +37,7 @@ WHERE {
   <EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>
   OPTIONAL { 
     ?uri schema:sameAs ?adid_obj. 
-    FILTER(STRSTARTS(STR(?adid_obj), "http://kg.artsdata.ca/resource/K")) 
+    FILTER(STRSTARTS(STR(?adid_obj), "${ArtsdataConstants.PREFIX_INCLUDING_K}")) 
   }
   OPTIONAL { ?uri schema:url ?urls. FILTER(!ISBLANK(?urls)) }
   OPTIONAL { 
@@ -50,5 +52,5 @@ WHERE {
 GROUP BY ?uri
 ORDER BY ?name
 LIMIT LIMIT_PLACEHOLDER
-OFFSET OFFSET_PLACEHOLDER` ,
+OFFSET OFFSET_PLACEHOLDER`,
 };

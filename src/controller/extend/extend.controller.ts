@@ -1,40 +1,60 @@
-import { Body , Controller , Get , Param , ParseIntPipe , Post , Query } from "@nestjs/common";
-import { ApiOperation , ApiParam , ApiQuery , ApiResponse , ApiTags } from "@nestjs/swagger";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+} from "@nestjs/common";
+import {
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from "@nestjs/swagger";
 import { EntityClassEnum } from "../../enum/entity-class.enum";
 import { ExtendService } from "../../service/extend";
-import { DataExtensionQueryDTO , DataExtensionResponseDTO , ProposedExtendProperty } from "../../dto/extend";
+import {
+  DataExtensionQueryDTO,
+  DataExtensionResponseDTO,
+  ProposedExtendProperty,
+} from "../../dto/extend";
 
 @Controller("/extend")
-
 @ApiTags("Extend Service APIs")
-// @UseInterceptors(new HeaderValidationInterceptor("accept" , ["application/reconciliation.v1+json"]))
 export class ExtendController {
-  constructor(private readonly _extendService: ExtendService) {
-  }
+  constructor(private readonly _extendService: ExtendService) {}
 
   @Get("/propose")
   @ApiOperation({ summary: "Get proposed properties for the selected type" })
   @ApiQuery({
-    name: "type" ,
-    enum: EntityClassEnum ,
-    type: String ,
-    description: "Select type" ,
-    required: true ,
-    explode: false
+    name: "type",
+    enum: EntityClassEnum,
+    type: String,
+    description: "Select type",
+    required: true,
+    explode: false,
   })
   @ApiResponse({
-    status: 200 , type: ProposedExtendProperty ,
-    description: "Proposed properties for the selected type"
+    status: 200,
+    type: ProposedExtendProperty,
+    description: "Proposed properties for the selected type",
   })
-  getProposedProperties(@Query("type") type: EntityClassEnum): ProposedExtendProperty {
+  getProposedProperties(
+    @Query("type") type: EntityClassEnum,
+  ): ProposedExtendProperty {
     return this._extendService.getProposedProperties(type);
   }
 
   @Post()
   @ApiOperation({ summary: "Get Data extension result" })
   @ApiResponse({
-    status: 200 , type: DataExtensionResponseDTO , isArray: true ,
-    description: "Reconciliation candidates for each query"
+    status: 200,
+    type: DataExtensionResponseDTO,
+    isArray: true,
+    description: "Reconciliation candidates for each query",
   })
   async getDataExtension(@Body() dataExtensionQuery: DataExtensionQueryDTO) {
     return await this._extendService.getDataExtension(dataExtensionQuery);
@@ -43,39 +63,40 @@ export class ExtendController {
   @Get(":graph_uri/:entity_class")
   @ApiOperation({ summary: "Get Data from a given graph" })
   @ApiParam({
-    name: "entity_class" ,
-    description: "**entity-class**" ,
-    required: true ,
-    enum: Object.values(EntityClassEnum)
+    name: "entity_class",
+    description: "**entity-class**",
+    required: true,
+    enum: Object.values(EntityClassEnum),
   })
   @ApiQuery({
-    name: "page" ,
-    description: "The page number." ,
-    required: true ,
-    explode: false ,
-    type: Number ,
-    example: 1
+    name: "page",
+    description: "The page number.",
+    required: true,
+    explode: false,
+    type: Number,
+    example: 1,
   })
   @ApiQuery({
-    name: "limit" ,
-    description: "The page size." ,
-    required: true ,
-    explode: false ,
-    type: Number ,
-    example: 10
+    name: "limit",
+    description: "The page size.",
+    required: true,
+    explode: false,
+    type: Number,
+    example: 10,
   })
   @ApiQuery({
-    name: "region" ,
-    type: String ,
-    description: "Select region" ,
-    required: false
+    name: "region",
+    type: String,
+    description: "Select region",
+    required: false,
   })
-  async getDataFromGraph(@Param("graph_uri") graphURI: string ,
-                         @Param("entity_class") entityClass: EntityClassEnum ,
-                         @Query("region") region: string ,
-                         @Query("page" , ParseIntPipe) page: number ,
-                         @Query("limit" , ParseIntPipe) limit: number) {
-    return await this._extendService.getDataFromGraph(graphURI , entityClass , region , page , limit);
+  async getDataFromGraph(
+    @Param("graph_uri") graphURI: string,
+    @Param("entity_class") entityClass: EntityClassEnum,
+    @Query("region") region: string,
+    @Query("page", ParseIntPipe) page: number,
+    @Query("limit", ParseIntPipe) limit: number,
+  ) {
+    return await this._extendService.getDataFromGraph(graphURI, entityClass, region, page, limit);
   }
-
 }
