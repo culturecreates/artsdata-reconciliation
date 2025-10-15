@@ -35,7 +35,7 @@ export class SuggestService {
     const sparqlQuery = SUGGEST_QUERY.ENTITY.replace("QUERY_PLACE_HOLDER" , query + "*")
       .replace("INDEX_PLACE_HOLDER" , GRAPHDB_INDEX.ENTITY)
       .replace("QUERY_PLACEHOLDER" , query.toLowerCase())
-      .replace("FILTER_CONDITION_PLACEHOLDER" , `FILTER (STRSTARTS(STR(?entity),"${ArtsdataConstants.PREFIX}")) `);
+      .replace("FILTER_CONDITION_PLACEHOLDER" , `FILTER (STRSTARTS(STR(?entity),"${ArtsdataConstants.PREFIX_INCLUDING_K}")) `);
     if (cursor) {
       return `${sparqlQuery} OFFSET ${cursor}`;
     }

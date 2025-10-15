@@ -389,7 +389,7 @@ describe("Recon Service tests" , () => {
       //   expectedCount: 1
       // } ,
       {
-        description: "Reconcile Place with right name and postal code and match should be true" ,
+        description: "Reconcile Place with matching name and postal code and match should be true" ,
         queries: [
           {
             "type": "schema:Place" ,
@@ -439,7 +439,7 @@ describe("Recon Service tests" , () => {
         expectedName: "Roy Thomson Hall"
       } ,
       {
-        description: "Reconcile Place with name, the match should be true since name is exactly matching" ,
+        description: "Reconcile Place with name, the match should be false since name is the only match" ,
         queries: [
           {
             "type": "schema:Place" ,
@@ -454,11 +454,11 @@ describe("Recon Service tests" , () => {
         ] ,
         expectedId: "K11-19" ,
         expectedCount: 1 ,
-        expectedMatchValue: true ,
+        expectedMatchValue: false ,
         expectedName: "Roy Thomson Hall"
       } ,
       {
-        description: "Reconcile Place with similar name, the match should be true since name is very close" ,
+        description: "Reconcile Place with similar name, the match should be false since name is the only match" ,
         queries: [
           {
             "type": "schema:Place" ,
@@ -473,7 +473,7 @@ describe("Recon Service tests" , () => {
         ] ,
         expectedId: "K11-19" ,
         expectedCount: 1 ,
-        expectedMatchValue: true ,//Since name is similar
+        expectedMatchValue: false ,//Since name is the only match
         expectedName: "Roy Thomson Hall"
       } ,
       {
@@ -489,7 +489,7 @@ describe("Recon Service tests" , () => {
               } ,
               {
                 "matchType": "property" ,
-                "propertyValue": "Toronto" , //correct addressLocality
+                "propertyValue": "Toronto" ,
                 "propertyId": "<http://schema.org/address>/<http://schema.org/addressLocality>"
               }
             ]

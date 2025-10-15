@@ -29,6 +29,8 @@ export class ResultCandidates {
   @ApiProperty()
   score: number;
   @ApiProperty()
+  startDate: string;
+  @ApiProperty()
   match: boolean;
   @ApiProperty({ type: [ReconciliationType] })
   type: ReconciliationType[];
