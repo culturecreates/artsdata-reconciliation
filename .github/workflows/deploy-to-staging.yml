@@ -63,7 +63,8 @@ jobs:
           envkey_PROPERTY: property-index
           envkey_TYPE: type-index
           envkey_ENTITY: entity-index
-          envkey_ENABLE_EVENT_BATCH_RECONCILIATION: true
+          envkey_ARTSDATA_USER: ${{ vars.ARTSDATA_USER }}
+          envkey_ARTSDATA_PASSWORD: ${{ secrets.ARTSDATA_USER_PASSWORD }}
           file_name: .env
           fail_on_empty: false
 
