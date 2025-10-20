@@ -41,7 +41,7 @@ jobs:
           envkey_TYPE: type-index
           envkey_ENTITY: entity-index
           envkey_ARTSDATA_USER: ${{ vars.ARTSDATA_USER }}
-          envkey_ARTSDATA_PASSWORD: ${{ secrets.ARTSDATA_USER_PASSWORD }}
+          envkey_ARTSDATA_PASSWORD: ${{ secrets.ARTSDATA_PASSWORD }}
           file_name: .env
           fail_on_empty: false
 
