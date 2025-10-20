@@ -9,15 +9,17 @@ import { ManifestController, MatchController } from "../../controller";
 import { LanguageEnum } from "../../enum";
 
 describe("Recon Service tests", () => {
-  let reconService: MatchService;
+  let matchService: MatchService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [ManifestController, MatchController],
       providers: [ManifestService, MatchService, ArtsdataService, HttpService],
     }).compile();
 
-    reconService = app.get<MatchService>(MatchService);
+    matchService = app.get<MatchService>(MatchService);
+    const artsdataService = app.get<ArtsdataService>(ArtsdataService);
+    await artsdataService.checkConnectionWithRetry();
   });
 
   describe("Recon API Tests", () => {
@@ -607,7 +609,7 @@ describe("Recon Service tests", () => {
 
     for (const test of testCases) {
       it(test.description, async () => {
-        const result = await reconService.reconcileByQueries(
+        const result = await matchService.reconcileByQueries(
           LanguageEnum.ENGLISH,
           { queries: test.queries },
         );
