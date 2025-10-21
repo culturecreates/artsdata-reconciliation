@@ -42,7 +42,6 @@ jobs:
           envkey_ENTITY: entity-index
           envkey_ARTSDATA_USER: ${{ vars.ARTSDATA_USER }}
           envkey_ARTSDATA_PASSWORD: ${{ secrets.ARTSDATA_PASSWORD }}
-          envkey_ENABLE_EVENT_BATCH_RECONCILIATION: true
           file_name: .env
           fail_on_empty: false
 
@@ -72,6 +71,28 @@ jobs:
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_ARTSDATA_ENDPOINT: ${{ secrets.ARTSDATA_ENDPOINT }}
+          envkey_REPOSITORY: artsdata
+          envkey_EVENT: event-index
+          envkey_PLACE: place-index
+          envkey_ORGANIZATION: organization-index
+          envkey_PERSON: person-index
+          envkey_AGENT: agent-index
+          envkey_CONCEPT: concept-index
+          envkey_EVENT_TYPE: event-type-index
+          envkey_DEFAULT: resource-index
+          envkey_PROPERTY: property-index
+          envkey_TYPE: type-index
+          envkey_ENTITY: entity-index
+          envkey_ARTSDATA_USER: ${{ vars.ARTSDATA_USER }}
+          envkey_ARTSDATA_PASSWORD: ${{ secrets.ARTSDATA_PASSWORD }}
+          envkey_ENABLE_EVENT_BATCH_RECONCILIATION: true
+          file_name: .env
+          fail_on_empty: false
 
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
