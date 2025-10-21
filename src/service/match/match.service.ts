@@ -272,7 +272,8 @@ export class MatchService {
     if (type === Entities.PLACE) {
       rawQuery = rawQuery.replace(
         "ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
-        `(SAMPLE(?postalCode) AS ?postalCode) \n (SAMPLE(?addressLocality) AS ?addressLocality)`,
+        `(SAMPLE(?postalCode) AS ?postalCode) \n (SAMPLE(?addressLocality) AS ?addressLocality)
+        (SAMPLE(?wikidata) AS ?wikidata)`,
       );
 
       rawQuery = rawQuery.replace(
@@ -280,7 +281,9 @@ export class MatchService {
         `
           OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode }
           OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality }
-       `);
+          OPTIONAL { ?entity schema:sameAs ?wikidata 
+        FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
+      }`);
     } else if (type === Entities.EVENT) {
       rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
         `(SAMPLE(?startDate) AS ?startDate)
@@ -301,7 +304,25 @@ export class MatchService {
         FILTER(STRSTARTS(STR(?artsdataUri), "${ArtsdataConstants.PREFIX_INCLUDING_K}")) }
        }`,
       );
-    } else {
+    } else if( type === Entities.PERSON || type === Entities.ORGANIZATION || type === Entities.AGENT){
+      rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
+        `(SAMPLE(?wikidata) AS ?wikidata)
+        (SAMPLE(?isni) AS ?isni)`,
+      );
+
+      rawQuery = rawQuery.replace(
+        "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
+        `OPTIONAL { ?entity schema:sameAs ?sameAs 
+      OPTIONAL {BIND(?sameAs AS ?wikidata)
+        FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
+      }
+      OPTIONAL {BIND(?sameAs AS ?isni)
+        FILTER (STRSTARTS(str(?isni), "https://isni.org/isni/"))
+      }
+    }`,
+      );
+    }
+    else {
       rawQuery = rawQuery.replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER", "");
       rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER", "");
     }
