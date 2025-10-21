@@ -42,6 +42,7 @@ jobs:
           envkey_ENTITY: entity-index
           envkey_ARTSDATA_USER: ${{ vars.ARTSDATA_USER }}
           envkey_ARTSDATA_PASSWORD: ${{ secrets.ARTSDATA_PASSWORD }}
+          envkey_ENABLE_EVENT_BATCH_RECONCILIATION: true
           file_name: .env
           fail_on_empty: false
 
