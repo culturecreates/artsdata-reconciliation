@@ -8,7 +8,7 @@ import { JaroWinklerDistance } from "natural";
 export class MatchServiceHelper {
 
     static escapeSpecialCharacters(inputString: string) {
-        const luceneSpecialChars = ["+", "-", "!", "(", ")", "{", "}", "[", "]", "^", "\"", "~", "*", "?",
+        const luceneSpecialChars = ["+", "-", "!", "(", ")","||", "{", "}", "[", "]", "^", "\"", "~", "*", "?",
             ":", "\\", "/", "AND", "OR", "NOT", "TO",];
         return Array.from(inputString)
             .map(char =>
