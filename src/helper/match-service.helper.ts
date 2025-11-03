@@ -9,7 +9,7 @@ export class MatchServiceHelper {
 
     static escapeSpecialCharacters(inputString: string) {
         const luceneSpecialChars = ["+", "-", "!", "(", ")","||", "{", "}", "[", "]", "^", "\"", "~", "*", "?",
-            ":", "\\", "/", "AND", "OR", "NOT", "TO",];
+            ":", "\\", "/", "&&", "AND", "OR", "NOT", "TO",];
         return Array.from(inputString)
             .map(char =>
                 luceneSpecialChars.includes(char)
