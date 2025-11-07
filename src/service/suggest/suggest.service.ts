@@ -2,7 +2,7 @@ import {Injectable} from "@nestjs/common";
 import {ArtsdataService} from "../artsdata";
 import {ArtsdataConstants, SUGGEST_QUERY} from "../../constant";
 import {GRAPHDB_INDEX} from "../../config";
-import {Exception} from "../../helper";
+import {Exception, MatchServiceHelper} from "../../helper";
 
 @Injectable()
 export class SuggestService {
