@@ -93,6 +93,8 @@ export class MatchServiceHelper {
                 return GRAPHDB_INDEX.CONCEPT;
             case "ado:EventType":
                 return GRAPHDB_INDEX.EVENT_TYPE;
+            case "ado:LivePerformanceWork":
+                return GRAPHDB_INDEX.LIVE_PERFORMANCE_WORK;
             default:
                 return GRAPHDB_INDEX.DEFAULT;
         }
