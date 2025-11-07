@@ -10,7 +10,7 @@ describe('isAutoMatch', () => {
             conditions: [
                 {matchType: "name", propertyValue: "Place Beell"},
                 {
-                    propertyId: "<https://schema.org/postalCode>",
+                    propertyId: "<http://schema.org/postalCode>",
                     propertyValue: "H7N 0E4",
                     matchType: "property",
                 },
@@ -30,7 +30,7 @@ describe('isAutoMatch', () => {
             conditions: [
                 {matchType: "name", propertyValue: "Place Bbell"},
                 {
-                    propertyId: "<https://schema.org/postalCode>",
+                    propertyId: "<http://schema.org/postalCode>",
                     propertyValue: "H7N 0E4",
                     matchType: "property",
                 },
@@ -50,7 +50,7 @@ describe('isAutoMatch', () => {
             conditions: [
                 {matchType: "name", propertyValue: "Place bbell"},
                 {
-                    propertyId: "<https://schema.org/url>",
+                    propertyId: "<http://schema.org/url>",
                     propertyValue: "http://example.com",
                     matchType: "property",
                 },
@@ -70,7 +70,7 @@ describe('isAutoMatch', () => {
             conditions: [
                 {matchType: "name", propertyValue: "place bell"},
                 {
-                    propertyId: "<https://schema.org/url>",
+                    propertyId: "<http://schema.org/url>",
                     propertyValue: "http://example.com",
                     matchType: "property",
                 },
@@ -89,12 +89,12 @@ describe('isAutoMatch', () => {
             type: Entities.PLACE,
             conditions: [
                 {
-                    propertyId: "<https://schema.org/sameAs>",
+                    propertyId: "<http://schema.org/sameAs>",
                     propertyValue: "https://isni.org/isni/0000000123456789",
                     matchType: "property",
                 },
                 {
-                    propertyId: "<https://schema.org/sameAs>",
+                    propertyId: "<http://schema.org/sameAs>",
                     propertyValue: "http://www.wikidata.org/entity/Q12345",
                     matchType: "property",
                 },
@@ -118,7 +118,7 @@ describe('isAutoMatch', () => {
             conditions: [
                 {matchType: "name", propertyValue: "eros ramazzotti"},
                 {
-                    propertyId: "<https://schema.org/startDate>",
+                    propertyId: "<http://schema.org/startDate>",
                     propertyValue: "2023-01-01",
                     matchType: "property",
                 },
@@ -138,7 +138,7 @@ describe('isAutoMatch', () => {
             conditions: [
                 {matchType: "name", propertyValue: "eros ramazzotti"},
                 {
-                    propertyId: "<https://schema.org/startDate>",
+                    propertyId: "<http://schema.org/startDate>",
                     propertyValue: "2023-01-01",
                     matchType: "property",
                 },
@@ -157,10 +157,10 @@ describe('isAutoMatch', () => {
             type: Entities.EVENT,
             conditions: [
                 {matchType: 'name', propertyValue: 'Eros Ramazzotti'},
-                {propertyId: '<https://schema.org/startDate>', propertyValue: '2023-01-01', matchType: 'property'},
-                {propertyId: '<https://schema.org/endDate>', propertyValue: '2023-01-02', matchType: 'property'},
+                {propertyId: '<http://schema.org/startDate>', propertyValue: '2023-01-01', matchType: 'property'},
+                {propertyId: '<http://schema.org/endDate>', propertyValue: '2023-01-02', matchType: 'property'},
                 {
-                    propertyId: '<https://schema.org/location>',
+                    propertyId: '<http://schema.org/location>',
                     propertyValue: 'http://kg.artsdata.ca/resource/K11-240',
                     matchType: 'property'
                 },
@@ -182,7 +182,7 @@ describe('isAutoMatch', () => {
             conditions: [
                 {matchType: 'name', propertyValue: 'Eros Ramazzotti'},
                 {
-                    propertyId: '<https://schema.org/location>',
+                    propertyId: '<http://schema.org/location>',
                     propertyValue: 'http://kg.artsdata.ca/resource/K11-240',
                     matchType: 'property'
                 },
@@ -202,7 +202,7 @@ describe('isAutoMatch', () => {
                 {propertyId: 'startDate', propertyValue: '2023-01-01', matchType: 'property'},
                 {propertyId: 'endDate', propertyValue: '2023-01-02', matchType: 'property'},
                 {
-                    propertyId: '<https://schema.org/location>/<https://schema.org/name>',
+                    propertyId: '<http://schema.org/location>/<http://schema.org/name>',
                     propertyValue: 'Place Bell',
                     matchType: 'property'
                 },
@@ -225,9 +225,9 @@ describe('isAutoMatch', () => {
             type: Entities.EVENT,
             conditions: [
                 {matchType: 'name', propertyValue: 'Eros Ramazzotti'},
-                {propertyId: '<https://schema.org/startDate>', propertyValue: '2023-01-01', matchType: 'property'},
-                {propertyId: '<https://schema.org/endDate>', propertyValue: '2023-01-02', matchType: 'property'},
-                {propertyId: '<https://schema.org/postalCode>', propertyValue: 'H7N 0E4', matchType: 'property'},
+                {propertyId: '<http://schema.org/startDate>', propertyValue: '2023-01-01', matchType: 'property'},
+                {propertyId: '<http://schema.org/endDate>', propertyValue: '2023-01-02', matchType: 'property'},
+                {propertyId: '<http://schema.org/postalCode>', propertyValue: 'H7N 0E4', matchType: 'property'},
             ],
         };
         const additionalProperties = {
@@ -245,9 +245,9 @@ describe('isAutoMatch', () => {
             type: Entities.EVENT,
             conditions: [
                 {matchType: 'name', propertyValue: 'Eros Ramazzotti'},
-                {propertyId: '<https://schema.org/startDate>', propertyValue: '2023-01-01', matchType: 'property'},
+                {propertyId: '<http://schema.org/startDate>', propertyValue: '2023-01-01', matchType: 'property'},
                 {
-                    propertyId: '<https://schema.org/location>',
+                    propertyId: '<http://schema.org/location>',
                     propertyValue: 'http://kg.artsdata.ca/resource/K11-240',
                     matchType: 'property'
                 }
@@ -268,17 +268,17 @@ describe('isAutoMatch', () => {
             conditions: [
                 {matchType: 'name', propertyValue: 'Eros Ramazzotti'},
                 {
-                    propertyId: '<https://schema.org/startDate>',
+                    propertyId: '<http://schema.org/startDate>',
                     propertyValue: '2023-01-01T10:00:00Z',
                     matchType: 'property'
                 },
                 {
-                    propertyId: '<https://schema.org/endDate>',
+                    propertyId: '<http://schema.org/endDate>',
                     propertyValue: '2023-01-02T18:00:00Z',
                     matchType: 'property'
                 },
                 {
-                    propertyId: '<https://schema.org/location>',
+                    propertyId: '<http://schema.org/location>',
                     propertyValue: 'http://kg.artsdata.ca/resource/K11-240',
                     matchType: 'property'
                 }
@@ -299,7 +299,7 @@ describe('isAutoMatch', () => {
             type: Entities.EVENT,
             conditions: [
                 {matchType: 'name', propertyValue: 'Eros Ramazzotti'},
-                {propertyId: '<https://schema.org/startDate>', propertyValue: '2023-01-01', matchType: 'property'}
+                {propertyId: '<http://schema.org/startDate>', propertyValue: '2023-01-01', matchType: 'property'}
             ],
         };
         const additionalProperties = {
@@ -317,12 +317,12 @@ describe('isAutoMatch', () => {
             conditions: [
                 {matchType: 'name', propertyValue: 'Eros Ramazzotti'},
                 {
-                    propertyId: '<https://schema.org/startDate>',
+                    propertyId: '<http://schema.org/startDate>',
                     propertyValue: '2023-01-01T10:00:00Z',
                     matchType: 'property'
                 },
                 {
-                    propertyId: '<https://schema.org/location>',
+                    propertyId: '<http://schema.org/location>',
                     propertyValue: 'http://kg.artsdata.ca/resource/K11-240',
                     matchType: 'property'
                 }
