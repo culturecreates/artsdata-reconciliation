@@ -281,11 +281,11 @@ export class MatchServiceHelper {
             if (condition.propertyId) {
                 let propertyId = condition.propertyId as string;
                 if (propertyId.startsWith('schema:')) {
-                    propertyId = propertyId.replace('schema:', 'https://schema.org/');
+                    propertyId = propertyId.replace('schema:', 'http://schema.org/');
                 } else if (propertyId.startsWith('<') && propertyId.endsWith('>')) {
                     propertyId = propertyId.substring(1, propertyId.length - 1);
                 } else {
-                    propertyId = `https://schema.org/${propertyId}`;
+                    propertyId = `http://schema.org/${propertyId}`;
                 }
 
                 switch (propertyId) {
@@ -315,11 +315,14 @@ export class MatchServiceHelper {
                         break;
 
                     default:
-                        if (condition.propertyId === "<https://schema.org/location>/<https://schema.org/name>") {
+                        if (condition.propertyId === "<http://schema.org/location>/<http://schema.org/name>") {
                             locationName = condition.propertyValue as string;
                         }
-                        if (condition.propertyId === "<https://schema.org/location>/<https://schema.org/sameAs>") {
+                        if (condition.propertyId === "<http://schema.org/location>/<http://schema.org/sameAs>") {
                             locationUri = condition.propertyValue as string;
+                        }
+                        if (condition.propertyId === "<http://schema.org/address>/<http://schema.org/postalCode>") {
+                            postalCode = condition.propertyValue as string;
                         }
                 }
             }
