@@ -280,21 +280,24 @@ export class MatchServiceHelper {
             if (condition.propertyId) {
                 let propertyId = condition.propertyId as string;
                 if (propertyId.startsWith('schema:')) {
-                    propertyId = propertyId.replace('schema:', 'http://schema.org/');
-                } else if (propertyId.startsWith('<') && propertyId.endsWith('>')) {
-                    propertyId = propertyId.substring(1, propertyId.length - 1);
-                } else {
-                    propertyId = `http://schema.org/${propertyId}`;
+                    propertyId = propertyId.replace('schema:', '<http://schema.org/') + '>';
+                } else if (isURL(propertyId)) {
+                    propertyId = `<${propertyId}>`;
+                } else if (!isURL(propertyId) && !((propertyId?.startsWith('<') && propertyId?.endsWith('>')))) {
+                    propertyId = `<http://schema.org/${propertyId}>`;
                 }
 
                 switch (propertyId) {
                     case SCHEMA_ORG_PROPERTY_URI_MAP.POSTAL_CODE:
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.ADDRESS_POSTAL_CODE:
                         postalCode = condition.propertyValue as string;
                         break;
                     case SCHEMA_ORG_PROPERTY_URI_MAP.ADDRESS_LOCALITY:
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.ADDRESS_ADDRESS_LOCALITY:
                         addressLocality = condition.propertyValue as string;
                         break;
                     case SCHEMA_ORG_PROPERTY_URI_MAP.ADDRESS_REGION:
+                    case    SCHEMA_ORG_PROPERTY_URI_MAP.ADDRESS_ADDRESS_REGION:
                         addressRegion = condition.propertyValue as string;
                         break;
                     case SCHEMA_ORG_PROPERTY_URI_MAP.URL:
@@ -312,22 +315,19 @@ export class MatchServiceHelper {
                     case SCHEMA_ORG_PROPERTY_URI_MAP.LOCATION:
                         locationUri = condition.propertyValue as string;
                         break;
-
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.LOCATION_NAME:
+                        locationName = condition.propertyValue as string;
+                        break;
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.LOCATIONS_URI:
+                        locationUri = condition.propertyValue as string;
+                        break;
                     default:
-                        if (condition.propertyId === "<http://schema.org/location>/<http://schema.org/name>") {
-                            locationName = condition.propertyValue as string;
-                        }
-                        if (condition.propertyId === "<http://schema.org/location>/<http://schema.org/sameAs>") {
-                            locationUri = condition.propertyValue as string;
-                        }
-                        if (condition.propertyId === "<http://schema.org/address>/<http://schema.org/postalCode>") {
-                            postalCode = condition.propertyValue as string;
-                        }
+                        break
                 }
             }
         }
 
-        if (sameAs) {
+        if (sameAs?.length) {
             wikidata = sameAs?.find((sameAs: any) => sameAs?.startsWith("http://www.wikidata.org/entity/"));
             isni = sameAs?.find((sameAs) => sameAs?.startsWith("https://isni.org/isni/"));
         }
