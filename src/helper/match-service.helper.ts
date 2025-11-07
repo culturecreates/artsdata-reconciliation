@@ -4,7 +4,6 @@ import {ReconciliationQuery, ResultCandidates} from "../dto";
 import {isURL} from "validator";
 import {ArtsdataConstants, Entities, SCHEMA_ORG_PROPERTY_URI_MAP} from "../constant";
 import {JaroWinklerDistance} from "natural";
-import any = jasmine.any;
 
 export class MatchServiceHelper {
 
