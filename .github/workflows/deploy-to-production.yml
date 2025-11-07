@@ -63,6 +63,7 @@ jobs:
           envkey_PROPERTY: property-index
           envkey_TYPE: type-index
           envkey_ENTITY: entity-index
+          envkey_LIVE_PERFORMANCE_WORK: live-performance-work-index
           envkey_ARTSDATA_USER: ${{ vars.ARTSDATA_USER }}
           envkey_ARTSDATA_PASSWORD: ${{ secrets.ARTSDATA_PASSWORD }}
           file_name: .env
