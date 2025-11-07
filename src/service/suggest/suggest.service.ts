@@ -15,7 +15,11 @@ export class SuggestService {
     }
 
     async getSuggestedProperties(prefix: string, cursor: number) {
-        return this._getSuggestions(prefix, cursor, this._generateSparqlQueryForPropertySuggestion.bind(this));
+        const suggestedProperties = await this._getSuggestions(prefix, cursor, this._generateSparqlQueryForPropertySuggestion.bind(this));
+        const supportedQualifiers = MatchServiceHelper.getAllQualifiers()
+        return suggestedProperties.result.map(result => {
+            return {...result, matchQualifiers: supportedQualifiers}
+        })
     }
 
     async getSuggestedTypes(prefix: string, cursor: number) {

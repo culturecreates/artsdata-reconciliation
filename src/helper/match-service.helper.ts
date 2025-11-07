@@ -1,9 +1,9 @@
-import { LanguageEnum } from "../enum";
-import { GRAPHDB_INDEX } from "../config";
-import { ReconciliationQuery, ResultCandidates } from "../dto";
-import { isURL } from "validator";
-import { ArtsdataConstants, Entities } from "../constant";
-import { JaroWinklerDistance } from "natural";
+import {LanguageEnum, MatchQualifierEnum} from "../enum";
+import {GRAPHDB_INDEX} from "../config";
+import {ReconciliationQuery, ResultCandidates} from "../dto";
+import {isURL} from "validator";
+import {ArtsdataConstants, Entities} from "../constant";
+import {JaroWinklerDistance} from "natural";
 
 export class MatchServiceHelper {
 
@@ -336,4 +336,16 @@ export class MatchServiceHelper {
       wikidata: wikidata?.length ? wikidata : undefined,
     };
   }
+
+     static getAllQualifiers(){
+        return [{
+            id: MatchQualifierEnum.EXACT_MATCH,
+            name: "Exact match of the property value",
+        },{
+            id: MatchQualifierEnum.REGEX_MATCH,
+            name: "Match the property value using regular expression",
+        }
+        ]
+    }
+
 }
