@@ -3,6 +3,7 @@ import {ArtsdataService} from "../artsdata";
 import {ArtsdataConstants, SUGGEST_QUERY} from "../../constant";
 import {GRAPHDB_INDEX} from "../../config";
 import {Exception, MatchServiceHelper} from "../../helper";
+import {SuggestPropertyResponse, SuggestPropertyResult, SuggestResponse} from "../../interface/suggest.interface";
 
 @Injectable()
 export class SuggestService {
@@ -10,19 +11,20 @@ export class SuggestService {
     constructor(private readonly _artsdataService: ArtsdataService) {
     }
 
-    async getSuggestedEntities(prefix: string, cursor: number) {
+    async getSuggestedEntities(prefix: string, cursor: number): Promise<SuggestResponse> {
         return this._getSuggestions(prefix, cursor, this._generateSparqlQueryForEntitySuggestion.bind(this));
     }
 
-    async getSuggestedProperties(prefix: string, cursor: number) {
+    async getSuggestedProperties(prefix: string, cursor: number): Promise<SuggestPropertyResponse> {
         const suggestedProperties = await this._getSuggestions(prefix, cursor, this._generateSparqlQueryForPropertySuggestion.bind(this));
         const supportedQualifiers = MatchServiceHelper.getAllQualifiers()
-        return suggestedProperties.result.map(result => {
+        const result = suggestedProperties.result.map(result => {
             return {...result, matchQualifiers: supportedQualifiers}
         })
+        return {result};
     }
 
-    async getSuggestedTypes(prefix: string, cursor: number) {
+    async getSuggestedTypes(prefix: string, cursor: number): Promise<SuggestResponse> {
         return this._getSuggestions(prefix, cursor, this._generateSparqlQueryForPropertyType.bind(this));
     }
 
@@ -69,7 +71,7 @@ export class SuggestService {
         return sparqlQuery;
     }
 
-    private _formatResult(result: any) {
+    private _formatResult(result: any): SuggestResponse {
         const results: any[] = [];
         result.results.bindings?.forEach((item: any) => {
             const currentId = item.entity?.value?.split(ArtsdataConstants.PREFIX).pop();
