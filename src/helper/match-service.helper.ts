@@ -1,15 +1,15 @@
-import { LanguageEnum } from "../enum";
-import { GRAPHDB_INDEX } from "../config";
-import { ReconciliationQuery, ResultCandidates } from "../dto";
-import { isURL } from "validator";
-import { ArtsdataConstants, Entities } from "../constant";
-import { JaroWinklerDistance } from "natural";
+import {LanguageEnum, MatchQualifierEnum} from "../enum";
+import {GRAPHDB_INDEX} from "../config";
+import {ReconciliationQuery, ResultCandidates} from "../dto";
+import {isURL} from "validator";
+import {ArtsdataConstants, Entities, SCHEMA_ORG_PROPERTY_URI_MAP} from "../constant";
+import {JaroWinklerDistance} from "natural";
 
 export class MatchServiceHelper {
 
     static escapeSpecialCharacters(inputString: string) {
-        const luceneSpecialChars = ["+", "-", "!", "(", ")","||", "{", "}", "[", "]", "^", "\"", "~", "*", "?",
-            ":", "\\", "/", "AND", "OR", "NOT", "TO",];
+        const luceneSpecialChars = ["+", "-", "!", "(", ")", "||", "{", "}", "[", "]", "^", "\"", "~", "*", "?",
+            ":", "\\", "/", "&&", "AND", "OR", "NOT", "TO",];
         return Array.from(inputString)
             .map(char =>
                 luceneSpecialChars.includes(char)
@@ -39,17 +39,17 @@ export class MatchServiceHelper {
             const descriptionEn = currentBinding["descriptionEn"]?.value;
             const descriptionFr = currentBinding["descriptionFr"]?.value;
 
-      const additionalPropertiesForAutoMatch = {
-        url: currentBinding["url"]?.value,
-        postalCode: currentBinding["postalCode"]?.value,
-        addressLocality: currentBinding["addressLocality"]?.value,
-        startDate: currentBinding["startDate"]?.value,
-        endDate: currentBinding["endDate"]?.value,
-        locationName: currentBinding["locationName"]?.value,
-        locationUri: currentBinding["locationUri"]?.value,
-        wikidata: currentBinding["wikidata"]?.value,
-        isni: currentBinding["isni"]?.value,
-      };
+            const additionalPropertiesForAutoMatch = {
+                url: currentBinding["url"]?.value,
+                postalCode: currentBinding["postalCode"]?.value,
+                addressLocality: currentBinding["addressLocality"]?.value,
+                startDate: currentBinding["startDate"]?.value,
+                endDate: currentBinding["endDate"]?.value,
+                locationName: currentBinding["locationName"]?.value,
+                locationUri: currentBinding["locationUri"]?.value,
+                wikidata: currentBinding["wikidata"]?.value,
+                isni: currentBinding["isni"]?.value,
+            };
 
             if (responseLanguage === LanguageEnum.FRENCH) {
                 resultCandidate.name = nameFr || name || nameEn;
@@ -93,6 +93,8 @@ export class MatchServiceHelper {
                 return GRAPHDB_INDEX.CONCEPT;
             case "ado:EventType":
                 return GRAPHDB_INDEX.EVENT_TYPE;
+            case "ado:LivePerformanceWork":
+                return GRAPHDB_INDEX.LIVE_PERFORMANCE_WORK;
             default:
                 return GRAPHDB_INDEX.DEFAULT;
         }
@@ -104,236 +106,257 @@ export class MatchServiceHelper {
 
     static isQueryByURI(query: string) {
         const artsdataIdPattern = "^K[0-9]+-[0-9]+$";
-        return !!(
-            query?.match(artsdataIdPattern) ||
-            (this.isValidURI(query) && query.startsWith(ArtsdataConstants.PREFIX))
-        );
+        return !!(query?.match(artsdataIdPattern) || (this.isValidURI(query) && query.startsWith(ArtsdataConstants.PREFIX)));
     }
 
     static isAutoMatch(recordFetched: { [key: string]: any }, reconciliationQuery: ReconciliationQuery,
                        additionalProperties: any): boolean {
         const recordFromQuery = this.formatReconciliationQuery(reconciliationQuery);
 
-    function cleanName(name: string) {
-      return name
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z]/g, ""); // keep only letters
-    }
-
-    function nameSimilarity(nameInQuery: string, nameInResult: string) {
-      const similarityScore = JaroWinklerDistance(
-        cleanName(nameInQuery),
-        cleanName(nameInResult),
-      );
-      return similarityScore > 0.9;
-    }
-
-    const matchers = {
-      veryClose: (a: string | undefined, b: string | undefined) => {
-        if (!a || !b) return false;
-        return nameSimilarity(a, b);
-      },
-      exactDate: (a: string | undefined, b: string | undefined) => {
-        if (!a || !b) return false;
-        return new Date(a) === new Date(b);
-      },
-      closeDates: (
-        startDateA: string,
-        startDateB: string,
-        endDateA: string | undefined,
-        endDateB: string | undefined,
-      ) => {
-        const dateStampA = endDateA
-          ? new Date(endDateA).getTime()
-          : new Date(startDateA).getTime();
-        const dateStampB = endDateB
-          ? new Date(endDateB).getTime()
-          : new Date(startDateB).getTime();
-        if (isNaN(dateStampA) || isNaN(dateStampB)) return false;
-        //if the difference between the two dates is greater than 24 hours (86400000 milliseconds), return false
-        return Math.abs(dateStampA - dateStampB) <= 86400000;
-      },
-      exact: (a: string | undefined, b: string | undefined) => {
-        if (!a || !b) return false;
-        return a === b;
-      },
-      notDifferentIfBothExists: (
-        a: string | undefined,
-        b: string | undefined,
-      ) => {
-        if (!a || !b) return true;
-        return a !== b;
-      },
-      exactUrl: (a: string, b: string) => {
-        if (a && b) {
-          const urlA = new URL(a.toLowerCase());
-          const urlB = new URL(b.toLowerCase());
-
-          let hostA = urlA.hostname;
-          let hostB = urlB.hostname;
-          // Normalize path (remove trailing slash unless root)
-          let pathA = urlA.pathname.replace(/\/+$/, "") || "/";
-          let pathB = urlB.pathname.replace(/\/+$/, "") || "/";
-          return `${hostA}${pathA}` === `${hostB}${pathB}`;
-        } else {
-          return false;
+        function cleanName(name: string) {
+            return name
+                .trim()
+                .toLowerCase()
+                .replace(/[^a-z]/g, ""); // keep only letters
         }
-      },
-    };
 
-    const checkIfIsniIsExactMatch = [
-      matchers.exact(additionalProperties.isni, recordFromQuery.isni),
-    ];
+        function nameSimilarity(nameInQuery: string, nameInResult: string) {
+            const similarityScore = JaroWinklerDistance(cleanName(nameInQuery), cleanName(nameInResult));
+            return similarityScore > 0.9;
+        }
 
-    // Wikidata should be exact match
-    const checkIfWikidataIdIsExactMatch = [
-      matchers.exact(additionalProperties.wikidata, recordFromQuery.wikidata),
-    ];
+        const matchers = {
+            veryClose: (a: string | undefined, b: string | undefined) => {
+                if (!a || !b) return false;
+                return nameSimilarity(a, b);
+            },
+            exactDate: (a: string | undefined, b: string | undefined) => {
+                if (!a || !b) return false;
+                return new Date(a)?.getTime() === new Date(b).getTime();
+            },
+            closeDates: (startDateA: string, startDateB: string, endDateA: string | undefined,
+                         endDateB: string | undefined) => {
+                const dateStampA = endDateA
+                    ? new Date(endDateA).getTime()
+                    : new Date(startDateA).getTime();
+                const dateStampB = endDateB
+                    ? new Date(endDateB).getTime()
+                    : new Date(startDateB).getTime();
+                if (isNaN(dateStampA) || isNaN(dateStampB)) return false;
+                //if the difference between the two dates is greater than 24 hours (86400000 milliseconds), return false
+                return Math.abs(dateStampA - dateStampB) <= 86400000;
+            },
+            exact: (a: string | undefined, b: string | undefined) => {
+                if (!a || !b) return false;
+                return a === b;
+            },
+            notDifferentIfBothExists: (a: string | undefined, b: string | undefined) => {
+                if (!a || !b) return true;
+                return a !== b;
+            },
+            exactUrl: (a: string, b: string) => {
+                if (a && b) {
+                    const urlA = new URL(a.toLowerCase());
+                    const urlB = new URL(b.toLowerCase());
 
-    const checkIfNameIsCloseAndWikidataIdIsExact = [
-      matchers.veryClose(recordFetched.name, recordFromQuery.name),
-      matchers.exact(additionalProperties.wikidata, recordFromQuery.wikidata),
-    ];
+                    let hostA = urlA.hostname;
+                    let hostB = urlB.hostname;
+                    // Normalize path (remove trailing slash unless root)
+                    let pathA = urlA.pathname.replace(/\/+$/, "") || "/";
+                    let pathB = urlB.pathname.replace(/\/+$/, "") || "/";
+                    return `${hostA}${pathA}` === `${hostB}${pathB}`;
+                } else {
+                    return false;
+                }
+            },
+        };
 
-    // Name should be close match and postal code should be exact match, wikidata should be exact match if present
-    const checkIfNameIsClosePostalCodeIsExactAndWikidataIsNotDifferent = [
-      matchers.veryClose(recordFetched.name, recordFromQuery.name),
-      matchers.exact(
-        additionalProperties.postalCode,
-        recordFromQuery.postalCode,
-      ),
-      matchers.notDifferentIfBothExists(
-        additionalProperties.wikidata,
-        recordFromQuery.wikidata,
-      ),
-    ];
-    //Name and address locality should be close match, wikidata should be exact match if present
-    const checkIfNameAddressLocalityAreCloseAndWikidataIsNotDifferentForPlace =
-      [
-        matchers.veryClose(recordFetched.name, recordFromQuery.name),
-        matchers.veryClose(
-          additionalProperties.addressLocality,
-          recordFromQuery.addressLocality,
-        ),
-        matchers.notDifferentIfBothExists(
-          additionalProperties.wikidata,
-          recordFromQuery.wikidata,
-        ),
-      ];
-    //Name is very close and URL is exact match, wikidata should be exact match if present
-    const checkIfNameIsCloseUrlIsExactAndWikidataIsNotDifferentForPlace = [
-      matchers.veryClose(recordFetched.name, recordFromQuery.name),
-      matchers.exactUrl(
-        additionalProperties.url,
-        recordFromQuery.url as string,
-      ),
-      matchers.notDifferentIfBothExists(
-        additionalProperties.wikidata,
-        recordFromQuery.wikidata,
-      ),
-    ];
+        const checkIfIsniIsExactMatch = [
+            matchers.exact(additionalProperties.isni, recordFromQuery.isni),
+        ];
 
-    //TODO Add endDate logic for event
-    const checksNameStartDateEndDatePlaceUriMatchForEvents = [
-      matchers.veryClose(recordFetched.name, recordFromQuery.name),
-      matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate
-      ),
-      matchers.exactUrl(additionalProperties.locationUri, recordFromQuery.locationUri as string,),
-      matchers.closeDates(additionalProperties.startDate, recordFromQuery.startDate as string,
-        additionalProperties.endDate, recordFromQuery.endDate,
-      ),
-    ];
+        // Wikidata should be exact match
+        const checkIfWikidataIdIsExactMatch = [
+            matchers.exact(additionalProperties.wikidata, recordFromQuery.wikidata),
+        ];
 
-    //TODO Add endDate logic for event
-    const checksNameStartDateEndDatePlaceNamePostalCodeMatchForEvents = [
-      matchers.veryClose(recordFetched.name, recordFromQuery.name),
-      matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate),
-      matchers.exact(additionalProperties.postalCode, recordFromQuery.postalCode),
-      matchers.veryClose(additionalProperties.locationName, recordFromQuery.locationName),
-      matchers.closeDates(
-        additionalProperties.startDate, recordFromQuery.startDate as string, additionalProperties.endDate,
-        recordFromQuery.endDate),
-    ];
+        const checkIfNameIsCloseAndWikidataIdIsExact = [
+            matchers.veryClose(recordFetched.name, recordFromQuery.name),
+            matchers.exact(additionalProperties.wikidata, recordFromQuery.wikidata),
+        ];
 
-    if (reconciliationQuery.type === Entities.PLACE) {
-      return (
-        checkIfWikidataIdIsExactMatch.every(Boolean) ||
-        checkIfNameIsClosePostalCodeIsExactAndWikidataIsNotDifferent.every(Boolean) ||
-        checkIfNameAddressLocalityAreCloseAndWikidataIsNotDifferentForPlace.every(Boolean) ||
-        checkIfNameIsCloseUrlIsExactAndWikidataIsNotDifferentForPlace.every(Boolean)
-      );
-    } else if (reconciliationQuery.type === Entities.EVENT) {
-      return (
-        checksNameStartDateEndDatePlaceUriMatchForEvents.every(Boolean) ||
-        checksNameStartDateEndDatePlaceNamePostalCodeMatchForEvents.every(Boolean)
-      );
-    } else {
-      return (
-        checkIfWikidataIdIsExactMatch.every(Boolean) ||
-        checkIfIsniIsExactMatch.every(Boolean) ||
-        checkIfNameIsCloseAndWikidataIdIsExact.every(Boolean)
-      );
+        // Name should be close match and postal code should be exact match, wikidata should be exact match if present
+        const checkIfNameIsClosePostalCodeIsExactAndWikidataIsNotDifferent = [
+            matchers.veryClose(recordFetched.name, recordFromQuery.name),
+            matchers.exact(
+                additionalProperties.postalCode,
+                recordFromQuery.postalCode,
+            ),
+            matchers.notDifferentIfBothExists(
+                additionalProperties.wikidata,
+                recordFromQuery.wikidata,
+            ),
+        ];
+        //Name and address locality should be close match, wikidata should be exact match if present
+        const checkIfNameAddressLocalityAreCloseAndWikidataIsNotDifferentForPlace =
+            [
+                matchers.veryClose(recordFetched.name, recordFromQuery.name),
+                matchers.veryClose(
+                    additionalProperties.addressLocality,
+                    recordFromQuery.addressLocality,
+                ),
+                matchers.notDifferentIfBothExists(
+                    additionalProperties.wikidata,
+                    recordFromQuery.wikidata,
+                ),
+            ];
+        //Name is very close and URL is exact match, wikidata should be exact match if present
+        const checkIfNameIsCloseUrlIsExactAndWikidataIsNotDifferentForPlace = [
+            matchers.veryClose(recordFetched.name, recordFromQuery.name),
+            matchers.exactUrl(
+                additionalProperties.url,
+                recordFromQuery.url as string,
+            ),
+            matchers.notDifferentIfBothExists(
+                additionalProperties.wikidata,
+                recordFromQuery.wikidata,
+            ),
+        ];
+
+        //TODO Add endDate logic for event
+        const checksNameStartDateEndDatePlaceUriMatchForEvents = [
+            matchers.veryClose(recordFetched.name, recordFromQuery.name),
+            matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate
+            ),
+            matchers.exactUrl(additionalProperties.locationUri, recordFromQuery.locationUri as string,),
+            matchers.closeDates(additionalProperties.startDate, recordFromQuery.startDate as string,
+                additionalProperties.endDate, recordFromQuery.endDate,
+            ),
+        ];
+
+        //TODO Add endDate logic for event
+        const checksNameStartDateEndDatePlaceNamePostalCodeMatchForEvents = [
+            matchers.veryClose(recordFetched.name, recordFromQuery.name),
+            matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate),
+            matchers.exact(additionalProperties.postalCode, recordFromQuery.postalCode),
+            matchers.veryClose(additionalProperties.locationName, recordFromQuery.locationName),
+            matchers.closeDates(
+                additionalProperties.startDate, recordFromQuery.startDate as string, additionalProperties.endDate,
+                recordFromQuery.endDate),
+        ];
+
+        if (reconciliationQuery.type === Entities.PLACE) {
+            return (
+                checkIfWikidataIdIsExactMatch.every(Boolean) ||
+                checkIfNameIsClosePostalCodeIsExactAndWikidataIsNotDifferent.every(Boolean) ||
+                checkIfNameAddressLocalityAreCloseAndWikidataIsNotDifferentForPlace.every(Boolean) ||
+                checkIfNameIsCloseUrlIsExactAndWikidataIsNotDifferentForPlace.every(Boolean)
+            );
+        } else if (reconciliationQuery.type === Entities.EVENT) {
+            return (
+                checksNameStartDateEndDatePlaceUriMatchForEvents.every(Boolean) ||
+                checksNameStartDateEndDatePlaceNamePostalCodeMatchForEvents.every(Boolean)
+            );
+        } else {
+            return (
+                checkIfWikidataIdIsExactMatch.every(Boolean) ||
+                checkIfIsniIsExactMatch.every(Boolean) ||
+                checkIfNameIsCloseAndWikidataIdIsExact.every(Boolean)
+            );
+        }
     }
-  }
 
-  private static formatReconciliationQuery(reconciliationQuery: ReconciliationQuery) {
-    const { conditions } = reconciliationQuery;
-    const name = conditions.find((condition) => condition.matchType === "name")
-      ?.propertyValue as string | undefined;
-    const postalCode = conditions.find((condition) =>
-      condition.propertyId?.includes("postalCode"),
-    )?.propertyValue as string | undefined;
-    const addressLocality = conditions.find((condition) =>
-      condition.propertyId?.includes("addressLocality"),
-    )?.propertyValue as string | undefined;
-    const addressRegion = conditions.find((condition) =>
-      condition.propertyId?.includes("addressRegion"),
-    )?.propertyValue as string | undefined;
-    const url = conditions.find((condition) =>
-      condition.propertyId?.includes("url"),
-    )?.propertyValue as string | undefined;
-    const sameAs = conditions
-      .filter((condition) => condition.propertyId?.includes("sameAs"))
-      ?.map((sameAs) => sameAs.propertyValue as string | undefined);
+    private static formatReconciliationQuery(reconciliationQuery: ReconciliationQuery) {
+        const {conditions} = reconciliationQuery;
+        const name = conditions.find((condition) => condition.matchType === "name")
+            ?.propertyValue as string | undefined;
 
-    const startDate = conditions.find((condition) =>
-      condition.propertyId?.includes("startDate"),
-    )?.propertyValue as string | undefined;
-    const endDate = conditions.find((condition) =>
-      condition.propertyId?.includes("endDate"),
-    )?.propertyValue as string | undefined;
+        let postalCode: string | undefined = undefined, addressLocality: string | undefined = undefined,
+            addressRegion: string | undefined = undefined, url: string | undefined = undefined,
+            startDate: string | undefined = undefined, endDate: string | undefined = undefined,
+            locationName: string | undefined = undefined, locationUri: string | undefined = undefined,
+            wikidata: string | undefined = undefined, isni: string | undefined = undefined;
+        let sameAs: string[] = [];
 
-    const locationName = conditions.find((condition) =>
-      condition.propertyId?.includes(
-        "<https://schema.org/location>/<https://schema.org/name>",
-      ),
-    )?.propertyValue as string | undefined;
-    const locationUri = conditions.find((condition) =>
-      condition.propertyId?.includes(
-        "<https://schema.org/location>/<https://schema.org/sameAs>",
-      ),
-    )?.propertyValue as string | undefined;
+        for (const condition of conditions) {
+            if (condition.propertyId) {
+                let propertyId = condition.propertyId as string;
+                if (propertyId.startsWith('schema:')) {
+                    propertyId = propertyId.replace('schema:', '<http://schema.org/') + '>';
+                } else if (isURL(propertyId)) {
+                    propertyId = `<${propertyId}>`;
+                } else if (!isURL(propertyId) && !((propertyId?.startsWith('<') && propertyId?.endsWith('>')))) {
+                    propertyId = `<http://schema.org/${propertyId}>`;
+                }
 
-    const wikidata = sameAs?.find((sameAs) =>
-      sameAs?.startsWith("http://www.wikidata.org/entity/"),
-    );
-    const isni = sameAs?.find((sameAs) =>
-      sameAs?.startsWith("https://isni.org/isni/"),
-    );
+                switch (propertyId) {
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.POSTAL_CODE:
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.ADDRESS_POSTAL_CODE:
+                        postalCode = condition.propertyValue as string;
+                        break;
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.ADDRESS_LOCALITY:
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.ADDRESS_ADDRESS_LOCALITY:
+                        addressLocality = condition.propertyValue as string;
+                        break;
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.ADDRESS_REGION:
+                    case    SCHEMA_ORG_PROPERTY_URI_MAP.ADDRESS_ADDRESS_REGION:
+                        addressRegion = condition.propertyValue as string;
+                        break;
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.URL:
+                        url = condition.propertyValue as string;
+                        break;
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.SAME_AS:
+                        sameAs.push(condition.propertyValue as string);
+                        break;
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.START_DATE:
+                        startDate = condition.propertyValue as string;
+                        break;
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.END_DATE:
+                        endDate = condition.propertyValue as string;
+                        break;
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.LOCATION:
+                        locationUri = condition.propertyValue as string;
+                        break;
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.LOCATION_NAME:
+                        locationName = condition.propertyValue as string;
+                        break;
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.LOCATIONS_URI:
+                        locationUri = condition.propertyValue as string;
+                        break;
+                    default:
+                        break
+                }
+            }
+        }
 
-    return {
-      name,
-      postalCode,
-      addressLocality,
-      addressRegion,
-      url,
-      startDate,
-      endDate,
-      locationName,
-      locationUri,
-      isni: isni?.length ? isni : undefined,
-      wikidata: wikidata?.length ? wikidata : undefined,
-    };
-  }
+        if (sameAs?.length) {
+            wikidata = sameAs?.find((sameAs: any) => sameAs?.startsWith("http://www.wikidata.org/entity/"));
+            isni = sameAs?.find((sameAs) => sameAs?.startsWith("https://isni.org/isni/"));
+        }
+
+        return {
+            name,
+            postalCode,
+            addressLocality,
+            addressRegion,
+            url,
+            startDate,
+            endDate,
+            locationName,
+            locationUri,
+            isni: isni ? (isni.length ? isni : undefined) : undefined,
+            wikidata: wikidata ? (wikidata.length ? wikidata : undefined) : undefined,
+        };
+    }
+
+    static getAllQualifiers() {
+        return [{
+            id: MatchQualifierEnum.EXACT_MATCH,
+            name: "Exact match of the property value",
+        }, {
+            id: MatchQualifierEnum.REGEX_MATCH,
+            name: "Match the property value using regular expression",
+        }]
+    }
+
 }
