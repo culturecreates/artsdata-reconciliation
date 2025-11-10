@@ -122,7 +122,7 @@ export class MatchServiceHelper {
 
         function nameSimilarity(nameInQuery: string, nameInResult: string) {
             const similarityScore = JaroWinklerDistance(cleanName(nameInQuery), cleanName(nameInResult));
-            return similarityScore > 0.9;
+            return similarityScore > 0.92;
         }
 
         const matchers = {
