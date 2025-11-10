@@ -122,7 +122,7 @@ export class MatchServiceHelper {
 
         function nameSimilarity(nameInQuery: string, nameInResult: string) {
             const similarityScore = JaroWinklerDistance(cleanName(nameInQuery), cleanName(nameInResult));
-            return similarityScore > 0.9;
+            return similarityScore > 0.92;
         }
 
         const matchers = {
@@ -188,42 +188,30 @@ export class MatchServiceHelper {
         // Name should be close match and postal code should be exact match, wikidata should be exact match if present
         const checkIfNameIsClosePostalCodeIsExactAndWikidataIsNotDifferent = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name),
-            matchers.exact(
-                additionalProperties.postalCode,
-                recordFromQuery.postalCode,
-            ),
-            matchers.notDifferentIfBothExists(
-                additionalProperties.wikidata,
-                recordFromQuery.wikidata,
-            ),
+            matchers.exact(additionalProperties.postalCode, recordFromQuery.postalCode),
+            matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
         ];
-        //Name and address locality should be close match, wikidata should be exact match if present
-        const checkIfNameAddressLocalityAreCloseAndWikidataIsNotDifferentForPlace =
+
+        //Name and address locality should be close match, postal code and wikidata should be exact match if present
+        const checkIfNameAddressLocalityAreCloseAndPostalCodeAndWikidataIsNotDifferentForPlace =
             [
                 matchers.veryClose(recordFetched.name, recordFromQuery.name),
-                matchers.veryClose(
-                    additionalProperties.addressLocality,
-                    recordFromQuery.addressLocality,
-                ),
-                matchers.notDifferentIfBothExists(
-                    additionalProperties.wikidata,
-                    recordFromQuery.wikidata,
-                ),
+                matchers.notDifferentIfBothExists(additionalProperties.postalCode, recordFromQuery.postalCode),
+                matchers.veryClose(additionalProperties.addressLocality,recordFromQuery.addressLocality),
+                matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
             ];
-        //Name is very close and URL is exact match, wikidata should be exact match if present
-        const checkIfNameIsCloseUrlIsExactAndWikidataIsNotDifferentForPlace = [
+
+        //Name is very close and URL is exact match, postal code and wikidata should be exact match if present
+        const checkIfNameIsCloseUrlIsExactAndPostalCodeAndWikidataIsNotDifferentForPlace = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name),
             matchers.exactUrl(
                 additionalProperties.url,
                 recordFromQuery.url as string,
             ),
-            matchers.notDifferentIfBothExists(
-                additionalProperties.wikidata,
-                recordFromQuery.wikidata,
-            ),
+            matchers.notDifferentIfBothExists(additionalProperties.postalCode, recordFromQuery.postalCode),
+            matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
         ];
 
-        //TODO Add endDate logic for event
         const checksNameStartDateEndDatePlaceUriMatchForEvents = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name),
             matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate
@@ -234,7 +222,6 @@ export class MatchServiceHelper {
             ),
         ];
 
-        //TODO Add endDate logic for event
         const checksNameStartDateEndDatePlaceNamePostalCodeMatchForEvents = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name),
             matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate),
@@ -249,8 +236,8 @@ export class MatchServiceHelper {
             return (
                 checkIfWikidataIdIsExactMatch.every(Boolean) ||
                 checkIfNameIsClosePostalCodeIsExactAndWikidataIsNotDifferent.every(Boolean) ||
-                checkIfNameAddressLocalityAreCloseAndWikidataIsNotDifferentForPlace.every(Boolean) ||
-                checkIfNameIsCloseUrlIsExactAndWikidataIsNotDifferentForPlace.every(Boolean)
+                checkIfNameAddressLocalityAreCloseAndPostalCodeAndWikidataIsNotDifferentForPlace.every(Boolean) ||
+                checkIfNameIsCloseUrlIsExactAndPostalCodeAndWikidataIsNotDifferentForPlace.every(Boolean)
             );
         } else if (reconciliationQuery.type === Entities.EVENT) {
             return (
