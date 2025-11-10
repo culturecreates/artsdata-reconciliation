@@ -43,7 +43,74 @@ describe('isAutoMatch', () => {
         expect(result).toBe(false);
     });
 
-    it('returns true when names are close and URLs match exactly for a PLACE entity', () => {
+    it('returns true when names, address Locality are close match and postal codes is exact', () => {
+        const recordFetched = {name: 'Place Bell'};
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [
+                {matchType: "name", propertyValue: "Place Bell"},
+                {
+                    propertyId: "<http://schema.org/postalCode>",
+                    propertyValue: "H7N 0E4",
+                    matchType: "property",
+                },{
+                    propertyId: "<http://schema.org/address>/<http://schema.org/addressLocality>",
+                    propertyValue: "Lavel",
+                    matchType: "property",
+                },
+            ],
+        };
+        const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval'};
+
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+
+        expect(result).toBe(true);
+    });
+
+    it('returns false when names, adddress Locality are close match and postal codes is different', () => {
+        const recordFetched = {name: 'Place Bell'};
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [
+                {matchType: "name", propertyValue: "Place Bell"},
+                {
+                    propertyId: "<http://schema.org/address>/<http://schema.org/addressLocality>",
+                    propertyValue: "Laval",
+                    matchType: "property",
+                },{
+                    propertyId: "<http://schema.org/postalCode>",
+                    propertyValue: "H7N 0E5",
+                    matchType: "property",
+                }
+            ],
+        };
+        const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval'};
+
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+
+        expect(result).toBe(true);
+    });
+    it('returns true when names, adddress Locality are close match and postal codes not exists in both', () => {
+        const recordFetched = {name: 'Place Bell'};
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [
+                {matchType: "name", propertyValue: "Place Bell"},
+                {
+                    propertyId: "<http://schema.org/address>/<http://schema.org/addressLocality>",
+                    propertyValue: "Laval",
+                    matchType: "property",
+                }
+            ],
+        };
+        const additionalProperties = {addressLocality: 'Laval'};
+
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+
+        expect(result).toBe(true);
+    });
+
+    it('returns true when names are close and URLs match exactly for a PLACE entity and postal code do not exist in both', () => {
         const recordFetched = {name: 'Place Bell'};
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
@@ -51,12 +118,32 @@ describe('isAutoMatch', () => {
                 {matchType: "name", propertyValue: "Place bbell"},
                 {
                     propertyId: "<http://schema.org/url>",
-                    propertyValue: "http://example.com",
+                    propertyValue: "http://www.placebell.ca/fr",
                     matchType: "property",
                 },
             ],
         };
-        const additionalProperties = {url: 'http://example.com'};
+        const additionalProperties = {url: "http://www.placebell.ca/fr"};
+
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+
+        expect(result).toBe(true);
+    });
+
+    it('returns true when names are close match and URLs match exactly for a PLACE entity', () => {
+        const recordFetched = {name: 'Place Bell'};
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [
+                {matchType: "name", propertyValue: "Place bbell"},
+                {
+                    propertyId: "<http://schema.org/url>",
+                    propertyValue: "http://www.placebell.ca/fr",
+                    matchType: "property",
+                },
+            ],
+        };
+        const additionalProperties = {url: 'http://www.placebell.ca/fr'};
 
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
 
@@ -71,12 +158,12 @@ describe('isAutoMatch', () => {
                 {matchType: "name", propertyValue: "place bell"},
                 {
                     propertyId: "<http://schema.org/url>",
-                    propertyValue: "http://example.com",
+                    propertyValue: "http://www.placebell.ca/fr",
                     matchType: "property",
                 },
             ],
         };
-        const additionalProperties = {url: 'http://different.com'};
+        const additionalProperties = {url: 'http://www.placebell.ca/wrong-url'};
 
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
 
@@ -311,6 +398,32 @@ describe('isAutoMatch', () => {
     });
 
     it('returns true when startDate and endDate are dateTime strings and name, startDate and location matches for EVENT entity', () => {
+        const recordFetched = {name: 'Eros Ramazzotti'};
+        const reconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {matchType: 'name', propertyValue: 'Eros Ramazzotti'},
+                {
+                    propertyId: '<http://schema.org/startDate>',
+                    propertyValue: '2023-01-01T10:00:00Z',
+                    matchType: 'property'
+                },
+                {
+                    propertyId: '<http://schema.org/location>',
+                    propertyValue: 'http://kg.artsdata.ca/resource/K11-240',
+                    matchType: 'property'
+                }
+            ],
+        };
+        const additionalProperties = {
+            startDate: '2023-01-01T10:00:00Z',
+            locationUri:'http://kg.artsdata.ca/resource/K11-240'
+        };
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        expect(result).toBe(true);
+    });
+
+    it('returns true ', () => {
         const recordFetched = {name: 'Eros Ramazzotti'};
         const reconciliationQuery = {
             type: Entities.EVENT,
