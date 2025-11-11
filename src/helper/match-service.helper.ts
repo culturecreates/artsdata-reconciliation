@@ -152,7 +152,7 @@ export class MatchServiceHelper {
             },
             notDifferentIfBothExists: (a: string | undefined, b: string | undefined) => {
                 if (!a || !b) return true;
-                return a !== b;
+                return a === b;
             },
             exactUrl: (a: string, b: string) => {
                 if (a && b) {
