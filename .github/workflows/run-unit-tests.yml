@@ -38,14 +38,14 @@ jobs:
           -H 'X-GraphDB-Repository: artsdata' \
           --data-raw '{
           "importSettings": {
-            "name": "statements.brf",
+            "name": "artsdata-export-11-11-25.brf",
             "type": "file",
-            "baseURI": "file:/root/graphdb-import/statements.brf",
+            "baseURI": "file:/root/graphdb-import/artsdata-export-11-11-25.brf",
             "parserSettings": {
             "verifyLanguageTags": true,
               "stopOnError": true
             }},
-          "fileNames": ["statements.brf"]
+          "fileNames": ["artsdata-export-11-11-25.brf"]
           }'
 
       - name: Create index
