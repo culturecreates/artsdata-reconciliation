@@ -16,7 +16,7 @@ jobs:
           unzip ./test/graph-db/data/artsdata-export-11-11-25.brf.zip -d ./test/
 
       - name: Run GraphDB
-        run: docker compose -f "graph-db/docker-compose.yml" up -d --build
+        run: docker compose -f "test/graph-db/docker-compose.yml" up -d --build
 
       - name: Wait for GraphDB to be ready
         run: |
