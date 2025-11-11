@@ -33,9 +33,20 @@ jobs:
 
       - name: Import repository data
         run: |
-          curl 'http://127.0.0.1:7200/repositories/artsdata/statements' \
-          --header 'Content-Type: application/x-binary-rdf' \
-          --data-binary '@./test/artsdata-export-11-11-25.brf'
+          curl -X POST 'http://localhost:7200/rest/repositories/artsdata/import/server' \
+          -H 'Content-Type: application/json' \
+          -H 'X-GraphDB-Repository: artsdata' \
+          --data-raw '{
+          "importSettings": {
+            "name": "statements.brf",
+            "type": "file",
+            "baseURI": "file:/root/graphdb-import/statements.brf",
+            "parserSettings": {
+            "verifyLanguageTags": true,
+              "stopOnError": true
+            }},
+          "fileNames": ["statements.brf"]
+          }'
 
       - name: Create index
         run: |
