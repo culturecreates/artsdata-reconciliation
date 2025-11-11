@@ -13,7 +13,7 @@ jobs:
 
       - name: Extract statements file
         run: |
-          unzip ./test/statements.nq.zip -d ./test/
+          unzip ./test/graph-db/data/artsdata-export-11-11-25.brf.zip -d ./test/
 
       - name: Run GraphDB
         run: docker compose -f "graph-db/docker-compose.yml" up -d --build
@@ -29,13 +29,13 @@ jobs:
         run: |
           curl 'http://127.0.0.1:7200/rest/repositories' \
           --header 'Content-Type: multipart/form-data' \
-          --form 'config=@"./test/config.ttl"'
+          --form 'config=@"./test/graph-db/data/config.ttl"'
 
       - name: Import repository data
         run: |
           curl 'http://127.0.0.1:7200/repositories/artsdata/statements' \
-          --header 'Content-Type: application/n-quads' \
-          --data-binary '@./test/statements.nq'
+          --header 'Content-Type: application/x-binary-rdf' \
+          --data-binary '@./test/artsdata-export-11-11-25.brf'
 
       - name: Create index
         run: |
