@@ -11,19 +11,10 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    steps:
+    uses: ./.github/workflows/run-unit-tests.yml
 
-      - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16.20.1
-          directory: .
-      - run: npm install
-      - run: npm test
   build-and-push-image:
-    #    needs: test
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
