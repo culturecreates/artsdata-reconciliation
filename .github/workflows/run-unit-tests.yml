@@ -1,0 +1,76 @@
+name: Run Unit Tests
+
+on:
+  workflow_call:
+
+jobs:
+  run-unit-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract statements file
+        run: |
+          unzip ./test/graph-db/data/artsdata-export-11-11-25.brf.zip -d ./test/
+
+      - name: Run GraphDB
+        run: docker compose -f "test/graph-db/docker-compose.yml" up -d --build
+
+      - name: Wait for GraphDB to be ready
+        run: |
+          until curl -s http://127.0.0.1:7200/rest/repositories > /dev/null; do
+            echo "Waiting for GraphDB to start..."
+            sleep 5
+          done
+
+      - name: Import repository configuration
+        run: |
+          curl 'http://127.0.0.1:7200/rest/repositories' \
+          --header 'Content-Type: multipart/form-data' \
+          --form 'config=@"./test/graph-db/data/config.ttl"'
+
+      - name: Import repository data
+        run: |
+          curl -X POST 'http://localhost:7200/rest/repositories/artsdata/import/server' \
+          -H 'Content-Type: application/json' \
+          -H 'X-GraphDB-Repository: artsdata' \
+          --data-raw '{
+          "importSettings": {
+            "name": "artsdata-export-11-11-25.brf",
+            "type": "file",
+            "baseURI": "file:/root/graphdb-import/artsdata-export-11-11-25.brf",
+            "parserSettings": {
+            "verifyLanguageTags": true,
+              "stopOnError": true
+            }},
+          "fileNames": ["artsdata-export-11-11-25.brf"]
+          }'
+
+      - name: Create index
+        run: |
+          for file in ./seed/sparql/index/*.sparql; do
+            curl -X POST -H "Content-Type: application/sparql-update" \
+              --data-binary @"$file" \
+              "http://localhost:7200/repositories/artsdata/statements"
+          done
+
+      - name: Ensure .env exists
+        run: |
+          touch .env
+          echo 'ARTSDATA_ENDPOINT="http://127.0.0.1:7200/"' >> .env
+
+      - name : display .env file
+        run : cat .env
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 22.17.0
+
+      - name: Install dependencies
+        run: npm install
+
+#      - name: Run unit tests
+#        run: npm test

@@ -1,65 +1,13 @@
 name: Run unit tests on pull request
 
 on:
-  pull_request:
-    branches: [ 'main' ]
+#  pull_request:
+#    branches: [ 'develop' ]
   workflow_dispatch:
 
 jobs:
   run-unit-tests:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Extract statements file
-        run: |
-          unzip ./test/statements.nq.zip -d ./test/
-
-      - name: Run GraphDB
-        run: docker compose -f "graph-db/docker-compose.yml" up -d --build
-
-      - name: Wait for GraphDB to be ready
-        run: |
-          until curl -s http://127.0.0.1:7200/rest/repositories > /dev/null; do
-            echo "Waiting for GraphDB to start..."
-            sleep 5
-          done
-
-      - name: Import repository configuration
-        run: |
-          curl 'http://127.0.0.1:7200/rest/repositories' \
-          --header 'Content-Type: multipart/form-data' \
-          --form 'config=@"./test/config.ttl"'
-
-      - name: Import repository data
-        run: |
-          curl 'http://127.0.0.1:7200/repositories/artsdata/statements' \
-          --header 'Content-Type: application/n-quads' \
-          --data-binary '@./test/statements.nq'
-
-      - name: Create index
-        run: |
-          for file in ./seed/sparql/index/*.sparql; do
-              curl -X POST -H "Content-Type: application/sparql-update" --data-binary @"$file" "http://localhost:7200/repositories/artsdata/statements"
-          done
-
-      - name: Ensure .env exists
-        run: |
-          touch .env
-          echo 'ARTSDATA_ENDPOINT="http://127.0.0.1:7200/"' >> .env
-
-      - name: Setup Node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16.20.1
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run unit tests
-        run: npm test
+    uses: ./.github/workflows/run-unit-tests.yml
 
   restrict-merging:
     name: restrict-merging

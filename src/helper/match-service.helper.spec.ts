@@ -67,7 +67,7 @@ describe('isAutoMatch', () => {
         expect(result).toBe(true);
     });
 
-    it('returns false when names, adddress Locality are close match and postal codes is different', () => {
+    it('returns false when names and address locality are close match and postal codes is different', () => {
         const recordFetched = {name: 'Place Bell'};
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
@@ -88,9 +88,71 @@ describe('isAutoMatch', () => {
 
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
 
+        expect(result).toBe(false);
+    });
+    it('returns true when names and address locality are close match but postal codes exists only in source', () => {
+        const recordFetched = {name: 'Place Bell'};
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [
+                {matchType: "name", propertyValue: "Place Bell"},
+                {
+                    propertyId: "<http://schema.org/address>/<http://schema.org/addressLocality>",
+                    propertyValue: "Laval",
+                    matchType: "property",
+                },{
+                    propertyId: "<http://schema.org/postalCode>",
+                    propertyValue: "H7N 0E5",
+                    matchType: "property",
+                }
+            ],
+        };
+        const additionalProperties = { addressLocality: 'Laval'};
+
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+
         expect(result).toBe(true);
     });
-    it('returns true when names, adddress Locality are close match and postal codes not exists in both', () => {
+    it('returns true when names amd address locality are close match but postal codes exists only in query', () => {
+        const recordFetched = {name: 'Place Bell'};
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [
+                {matchType: "name", propertyValue: "Place Bell"},
+                {
+                    propertyId: "<http://schema.org/address>/<http://schema.org/addressLocality>",
+                    propertyValue: "Laval",
+                    matchType: "property",
+                }
+            ],
+        };
+        const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval'};
+
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+
+        expect(result).toBe(true);
+    });
+
+    it('returns true when names and address Locality are close match but postal codes exists neither in query nor source', () => {
+        const recordFetched = {name: 'Place Bell'};
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [
+                {matchType: "name", propertyValue: "Place Bell"},
+                {
+                    propertyId: "<http://schema.org/address>/<http://schema.org/addressLocality>",
+                    propertyValue: "Laval",
+                    matchType: "property",
+                }
+            ],
+        };
+        const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval'};
+
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+
+        expect(result).toBe(true);
+    });
+    it('returns true when names, adddress Locality are close match and postal code not exist in both query and source', () => {
         const recordFetched = {name: 'Place Bell'};
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
