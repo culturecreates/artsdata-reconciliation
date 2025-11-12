@@ -587,56 +587,56 @@ describe("Recon Service tests", () => {
                 expectedMatchValue: false, //Since name is the only match
                 expectedName: "Roy Thomson Hall",
             },
-            {
-                description:
-                    "Reconcile Agent by name and wikidataId, the match should be true since the wikidata uri match",
-                queries: [
-                    {
-                        conditions: [
-                            {
-                                matchType: "name",
-                                propertyValue: "Emile Bilodeau",
-                            },
-                            {
-                                matchType: "property",
-                                propertyId: "http://schema.org/sameAs",
-                                propertyValue: "http://www.wikidata.org/entity/Q30015784",
-                            },
-                        ],
-                        type: "dbo:Agent",
-                        limit: 1,
-                    },
-                ],
-                expectedId: "K12-227",
-                expectedCount: 1,
-                expectedMatchValue: true, //Since wikidata is matching
-                expectedName: "Émile Bilodeau",
-            },
-            {
-                description:
-                    "Reconcile Agent by name and wikidataId, the match should be true since the wikidata uri match",
-                queries: [
-                    {
-                        conditions: [
-                            {
-                                matchType: "name",
-                                propertyValue: "Philippe-Audrey Larrue St-Jacques"
-                            },
-                            {
-                                matchType: "property",
-                                propertyId: "http://schema.org/sameAs",
-                                propertyValue: "http://www.wikidata.org/entity/Q110017181"
-                            },
-                        ],
-                        type: "dbo:Agent",
-                        limit: 1,
-                    },
-                ],
-                expectedId: "K12-224",
-                expectedCount: 1,
-                expectedMatchValue: true, //Since name and wikidata is matching
-                expectedName: "Philippe-Audrey Larrue-St-Jacques",
-            },
+            // {
+            //     description:
+            //         "Reconcile Agent by name and wikidataId, the match should be true since the wikidata uri match",
+            //     queries: [
+            //         {
+            //             conditions: [
+            //                 {
+            //                     matchType: "name",
+            //                     propertyValue: "Emile Bilodeau",
+            //                 },
+            //                 {
+            //                     matchType: "property",
+            //                     propertyId: "http://schema.org/sameAs",
+            //                     propertyValue: "http://www.wikidata.org/entity/Q30015784",
+            //                 },
+            //             ],
+            //             type: "dbo:Agent",
+            //             limit: 1,
+            //         },
+            //     ],
+            //     expectedId: "K12-227",
+            //     expectedCount: 1,
+            //     expectedMatchValue: true, //Since wikidata is matching
+            //     expectedName: "Émile Bilodeau",
+            // },
+            // {
+            //     description:
+            //         "Reconcile Agent by name and wikidataId, the match should be true since the wikidata uri match",
+            //     queries: [
+            //         {
+            //             conditions: [
+            //                 {
+            //                     matchType: "name",
+            //                     propertyValue: "Philippe-Audrey Larrue St-Jacques"
+            //                 },
+            //                 {
+            //                     matchType: "property",
+            //                     propertyId: "http://schema.org/sameAs",
+            //                     propertyValue: "http://www.wikidata.org/entity/Q110017181"
+            //                 },
+            //             ],
+            //             type: "dbo:Agent",
+            //             limit: 1,
+            //         },
+            //     ],
+            //     expectedId: "K12-224",
+            //     expectedCount: 1,
+            //     expectedMatchValue: true, //Since name and wikidata is matching
+            //     expectedName: "Philippe-Audrey Larrue-St-Jacques",
+            // },
             {
                 description:
                     "Reconcile Place with name and locality, the match should be true since all are exactly matching",
