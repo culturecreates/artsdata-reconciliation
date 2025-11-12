@@ -2,8 +2,8 @@ name: CI CD - Staging Server
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ 'develop' ]
+#  push:
+#    branches: [ 'develop' ]
 
 env:
   REGISTRY: ghcr.io
