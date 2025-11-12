@@ -1,5 +1,5 @@
 import {Injectable} from "@nestjs/common";
-import {ARTSDATA} from "../../config";
+import {ARTSDATA, FEATURE_FLAG} from "../../config";
 import {HttpService} from "../http";
 import {Exception} from "../../helper";
 import axios from "axios";
@@ -27,7 +27,11 @@ export class ArtsdataService {
      */
     async executeSparqlQuery(sparqlQuery: string, infer = false): Promise<any> {
         const sparqlEndpoint = this._getArtsdataEndPoint();
-        console.log(`Executing Sparql query:\n${sparqlQuery}`);
+
+        if (FEATURE_FLAG.LOG_QUERIES) {
+            console.log(`Executing Sparql query:\n${sparqlQuery}`);
+        }
+
         const queryParam = `query=${encodeURIComponent(sparqlQuery)}&infer=${infer}`;
 
         try {
