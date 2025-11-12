@@ -49,8 +49,15 @@ jobs:
           "fileNames": ["test-data-set.brf"]
           }'
 
-      - name : Wait for import to finish
-        run : sleep 60
+      - name: Wait for import to finish
+        run: |
+          echo "Waiting for data import to complete..."
+          until curl -s "http://localhost:7200/rest/repositories/artsdata/import/server" | grep -q '"status":"DONE"'; do
+            echo "Still importing..."
+            sleep 5
+          done
+          echo "Import completed."
+
 
       - name: Create index
         run: |
@@ -59,7 +66,9 @@ jobs:
               --data-binary @"$file" \
               "http://localhost:7200/repositories/artsdata/statements"
           done
-      
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Display indexes
         run: |
@@ -80,9 +89,9 @@ jobs:
           echo 'REPOSITORY="artsdata"' >> .env
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: 22.17.0
+          node-version: 22
 
       - name: Install dependencies
         run: npm install
