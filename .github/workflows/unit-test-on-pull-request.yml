@@ -1,8 +1,8 @@
 name: Run unit tests on pull request
 
 on:
-#  pull_request:
-#    branches: [ 'develop' ]
+  pull_request:
+    branches: [ 'main' ]
   workflow_dispatch:
 
 jobs:
