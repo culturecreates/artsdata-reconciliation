@@ -59,11 +59,19 @@ jobs:
               --data-binary @"$file" \
               "http://localhost:7200/repositories/artsdata/statements"
           done
-      - name: Display indexes
-        run: curl -X GET "http://localhost:7200/repositories/artsdata/indexes"
+      
 
-      - name: Display the import status
-        run: curl -X GET "http://localhost:7200/rest/repositories/artsdata/import/server"
+      - name: Display indexes
+        run: |
+          echo "Displaying repository indexes..."
+          curl -s -X GET "http://localhost:7200/repositories/artsdata/indexes" \
+            -H "Accept: application/json" | jq .
+
+      - name: Display import status
+        run: |
+          echo "Displaying import status..."
+          curl -s -X GET "http://localhost:7200/rest/repositories/artsdata/import/server" \
+            -H "Accept: application/json" | jq .
 
       - name: Ensure .env exists
         run: |
