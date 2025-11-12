@@ -14,7 +14,7 @@ jobs:
 
       - name: Extract statements file
         run: |
-          unzip ./test/graph-db/data/test-data-set.brf.zip -d ./test/
+          unzip ./test/graph-db/data/test-data-set.nq.zip -d ./test/
 
       - name: Run GraphDB
         run: docker compose -f "test/graph-db/docker-compose.yml" up -d --build
@@ -34,30 +34,9 @@ jobs:
 
       - name: Import repository data
         run: |
-          curl -X POST 'http://localhost:7200/rest/repositories/artsdata/import/server' \
-          -H 'Content-Type: application/json' \
-          -H 'X-GraphDB-Repository: artsdata' \
-          --data-raw '{
-          "importSettings": {
-            "name": "test-data-set.brf",
-            "type": "file",
-            "baseURI": "file:/root/graphdb-import/test-data-set.brf",
-            "parserSettings": {
-            "verifyLanguageTags": true,
-              "stopOnError": true
-            }},
-          "fileNames": ["test-data-set.brf"]
-          }'
-
-      - name: Wait for import to finish
-        run: |
-          echo "Waiting for data import to complete..."
-          until curl -s "http://localhost:7200/rest/repositories/artsdata/import/server" | grep -q '"status":"DONE"'; do
-            echo "Still importing..."
-            sleep 5
-          done
-          echo "Import completed."
-
+          curl 'http://127.0.0.1:7200/repositories/artsdata/statements' \
+          --header 'Content-Type: application/n-quads' \
+          --data-binary '@./test/graph-db/data/test-data-set.nq'
 
       - name: Create index
         run: |
