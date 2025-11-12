@@ -14,7 +14,7 @@ jobs:
 
       - name: Extract statements file
         run: |
-          unzip ./test/graph-db/data/artsdata-export-11-11-25.brf.zip -d ./test/
+          unzip ./test/graph-db/data/artsdata-core-graph-12-11-25.brf.zip -d ./test/
 
       - name: Run GraphDB
         run: docker compose -f "test/graph-db/docker-compose.yml" up -d --build
@@ -39,14 +39,14 @@ jobs:
           -H 'X-GraphDB-Repository: artsdata' \
           --data-raw '{
           "importSettings": {
-            "name": "artsdata-export-11-11-25.brf",
+            "name": "artsdata-core-graph-12-11-25.brf",
             "type": "file",
-            "baseURI": "file:/root/graphdb-import/artsdata-export-11-11-25.brf",
+            "baseURI": "file:/root/graphdb-import/artsdata-core-graph-12-11-25.brf",
             "parserSettings": {
             "verifyLanguageTags": true,
               "stopOnError": true
             }},
-          "fileNames": ["artsdata-export-11-11-25.brf"]
+          "fileNames": ["artsdata-core-graph-12-11-25.brf"]
           }'
 
       - name: Create index

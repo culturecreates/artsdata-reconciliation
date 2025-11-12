@@ -8,7 +8,7 @@ services:
       - "7200:7200"
     volumes:
       - ./data/config.ttl:/opt/graphdb/home/data/repositories/artsdata/config.ttl:ro
-      - ./data/artsdata-export-11-11-25.brf:/root/graphdb-import/artsdata-export-11-11-25.brf:ro
+      - ./data/artsdata-core-graph-12-11-25.brf:/root/graphdb-import/artsdata-core-graph-12-11-25.brf:ro
     environment:
       - GDB_HEAP_SIZE=2G
     restart: always
