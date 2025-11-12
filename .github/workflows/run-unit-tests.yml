@@ -60,7 +60,8 @@ jobs:
       - name: Ensure .env exists
         run: |
           touch .env
-          echo 'ARTSDATA_ENDPOINT="http://127.0.0.1:7200/"\nREPOSITORY="artsdata"' >> .env
+          echo 'ARTSDATA_ENDPOINT="http://127.0.0.1:7200/"' >> .env
+          echo 'REPOSITORY="artsdata"' >> .env
 
       - name : display .env file
         run : cat .env
