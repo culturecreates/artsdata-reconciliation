@@ -60,7 +60,7 @@ jobs:
       - name: Ensure .env exists
         run: |
           touch .env
-          echo 'ARTSDATA_ENDPOINT="http://127.0.0.1:7200/"' >> .env
+          echo 'ARTSDATA_ENDPOINT="http://127.0.0.1:7200/"\nREPOSITORY="artsdata"' >> .env
 
       - name : display .env file
         run : cat .env
@@ -73,5 +73,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-#      - name: Run unit tests
-#        run: npm test
+      - name: Run unit tests
+        run: npm test
