@@ -37,7 +37,7 @@ export class ArtsdataService {
         try {
             return await this.httpService.postRequest(sparqlEndpoint, queryParam, this.token);
         } catch (error) {
-            console.error("Error executing SPARQL query:", error);
+            console.error("Error executing SPARQL query:", error.message);
             throw Exception.internalServerError(`Error executing SPARQL query: ${error.message}`);
         }
     }
