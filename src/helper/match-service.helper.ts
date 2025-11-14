@@ -60,9 +60,7 @@ export class MatchServiceHelper {
                 resultCandidate.description = descriptionEn || description || descriptionFr;
             }
 
-            resultCandidate.score = Math.round(
-                Number(currentBinding["score"]?.value),
-            );
+            resultCandidate.score = Math.round(Number(currentBinding["total_score"]?.value));
             resultCandidate.match =
                 isQueryByURI ||
                 MatchServiceHelper.isAutoMatch(resultCandidate, reconciliationQuery, additionalPropertiesForAutoMatch);

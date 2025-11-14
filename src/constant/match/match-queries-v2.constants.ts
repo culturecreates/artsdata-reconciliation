@@ -5,7 +5,8 @@ export const QUERIES_V2 = {
     PREFIXES: `
 PREFIX con-inst: <http://www.ontotext.com/connectors/lucene/instance#>
 PREFIX con: <http://www.ontotext.com/connectors/lucene#>
-PREFIX schema: <http://schema.org/>`,
+PREFIX schema: <http://schema.org/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
 
     SELECT_INDEXED_ENTITY_QUERY_TEMPLATE: `SELECT * {
         [] a con-inst:INDEX_PLACEHOLDER ;
@@ -46,8 +47,7 @@ PREFIX schema: <http://schema.org/>`,
 
 
     SELECT_QUERY_FOR_AGENT_PROPERTIES_SUB_QUERY: `
-    (SAMPLE(?wikidata) AS ?wikidata)
-    (SAMPLE(?isni) AS ?isni)`,
+    (SAMPLE(?wikidata) AS ?wikidata)\n(SAMPLE(?isni) AS ?isni)`,
 
     ADDITIONAL_PROPERTIES_TO_FETCH_FOR_AGENTS_SUB_QUERY: `
     # Wikidata and ISNI

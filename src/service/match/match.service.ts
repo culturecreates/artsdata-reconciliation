@@ -160,13 +160,7 @@ export class MatchService {
                 const isQueryByURI: boolean = name ? MatchServiceHelper.isQueryByURI(name as string) : false;
                 sparqlQuery = this._generateSparqlQueryV2(name as string, type, isQueryByURI, limit || 25,
                     propertyConditions);
-                console.log(sparqlQuery)
-
-
-                sparqlQuery = this._generateSparqlQuery(name as string, type, isQueryByURI, limit || 25,
-                    propertyConditions);
-                const response =
-                    await this._artsdataService.executeSparqlQuery(sparqlQuery);
+                const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
                 const candidates = MatchServiceHelper.formatReconciliationResponse(requestLanguage,
                     response, reconciliationQuery, isQueryByURI);
                 results.push({candidates});
