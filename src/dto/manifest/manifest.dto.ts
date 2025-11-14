@@ -38,10 +38,6 @@ export class ServiceManifestResponse {
   versions: string[];
   @ApiProperty({ example: "Artsdata.ca Reconciliation Service" })
   name: String;
-  @ApiProperty({ example: "http://kg.artsdata.ca/" })
-  identifierSpace: String;
-  @ApiProperty({ example: "http://schema.org/" })
-  schemaSpace: String;
   @ApiProperty({
     type: [DefaultType], example: [
       {
