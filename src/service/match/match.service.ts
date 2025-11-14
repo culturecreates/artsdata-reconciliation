@@ -163,13 +163,13 @@ export class MatchService {
                 console.log(sparqlQuery)
 
 
-                // sparqlQuery = this._generateSparqlQuery(name as string, type, isQueryByURI, limit || 25,
-                //     propertyConditions);
-                // const response =
-                //     await this._artsdataService.executeSparqlQuery(sparqlQuery);
-                // const candidates = MatchServiceHelper.formatReconciliationResponse(requestLanguage,
-                //     response, reconciliationQuery, isQueryByURI);
-                // results.push({candidates});
+                sparqlQuery = this._generateSparqlQuery(name as string, type, isQueryByURI, limit || 25,
+                    propertyConditions);
+                const response =
+                    await this._artsdataService.executeSparqlQuery(sparqlQuery);
+                const candidates = MatchServiceHelper.formatReconciliationResponse(requestLanguage,
+                    response, reconciliationQuery, isQueryByURI);
+                results.push({candidates});
             } catch (error) {
                 console.error("Error in reconciliation query:", error);
                 results.push({candidates: []});
@@ -262,9 +262,10 @@ export class MatchService {
             const propertyName = 'name'
             const scoreVariable = `?${propertyName}_score`;
 
-            const subQueryForName = this._generateSubQueryUsingLucene(propertyName, name, lucenceIndex, type, scoreVariable, limit)
-            selectVariables.push(`?${propertyName}`, scoreVariable)
+            selectVariables.push(scoreVariable)
             scoreVariables.push(scoreVariable)
+
+            const subQueryForName = this._generateSubQueryUsingLucene(propertyName, name, lucenceIndex, type, scoreVariable, limit)
             subQueries.push(subQueryForName)
         }
 
@@ -276,7 +277,7 @@ export class MatchService {
 
         query += `\n # Properties to return with matching results \n{${propertiesSubQuery}\n}`;
         query += MatchServiceHelper.generateBingStatementForScoreCalculation(scoreVariables);
-        query += `\n}GROUP BY ?entity ${scoreVariables.join(' ')}`
+        query += `\n}GROUP BY ?entity ?type_label ${scoreVariables.join(' ')}`
 
         return query;
     }

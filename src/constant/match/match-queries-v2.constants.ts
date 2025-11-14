@@ -21,7 +21,8 @@ PREFIX schema: <http://schema.org/>`,
     (SAMPLE(?name_default) AS ?name)
     (SAMPLE(?description_en) AS ?descriptionEn)
     (SAMPLE(?description_fr) AS ?descriptionFr)
-    (SAMPLE(?description_default) AS ?description)`,
+    (SAMPLE(?description_default) AS ?description)
+    ?type_label`,
 
     COMMON_PROPERTIES_TO_FETCH_QUERY: `
   # Name label
@@ -31,15 +32,15 @@ PREFIX schema: <http://schema.org/>`,
   # Additional type labels
     OPTIONAL { 
         ?entity a ?type_additional .
-        OPTIONAL { ?type_additional rdfs:label ?type_label_raw FILTER(LANG(?type_label_default) = "") }
+        OPTIONAL { ?type_additional rdfs:label ?type_label_default FILTER(LANG(?type_label_default) = "") }
         OPTIONAL { ?type_additional rdfs:label ?type_label_en FILTER(LANG(?type_label_en) = "en") }
         OPTIONAL { ?type_additional rdfs:label ?type_label_fr FILTER(LANG(?type_label_fr) = "en") }
-    BIND(COALESCE(?type_label_en,?type_label_fr, ?type_label_default, "") AS ?type_label)
+    BIND(COALESCE(?type_label_en, ?type_label_fr, ?type_label_default, "") AS ?type_label)
     }
   # Description
     OPTIONAL { ?entity schema:disambiguatingDescription ?description_en FILTER(LANG(?description_en) = "en") }
     OPTIONAL { ?entity schema:disambiguatingDescription ?description_fr FILTER(LANG(?description_fr) = "fr") }
-    OPTIONAL { ?entity schema:disambiguatingDescription ?description_no FILTER(LANG(?description_default) = "") }
+    OPTIONAL { ?entity schema:disambiguatingDescription ?description_default FILTER(LANG(?description_default) = "") }
     #url
     OPTIONAL { ?entity schema:url ?url }`,
 
