@@ -4,6 +4,7 @@ import {ReconciliationQuery, ResultCandidates} from "../dto";
 import {isURL} from "validator";
 import {ArtsdataConstants, Entities, SCHEMA_ORG_PROPERTY_URI_MAP} from "../constant";
 import {JaroWinklerDistance} from "natural";
+import {QUERIES_V2} from "../constant/match/match-queries-v2.constants";
 
 export class MatchServiceHelper {
 
@@ -197,7 +198,7 @@ export class MatchServiceHelper {
             [
                 matchers.veryClose(recordFetched.name, recordFromQuery.name),
                 matchers.notDifferentIfBothExists(additionalProperties.postalCode, recordFromQuery.postalCode),
-                matchers.veryClose(additionalProperties.addressLocality,recordFromQuery.addressLocality),
+                matchers.veryClose(additionalProperties.addressLocality, recordFromQuery.addressLocality),
                 matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
             ];
 
@@ -346,4 +347,29 @@ export class MatchServiceHelper {
         }]
     }
 
+    static generateSubQueryToFetchProperties(type: string) {
+
+        let propertiesSubQuery: string = QUERIES_V2.COMMON_PROPERTIES_TO_FETCH_QUERY;
+        let selectQueryFragment: string = QUERIES_V2.COMMON_SELECT_QUERY_FOR_ALL_ENTITY_PROPERTIES_SUB_QUERY;
+
+        switch (type) {
+            case Entities.PERSON:
+            case Entities.ORGANIZATION:
+            case Entities.AGENT:
+                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_AGENT_PROPERTIES_SUB_QUERY;
+                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_AGENTS_SUB_QUERY;
+                break;
+            case Entities.PLACE:
+                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_PLACE_PROPERTIES_SUB_QUERY;
+                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_PLACES_SUB_QUERY
+                break;
+            case Entities.EVENT:
+                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_EVENT_PROPERTIES_SUB_QUERY;
+                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_EVENTS_SUB_QUERY
+                break;
+        }
+
+        return {selectQueryFragment, propertiesSubQuery}
+
+    }
 }
