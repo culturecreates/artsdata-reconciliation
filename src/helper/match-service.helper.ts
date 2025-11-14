@@ -372,4 +372,8 @@ export class MatchServiceHelper {
         return {selectQueryFragment, propertiesSubQuery}
 
     }
+
+    static generateBingStatementForScoreCalculation(scoreVariables: string[]) {
+        return `BIND(${scoreVariables.join(' + ')}  as ?total_score)`;
+    }
 }
