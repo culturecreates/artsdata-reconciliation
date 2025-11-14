@@ -16,7 +16,7 @@ export const GRAPHDB_INDEX = {
     TYPE: env.TYPE || "type-index",
     ENTITY: env.ENTITY || "entity-index",
     LIVE_PERFORMANCE_WORK: env.LIVE_PERFORMANCE_WORK || "live-performance-work-index",
-    LABELLED_ENTITIES: env.ALL_LABELS || "labeled-entities-index",
+    LABELLED_ENTITIES: env.LABELLED_ENTITIES || "labeled-entities-index",
 };
 
 
