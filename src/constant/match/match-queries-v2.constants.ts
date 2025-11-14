@@ -24,6 +24,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
     (SAMPLE(?description_fr) AS ?descriptionFr)
     (SAMPLE(?description_default) AS ?description)
     ?type_label
+    ?type
     ?total_score`,
 
     COMMON_PROPERTIES_TO_FETCH_QUERY: `
@@ -33,10 +34,10 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
     OPTIONAL { ?entity schema:name | skos:prefLabel ?name_no FILTER(LANG(?name_default) = "") }
   # Additional type labels
     OPTIONAL { 
-        ?entity a ?type_additional .
-        OPTIONAL { ?type_additional rdfs:label ?type_label_default FILTER(LANG(?type_label_default) = "") }
-        OPTIONAL { ?type_additional rdfs:label ?type_label_en FILTER(LANG(?type_label_en) = "en") }
-        OPTIONAL { ?type_additional rdfs:label ?type_label_fr FILTER(LANG(?type_label_fr) = "en") }
+        ?entity a ?type .
+        OPTIONAL { ?type rdfs:label ?type_label_default FILTER(LANG(?type_label_default) = "") }
+        OPTIONAL { ?type rdfs:label ?type_label_en FILTER(LANG(?type_label_en) = "en") }
+        OPTIONAL { ?type rdfs:label ?type_label_fr FILTER(LANG(?type_label_fr) = "en") }
     BIND(COALESCE(?type_label_en, ?type_label_fr, ?type_label_default, "") AS ?type_label)
     }
   # Description
@@ -91,7 +92,8 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
     OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality }
     OPTIONAL { ?entity schema:sameAs ?wikidata 
         FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
-    }`
+    }`,
+    COMMON_GROUP_BY_STATEMENT: `GROUP BY ?entity ?type ?type_label ?total_score`,
 
 }
 

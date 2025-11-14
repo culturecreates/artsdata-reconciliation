@@ -280,7 +280,7 @@ export class MatchService {
 
         query += `\n # Properties to return with matching results \n{${propertiesSubQuery}\n}`;
         query += MatchServiceHelper.generateBindStatementForScoreCalculation(scoreVariables);
-        query += `\n}GROUP BY ?entity ?type_label ?total_score ${scoreVariables.join(' ')}`
+        query += `\n}${QUERIES_V2.COMMON_GROUP_BY_STATEMENT} ${scoreVariables.join(' ')}`
 
         return query;
     }

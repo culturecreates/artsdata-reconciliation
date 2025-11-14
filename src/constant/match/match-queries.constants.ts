@@ -21,6 +21,7 @@ export const QUERIES = {
    (SAMPLE(?description_fr) AS ?descriptionFr)
    (SAMPLE(?url) AS ?url)
    ?type_label
+   ?type
    ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER
  WHERE {
    {
@@ -31,9 +32,9 @@ export const QUERIES = {
    OPTIONAL { ?entity schema:name | skos:prefLabel ?name_fr. FILTER(LANG(?name_fr) = "fr") }
    OPTIONAL { ?entity schema:name | skos:prefLabel ?name_no. FILTER(LANG(?name_no) = "") }
  
-   ?entity a ?type_additional.
-   OPTIONAL { ?type_additional rdfs:label ?type_label_raw FILTER(LANG(?type_label_raw) = "") }
-   OPTIONAL { ?type_additional rdfs:label ?type_label_en FILTER(LANG(?type_label_en) = "en") }
+   ?entity a ?type.
+   OPTIONAL { ?type rdfs:label ?type_label_raw FILTER(LANG(?type_label_raw) = "") }
+   OPTIONAL { ?type rdfs:label ?type_label_en FILTER(LANG(?type_label_en) = "en") }
    BIND(COALESCE(?type_label_en, ?type_label_raw, "") AS ?type_label)
  
    OPTIONAL { ?entity schema:disambiguatingDescription ?description_en. FILTER(LANG(?description_en) = "en") }
@@ -45,7 +46,7 @@ export const QUERIES = {
    ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER
    
  }
- GROUP BY ?entity ?total_score ?type_label`,
+ GROUP BY ?entity ?total_score ?type_label ?type`,
 
   SELECT_ENTITY_QUERY_BY_KEYWORD: `
  SELECT ?entity ?total_score WHERE {

@@ -66,7 +66,7 @@ export class MatchServiceHelper {
                 MatchServiceHelper.isAutoMatch(resultCandidate, reconciliationQuery, additionalPropertiesForAutoMatch);
 
             resultCandidate.type = currentBindings.map((binding: any) => ({
-                id: binding["type_label"]?.value,
+                id: binding["type"]?.value,
                 name: binding["type_label"]?.value,
             }));
 
