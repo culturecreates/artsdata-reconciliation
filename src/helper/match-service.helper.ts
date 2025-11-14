@@ -371,7 +371,7 @@ export class MatchServiceHelper {
 
     }
 
-    static generateBingStatementForScoreCalculation(scoreVariables: string[]) {
+    static generateBindStatementForScoreCalculation(scoreVariables: string[]) {
         return `BIND(${scoreVariables.join(' + ')}  as ?total_score)`;
     }
 }
