@@ -249,9 +249,9 @@ export class MatchService {
         let query: string = QUERIES_V2.PREFIXES;
         const selectVariables: string[] = ['?entity'];
         const subQueries: string[] = [];
-        const scoreVariables: string[] = ['?total_score']
+        const scoreVariables: string[] = []
         if (isQueryByURI) {
-
+            //TODO
         } else if (name) {
             const propertyName = 'name'
             const scoreVariable = `?${propertyName}_score`;
@@ -271,7 +271,7 @@ export class MatchService {
 
         query += `\n # Properties to return with matching results \n{${propertiesSubQuery}\n}`;
         query += MatchServiceHelper.generateBingStatementForScoreCalculation(scoreVariables);
-        query += `\n}GROUP BY ?entity ?type_label ${scoreVariables.join(' ')}`
+        query += `\n}GROUP BY ?entity ?type_label ?total_score ${scoreVariables.join(' ')}`
 
         return query;
     }

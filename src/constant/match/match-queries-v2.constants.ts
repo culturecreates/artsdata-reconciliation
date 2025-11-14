@@ -23,7 +23,8 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
     (SAMPLE(?description_en) AS ?descriptionEn)
     (SAMPLE(?description_fr) AS ?descriptionFr)
     (SAMPLE(?description_default) AS ?description)
-    ?type_label`,
+    ?type_label
+    ?total_score`,
 
     COMMON_PROPERTIES_TO_FETCH_QUERY: `
   # Name label
