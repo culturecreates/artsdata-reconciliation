@@ -3,8 +3,6 @@
     "1.0-draft"
   ],
   "name": "Artsdata.ca Reconciliation Service",
-  "identifierSpace": "http://kg.artsdata.ca/",
-  "schemaSpace": "http://schema.org/",
   "defaultTypes": [
     {
       "id": "schema:Event",
