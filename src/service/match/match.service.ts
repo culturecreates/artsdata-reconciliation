@@ -265,7 +265,7 @@ export class MatchService {
 
         const {selectQueryFragment, propertiesSubQuery} = MatchServiceHelper.generateSubQueryToFetchProperties(type);
 
-        const selectClause = `\nSELECT ${selectVariables.join(' ')}` + selectQueryFragment;
+        const selectClause = `\nSELECT DISTINCT ${selectVariables.join(' ')}` + selectQueryFragment;
         query += `${selectClause}\nWHERE { \n${subQueries.join('\n')}`
 
 
