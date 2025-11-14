@@ -39,7 +39,10 @@ PREFIX schema: <http://schema.org/>`,
   # Description
     OPTIONAL { ?entity schema:disambiguatingDescription ?description_en FILTER(LANG(?description_en) = "en") }
     OPTIONAL { ?entity schema:disambiguatingDescription ?description_fr FILTER(LANG(?description_fr) = "fr") }
-    OPTIONAL { ?entity schema:disambiguatingDescription ?description_no FILTER(LANG(?description_default) = "") }`,
+    OPTIONAL { ?entity schema:disambiguatingDescription ?description_no FILTER(LANG(?description_default) = "") }
+    #url
+    OPTIONAL { ?entity schema:url ?url }`,
+
 
     SELECT_QUERY_FOR_AGENT_PROPERTIES_SUB_QUERY: `
     (SAMPLE(?wikidata) AS ?wikidata)
