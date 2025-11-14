@@ -32,7 +32,7 @@ export class MatchServiceHelper {
             const currentBinding = currentBindings[0];
             const resultCandidate = new ResultCandidates();
 
-            resultCandidate.id = currentBinding["entity"].value?.split(ArtsdataConstants.PREFIX).pop();
+            resultCandidate.id = currentBinding["entity"].value;
             const name = currentBinding["name"]?.value;
             const nameEn = currentBinding["nameEn"]?.value;
             const nameFr = currentBinding["nameFr"]?.value;
