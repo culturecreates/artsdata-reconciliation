@@ -12,7 +12,7 @@ export const QUERIES = {
  
  SELECT DISTINCT
    ?entity
-   ?score
+   ?total_score
    (SAMPLE(?name_en) AS ?nameEn)
    (SAMPLE(?name_fr) AS ?nameFr)
    (SAMPLE(?name_no) AS ?name)
@@ -45,16 +45,16 @@ export const QUERIES = {
    ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER
    
  }
- GROUP BY ?entity ?score ?type_label`,
+ GROUP BY ?entity ?total_score ?type_label`,
 
   SELECT_ENTITY_QUERY_BY_KEYWORD: `
- SELECT ?entity ?score WHERE {
+ SELECT ?entity ?total_score WHERE {
    QUERY_PLACE_HOLDER
    ?search a luc-index:INDEX_PLACE_HOLDER;
      QUERY_FILTER_PLACE_HOLDER
      luc:entities ?entity.
    PROPERTY_PLACE_HOLDER
    FILTER(STRSTARTS(STR(?entity), "${ArtsdataConstants.PREFIX}"))
-   ?entity luc:score ?score;
+   ?entity luc:score ?total_score;
  } LIMIT_PLACE_HOLDER`,
 };

@@ -147,7 +147,7 @@ export class MatchService {
      * @param requestLanguage
      * @param reconciliationRequest
      */
-    async reconcileByQueries(requestLanguage: LanguageEnum, reconciliationRequest: ReconciliationRequest)
+    async reconcileByQueries(requestLanguage: LanguageEnum, reconciliationRequest: ReconciliationRequest, version?: string)
         : Promise<ReconciliationResponse> {
         const {queries} = reconciliationRequest;
         const results: ReconciliationResults[] = [];
@@ -158,8 +158,16 @@ export class MatchService {
                 const {name, propertyConditions} =
                     this._resolveConditions(conditions);
                 const isQueryByURI: boolean = name ? MatchServiceHelper.isQueryByURI(name as string) : false;
-                sparqlQuery = this._generateSparqlQueryV2(name as string, type, isQueryByURI, limit || 25,
-                    propertyConditions);
+
+                //TODO Remove this condition once the new version is fully released
+                if (version === 'v2') {
+                    sparqlQuery = this._generateSparqlQueryV2(name as string, type, isQueryByURI, limit || 25,
+                        propertyConditions);
+                } else {
+                    sparqlQuery = this._generateSparqlQuery(name as string, type, isQueryByURI, limit || 25,
+                        propertyConditions);
+                }
+
                 const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
                 const candidates = MatchServiceHelper.formatReconciliationResponse(requestLanguage,
                     response, reconciliationQuery, isQueryByURI);
