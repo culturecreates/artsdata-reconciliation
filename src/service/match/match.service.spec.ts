@@ -39,7 +39,7 @@ describe("Recon Service tests", () => {
                         ]
                     }
                 ],
-                expectedId: "K43-2312",
+                expectedId: "http://kg.artsdata.ca/resource/K43-2312",
                 expectedName: "Gravity & Other Myths: Ten Thousand Hours",
                 expectedMatchValue: false,
                 expectedCount: 1
@@ -57,7 +57,7 @@ describe("Recon Service tests", () => {
                         ]
                     }
                 ],
-                expectedId: "K23-283",
+                expectedId: "http://kg.artsdata.ca/resource/K23-283",
                 expectedName: "Pierre-Yves Roy-Desmarais",
                 expectedCount: 1,
                 expectedMatchValue: false,
@@ -76,7 +76,7 @@ describe("Recon Service tests", () => {
                         ]
                     }
                 ],
-                expectedId: "K23-465",
+                expectedId: "http://kg.artsdata.ca/resource/K23-465",
                 expectedName: "Banx & Ranx || FMG 2023",
                 expectedCount: 1,
                 expectedMatchValue: false,
@@ -95,7 +95,7 @@ describe("Recon Service tests", () => {
                         ]
                     }
                 ],
-                expectedId: "K23-167",
+                expectedId: "http://kg.artsdata.ca/resource/K23-167",
                 expectedName: "Parcours citoyenne : Maï Nguyen (Vietnam)",
                 expectedCount: 1,
                 expectedMatchValue: false,
@@ -114,7 +114,7 @@ describe("Recon Service tests", () => {
                         ]
                     }
                 ],
-                expectedId: "K23-5109",
+                expectedId: "http://kg.artsdata.ca/resource/K23-5109",
                 expectedName: "Kev - M'en c*lisse, j'essaye [Trois-Rivières] 18+",
                 expectedCount: 1,
                 expectedMatchValue: false
@@ -133,7 +133,7 @@ describe("Recon Service tests", () => {
                         ]
                     }
                 ],
-                expectedId: "K23-4",
+                expectedId: "http://kg.artsdata.ca/resource/K23-4",
                 expectedName: "Clay and friends",
                 expectedCount: 1,
                 expectedMatchValue: false
@@ -324,7 +324,7 @@ describe("Recon Service tests", () => {
                         ],
                     },
                 ],
-                expectedId: "K11-19",
+                expectedId: "http://kg.artsdata.ca/resource/K11-19",
                 expectedName: "Roy Thomson Hall",
                 expectedCount: 1,
             },
@@ -342,7 +342,7 @@ describe("Recon Service tests", () => {
                         ],
                     },
                 ],
-                expectedId: "K11-19",
+                expectedId: "http://kg.artsdata.ca/resource/K11-19",
                 expectedName: "Roy Thomson Hall",
                 expectedCount: 1,
             },
@@ -360,7 +360,7 @@ describe("Recon Service tests", () => {
                         ],
                     },
                 ],
-                expectedId: "K11-19",
+                expectedId: "http://kg.artsdata.ca/resource/K11-19",
                 expectedName: "Roy Thomson Hall",
                 expectedCount: 1,
             },
@@ -378,7 +378,7 @@ describe("Recon Service tests", () => {
                         ],
                     },
                 ],
-                expectedId: "K11-19",
+                expectedId: "http://kg.artsdata.ca/resource/K11-19",
                 expectedName: "Roy Thomson Hall",
                 expectedCount: 1,
             },
@@ -402,7 +402,7 @@ describe("Recon Service tests", () => {
                         ],
                     },
                 ],
-                expectedId: "K11-19",
+                expectedId: "http://kg.artsdata.ca/resource/K11-19",
                 expectedName: "Roy Thomson Hall",
                 expectedCount: 1,
             },
@@ -426,7 +426,7 @@ describe("Recon Service tests", () => {
                         ],
                     },
                 ],
-                expectedId: "K11-19",
+                expectedId: "http://kg.artsdata.ca/resource/K11-19",
                 expectedName: "Roy Thomson Hall",
                 expectedCount: 1,
             },
@@ -444,7 +444,7 @@ describe("Recon Service tests", () => {
                         ],
                     },
                 ],
-                expectedId: "K43-1701",
+                expectedId: "http://kg.artsdata.ca/resource/K43-1701",
                 expectedName: "Dufflebag Theatre",
                 expectedCount: 1,
             },
@@ -470,7 +470,7 @@ describe("Recon Service tests", () => {
                         ],
                     },
                 ],
-                expectedId: "K43-1701",
+                expectedId: "http://kg.artsdata.ca/resource/K43-1701",
                 expectedName: "Dufflebag Theatre",
                 expectedCount: 1,
             },
@@ -489,7 +489,7 @@ describe("Recon Service tests", () => {
             //         }
             //       ]
             //     }
-            //   ] , expectedId: "K11-19" ,
+            //   ] , expectedId: "http://kg.artsdata.ca/resource/K11-19" ,
             //   expectedName: "Roy Thomson Hall" ,
             //   expectedCount: 1
             // } ,
@@ -515,7 +515,7 @@ describe("Recon Service tests", () => {
                         ],
                     },
                 ],
-                expectedId: "K11-19",
+                expectedId: "http://kg.artsdata.ca/resource/K11-19",
                 expectedCount: 1,
                 expectedMatchValue: true,
                 expectedName: "Roy Thomson Hall",
@@ -542,7 +542,7 @@ describe("Recon Service tests", () => {
                         ],
                     },
                 ],
-                expectedId: "K11-19",
+                expectedId: "http://kg.artsdata.ca/resource/K11-19",
                 expectedCount: 1,
                 expectedMatchValue: false,
                 expectedName: "Roy Thomson Hall",
@@ -562,7 +562,7 @@ describe("Recon Service tests", () => {
                         ],
                     },
                 ],
-                expectedId: "K11-19",
+                expectedId: "http://kg.artsdata.ca/resource/K11-19",
                 expectedCount: 1,
                 expectedMatchValue: false,
                 expectedName: "Roy Thomson Hall",
@@ -582,7 +582,7 @@ describe("Recon Service tests", () => {
                         ],
                     },
                 ],
-                expectedId: "K11-19",
+                expectedId: "http://kg.artsdata.ca/resource/K11-19",
                 expectedCount: 1,
                 expectedMatchValue: false, //Since name is the only match
                 expectedName: "Roy Thomson Hall",
@@ -607,7 +607,7 @@ describe("Recon Service tests", () => {
             //             limit: 1,
             //         },
             //     ],
-            //     expectedId: "K12-227",
+            //     expectedId: "http://kg.artsdata.ca/resource/K12-227",
             //     expectedCount: 1,
             //     expectedMatchValue: true, //Since wikidata is matching
             //     expectedName: "Émile Bilodeau",
@@ -632,7 +632,7 @@ describe("Recon Service tests", () => {
             //             limit: 1,
             //         },
             //     ],
-            //     expectedId: "K12-224",
+            //     expectedId: "http://kg.artsdata.ca/resource/K12-224",
             //     expectedCount: 1,
             //     expectedMatchValue: true, //Since name and wikidata is matching
             //     expectedName: "Philippe-Audrey Larrue-St-Jacques",
@@ -658,7 +658,7 @@ describe("Recon Service tests", () => {
                         ],
                     },
                 ],
-                expectedId: "K11-19",
+                expectedId: "http://kg.artsdata.ca/resource/K11-19",
                 expectedCount: 1,
                 expectedMatchValue: true,
                 expectedName: "Roy Thomson Hall",
@@ -672,7 +672,7 @@ describe("Recon Service tests", () => {
                         conditions: [{matchType: "name", propertyValue: "Famille"}],
                     },
                 ],
-                expectedId: "ChildrensEvent",
+                expectedId: "http://kg.artsdata.ca/resource/ChildrensEvent",
                 expectedCount: 1,
                 expectedMatchValue: false,
                 expectedName: "Children's Event",
@@ -686,7 +686,7 @@ describe("Recon Service tests", () => {
                         conditions: [{matchType: "name", propertyValue: "occurrence"}],
                     },
                 ],
-                expectedId: "Festival",
+                expectedId: "http://kg.artsdata.ca/resource/Festival",
                 expectedCount: 1,
                 expectedMatchValue: false,
                 expectedName: "Festival",
@@ -700,7 +700,7 @@ describe("Recon Service tests", () => {
                         conditions: [{matchType: "name", propertyValue: "pour enfants"}],
                     },
                 ],
-                expectedId: "ChildrensEvent",
+                expectedId: "http://kg.artsdata.ca/resource/ChildrensEvent",
                 expectedCount: 1,
                 expectedMatchValue: false,
                 expectedName: "Children's Event",
@@ -728,7 +728,7 @@ describe("Recon Service tests", () => {
             //       ]
             //     }
             //   ] ,
-            //   expectedId: "K11-19" ,
+            //   expectedId: "http://kg.artsdata.ca/resource/K11-19" ,
             //   expectedName: "Roy Thomson Hall" ,
             //   expectedCount: 1
             // }
