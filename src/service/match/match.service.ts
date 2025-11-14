@@ -267,7 +267,8 @@ export class MatchService {
             selectVariables.push(scoreVariable)
             scoreVariables.push(scoreVariable)
 
-            const subQueryForName = this._generateSubQueryUsingLucene(propertyName, name, lucenceIndex, type, scoreVariable, limit)
+            const subQueryForName =
+                this._generateSubQueryUsingLucene(propertyName, name, lucenceIndex, type, scoreVariable, limit)
             subQueries.push(subQueryForName)
         }
 
