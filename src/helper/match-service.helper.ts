@@ -345,7 +345,7 @@ export class MatchServiceHelper {
         }]
     }
 
-    static generateSubQueryToFetchProperties(type: string) {
+    static generateSubQueryToFetchAdditionalProperties(type: string) {
 
         let propertiesSubQuery: string = QUERIES_V2.COMMON_PROPERTIES_TO_FETCH_QUERY;
         let selectQueryFragment: string = QUERIES_V2.COMMON_SELECT_QUERY_FOR_ALL_ENTITY_PROPERTIES_SUB_QUERY;
@@ -391,6 +391,23 @@ export class MatchServiceHelper {
 
     static generateSubQueryUsingLuceneQuerySearch(propertyName: string, propertyValue: string, lucenceIndex: string, type: string,
                                                     scoreVariable: string, limit?: number) {
+        let query = QUERIES_V2.SELECT_INDEXED_ENTITY_QUERY_TEMPLATE;
+
+        query = query.replace("INDEX_PLACEHOLDER", lucenceIndex);
+        query = query.replace("LUCENE_QUERY_PLACEHOLDER", `${propertyName}: ${propertyValue}`);
+        query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type);
+        query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
+
+        if (limit) {
+            query = query + `LIMIT ${limit}`;
+        }
+
+        return `{ \n\t${query}\n }`;
+    }
+
+
+    static generateSubQueryForProperties(propertyName: string, propertyValue: string, lucenceIndex: string, type: string,
+                                                  scoreVariable: string, limit?: number) {
         let query = QUERIES_V2.SELECT_INDEXED_ENTITY_QUERY_TEMPLATE;
 
         query = query.replace("INDEX_PLACEHOLDER", lucenceIndex);

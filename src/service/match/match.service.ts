@@ -284,7 +284,7 @@ export class MatchService {
             subQueries.push(subQueryForName)
         }
 
-        const {selectQueryFragment, propertiesSubQuery} = MatchServiceHelper.generateSubQueryToFetchProperties(type);
+        const {selectQueryFragment, propertiesSubQuery} = MatchServiceHelper.generateSubQueryToFetchAdditionalProperties(type);
 
         const selectClause = `\nSELECT DISTINCT ${selectVariables.join(' ')}` + selectQueryFragment;
         query += `${selectClause}\nWHERE { \n${subQueries.join('\n')}`
