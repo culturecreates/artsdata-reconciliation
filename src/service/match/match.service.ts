@@ -146,6 +146,7 @@ export class MatchService {
      * @description Reconcile by queries
      * @param requestLanguage
      * @param reconciliationRequest
+     * @param version (v1 by default or v2 for a new sparql version)
      */
     async reconcileByQueries(requestLanguage: LanguageEnum, reconciliationRequest: ReconciliationRequest, version?: string)
         : Promise<ReconciliationResponse> {
