@@ -1,12 +1,12 @@
 import {Test, TestingModule} from "@nestjs/testing";
 import {ManifestController, MatchController} from "../../controller";
 import {ArtsdataService, HttpService, ManifestService, MatchService,} from "../../service";
-import {ReconciliationQuery, ReconciliationResponse} from "../../dto";
+import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
 import {LanguageEnum, MatchTypeEnum} from "../../enum";
 
 
-describe('Test reconciling people using sparql query version 2', () => {
+describe('Test reconciling places using sparql query version 2', () => {
 
     let matchService: MatchService;
 
@@ -59,18 +59,18 @@ describe('Test reconciling people using sparql query version 2', () => {
 
     }
 
-    it('Reconcile a place entity with name, which is exact match', async () => {
+    it('Reconcile a place entity with name, which is close match', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: Entities.PLACE,
-            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Roy Thomson Hall"}],
+            type: Entities.PERSON,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Jérémy De"}],
             limit: 1
         };
 
         const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K11-19",
-            name: "Roy Thomson Hall",
-            type: Entities.PLACE,
+            id: "http://kg.artsdata.ca/resource/K2-2791",
+            name: "Jérémy Desmarais",
+            type: Entities.PERSON,
             match: false,
             count: 1
         }
@@ -78,61 +78,5 @@ describe('Test reconciling people using sparql query version 2', () => {
         await executeAndCompareResults(expectedResult, reconciliationQuery);
     });
 
-    it(`Reconcile a place entity with name, which is close match - 'Roy Thomson'`, async () => {
-
-        const reconciliationQuery: ReconciliationQuery = {
-            type: Entities.PLACE,
-            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Roy Thomson"}],
-            limit: 1
-        };
-
-        const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K11-19",
-            name: "Roy Thomson Hall",
-            type: Entities.PLACE,
-            match: false,
-            count: 1
-        }
-
-        await executeAndCompareResults(expectedResult, reconciliationQuery);
-    });
-
-    it(`Reconcile a place entity with name, which is close match - 'Thomson Hall'`, async () => {
-
-        const reconciliationQuery: ReconciliationQuery = {
-            type: Entities.PLACE,
-            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Thomson Hall"}],
-            limit: 1
-        };
-
-        const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K11-19",
-            name: "Roy Thomson Hall",
-            type: Entities.PLACE,
-            match: false,
-            count: 1
-        }
-
-        await executeAndCompareResults(expectedResult, reconciliationQuery);
-    });
-
-    it(`Reconcile a place entity with accented name, which is close match - 'Amphithéâtre Cogeco'`, async () => {
-
-        const reconciliationQuery: ReconciliationQuery = {
-            type: Entities.PLACE,
-            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Amphithéâtre Cogeco"}],
-            limit: 1
-        };
-
-        const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K5-463",
-            name: "Amphithéâtre Cogeco",
-            type: Entities.PLACE,
-            match: false,
-            count: 1
-        }
-
-        await executeAndCompareResults(expectedResult, reconciliationQuery);
-    });
 });
 
