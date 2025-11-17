@@ -345,7 +345,7 @@ export class MatchServiceHelper {
         }]
     }
 
-    static generateSubQueryToFetchAdditionalProperties(type: string) {
+    static generateSubQueryToFetchProperties(type: string) {
 
         let propertiesSubQuery: string = QUERIES_V2.COMMON_PROPERTIES_TO_FETCH_QUERY;
         let selectQueryFragment: string = QUERIES_V2.COMMON_SELECT_QUERY_FOR_ALL_ENTITY_PROPERTIES_SUB_QUERY;
