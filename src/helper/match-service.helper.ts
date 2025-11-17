@@ -103,7 +103,7 @@ export class MatchServiceHelper {
         return isURL(text);
     }
 
-    static isQueryByURI(query: string) {
+    static isQueryByURIOrArtsdataId(query: string) {
         const artsdataIdPattern = "^K[0-9]+-[0-9]+$";
         return !!(query?.match(artsdataIdPattern) || (this.isValidURI(query) && query.startsWith(ArtsdataConstants.PREFIX)));
     }

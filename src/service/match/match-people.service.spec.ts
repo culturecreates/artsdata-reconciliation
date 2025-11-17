@@ -78,5 +78,24 @@ describe('Test reconciling people using sparql query version 2', () => {
         await executeAndCompareResults(expectedResult, reconciliationQuery);
     });
 
+    it(`Reconcile an person entity with uri 'http://kg.artsdata.ca/resource/K5-198`, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PERSON,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "http://kg.artsdata.ca/resource/K5-198"}],
+            limit: 1
+        };
+
+        const expectedResult = {
+            id: "http://kg.artsdata.ca/resource/K5-198",
+            name: "Alex Roy",
+            type: Entities.PERSON,
+            match: false,
+            count: 1
+        }
+
+        await executeAndCompareResults(expectedResult, reconciliationQuery);
+    });
+
 });
 

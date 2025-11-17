@@ -78,5 +78,24 @@ describe('Test reconciling organizations using sparql query version 2', () => {
         await executeAndCompareResults(expectedResult, reconciliationQuery);
     });
 
+    it(`Reconcile an organization entity with uri 'http://kg.artsdata.ca/resource/K5-32`, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ORGANIZATION,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "http://kg.artsdata.ca/resource/K5-32"}],
+            limit: 1
+        };
+
+        const expectedResult = {
+            id: "http://kg.artsdata.ca/resource/K5-32",
+            name: "La Chicane",
+            type: Entities.ORGANIZATION,
+            match: false,
+            count: 1
+        }
+
+        await executeAndCompareResults(expectedResult, reconciliationQuery);
+    });
+
 });
 

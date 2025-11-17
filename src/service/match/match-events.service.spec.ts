@@ -59,7 +59,7 @@ describe('Test reconciling events using sparql query version 2', () => {
 
     }
 
-    it('Reconcile a event with name `Émile Bilodeau`, which is exact match', async () => {
+    it('Reconcile an event with name `Émile Bilodeau`, which is exact match', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -78,56 +78,18 @@ describe('Test reconciling events using sparql query version 2', () => {
         await executeAndCompareResults(expectedResult, reconciliationQuery);
     });
 
-    it(`Reconcile a place entity with name 'Roy Thomson', which is a close match`, async () => {
+    it(`Reconcile an event entity with uri 'http://kg.artsdata.ca/resource/K23-5524`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: Entities.PLACE,
-            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Roy Thomson"}],
+            type: Entities.EVENT,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "http://kg.artsdata.ca/resource/K23-5524"}],
             limit: 1
         };
 
         const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K11-19",
-            name: "Roy Thomson Hall",
-            type: Entities.PLACE,
-            match: false,
-            count: 1
-        }
-
-        await executeAndCompareResults(expectedResult, reconciliationQuery);
-    });
-
-    it(`Reconcile a place entity with name 'Thomson Hall', which is a close match`, async () => {
-
-        const reconciliationQuery: ReconciliationQuery = {
-            type: Entities.PLACE,
-            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Thomson Hall"}],
-            limit: 1
-        };
-
-        const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K11-19",
-            name: "Roy Thomson Hall",
-            type: Entities.PLACE,
-            match: false,
-            count: 1
-        }
-
-        await executeAndCompareResults(expectedResult, reconciliationQuery);
-    });
-
-    it(`Reconcile a place entity with accented name 'Amphithéâtre Cogeco', which is close match`, async () => {
-
-        const reconciliationQuery: ReconciliationQuery = {
-            type: Entities.PLACE,
-            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Amphithéâtre Cogeco"}],
-            limit: 1
-        };
-
-        const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K5-463",
-            name: "Amphithéâtre Cogeco",
-            type: Entities.PLACE,
+            id: "http://kg.artsdata.ca/resource/K23-5524",
+            name: "Émile Bilodeau",
+            type: Entities.EVENT,
             match: false,
             count: 1
         }

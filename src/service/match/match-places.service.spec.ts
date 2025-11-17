@@ -134,5 +134,24 @@ describe('Test reconciling places using sparql query version 2', () => {
 
         await executeAndCompareResults(expectedResult, reconciliationQuery);
     });
+
+    it(`Reconcile an place entity with uri 'http://kg.artsdata.ca/resource/K5-452`, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "http://kg.artsdata.ca/resource/K5-452"}],
+            limit: 1
+        };
+
+        const expectedResult = {
+            id: "http://kg.artsdata.ca/resource/K5-452",
+            name: "Foyer Gilles-Beaudoin",
+            type: Entities.PLACE,
+            match: false,
+            count: 1
+        }
+
+        await executeAndCompareResults(expectedResult, reconciliationQuery);
+    });
 });
 

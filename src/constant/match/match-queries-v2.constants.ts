@@ -16,6 +16,12 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
         ?entity a PROPERTY_TYPE_PLACEHOLDER .
     }`,
 
+    SELECT_ENTITY_BY_URI_TEMPLATE: `SELECT * {
+        BIND(URI_PLACEHOLDER as ?entity)
+        ?entity a PROPERTY_TYPE_PLACEHOLDER .
+        BIND(100 AS ?name_Score)
+    }`,
+
     COMMON_SELECT_QUERY_FOR_ALL_ENTITY_PROPERTIES_SUB_QUERY: `
     (SAMPLE(?name_en) AS ?nameEn)
     (SAMPLE(?name_fr) AS ?nameFr)

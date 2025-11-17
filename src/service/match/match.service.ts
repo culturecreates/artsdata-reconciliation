@@ -158,7 +158,7 @@ export class MatchService {
                 const {type, limit, conditions} = reconciliationQuery;
                 const {name, propertyConditions} =
                     this._resolveConditions(conditions);
-                const isQueryByURI: boolean = name ? MatchServiceHelper.isQueryByURI(name as string) : false;
+                const isQueryByURI: boolean = name ? MatchServiceHelper.isQueryByURIOrArtsdataId(name as string) : false;
 
                 //TODO Remove this condition once the new version is fully released
                 if (version === 'v2') {
@@ -259,8 +259,18 @@ export class MatchService {
         const selectVariables: string[] = ['?entity'];
         const subQueries: string[] = [];
         const scoreVariables: string[] = []
-        if (isQueryByURI) {
-            //TODO
+        if (isQueryByURI && name) {
+            const propertyName = 'name'
+            const scoreVariable = `?${propertyName}_score`;
+
+            selectVariables.push(scoreVariable)
+            scoreVariables.push(scoreVariable)
+
+            const uri = name.startsWith('K') ? `${ArtsdataConstants.PREFIX}${name}` : name;
+
+            const subQueryForName = this._generateSubQueryToURI(uri, type, scoreVariable, limit)
+            subQueries.push(subQueryForName)
+
         } else if (name) {
             const propertyName = 'name'
             const scoreVariable = `?${propertyName}_score`;
@@ -269,7 +279,7 @@ export class MatchService {
             scoreVariables.push(scoreVariable)
 
             const subQueryForName =
-                this._generateSubQueryUsingLucene(propertyName, name, lucenceIndex, type, scoreVariable, limit)
+                this._generateSubQueryUsingLuceneQuerySearch(propertyName, name, lucenceIndex, type, scoreVariable, limit)
             subQueries.push(subQueryForName)
         }
 
@@ -430,13 +440,27 @@ export class MatchService {
             .join(" ");
     }
 
-    private _generateSubQueryUsingLucene(propertyName: string, propertyValue: string, lucenceIndex: string, type: string,
-                                         scoreVariable: string, limit?: number) {
+    private _generateSubQueryUsingLuceneQuerySearch(propertyName: string, propertyValue: string, lucenceIndex: string, type: string,
+                                                    scoreVariable: string, limit?: number) {
         let query = QUERIES_V2.SELECT_INDEXED_ENTITY_QUERY_TEMPLATE;
 
         query = query.replace("INDEX_PLACEHOLDER", lucenceIndex);
         query = query.replace("LUCENE_QUERY_PLACEHOLDER", `${propertyName}: ${propertyValue}`);
         query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type);
+        query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
+
+        if (limit) {
+            query = query + `LIMIT ${limit}`;
+        }
+
+        return `{ \n\t${query}\n }`;
+    }
+
+    private _generateSubQueryToURI(uri: string, type: string, scoreVariable: string, limit?: number) {
+        let query = QUERIES_V2.SELECT_ENTITY_BY_URI_TEMPLATE;
+
+        query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type);
+        query = query.replace("URI_PLACEHOLDER", `<${uri}>`);
         query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
 
         if (limit) {
