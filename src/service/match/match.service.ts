@@ -259,6 +259,7 @@ export class MatchService {
         const selectVariables: string[] = ['?entity'];
         const subQueries: string[] = [];
         const scoreVariables: string[] = []
+
         if (isQueryByURI && name) {
             const propertyName = 'name'
             const scoreVariable = `?${propertyName}_score`;
