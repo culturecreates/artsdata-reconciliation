@@ -268,7 +268,7 @@ export class MatchService {
 
             const uri = name.startsWith('K') ? `${ArtsdataConstants.PREFIX}${name}` : name;
 
-            const subQueryForName = this._generateSubQueryToURI(uri, type, scoreVariable, limit)
+            const subQueryForName = MatchServiceHelper.generateSubQueryToURI(uri, type, scoreVariable, limit)
             subQueries.push(subQueryForName)
 
         } else if (name) {
@@ -278,8 +278,8 @@ export class MatchService {
             selectVariables.push(scoreVariable)
             scoreVariables.push(scoreVariable)
 
-            const subQueryForName =
-                this._generateSubQueryUsingLuceneQuerySearch(propertyName, name, lucenceIndex, type, scoreVariable, limit)
+            const subQueryForName = MatchServiceHelper.generateSubQueryUsingLuceneQuerySearch(propertyName,
+                name, lucenceIndex, type, scoreVariable, limit)
             subQueries.push(subQueryForName)
         }
 
@@ -440,33 +440,4 @@ export class MatchService {
             .join(" ");
     }
 
-    private _generateSubQueryUsingLuceneQuerySearch(propertyName: string, propertyValue: string, lucenceIndex: string, type: string,
-                                                    scoreVariable: string, limit?: number) {
-        let query = QUERIES_V2.SELECT_INDEXED_ENTITY_QUERY_TEMPLATE;
-
-        query = query.replace("INDEX_PLACEHOLDER", lucenceIndex);
-        query = query.replace("LUCENE_QUERY_PLACEHOLDER", `${propertyName}: ${propertyValue}`);
-        query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type);
-        query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
-
-        if (limit) {
-            query = query + `LIMIT ${limit}`;
-        }
-
-        return `{ \n\t${query}\n }`;
-    }
-
-    private _generateSubQueryToURI(uri: string, type: string, scoreVariable: string, limit?: number) {
-        let query = QUERIES_V2.SELECT_ENTITY_BY_URI_TEMPLATE;
-
-        query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type);
-        query = query.replace("URI_PLACEHOLDER", `<${uri}>`);
-        query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
-
-        if (limit) {
-            query = query + `LIMIT ${limit}`;
-        }
-
-        return `{ \n\t${query}\n }`;
-    }
 }
