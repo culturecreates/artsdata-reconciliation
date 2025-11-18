@@ -82,7 +82,7 @@ describe('Test reconciling events using sparql query version 2', () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
-            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "http://kg.artsdata.ca/resource/K23-5524"}],
+            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/K23-5524"}],
             limit: 1
         };
 

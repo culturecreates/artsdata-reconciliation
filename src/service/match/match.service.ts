@@ -75,8 +75,10 @@ export class MatchService {
      * @return {{name: string | undefined, propertyConditions: QueryCondition[]}}
      */
     private _resolveConditions(conditions: QueryCondition[]):
-        { name: string | string[] | undefined; propertyConditions: QueryCondition[]; } {
+        { id: string | undefined, name: string | string[] | undefined; propertyConditions: QueryCondition[]; } {
         return {
+            id: conditions.find(({matchType}) => matchType === MatchTypeEnum.ID)
+                ?.propertyValue as string,
             name: conditions.find(({matchType}) => matchType === MatchTypeEnum.NAME)
                 ?.propertyValue,
             propertyConditions: conditions
@@ -156,16 +158,15 @@ export class MatchService {
         for (const reconciliationQuery of queries) {
             try {
                 const {type, limit, conditions} = reconciliationQuery;
-                const {name, propertyConditions} =
-                    this._resolveConditions(conditions);
-                const isQueryByURI: boolean = name ? MatchServiceHelper.isQueryByURIOrArtsdataId(name as string) : false;
+                const {id, name, propertyConditions} = this._resolveConditions(conditions);
+                const isQueryByURI: boolean = !!id;
 
                 //TODO Remove this condition once the new version is fully released
                 if (version === 'v2') {
-                    sparqlQuery = this._generateSparqlQueryV2(name as string, type, isQueryByURI, limit || 25,
+                    sparqlQuery = this._generateSparqlQueryV2(id, name as string, type, isQueryByURI, limit || 25,
                         propertyConditions);
                 } else {
-                    sparqlQuery = this._generateSparqlQuery(name as string, type, isQueryByURI, limit || 25,
+                    sparqlQuery = this._generateSparqlQuery(id, name as string, type, isQueryByURI, limit || 25,
                         propertyConditions);
                 }
 
@@ -252,22 +253,25 @@ export class MatchService {
         return triple;
     }
 
-    private _generateSparqlQueryV2(name: string | undefined, type: string, isQueryByURI: boolean, limit: number,
-                                   propertyConditions: QueryCondition[]) {
+    private _generateSparqlQueryV2(id: string | undefined, name: string | undefined, type: string, isQueryByURI: boolean,
+                                   limit: number, propertyConditions: QueryCondition[]) {
         const lucenceIndex = GRAPHDB_INDEX.LABELLED_ENTITIES;
         let query: string = QUERIES_V2.PREFIXES;
         const selectVariables: string[] = ['?entity'];
         const subQueries: string[] = [];
         const scoreVariables: string[] = []
 
-        if (isQueryByURI && name) {
-            const propertyName = 'name'
+        if (id && (MatchServiceHelper.isValidURI(id) || id?.startsWith('K'))) {
+            const propertyName = 'id'
             const scoreVariable = `?${propertyName}_score`;
 
             selectVariables.push(scoreVariable)
             scoreVariables.push(scoreVariable)
 
-            const uri = name.startsWith('K') ? `${ArtsdataConstants.PREFIX}${name}` : name;
+            let uri: string = id;
+            if (id.startsWith('K')) {
+                uri = `${ArtsdataConstants.PREFIX}${id}`;
+            }
 
             const subQueryForName = MatchServiceHelper.generateSubQueryToURI(uri, type, scoreVariable, limit)
             subQueries.push(subQueryForName)
@@ -284,7 +288,10 @@ export class MatchService {
             subQueries.push(subQueryForName)
         }
 
-        const {selectQueryFragment, propertiesSubQuery} = MatchServiceHelper.generateSubQueryToFetchAdditionalProperties(type);
+        const {
+            selectQueryFragment,
+            propertiesSubQuery
+        } = MatchServiceHelper.generateSubQueryToFetchAdditionalProperties(type);
 
         const selectClause = `\nSELECT DISTINCT ${selectVariables.join(' ')}` + selectQueryFragment;
         query += `${selectClause}\nWHERE { \n${subQueries.join('\n')}`
@@ -302,6 +309,7 @@ export class MatchService {
      * @private
      * @name _generateSparqlQuery
      * @description Generate SPARQL query
+     * @param id
      * @param name
      * @param type
      * @param isQueryByURI
@@ -309,7 +317,7 @@ export class MatchService {
      * @param propertyConditions
      */
     private _generateSparqlQuery(
-        name: string | undefined, type: string, isQueryByURI: boolean, limit: number,
+        id: string | undefined, name: string | undefined, type: string, isQueryByURI: boolean, limit: number,
         propertyConditions: QueryCondition[]): string {
         const graphdbIndex = MatchServiceHelper.getGraphdbIndex(type);
         let rawQuery = QUERIES.RECONCILIATION_QUERY;
