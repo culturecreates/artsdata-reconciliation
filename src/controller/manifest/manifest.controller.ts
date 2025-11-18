@@ -15,4 +15,13 @@ export class ManifestController {
   getServiceManifest(): ServiceManifestResponse | undefined {
     return this.appService.getServiceManifest();
   }
+
+    @Get('/v2')
+    @ApiTags("Service Definition")
+    @ApiOperation({ summary: "Get service manifest" })
+    @ApiResponse({ status: 200, type: ServiceManifestResponse })
+    @ApiResponse({ status: 500, description: "Internal server error" })
+    getServiceManifestV2(): ServiceManifestResponse | undefined {
+        return this.appService.getServiceManifest();
+    }
 }
