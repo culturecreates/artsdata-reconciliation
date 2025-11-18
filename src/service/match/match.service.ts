@@ -323,11 +323,15 @@ export class MatchService {
         let rawQuery = QUERIES.RECONCILIATION_QUERY;
 
         if (name) {
-            name = isQueryByURI
-                ? `<${name}>`
-                : this._modifyNameForLuceneScore(MatchServiceHelper.escapeSpecialCharacters(name), propertyConditions);
+            name = this._modifyNameForLuceneScore(MatchServiceHelper.escapeSpecialCharacters(name), propertyConditions);
         }
         if (isQueryByURI) {
+            if (MatchServiceHelper.isValidURI(id as string) || id?.startsWith('K')) {
+                id = id?.startsWith('K') ? `<${ArtsdataConstants.PREFIX}${id}>` : `<${id}>`;
+            } else {
+                Exception.badRequest("Invalid URI format");
+            }
+
             rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER",
                 `BIND(URI_PLACEHOLDER as ?entity)`);
         } else {
@@ -396,7 +400,7 @@ export class MatchService {
             .replace("INDEX_PLACE_HOLDER", graphdbIndex)
             .replace("QUERY_PLACE_HOLDER", name ? `values ?query { "${name}" }` : "")
             .replace("QUERY_FILTER_PLACE_HOLDER", name ? "luc:query ?query ;" : "")
-            .replace("URI_PLACEHOLDER", name || "")
+            .replace("URI_PLACEHOLDER", id || "")
             .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
 
         return this._resolvePropertyConditions(rawQuery, propertyConditions);
