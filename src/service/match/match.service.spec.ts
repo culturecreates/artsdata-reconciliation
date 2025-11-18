@@ -39,7 +39,7 @@ describe("Recon Service tests", () => {
                         ]
                     }
                 ],
-                expectedId: "http://kg.artsdata.ca/resource/K43-2312",
+                expectedId: "K43-2312",
                 expectedName: "Gravity & Other Myths: Ten Thousand Hours",
                 expectedMatchValue: false,
                 expectedCount: 1
