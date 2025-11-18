@@ -261,21 +261,24 @@ export class MatchService {
         const subQueries: string[] = [];
         const scoreVariables: string[] = []
 
-        if (id && (MatchServiceHelper.isValidURI(id) || id?.startsWith('K'))) {
-            const propertyName = 'id'
-            const scoreVariable = `?${propertyName}_score`;
+        if (id) {
+            if ((MatchServiceHelper.isValidURI(id) || id?.startsWith('K'))) {
+                const propertyName = 'id'
+                const scoreVariable = `?${propertyName}_score`;
 
-            selectVariables.push(scoreVariable)
-            scoreVariables.push(scoreVariable)
+                selectVariables.push(scoreVariable)
+                scoreVariables.push(scoreVariable)
 
-            let uri: string = id;
-            if (id.startsWith('K')) {
-                uri = `${ArtsdataConstants.PREFIX}${id}`;
+                let uri: string = id;
+                if (id.startsWith('K')) {
+                    uri = `${ArtsdataConstants.PREFIX}${id}`;
+                }
+
+                const subQueryForName = MatchServiceHelper.generateSubQueryToURI(uri, type, scoreVariable, limit)
+                subQueries.push(subQueryForName)
+            } else {
+                Exception.badRequest("Invalid URI format");
             }
-
-            const subQueryForName = MatchServiceHelper.generateSubQueryToURI(uri, type, scoreVariable, limit)
-            subQueries.push(subQueryForName)
-
         } else if (name) {
             const propertyName = 'name'
             const scoreVariable = `?${propertyName}_score`;
