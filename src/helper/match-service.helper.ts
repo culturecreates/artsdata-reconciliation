@@ -395,7 +395,7 @@ export class MatchServiceHelper {
 
         query = query.replace("INDEX_PLACEHOLDER", lucenceIndex);
         query = query.replace("LUCENE_QUERY_PLACEHOLDER", `${propertyName}: ${propertyValue}`);
-        query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type);
+        query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type||"?x");
         query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
 
         if (limit) {
