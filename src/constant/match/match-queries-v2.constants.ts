@@ -37,7 +37,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
   # Name label
     OPTIONAL { ?entity schema:name | skos:prefLabel ?name_en FILTER(LANG(?name_en) = "en") }
     OPTIONAL { ?entity schema:name | skos:prefLabel ?name_fr FILTER(LANG(?name_fr) = "fr") }
-    OPTIONAL { ?entity schema:name | skos:prefLabel ?name_no FILTER(LANG(?name_default) = "") }
+    OPTIONAL { ?entity schema:name | skos:prefLabel ?name_default FILTER(LANG(?name_default) = "") }
   # Additional type labels
     OPTIONAL { 
         ?entity a ?type .
