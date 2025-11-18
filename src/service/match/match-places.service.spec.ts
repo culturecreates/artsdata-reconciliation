@@ -68,7 +68,7 @@ describe('Test reconciling places using sparql query version 2', () => {
         };
 
         const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K11-19",
+            id: "K11-19",
             name: "Roy Thomson Hall",
             type: Entities.PLACE,
             match: false,
@@ -87,7 +87,7 @@ describe('Test reconciling places using sparql query version 2', () => {
         };
 
         const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K11-19",
+            id: "K11-19",
             name: "Roy Thomson Hall",
             type: Entities.PLACE,
             match: false,
@@ -106,7 +106,7 @@ describe('Test reconciling places using sparql query version 2', () => {
         };
 
         const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K11-19",
+            id: "K11-19",
             name: "Roy Thomson Hall",
             type: Entities.PLACE,
             match: false,
@@ -125,7 +125,7 @@ describe('Test reconciling places using sparql query version 2', () => {
         };
 
         const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K5-463",
+            id: "K5-463",
             name: "Amphithéâtre Cogeco",
             type: Entities.PLACE,
             match: false,
@@ -144,7 +144,7 @@ describe('Test reconciling places using sparql query version 2', () => {
         };
 
         const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K5-452",
+            id: "K5-452",
             name: "Foyer Gilles-Beaudoin",
             type: Entities.PLACE,
             match: false,

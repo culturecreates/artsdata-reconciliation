@@ -68,7 +68,7 @@ describe('Test reconciling events using sparql query version 2', () => {
         };
 
         const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K23-5524",
+            id: "K23-5524",
             name: "Émile Bilodeau",
             type: Entities.EVENT,
             match: false,
@@ -87,7 +87,7 @@ describe('Test reconciling events using sparql query version 2', () => {
         };
 
         const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K23-5524",
+            id: "K23-5524",
             name: "Émile Bilodeau",
             type: Entities.EVENT,
             match: false,

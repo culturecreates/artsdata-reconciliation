@@ -68,7 +68,7 @@ describe('Test reconciling organizations using sparql query version 2', () => {
         };
 
         const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K10-29",
+            id: "K10-29",
             name: "Ballet Jörgen Canada",
             type: Entities.ORGANIZATION,
             match: false,
@@ -87,7 +87,7 @@ describe('Test reconciling organizations using sparql query version 2', () => {
         };
 
         const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K5-32",
+            id: "K5-32",
             name: "La Chicane",
             type: Entities.ORGANIZATION,
             match: false,
