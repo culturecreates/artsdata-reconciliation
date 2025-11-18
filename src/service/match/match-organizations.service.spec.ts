@@ -69,7 +69,7 @@ describe('Test reconciling organizations using sparql query version 2', () => {
 
         const expectedResult = {
             id: "K10-29",
-            name: "Ballet Jörgen Canada",
+            name: "Canada's Ballet Jörgen",
             type: Entities.ORGANIZATION,
             match: false,
             count: 1

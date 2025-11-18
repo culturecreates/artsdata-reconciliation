@@ -68,7 +68,7 @@ describe('Test reconciling people using sparql query version 2', () => {
         };
 
         const expectedResult = {
-            id: "http://kg.artsdata.ca/resource/K2-2791",
+            id: "K2-2791",
             name: "Jérémy Desmarais",
             type: Entities.PERSON,
             match: false,
