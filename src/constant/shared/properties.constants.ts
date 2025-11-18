@@ -25,6 +25,7 @@ export const Entities = {
     ORGANIZATION: "schema:Organization",
     CONCEPT: "skos:Concept",
     AGENT: "dbo:Agent",
+    LIVE_PERFORMANCE_WORK: "dbo:LivePerformanceWork",
 };
 
 export const SCHEMA_ORG_PROPERTY_URI_MAP = {

@@ -4,6 +4,7 @@ import {ReconciliationQuery, ResultCandidates} from "../dto";
 import {isURL} from "validator";
 import {ArtsdataConstants, Entities, SCHEMA_ORG_PROPERTY_URI_MAP} from "../constant";
 import {JaroWinklerDistance} from "natural";
+import {QUERIES_V2} from "../constant/match/match-queries-v2.constants";
 
 export class MatchServiceHelper {
 
@@ -59,15 +60,13 @@ export class MatchServiceHelper {
                 resultCandidate.description = descriptionEn || description || descriptionFr;
             }
 
-            resultCandidate.score = Math.round(
-                Number(currentBinding["score"]?.value),
-            );
+            resultCandidate.score = Math.round(Number(currentBinding["total_score"]?.value));
             resultCandidate.match =
                 isQueryByURI ||
                 MatchServiceHelper.isAutoMatch(resultCandidate, reconciliationQuery, additionalPropertiesForAutoMatch);
 
             resultCandidate.type = currentBindings.map((binding: any) => ({
-                id: binding["type_label"]?.value,
+                id: binding["type"]?.value,
                 name: binding["type_label"]?.value,
             }));
 
@@ -104,7 +103,7 @@ export class MatchServiceHelper {
         return isURL(text);
     }
 
-    static isQueryByURI(query: string) {
+    static isQueryByURIOrArtsdataId(query: string) {
         const artsdataIdPattern = "^K[0-9]+-[0-9]+$";
         return !!(query?.match(artsdataIdPattern) || (this.isValidURI(query) && query.startsWith(ArtsdataConstants.PREFIX)));
     }
@@ -197,7 +196,7 @@ export class MatchServiceHelper {
             [
                 matchers.veryClose(recordFetched.name, recordFromQuery.name),
                 matchers.notDifferentIfBothExists(additionalProperties.postalCode, recordFromQuery.postalCode),
-                matchers.veryClose(additionalProperties.addressLocality,recordFromQuery.addressLocality),
+                matchers.veryClose(additionalProperties.addressLocality, recordFromQuery.addressLocality),
                 matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
             ];
 
@@ -345,5 +344,83 @@ export class MatchServiceHelper {
             name: "Match the property value using regular expression",
         }]
     }
+
+    static generateSubQueryToFetchAdditionalProperties(type: string) {
+
+        let propertiesSubQuery: string = QUERIES_V2.COMMON_PROPERTIES_TO_FETCH_QUERY;
+        let selectQueryFragment: string = QUERIES_V2.COMMON_SELECT_QUERY_FOR_ALL_ENTITY_PROPERTIES_SUB_QUERY;
+
+        switch (type) {
+            case Entities.PERSON:
+            case Entities.ORGANIZATION:
+            case Entities.AGENT:
+                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_AGENT_PROPERTIES_SUB_QUERY;
+                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_AGENTS_SUB_QUERY;
+                break;
+            case Entities.PLACE:
+                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_PLACE_PROPERTIES_SUB_QUERY;
+                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_PLACES_SUB_QUERY
+                break;
+            case Entities.EVENT:
+                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_EVENT_PROPERTIES_SUB_QUERY;
+                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_EVENTS_SUB_QUERY
+                break;
+        }
+
+        return {selectQueryFragment, propertiesSubQuery}
+
+    }
+
+    static generateBindStatementForScoreCalculation(scoreVariables: string[]) {
+        return `BIND(${scoreVariables.join(' + ')}  as ?total_score)`;
+    }
+
+    static generateSubQueryToURI(uri: string, type: string, scoreVariable: string, limit?: number) {
+        let query = QUERIES_V2.SELECT_ENTITY_BY_URI_TEMPLATE;
+
+        query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type);
+        query = query.replace("URI_PLACEHOLDER", `<${uri}>`);
+        query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
+
+        if (limit) {
+            query = query + `LIMIT ${limit}`;
+        }
+
+        return `{ \n\t${query}\n }`;
+    }
+
+    static generateSubQueryUsingLuceneQuerySearch(propertyName: string, propertyValue: string, lucenceIndex: string, type: string,
+                                                    scoreVariable: string, limit?: number) {
+        let query = QUERIES_V2.SELECT_INDEXED_ENTITY_QUERY_TEMPLATE;
+
+        query = query.replace("INDEX_PLACEHOLDER", lucenceIndex);
+        query = query.replace("LUCENE_QUERY_PLACEHOLDER", `${propertyName}: ${propertyValue}`);
+        query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type);
+        query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
+
+        if (limit) {
+            query = query + `LIMIT ${limit}`;
+        }
+
+        return `{ \n\t${query}\n }`;
+    }
+
+
+    static generateSubQueryForProperties(propertyName: string, propertyValue: string, lucenceIndex: string, type: string,
+                                                  scoreVariable: string, limit?: number) {
+        let query = QUERIES_V2.SELECT_INDEXED_ENTITY_QUERY_TEMPLATE;
+
+        query = query.replace("INDEX_PLACEHOLDER", lucenceIndex);
+        query = query.replace("LUCENE_QUERY_PLACEHOLDER", `${propertyName}: ${propertyValue}`);
+        query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type);
+        query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
+
+        if (limit) {
+            query = query + `LIMIT ${limit}`;
+        }
+
+        return `{ \n\t${query}\n }`;
+    }
+
 
 }

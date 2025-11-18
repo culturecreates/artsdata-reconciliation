@@ -1,0 +1,34 @@
+PREFIX :<http://www.ontotext.com/connectors/lucene#>
+PREFIX inst:<http://www.ontotext.com/connectors/lucene/instance#>
+INSERT DATA {
+	inst:all-literals :createConnector '''
+{
+  "fields": [
+    {
+      "fieldName": "label",
+      "fieldNameTransform": "predicate.localName",
+      "propertyChain": [
+        "$literal"
+      ],
+      "valueFilter": "graph($this) = <http://kg.artsdata.ca/core>",
+      "indexed": true,
+      "stored": true,
+      "analyzed": true,
+      "multivalued": true,
+      "ignoreInvalidValues": true,
+      "facet": true
+    }
+  ],
+  "languages": [],
+  "types": [
+    "$any"
+  ],
+  "readonly": false,
+  "detectFields": false,
+  "importGraph": false,
+  "skipInitialIndexing": false,
+  "boostProperties": [],
+  "stripMarkup": false
+}
+''' .
+}

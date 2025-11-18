@@ -1,12 +1,7 @@
 import {Test, TestingModule} from "@nestjs/testing";
-import {
-    ArtsdataService,
-    HttpService,
-    ManifestService,
-    MatchService,
-} from "../../service";
+import {ArtsdataService, HttpService, ManifestService, MatchService,} from "../../service";
 import {ManifestController, MatchController} from "../../controller";
-import {LanguageEnum} from "../../enum";
+import {LanguageEnum, MatchTypeEnum} from "../../enum";
 
 describe("Recon Service tests", () => {
     let matchService: MatchService;
@@ -311,15 +306,15 @@ describe("Recon Service tests", () => {
                 expectedCount: 1,
             },
             {
-                description: "Reconcile a Place with Artsdata ID",
+                description: "Reconcile a Place with Artsdata ID - K11-19",
                 queries: [
                     {
                         type: "schema:Place",
                         limit: 1,
                         conditions: [
                             {
-                                matchType: "name",
-                                propertyValue: "http://kg.artsdata.ca/resource/K11-19",
+                                matchType: MatchTypeEnum.ID,
+                                propertyValue: "K11-19",
                             },
                         ],
                     },
@@ -329,14 +324,32 @@ describe("Recon Service tests", () => {
                 expectedCount: 1,
             },
             {
-                description: "Reconcile Place with Artsdata URI",
+                description: "Reconcile a Place with Invalid Artsdata ID - XXX",
                 queries: [
                     {
                         type: "schema:Place",
                         limit: 1,
                         conditions: [
                             {
-                                matchType: "name",
+                                matchType: MatchTypeEnum.ID,
+                                propertyValue: "XXX",
+                            },
+                        ],
+                    },
+                ],
+                expectedId: undefined,
+                expectedName: undefined,
+                expectedCount: 0,
+            },
+            {
+                description: "Reconcile Place with Artsdata URI - http://kg.artsdata.ca/resource/K11-19",
+                queries: [
+                    {
+                        type: "schema:Place",
+                        limit: 1,
+                        conditions: [
+                            {
+                                matchType: MatchTypeEnum.ID,
                                 propertyValue: "http://kg.artsdata.ca/resource/K11-19",
                             },
                         ],

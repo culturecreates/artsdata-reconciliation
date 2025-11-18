@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { ManifestController } from "./manifest.controller";
-import * as MANIFEST from "../../constant/manifest.constant.json";
 import { ManifestService } from "../../service";
+import {MANIFEST} from "../../constant";
 
 describe('ManifestController', () => {
   let manifestController: ManifestController;

@@ -97,4 +97,25 @@ export class MatchController {
     response.setHeader("Content-Language", acceptLanguage);
     return await this._matchService.reconcileByQueries(acceptLanguage, reconciliationRequest);
   }
+
+
+    @Post("/match/v2")
+    @ApiOperation({ summary: "Send reconciliation queries to the match service-v2" })
+    @ApiHeader({
+        name: "accept-language",
+        description:
+            "Select language for the response. 'en' for English and 'fr' for French. 'en' is the default.",
+        required: true,
+        enum: ["en", "fr"], // Optional: List of allowed values
+        example: "en", // Optional: Example value
+    })
+    async reconcileByQueriesV2(
+        @Headers("accept-language") acceptLanguage: LanguageEnum,
+        @Body() reconciliationRequest: ReconciliationRequest,
+        @Res({ passthrough: true }) response: Response,
+    ) {
+        acceptLanguage = acceptLanguage || LanguageEnum.ENGLISH;
+        response.setHeader("Content-Language", acceptLanguage);
+        return await this._matchService.reconcileByQueries(acceptLanguage, reconciliationRequest, 'v2');
+    }
 }

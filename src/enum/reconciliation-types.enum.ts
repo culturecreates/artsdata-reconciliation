@@ -1,29 +1,30 @@
 export enum ReconciliationTypesEnum {
-  EVENT = "schema:Event" ,
-  PLACE = "schema:Place" ,
-  PERSON = "schema:Person" ,
-  ORGANIZATION = "schema:Organization"
+    EVENT = "schema:Event",
+    PLACE = "schema:Place",
+    PERSON = "schema:Person",
+    ORGANIZATION = "schema:Organization"
 }
 
 export enum LanguageEnum {
-  ENGLISH = "en" ,
-  FRENCH = "fr"
+    ENGLISH = "en",
+    FRENCH = "fr"
 }
 
 export enum MatchTypeEnum {
-  NAME = "name" ,
-  PROPERTY = "property"
+    ID = "id",
+    NAME = "name",
+    PROPERTY = "property"
 }
 
 
 export enum MatchQuantifierEnum {
-  ANY = "any" ,
-  ALL = "all" ,
-  NONE = "none"
+    ANY = "any",
+    ALL = "all",
+    NONE = "none"
 }
 
 export enum MatchQualifierEnum {
-  REGEX_MATCH = "RegexMatch" ,
-  EXACT_MATCH = "ExactMatch"
+    REGEX_MATCH = "RegexMatch",
+    EXACT_MATCH = "ExactMatch"
 
 }

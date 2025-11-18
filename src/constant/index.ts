@@ -4,3 +4,4 @@ export * from "./match";
 export * from "./extend";
 export * from "./suggest";
 export * from "./preview";
+export * from "./manifest";
