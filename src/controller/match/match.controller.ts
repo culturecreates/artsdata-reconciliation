@@ -99,7 +99,7 @@ export class MatchController {
   }
 
 
-    @Post("/match/v2")
+    @Post("v2/match")
     @ApiOperation({ summary: "Send reconciliation queries to the match service-v2" })
     @ApiHeader({
         name: "accept-language",
