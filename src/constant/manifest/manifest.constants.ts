@@ -73,17 +73,17 @@ export const MANIFEST =
                 }
             ],
             "propose_properties": {
-                "service_url": "https://staging.recon.artsdata.ca",
+                "service_url": `${APPLICATION.RECON_URL}`,
                 "service_path": "/extend/propose"
             }
         },
         "view": {
-            "url": `${APPLICATION.KG_URL}resource/{{id}}`
+            "url": `${APPLICATION.KG_URL}/{{id}}`,
         },
         "preview": {
             "height": 100,
             "width": 400,
-            "url": "https://staging.recon.artsdata.ca/preview?id={{id}}"
+            "url": `${APPLICATION.RECON_URL}/preview?id={{id}}`
         },
         "suggest": {
             "entity": true,
