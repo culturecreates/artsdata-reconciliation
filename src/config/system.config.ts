@@ -17,7 +17,8 @@ export const ARTSDATA: {
 
 export const APPLICATION = {
     HTTP_PORT: Number(env.APP_PORT) || 3000,
-    HTTPS_PORT: Number(env.APP_PORT) || 443
+    HTTPS_PORT: Number(env.APP_PORT) || 443,
+    KG_URL: env.KG_URL || "http://kg.artsdata.ca/resource/",
 };
 
 export const FEATURE_FLAG = {
