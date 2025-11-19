@@ -18,7 +18,7 @@ describe('ManifestController', () => {
         }).compile();
 
         manifestController = app.get<ManifestController>(ManifestController);
-        const ajv = new Ajv({ allErrors: true });
+        const ajv = new Ajv({allErrors: true, strict: false});
         addFormats(ajv);
 
         // Fetch manifest schema
@@ -58,7 +58,13 @@ describe('ManifestController', () => {
         it('should return true the manifest validation schema', async () => {
             const response = manifestController.getServiceManifest();
             const valid = validate(response);
-            if (!valid) console.error(validate.errors);
+            if(!valid) console.error(
+                validate.errors?.map((error: any) => ({
+                    message: error.message,
+                    params: error.params,
+                    instancePath: error.instancePath,
+                }))
+            )
             expect(valid).toBe(true);
         });
 
