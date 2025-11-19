@@ -42,7 +42,7 @@ jobs:
         uses: SpicyPizza/create-envfile@v1.3
         with:
           envkey_ARTSDATA_ENDPOINT: ${{ secrets.ARTSDATA_ENDPOINT }}
-          envkey_KG_URL: http://staging.kg.artsdata.ca/
+          envkey_ENVIRONMENT: staging
           envkey_REPOSITORY: artsdata
           envkey_EVENT: event-index
           envkey_PLACE: place-index
