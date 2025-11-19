@@ -3,7 +3,7 @@ import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 import {ExpressAdapter} from '@nestjs/platform-express';
 import {AppModule} from './app.module';
 import {APPLICATION} from './config';
-import * as express from 'express';
+import express from 'express';
 import * as http from 'http';
 import {ValidationPipe} from '@nestjs/common';
 import {ArtsdataService} from './service';
