@@ -262,23 +262,19 @@ export class MatchService {
         const scoreVariables: string[] = []
 
         if (id) {
-            if ((MatchServiceHelper.isValidURI(id) || id?.startsWith('K'))) {
-                const propertyName = 'id'
-                const scoreVariable = `?${propertyName}_score`;
+            const propertyName = 'id'
+            const scoreVariable = `?${propertyName}_score`;
 
-                selectVariables.push(scoreVariable)
-                scoreVariables.push(scoreVariable)
+            selectVariables.push(scoreVariable)
+            scoreVariables.push(scoreVariable)
 
-                let uri: string = id;
-                if (id.startsWith('K')) {
-                    uri = `${ArtsdataConstants.PREFIX}${id}`;
-                }
-
-                const subQueryForName = MatchServiceHelper.generateSubQueryToURI(uri, type, scoreVariable, limit)
-                subQueries.push(subQueryForName)
-            } else {
-                Exception.badRequest("Invalid URI format");
+            let uri: string = id;
+            if (id.startsWith('K')) {
+                uri = `${ArtsdataConstants.PREFIX}${id}`;
             }
+
+            const subQueryForName = MatchServiceHelper.generateSubQueryToURI(uri, type, scoreVariable, limit)
+            subQueries.push(subQueryForName)
         } else if (name) {
             const propertyName = 'name'
             const scoreVariable = `?${propertyName}_score`;
@@ -328,15 +324,10 @@ export class MatchService {
         if (name) {
             name = this._modifyNameForLuceneScore(MatchServiceHelper.escapeSpecialCharacters(name), propertyConditions);
         }
-        if (isQueryByURI) {
-            if (MatchServiceHelper.isValidURI(id as string) || id?.startsWith('K')) {
-                id = id?.startsWith('K') ? `<${ArtsdataConstants.PREFIX}${id}>` : `<${id}>`;
-            } else {
-                Exception.badRequest("Invalid URI format");
-            }
-
+        if (id) {
+            id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX}${id}>`;
             rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER",
-                `BIND(URI_PLACEHOLDER as ?entity)`);
+                `BIND(${id} as ?entity)`);
         } else {
             rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER",
                 QUERIES.SELECT_ENTITY_QUERY_BY_KEYWORD);
@@ -403,7 +394,6 @@ export class MatchService {
             .replace("INDEX_PLACE_HOLDER", graphdbIndex)
             .replace("QUERY_PLACE_HOLDER", name ? `values ?query { "${name}" }` : "")
             .replace("QUERY_FILTER_PLACE_HOLDER", name ? "luc:query ?query ;" : "")
-            .replace("URI_PLACEHOLDER", id || "")
             .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
 
         return this._resolvePropertyConditions(rawQuery, propertyConditions);
