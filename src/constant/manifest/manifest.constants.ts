@@ -1,3 +1,5 @@
+import {APPLICATION} from "../../config";
+
 export const MANIFEST =
     {
         "versions": [
@@ -76,7 +78,7 @@ export const MANIFEST =
             }
         },
         "view": {
-            "url": "http://kg.artsdata.ca/resource/{{id}}"
+            "url": `${APPLICATION.KG_URL}resource/{{id}}`
         },
         "preview": {
             "height": 100,
