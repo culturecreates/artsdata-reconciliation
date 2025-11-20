@@ -163,11 +163,9 @@ export class MatchService {
 
                 //TODO Remove this condition once the new version is fully released
                 if (version === 'v2') {
-                    sparqlQuery = this._generateSparqlQueryV2(id, name as string, type, isQueryByURI, limit || 25,
-                        propertyConditions);
+                    sparqlQuery = this._generateSparqlQueryV2(id, name as string, type, limit || 25, propertyConditions);
                 } else {
-                    sparqlQuery = this._generateSparqlQuery(id, name as string, type, isQueryByURI, limit || 25,
-                        propertyConditions);
+                    sparqlQuery = this._generateSparqlQuery(id, name as string, type, limit || 25, propertyConditions);
                 }
 
                 const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
@@ -253,7 +251,7 @@ export class MatchService {
         return triple;
     }
 
-    private _generateSparqlQueryV2(id: string | undefined, name: string | undefined, type: string, isQueryByURI: boolean,
+    private _generateSparqlQueryV2(id: string | undefined, name: string | undefined, type: string,
                                    limit: number, propertyConditions: QueryCondition[]) {
         const lucenceIndex = GRAPHDB_INDEX.LABELLED_ENTITIES;
         let query: string = QUERIES_V2.PREFIXES;
@@ -316,8 +314,9 @@ export class MatchService {
      * @param propertyConditions
      */
     private _generateSparqlQuery(
-        id: string | undefined, name: string | undefined, type: string, isQueryByURI: boolean, limit: number,
+        id: string | undefined, name: string | undefined, type: string, limit: number,
         propertyConditions: QueryCondition[]): string {
+
         const graphdbIndex = MatchServiceHelper.getGraphdbIndex(type);
         let rawQuery = QUERIES.RECONCILIATION_QUERY;
 
