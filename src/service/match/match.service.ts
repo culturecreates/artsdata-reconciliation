@@ -251,6 +251,16 @@ export class MatchService {
         return triple;
     }
 
+    /**
+     * @private
+     * @name _generateSparqlQueryV2
+     * @description Generate SPARQL query for v2
+     * @param id
+     * @param name
+     * @param type
+     * @param limit
+     * @param propertyConditions
+     */
     private _generateSparqlQueryV2(id: string | undefined, name: string | undefined, type: string,
                                    limit: number, propertyConditions: QueryCondition[]) {
 

@@ -372,7 +372,8 @@ export class MatchServiceHelper {
     }
 
     static generateBindStatementForScoreCalculation(scoreVariables: Set<string>) {
-        return `BIND(${[...scoreVariables].join(' + ')}  as ?total_score)`;
+        return `BIND( ${[...scoreVariables].map(v => `COALESCE(${v}, 0)`)
+            .join(' + ')}  as ?total_score)`;
     }
 
     static generateSubQueryToURI(uri: string, type: string, scoreVariable: string, limit?: number) {
@@ -389,11 +390,11 @@ export class MatchServiceHelper {
         return `{ \n\t${query}\n }`;
     }
 
-   static extractPropertyLocalName(value: string): string {
-       const cleaned = value.replace(/^<|>$/g, "")
-           .split(/[:/]/).filter(Boolean);
-       return cleaned[cleaned.length - 1];
-   }
+    static extractPropertyLocalName(value: string): string {
+        const cleaned = value.replace(/^<|>$/g, "")
+            .split(/[:/]/).filter(Boolean);
+        return cleaned[cleaned.length - 1];
+    }
 
     static generateSubQueryUsingLuceneQuerySearch(propertyName: string, propertyValue: string | string[],
                                                   lucenceIndex: string, type: string, scoreVariable: string) {
@@ -411,13 +412,17 @@ export class MatchServiceHelper {
         const scoreVariables: string[] = [];
         const propertySubQueries: string[] = [];
 
-        propertyConditions.forEach(({propertyId, propertyValue}) => {
+        propertyConditions.forEach(({propertyId, propertyValue, required}) => {
             if (propertyId && propertyValue) {
                 const propertyVariable = this.extractPropertyLocalName(propertyId);
                 const scoreVariable = `?${propertyVariable}_score`;
-                const subQuery = MatchServiceHelper.isValidURI(propertyValue as string)
+                let subQuery = MatchServiceHelper.isValidURI(propertyValue as string)
                     ? this.generateSubqueryForUnindexedProperties(propertyId, propertyValue, scoreVariable)
                     : this.generateSubQueryUsingLuceneQuerySearch(propertyVariable, propertyValue, luceneIndex, type, scoreVariable);
+
+                if (!required) {
+                    subQuery = `OPTIONAL ${subQuery}\nBIND(IF( !BOUND( ${scoreVariable}),0,${scoreVariable}) as ${scoreVariable})`
+                }
 
                 propertySubQueries.push(subQuery);
                 scoreVariables.push(scoreVariable);
