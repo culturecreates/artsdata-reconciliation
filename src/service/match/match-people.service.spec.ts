@@ -15,40 +15,63 @@ describe('Test reconciling people using sparql query version 2', () => {
         matchService = setup.matchService;
     });
 
-    it(`Reconcile a person entity with name 'Jérémy De', which is close match`, async () => {
+    it(`Fuzzy match person name 'Jérémy Des'`, async () => {
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PERSON,
-            conditions: [{ matchType: MatchTypeEnum.NAME, propertyValue: "Jérémy De" }],
+            conditions: [{
+                matchType: MatchTypeEnum.NAME,
+                propertyValue: "Jérémy De"
+            }],
             limit: 1
         };
 
-        const result = await matchService.reconcileByQueries(
-            LanguageEnum.ENGLISH,
-            { queries: [reconciliationQuery] },
-            "v2"
-        );
-
+        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, { queries: [reconciliationQuery] }, "v2");
         const candidate = result.results?.[0]?.candidates?.[0];
-        expect(candidate.id).toBe("K2-2791");
         expect(candidate.name).toBe("Jérémy Desmarais");
+        expect(candidate.id).toBe("K2-2791");
     });
 
-    it(`Reconcile an person entity with uri 'http://kg.artsdata.ca/resource/K5-198`, async () => {
-
+    it(`Reconcile person with name and wikidata ID`, async () => {
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PERSON,
-            conditions: [{ matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/K5-198" }],
+            conditions: [
+                {
+                    matchType: MatchTypeEnum.NAME,
+                    propertyValue: "Jérémy Desmarais"
+                },
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyId: "http://schema.org/sameAs",
+                    propertyValue: "http://www.wikidata.org/entity/Q111454795"
+                }
+            ],
             limit: 1
         };
 
-       const result = await matchService.reconcileByQueries(
-            LanguageEnum.ENGLISH,
-            { queries: [reconciliationQuery] },
-            "v2"
-        );
-
+        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, { queries: [reconciliationQuery] }, "v2");
         const candidate = result.results?.[0]?.candidates?.[0];
-        expect(candidate.id).toBe("K5-198");
+        expect(candidate).toBeDefined();
+        expect(candidate.name).toBe("Jérémy Desmarais");
+        expect(candidate.id).toBe("K2-2791");
+    });
+
+    // Match name by searching without accents
+    // The lucene analylzer should be ascii folding to match "Jeremy" to "Jérémy"
+    // NOTE: This is avandanced and may be commented out for future
+    it(`Reconcile person Jeremy Desmarais`, async () => {
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PERSON,
+            conditions: [{
+                matchType: MatchTypeEnum.NAME,
+                propertyValue: "Jeremy Desmarais"
+            }],
+            limit: 5
+        };
+
+        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, { queries: [reconciliationQuery] }, "v2");
+        const candidate = result.results?.[0]?.candidates?.[0];
+        expect(candidate.name).toBe("Jérémy Desmarais");
+        expect(candidate.id).toBe("K2-2791");
     });
 
 });
