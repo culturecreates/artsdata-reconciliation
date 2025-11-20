@@ -4,7 +4,7 @@ import {ArtsdataService, HttpService, ManifestService, MatchService,} from "../.
 import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
 import { MatchTypeEnum} from "../../enum";
-import {executeAndCompareResults} from "../../../test/test-util";
+import {executeAndCompareResults, setupMatchService} from "../../../test/test-util";
 
 
 describe('Test reconciling organizations using sparql query version 2', () => {
@@ -12,14 +12,8 @@ describe('Test reconciling organizations using sparql query version 2', () => {
     let matchService: MatchService;
 
     beforeAll(async () => {
-        const app: TestingModule = await Test.createTestingModule({
-            controllers: [ManifestController, MatchController],
-            providers: [ManifestService, MatchService, ArtsdataService, HttpService],
-        }).compile();
-
-        matchService = app.get<MatchService>(MatchService);
-        const artsdataService = app.get<ArtsdataService>(ArtsdataService);
-        await artsdataService.checkConnectionWithRetry();
+        const setup = await setupMatchService();
+        matchService = setup.matchService;
     });
 
     it(`Reconcile a organization by name 'Ballet Jörgen', which is close match - `, async () => {
