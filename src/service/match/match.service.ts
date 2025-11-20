@@ -253,52 +253,42 @@ export class MatchService {
 
     private _generateSparqlQueryV2(id: string | undefined, name: string | undefined, type: string,
                                    limit: number, propertyConditions: QueryCondition[]) {
-        const lucenceIndex = GRAPHDB_INDEX.LABELLED_ENTITIES;
-        let query: string = QUERIES_V2.PREFIXES;
-        const selectVariables: string[] = ['?entity'];
-        const subQueries: string[] = [];
-        const scoreVariables: string[] = []
+
+        const luceneIndex = GRAPHDB_INDEX.LABELLED_ENTITIES;
+        const selectVariables = ['?entity'];
+        const subQueries = [];
+        const scoreVariables = new Set<string>();
+
+        const addSubQuery = (propertyName: string, value: string, generator: Function) => {
+            const scoreVariable = `?${propertyName}_score`;
+            selectVariables.push(scoreVariable);
+            scoreVariables.add(scoreVariable);
+            subQueries.push(generator(value, type, scoreVariable, limit));
+        };
 
         if (id) {
-            const propertyName = 'id'
-            const scoreVariable = `?${propertyName}_score`;
-
-            selectVariables.push(scoreVariable)
-            scoreVariables.push(scoreVariable)
-
-            let uri: string = id;
-            if (id.startsWith('K')) {
-                uri = `${ArtsdataConstants.PREFIX}${id}`;
-            }
-
-            const subQueryForName = MatchServiceHelper.generateSubQueryToURI(uri, type, scoreVariable, limit)
-            subQueries.push(subQueryForName)
+            const uri = id.startsWith('K') ? `${ArtsdataConstants.PREFIX}${id}` : id;
+            addSubQuery('id', uri, MatchServiceHelper.generateSubQueryToURI);
         } else if (name) {
-            const propertyName = 'name'
-            const scoreVariable = `?${propertyName}_score`;
-
-            selectVariables.push(scoreVariable)
-            scoreVariables.push(scoreVariable)
-
-            const subQueryForName = MatchServiceHelper.generateSubQueryUsingLuceneQuerySearch(propertyName,
-                name, lucenceIndex, type, scoreVariable, limit)
-            subQueries.push(subQueryForName)
+            addSubQuery('name', name, (value: string, type: string, scoreVar: string) =>
+                MatchServiceHelper.generateSubQueryUsingLuceneQuerySearch('name', value, luceneIndex, type,
+                    scoreVar));
         }
 
         const {
             selectQueryFragment,
             propertiesSubQuery
         } = MatchServiceHelper.generateSubQueryToFetchAdditionalProperties(type);
+        const {
+            scoreVariables: scoreVarsFromProps,
+            propertySubQueries
+        } = MatchServiceHelper.resolvedPropertyConditions(luceneIndex, propertyConditions, type);
 
-        const selectClause = `\nSELECT DISTINCT ${selectVariables.join(' ')}` + selectQueryFragment;
-        query += `${selectClause}\nWHERE { \n${subQueries.join('\n')}`
+        scoreVarsFromProps.forEach(scoreVariables.add, scoreVariables);
+        selectVariables.push(...scoreVarsFromProps, selectQueryFragment);
+        subQueries.push(...propertySubQueries);
 
-
-        query += `\n # Properties to return with matching results \n{${propertiesSubQuery}\n}`;
-        query += MatchServiceHelper.generateBindStatementForScoreCalculation(scoreVariables);
-        query += `\n}${QUERIES_V2.COMMON_GROUP_BY_STATEMENT} ${scoreVariables.join(' ')}`
-
-        return query;
+        return MatchServiceHelper.createSparqlQuery(selectVariables, subQueries, propertiesSubQuery, scoreVariables, limit);
     }
 
 

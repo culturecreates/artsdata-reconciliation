@@ -8,13 +8,19 @@ PREFIX con: <http://www.ontotext.com/connectors/lucene#>
 PREFIX schema: <http://schema.org/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
 
-    SELECT_INDEXED_ENTITY_QUERY_TEMPLATE: `SELECT * {
+    SUBQUERY_TO_FETCH_INDEXED_ENTITY_TEMPLATE: `SELECT * {
         [] a con-inst:INDEX_PLACEHOLDER ;
         con:query "LUCENE_QUERY_PLACEHOLDER"  ;
         con:entities ?entity  .
         ?entity con:score PROPERTY_SCORE_VARIABLE_PLACEHOLDER.
-        ?entity a PROPERTY_TYPE_PLACEHOLDER .
+        ?entity a TYPE_PLACEHOLDER .
     }`,
+
+    SUBQUERY_TO_FETCH_UNINDEXED_ENTITY_TEMPLATE: `{
+        ?entity PROPERTY_PLACEHOLDER PROPERTY_VARIABLE_PLACEHOLDER .
+         BIND(10 as PROPERTY_SCORE_VARIABLE_PLACEHOLDER) .
+     }
+`,
 
     SELECT_ENTITY_BY_URI_TEMPLATE: `SELECT * {
         BIND(URI_PLACEHOLDER as ?entity)
