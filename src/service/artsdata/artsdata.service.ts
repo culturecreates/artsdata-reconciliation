@@ -85,7 +85,7 @@ export class ArtsdataService {
 
             const testResp = await axios.get(repoUrl, {headers});
             if (testResp.status === 200) {
-                console.log('GraphDB connection verified successfully.');
+                console.log(`GraphDB connection verified successfully. ${ARTSDATA.ENDPOINT} `);
                 return true;
             }
             console.warn(`GraphDB responded with ${testResp.status}`);
