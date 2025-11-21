@@ -376,7 +376,7 @@ export class MatchServiceHelper {
             .join(' + ')}  as ?total_score)`;
     }
 
-    static generateSubQueryToURI(uri: string, type: string, scoreVariable: string, limit?: number) {
+    static generateSubQueryToURI(uri: string, type: string, scoreVariable: string, limit: number) {
         let query = QUERIES_V2.SELECT_ENTITY_BY_URI_TEMPLATE;
 
         query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type);
@@ -397,18 +397,20 @@ export class MatchServiceHelper {
     }
 
     static generateSubQueryUsingLuceneQuerySearch(propertyName: string, propertyValue: string | string[],
-                                                  lucenceIndex: string, type: string, scoreVariable: string) {
+                                                  lucenceIndex: string, type: string, scoreVariable: string, limit:number) {
         let query = QUERIES_V2.SUBQUERY_TO_FETCH_INDEXED_ENTITY_TEMPLATE;
 
         query = query.replace("INDEX_PLACEHOLDER", lucenceIndex);
         query = query.replace("LUCENE_QUERY_PLACEHOLDER", `${propertyName}: ${propertyValue}`);
         query = query.replace("TYPE_PLACEHOLDER", type || "?x");
         query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
+        query = query + ` LIMIT ${limit}`;
 
         return `{ \n\t${query}\n }`;
     }
 
-    static resolvedPropertyConditions(luceneIndex: string, propertyConditions: QueryCondition[], type: string) {
+    static resolvedPropertyConditions(luceneIndex: string, propertyConditions: QueryCondition[], type: string,
+                                      limit:number) {
         const scoreVariables: string[] = [];
         const propertySubQueries: string[] = [];
 
@@ -418,7 +420,8 @@ export class MatchServiceHelper {
                 const scoreVariable = `?${propertyVariable}_score`;
                 let subQuery = MatchServiceHelper.isValidURI(propertyValue as string)
                     ? this.generateSubqueryForUnindexedProperties(propertyId, propertyValue, scoreVariable)
-                    : this.generateSubQueryUsingLuceneQuerySearch(propertyVariable, propertyValue, luceneIndex, type, scoreVariable);
+                    : this.generateSubQueryUsingLuceneQuerySearch(propertyVariable, propertyValue, luceneIndex, type,
+                        scoreVariable, limit);
 
                 if (!required) {
                     subQuery = `OPTIONAL ${subQuery}\nBIND(IF( !BOUND( ${scoreVariable}),0,${scoreVariable}) as ${scoreVariable})`
@@ -451,8 +454,7 @@ export class MatchServiceHelper {
             `# Properties to return with matching results`,
             `{${propertiesSubQuery}}`,
             MatchServiceHelper.generateBindStatementForScoreCalculation(scoreVariables),
-            `}${QUERIES_V2.COMMON_GROUP_BY_STATEMENT} ${scoreVars}`,
-            `LIMIT ${limit}`
+            `}${QUERIES_V2.COMMON_GROUP_BY_STATEMENT} ${scoreVars}`
         ].join('\n');
     }
 

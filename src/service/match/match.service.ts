@@ -21,7 +21,6 @@ import {
     MatchTypeEnum,
 } from "../../enum";
 import {GRAPHDB_INDEX} from "../../config";
-import {QUERIES_V2} from "../../constant/match/match-queries-v2.constants";
 
 @Injectable()
 export class MatchService {
@@ -282,7 +281,7 @@ export class MatchService {
         } else if (name) {
             addSubQuery('name', name, (value: string, type: string, scoreVar: string) =>
                 MatchServiceHelper.generateSubQueryUsingLuceneQuerySearch('name', value, luceneIndex, type,
-                    scoreVar));
+                    scoreVar, limit));
         }
 
         const {
@@ -292,7 +291,7 @@ export class MatchService {
         const {
             scoreVariables: scoreVarsFromProps,
             propertySubQueries
-        } = MatchServiceHelper.resolvedPropertyConditions(luceneIndex, propertyConditions, type);
+        } = MatchServiceHelper.resolvedPropertyConditions(luceneIndex, propertyConditions, type, limit);
 
         scoreVarsFromProps.forEach(scoreVariables.add, scoreVariables);
         selectVariables.push(...scoreVarsFromProps, selectQueryFragment);
