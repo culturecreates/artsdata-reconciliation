@@ -1,10 +1,8 @@
-import {Test, TestingModule} from "@nestjs/testing";
-import {ManifestController, MatchController} from "../../controller";
-import {ArtsdataService, HttpService, ManifestService, MatchService,} from "../../service";
-import {ReconciliationQuery, ReconciliationResponse} from "../../dto";
+import {MatchService,} from "../../service";
+import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
-import {LanguageEnum, MatchTypeEnum} from "../../enum";
-import {executeAndCompareResults} from "../../../test/test-util";
+import {MatchTypeEnum} from "../../enum";
+import {executeAndCompareResults, setupMatchService} from "../../../test/test-util";
 
 
 describe('Test reconciling events using sparql query version 2', () => {
@@ -12,14 +10,8 @@ describe('Test reconciling events using sparql query version 2', () => {
     let matchService: MatchService;
 
     beforeAll(async () => {
-        const app: TestingModule = await Test.createTestingModule({
-            controllers: [ManifestController, MatchController],
-            providers: [ManifestService, MatchService, ArtsdataService, HttpService],
-        }).compile();
-
-        matchService = app.get<MatchService>(MatchService);
-        const artsdataService = app.get<ArtsdataService>(ArtsdataService);
-        await artsdataService.checkConnectionWithRetry();
+        const setup = await setupMatchService();
+        matchService = setup.matchService;
     });
 
     it('Reconcile an event with name `Émile Bilodeau`, which is exact match', async () => {

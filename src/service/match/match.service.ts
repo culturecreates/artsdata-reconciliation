@@ -21,7 +21,6 @@ import {
     MatchTypeEnum,
 } from "../../enum";
 import {GRAPHDB_INDEX} from "../../config";
-import {QUERIES_V2} from "../../constant/match/match-queries-v2.constants";
 
 @Injectable()
 export class MatchService {
@@ -282,23 +281,24 @@ export class MatchService {
         } else if (name) {
             addSubQuery('name', name, (value: string, type: string, scoreVar: string) =>
                 MatchServiceHelper.generateSubQueryUsingLuceneQuerySearch('name', value, luceneIndex, type,
-                    scoreVar));
+                    scoreVar, limit));
         }
-
+        // Fetch name, type and type label and disambiguatingDescription
         const {
             selectQueryFragment,
             propertiesSubQuery
-        } = MatchServiceHelper.generateSubQueryToFetchAdditionalProperties(type);
+        } = MatchServiceHelper.generateSubQueryToFetchAdditionalProperties();
+
         const {
             scoreVariables: scoreVarsFromProps,
             propertySubQueries
-        } = MatchServiceHelper.resolvedPropertyConditions(luceneIndex, propertyConditions, type);
+        } = MatchServiceHelper.resolvedPropertyConditions(luceneIndex, propertyConditions, type, limit);
 
         scoreVarsFromProps.forEach(scoreVariables.add, scoreVariables);
         selectVariables.push(...scoreVarsFromProps, selectQueryFragment);
         subQueries.push(...propertySubQueries);
 
-        return MatchServiceHelper.createSparqlQuery(selectVariables, subQueries, propertiesSubQuery, scoreVariables, limit);
+        return MatchServiceHelper.createSparqlQuery(selectVariables, subQueries, propertiesSubQuery, scoreVariables);
     }
 
 
@@ -309,7 +309,6 @@ export class MatchService {
      * @param id
      * @param name
      * @param type
-     * @param isQueryByURI
      * @param limit
      * @param propertyConditions
      */

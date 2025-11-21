@@ -1,10 +1,9 @@
-import {Test, TestingModule} from "@nestjs/testing";
-import {ManifestController, MatchController} from "../../controller";
-import {ArtsdataService, HttpService, ManifestService, MatchService,} from "../../service";
+import {MatchService,} from "../../service";
 import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
-import { MatchTypeEnum} from "../../enum";
-import {executeAndCompareResults} from "../../../test/test-util";
+import {MatchTypeEnum} from "../../enum";
+import {LanguageEnum} from "../../enum";
+import {executeAndCompareResults, setupMatchService} from "../../../test/test-util";
 
 
 describe('Test reconciling organizations using sparql query version 2', () => {
@@ -12,14 +11,8 @@ describe('Test reconciling organizations using sparql query version 2', () => {
     let matchService: MatchService;
 
     beforeAll(async () => {
-        const app: TestingModule = await Test.createTestingModule({
-            controllers: [ManifestController, MatchController],
-            providers: [ManifestService, MatchService, ArtsdataService, HttpService],
-        }).compile();
-
-        matchService = app.get<MatchService>(MatchService);
-        const artsdataService = app.get<ArtsdataService>(ArtsdataService);
-        await artsdataService.checkConnectionWithRetry();
+        const setup = await setupMatchService();
+        matchService = setup.matchService;
     });
 
     it(`Reconcile a organization by name 'Ballet Jörgen', which is close match - `, async () => {
@@ -58,6 +51,25 @@ describe('Test reconciling organizations using sparql query version 2', () => {
         }
 
         await executeAndCompareResults(matchService, expectedResult, reconciliationQuery);
+    });
+
+    // exact id match for an Organization with multiple types
+    it(`Reconcile an person entity with uri 'http://kg.artsdata.ca/resource/K5-198`, async () => {
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ORGANIZATION,
+            conditions: [{
+                matchType: MatchTypeEnum.ID,
+                propertyValue: "http://kg.artsdata.ca/resource/K10-275"
+            }],
+            limit: 1
+        };
+
+        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, {queries: [reconciliationQuery]}, "v2");
+        const candidate = result.results?.[0]?.candidates?.[0];
+        console.log(candidate);
+        expect(candidate.id).toBe("K10-275");
+        expect(candidate.type?.some(type => type.id === "http://schema.org/Organization")).toBeTruthy();
+        expect(candidate.type?.some(type => type.id === "http://schema.org/PerformingGroup")).toBeTruthy();
     });
 
 });

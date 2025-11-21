@@ -1,10 +1,8 @@
-import {Test, TestingModule} from "@nestjs/testing";
-import {ManifestController, MatchController} from "../../controller";
-import {ArtsdataService, HttpService, ManifestService, MatchService,} from "../../service";
-import {ReconciliationQuery, ReconciliationResponse} from "../../dto";
+import {MatchService,} from "../../service";
+import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
-import {MatchTypeEnum} from "../../enum";
-import {executeAndCompareResults} from "../../../test/test-util";
+import {LanguageEnum, MatchTypeEnum} from "../../enum";
+import {executeAndCompareResults, setupMatchService} from "../../../test/test-util";
 
 
 describe('Test reconciling places using sparql query version 2', () => {
@@ -12,14 +10,8 @@ describe('Test reconciling places using sparql query version 2', () => {
     let matchService: MatchService;
 
     beforeAll(async () => {
-        const app: TestingModule = await Test.createTestingModule({
-            controllers: [ManifestController, MatchController],
-            providers: [ManifestService, MatchService, ArtsdataService, HttpService],
-        }).compile();
-
-        matchService = app.get<MatchService>(MatchService);
-        const artsdataService = app.get<ArtsdataService>(ArtsdataService);
-        await artsdataService.checkConnectionWithRetry();
+        const setup = await setupMatchService();
+        matchService = setup.matchService;
     });
 
     it('Reconcile a place with name `Roy Thomson Hall`, which is exact match', async () => {
@@ -115,6 +107,38 @@ describe('Test reconciling places using sparql query version 2', () => {
         }
 
         await executeAndCompareResults(matchService, expectedResult, reconciliationQuery);
+    });
+
+    it(`Reconcile National Arts Centre - Azrieli Studio using English UI`, async () => {
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{
+                matchType: MatchTypeEnum.NAME,
+                propertyValue: "National Arts Centre - Azrieli Studio"
+            }],
+            limit: 1
+        };
+
+        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, {queries: [reconciliationQuery]}, "v2");
+        const candidate = result.results?.[0]?.candidates?.[0];
+        expect(candidate.name).toBe("National Arts Centre - Azrieli Studio");
+        expect(candidate.id).toBe("K11-15");
+    });
+
+    it(`Reconcile National Arts Centre - Azrieli Studio using French UI`, async () => {
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{
+                matchType: MatchTypeEnum.NAME,
+                propertyValue: "National Arts Centre - Azrieli Studio"
+            }],
+            limit: 1
+        };
+
+        const result = await matchService.reconcileByQueries(LanguageEnum.FRENCH, {queries: [reconciliationQuery]}, "v2");
+        const candidate = result.results?.[0]?.candidates?.[0];
+        expect(candidate.name).toBe("Centre national des arts - Studio Azrieli");
+        expect(candidate.id).toBe("K11-15");
     });
 });
 

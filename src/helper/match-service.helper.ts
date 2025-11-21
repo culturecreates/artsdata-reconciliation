@@ -345,27 +345,10 @@ export class MatchServiceHelper {
         }]
     }
 
-    static generateSubQueryToFetchAdditionalProperties(type: string) {
+    static generateSubQueryToFetchAdditionalProperties() {
 
         let propertiesSubQuery: string = QUERIES_V2.COMMON_PROPERTIES_TO_FETCH_QUERY;
         let selectQueryFragment: string = QUERIES_V2.COMMON_SELECT_QUERY_FOR_ALL_ENTITY_PROPERTIES_SUB_QUERY;
-
-        switch (type) {
-            case Entities.PERSON:
-            case Entities.ORGANIZATION:
-            case Entities.AGENT:
-                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_AGENT_PROPERTIES_SUB_QUERY;
-                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_AGENTS_SUB_QUERY;
-                break;
-            case Entities.PLACE:
-                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_PLACE_PROPERTIES_SUB_QUERY;
-                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_PLACES_SUB_QUERY
-                break;
-            case Entities.EVENT:
-                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_EVENT_PROPERTIES_SUB_QUERY;
-                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_EVENTS_SUB_QUERY
-                break;
-        }
 
         return {selectQueryFragment, propertiesSubQuery}
 
@@ -376,7 +359,7 @@ export class MatchServiceHelper {
             .join(' + ')}  as ?total_score)`;
     }
 
-    static generateSubQueryToURI(uri: string, type: string, scoreVariable: string, limit?: number) {
+    static generateSubQueryToURI(uri: string, type: string, scoreVariable: string, limit: number) {
         let query = QUERIES_V2.SELECT_ENTITY_BY_URI_TEMPLATE;
 
         query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type);
@@ -397,18 +380,20 @@ export class MatchServiceHelper {
     }
 
     static generateSubQueryUsingLuceneQuerySearch(propertyName: string, propertyValue: string | string[],
-                                                  lucenceIndex: string, type: string, scoreVariable: string) {
+                                                  lucenceIndex: string, type: string, scoreVariable: string, limit: number) {
         let query = QUERIES_V2.SUBQUERY_TO_FETCH_INDEXED_ENTITY_TEMPLATE;
 
         query = query.replace("INDEX_PLACEHOLDER", lucenceIndex);
         query = query.replace("LUCENE_QUERY_PLACEHOLDER", `${propertyName}: ${propertyValue}`);
         query = query.replace("TYPE_PLACEHOLDER", type || "?x");
         query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
+        query = query + ` LIMIT ${limit}`;
 
         return `{ \n\t${query}\n }`;
     }
 
-    static resolvedPropertyConditions(luceneIndex: string, propertyConditions: QueryCondition[], type: string) {
+    static resolvedPropertyConditions(luceneIndex: string, propertyConditions: QueryCondition[], type: string,
+                                      limit: number) {
         const scoreVariables: string[] = [];
         const propertySubQueries: string[] = [];
 
@@ -418,7 +403,8 @@ export class MatchServiceHelper {
                 const scoreVariable = `?${propertyVariable}_score`;
                 let subQuery = MatchServiceHelper.isValidURI(propertyValue as string)
                     ? this.generateSubqueryForUnindexedProperties(propertyId, propertyValue, scoreVariable)
-                    : this.generateSubQueryUsingLuceneQuerySearch(propertyVariable, propertyValue, luceneIndex, type, scoreVariable);
+                    : this.generateSubQueryUsingLuceneQuerySearch(propertyVariable, propertyValue, luceneIndex, type,
+                        scoreVariable, limit);
 
                 if (!required) {
                     subQuery = `OPTIONAL ${subQuery}\nBIND(IF( !BOUND( ${scoreVariable}),0,${scoreVariable}) as ${scoreVariable})`
@@ -435,13 +421,14 @@ export class MatchServiceHelper {
     private static generateSubqueryForUnindexedProperties(propertyId: string, propertyValue: string | string[],
                                                           scoreVariable: string) {
         return QUERIES_V2.SUBQUERY_TO_FETCH_UNINDEXED_ENTITY_TEMPLATE
-            .replace("PROPERTY_PLACEHOLDER", propertyId)
+            .replace("PROPERTY_PLACEHOLDER",
+                `${(propertyId.startsWith('<') && propertyId.endsWith('>')) ? propertyId : `<${propertyId}>`}`)
             .replace("PROPERTY_VARIABLE_PLACEHOLDER", `<${propertyValue}>`)
             .replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable)
     }
 
     static createSparqlQuery(selectVariables: string[], subQueries: string[], propertiesSubQuery: string,
-                             scoreVariables: Set<string>, limit: number) {
+                             scoreVariables: Set<string>) {
         const scoreVars = [...scoreVariables].join(' ');
         return [
             QUERIES_V2.PREFIXES,
@@ -452,7 +439,7 @@ export class MatchServiceHelper {
             `{${propertiesSubQuery}}`,
             MatchServiceHelper.generateBindStatementForScoreCalculation(scoreVariables),
             `}${QUERIES_V2.COMMON_GROUP_BY_STATEMENT} ${scoreVars}`,
-            `LIMIT ${limit}`
+            `ORDER BY DESC(?total_score)`
         ].join('\n');
     }
 
