@@ -297,7 +297,7 @@ export class MatchService {
         selectVariables.push(...scoreVarsFromProps, selectQueryFragment);
         subQueries.push(...propertySubQueries);
 
-        return MatchServiceHelper.createSparqlQuery(selectVariables, subQueries, propertiesSubQuery, scoreVariables, limit);
+        return MatchServiceHelper.createSparqlQuery(selectVariables, subQueries, propertiesSubQuery, scoreVariables);
     }
 
 
@@ -308,7 +308,6 @@ export class MatchService {
      * @param id
      * @param name
      * @param type
-     * @param isQueryByURI
      * @param limit
      * @param propertyConditions
      */

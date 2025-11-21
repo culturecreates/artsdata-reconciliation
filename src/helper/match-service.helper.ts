@@ -350,23 +350,6 @@ export class MatchServiceHelper {
         let propertiesSubQuery: string = QUERIES_V2.COMMON_PROPERTIES_TO_FETCH_QUERY;
         let selectQueryFragment: string = QUERIES_V2.COMMON_SELECT_QUERY_FOR_ALL_ENTITY_PROPERTIES_SUB_QUERY;
 
-        switch (type) {
-            case Entities.PERSON:
-            case Entities.ORGANIZATION:
-            case Entities.AGENT:
-                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_AGENT_PROPERTIES_SUB_QUERY;
-                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_AGENTS_SUB_QUERY;
-                break;
-            case Entities.PLACE:
-                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_PLACE_PROPERTIES_SUB_QUERY;
-                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_PLACES_SUB_QUERY
-                break;
-            case Entities.EVENT:
-                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_EVENT_PROPERTIES_SUB_QUERY;
-                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_EVENTS_SUB_QUERY
-                break;
-        }
-
         return {selectQueryFragment, propertiesSubQuery}
 
     }
@@ -397,7 +380,7 @@ export class MatchServiceHelper {
     }
 
     static generateSubQueryUsingLuceneQuerySearch(propertyName: string, propertyValue: string | string[],
-                                                  lucenceIndex: string, type: string, scoreVariable: string, limit:number) {
+                                                  lucenceIndex: string, type: string, scoreVariable: string, limit: number) {
         let query = QUERIES_V2.SUBQUERY_TO_FETCH_INDEXED_ENTITY_TEMPLATE;
 
         query = query.replace("INDEX_PLACEHOLDER", lucenceIndex);
@@ -410,7 +393,7 @@ export class MatchServiceHelper {
     }
 
     static resolvedPropertyConditions(luceneIndex: string, propertyConditions: QueryCondition[], type: string,
-                                      limit:number) {
+                                      limit: number) {
         const scoreVariables: string[] = [];
         const propertySubQueries: string[] = [];
 
@@ -444,7 +427,7 @@ export class MatchServiceHelper {
     }
 
     static createSparqlQuery(selectVariables: string[], subQueries: string[], propertiesSubQuery: string,
-                             scoreVariables: Set<string>, limit: number) {
+                             scoreVariables: Set<string>) {
         const scoreVars = [...scoreVariables].join(' ');
         return [
             QUERIES_V2.PREFIXES,
