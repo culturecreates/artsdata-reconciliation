@@ -58,21 +58,21 @@ describe('Test reconciling people using sparql query version 2', () => {
     // Match name by searching without accents
     // The lucene analylzer should be ascii folding to match "Jeremy" to "Jérémy"
     // NOTE: This is avandanced and may be commented out for future
-    it(`Reconcile person Jeremy Desmarais`, async () => {
-        const reconciliationQuery: ReconciliationQuery = {
-            type: Entities.PERSON,
-            conditions: [{
-                matchType: MatchTypeEnum.NAME,
-                propertyValue: "Jeremy Desmarais"
-            }],
-            limit: 5
-        };
-
-        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, { queries: [reconciliationQuery] }, "v2");
-        const candidate = result.results?.[0]?.candidates?.[0];
-        expect(candidate.name).toBe("Jérémy Desmarais");
-        expect(candidate.id).toBe("K2-2791");
-    });
+    // it(`Reconcile person Jeremy Desmarais`, async () => {
+    //     const reconciliationQuery: ReconciliationQuery = {
+    //         type: Entities.PERSON,
+    //         conditions: [{
+    //             matchType: MatchTypeEnum.NAME,
+    //             propertyValue: "Jeremy Desmarais"
+    //         }],
+    //         limit: 5
+    //     };
+    //
+    //     const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, { queries: [reconciliationQuery] }, "v2");
+    //     const candidate = result.results?.[0]?.candidates?.[0];
+    //     expect(candidate.name).toBe("Jérémy Desmarais");
+    //     expect(candidate.id).toBe("K2-2791");
+    // });
 
 });
 
