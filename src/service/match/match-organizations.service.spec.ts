@@ -1,10 +1,8 @@
-import {Test, TestingModule} from "@nestjs/testing";
-import {ManifestController, MatchController} from "../../controller";
-import {ArtsdataService, HttpService, ManifestService, MatchService,} from "../../service";
+import {MatchService,} from "../../service";
 import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
-import { MatchTypeEnum} from "../../enum";
-import { LanguageEnum } from "../../enum";
+import {MatchTypeEnum} from "../../enum";
+import {LanguageEnum} from "../../enum";
 import {executeAndCompareResults, setupMatchService} from "../../../test/test-util";
 
 
@@ -59,14 +57,14 @@ describe('Test reconciling organizations using sparql query version 2', () => {
     it(`Reconcile an person entity with uri 'http://kg.artsdata.ca/resource/K5-198`, async () => {
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.ORGANIZATION,
-            conditions: [{ 
-                matchType: MatchTypeEnum.ID, 
-                propertyValue: "http://kg.artsdata.ca/resource/K10-275" 
+            conditions: [{
+                matchType: MatchTypeEnum.ID,
+                propertyValue: "http://kg.artsdata.ca/resource/K10-275"
             }],
             limit: 1
         };
 
-        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, { queries: [reconciliationQuery] }, "v2");
+        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, {queries: [reconciliationQuery]}, "v2");
         const candidate = result.results?.[0]?.candidates?.[0];
         console.log(candidate);
         expect(candidate.id).toBe("K10-275");

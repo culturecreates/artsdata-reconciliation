@@ -1,5 +1,5 @@
 import {MatchService,} from "../../service";
-import {ReconciliationQuery, ReconciliationResponse} from "../../dto";
+import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
 import {LanguageEnum, MatchTypeEnum} from "../../enum";
 import {executeAndCompareResults, setupMatchService} from "../../../test/test-util";
@@ -109,7 +109,7 @@ describe('Test reconciling places using sparql query version 2', () => {
         await executeAndCompareResults(matchService, expectedResult, reconciliationQuery);
     });
 
-     it(`Reconcile Capitol Theatre using English UI`, async () => {
+    it(`Reconcile Capitol Theatre using English UI`, async () => {
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
             conditions: [{
@@ -119,7 +119,7 @@ describe('Test reconciling places using sparql query version 2', () => {
             limit: 1
         };
 
-        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, { queries: [reconciliationQuery] }, "v2");
+        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, {queries: [reconciliationQuery]}, "v2");
         const candidate = result.results?.[0]?.candidates?.[0];
         expect(candidate.name).toBe("Capitol Theatre");
         expect(candidate.id).toBe("K11-116");
@@ -135,7 +135,7 @@ describe('Test reconciling places using sparql query version 2', () => {
             limit: 1
         };
 
-        const result = await matchService.reconcileByQueries(LanguageEnum.FRENCH, { queries: [reconciliationQuery] }, "v2");
+        const result = await matchService.reconcileByQueries(LanguageEnum.FRENCH, {queries: [reconciliationQuery]}, "v2");
         const candidate = result.results?.[0]?.candidates?.[0];
         expect(candidate.name).toBe("Théâtre Capitol");
         expect(candidate.id).toBe("K11-116");
