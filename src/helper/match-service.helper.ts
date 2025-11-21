@@ -438,7 +438,8 @@ export class MatchServiceHelper {
             `# Properties to return with matching results`,
             `{${propertiesSubQuery}}`,
             MatchServiceHelper.generateBindStatementForScoreCalculation(scoreVariables),
-            `}${QUERIES_V2.COMMON_GROUP_BY_STATEMENT} ${scoreVars}`
+            `}${QUERIES_V2.COMMON_GROUP_BY_STATEMENT} ${scoreVars}`,
+            `ORDER BY DESC(?total_score)`
         ].join('\n');
     }
 
