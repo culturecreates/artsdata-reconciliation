@@ -283,11 +283,12 @@ export class MatchService {
                 MatchServiceHelper.generateSubQueryUsingLuceneQuerySearch('name', value, luceneIndex, type,
                     scoreVar, limit));
         }
-
+        // Fetch name, type and type label and disambiguatingDescription
         const {
             selectQueryFragment,
             propertiesSubQuery
-        } = MatchServiceHelper.generateSubQueryToFetchAdditionalProperties(type);
+        } = MatchServiceHelper.generateSubQueryToFetchAdditionalProperties();
+
         const {
             scoreVariables: scoreVarsFromProps,
             propertySubQueries
