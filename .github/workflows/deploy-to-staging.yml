@@ -76,7 +76,7 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
-      - name: Deploy in EC2
+      - name: Deploy in Lightsail
         env:
             PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
             HOSTNAME : ${{ vars.HOSTNAME_TEST_SERVER_2 }}
