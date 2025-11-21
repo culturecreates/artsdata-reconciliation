@@ -52,8 +52,8 @@ describe("Recon Service tests", () => {
                         ]
                     }
                 ],
-                expectedId: "K23-5518",
-                expectedName: "Pierre-Yves Roy Desmarais",
+                expectedId: "K23-283",
+                expectedName: "Pierre-Yves Roy-Desmarais",
                 expectedCount: 1,
                 expectedMatchValue: false,
             },
