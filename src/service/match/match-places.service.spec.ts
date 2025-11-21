@@ -125,20 +125,20 @@ describe('Test reconciling places using sparql query version 2', () => {
         expect(candidate.id).toBe("K11-15");
     });
 
-    it(`Reconcile Capitol Theatre using French UI`, async () => {
+    it(`Reconcile National Arts Centre - Azrieli Studio using French UI`, async () => {
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
             conditions: [{
                 matchType: MatchTypeEnum.NAME,
-                propertyValue: "Capitol Theatre"
+                propertyValue: "National Arts Centre - Azrieli Studio"
             }],
             limit: 1
         };
 
         const result = await matchService.reconcileByQueries(LanguageEnum.FRENCH, {queries: [reconciliationQuery]}, "v2");
         const candidate = result.results?.[0]?.candidates?.[0];
-        expect(candidate.name).toBe("Théâtre Capitol");
-        expect(candidate.id).toBe("K11-116");
+        expect(candidate.name).toBe("Centre national des arts - Studio Azrieli");
+        expect(candidate.id).toBe("K11-15");
     });
 });
 
