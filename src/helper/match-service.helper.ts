@@ -421,7 +421,8 @@ export class MatchServiceHelper {
     private static generateSubqueryForUnindexedProperties(propertyId: string, propertyValue: string | string[],
                                                           scoreVariable: string) {
         return QUERIES_V2.SUBQUERY_TO_FETCH_UNINDEXED_ENTITY_TEMPLATE
-            .replace("PROPERTY_PLACEHOLDER", propertyId)
+            .replace("PROPERTY_PLACEHOLDER",
+                `${(propertyId.startsWith('<') && propertyId.endsWith('>')) ? propertyId : `<${propertyId}>`}`)
             .replace("PROPERTY_VARIABLE_PLACEHOLDER", `<${propertyValue}>`)
             .replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable)
     }
