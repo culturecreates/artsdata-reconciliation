@@ -15,17 +15,19 @@ describe('Test reconciling people using sparql query version 2', () => {
         matchService = setup.matchService;
     });
 
+    
     it(`Fuzzy match person name 'Jérémy Des'`, async () => {
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PERSON,
             conditions: [{
                 matchType: MatchTypeEnum.NAME,
-                propertyValue: "Jérémy De"
+                propertyValue: "Jeremy~^2+Desmarais~"
             }],
-            limit: 1
+            limit: 5
         };
 
         const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, { queries: [reconciliationQuery] }, "v2");
+        console.log(JSON.stringify(result, null, 2));
         const candidate = result.results?.[0]?.candidates?.[0];
         expect(candidate.name).toBe("Jérémy Desmarais");
         expect(candidate.id).toBe("K2-2791");
