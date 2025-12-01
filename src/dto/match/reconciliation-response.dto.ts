@@ -1,10 +1,19 @@
-import { ApiProperty } from "@nestjs/swagger";
+import {ApiProperty, ApiPropertyOptional} from "@nestjs/swagger";
 
 class ReconciliationType {
   @ApiProperty()
   id: string;
   @ApiProperty()
   name: string;
+}
+
+class ReconciliationFeature {
+    @ApiProperty()
+    id: string;
+    @ApiProperty()
+    name: string;
+    @ApiProperty()
+    value: number;
 }
 
 export class MultilingualValues {
@@ -34,6 +43,8 @@ export class ResultCandidates {
   match: boolean;
   @ApiProperty({ type: [ReconciliationType] })
   type: ReconciliationType[];
+    @ApiPropertyOptional({ type: [ReconciliationFeature] })
+    features?: ReconciliationFeature[]
 }
 
 export class ReconciliationResults {

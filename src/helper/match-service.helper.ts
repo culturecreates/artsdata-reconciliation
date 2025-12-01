@@ -60,7 +60,7 @@ export class MatchServiceHelper {
                 resultCandidate.description = descriptionEn || description || descriptionFr;
             }
 
-            resultCandidate.score = Math.round(Number(currentBinding["total_score"]?.value));
+            resultCandidate.score = Math.round(Number(currentBinding["total_score"]?.value)*100)/100;
             resultCandidate.match =
                 isQueryByURI ||
                 MatchServiceHelper.isAutoMatch(resultCandidate, reconciliationQuery, additionalPropertiesForAutoMatch);
@@ -69,6 +69,17 @@ export class MatchServiceHelper {
                 id: binding["type"]?.value,
                 name: binding["type_label"]?.value,
             }));
+
+            resultCandidate.features = Object.entries(currentBinding)
+                .filter(([key]) => key.endsWith("_score") && key !== "total_score")
+                .map(([key, val]: [string, {datatype:string, type:string,value:string}]) => {
+                    const id = key.replace("_score", "");
+                    return {
+                        id,
+                        name: `${id} score for the entity`,
+                        value: Math.round(parseFloat(val.value)*100)/100
+                    };
+                });
 
             candidates.push(resultCandidate);
         }
