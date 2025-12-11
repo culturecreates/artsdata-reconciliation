@@ -13,7 +13,7 @@ INSERT DATA {
       "stored": true,
       "analyzed": true,
       "multivalued": true,
-      "ignoreInvalidValues": false,
+      "ignoreInvalidValues": true,
       "facet": true
     },
     {

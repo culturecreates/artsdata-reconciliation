@@ -1,6 +1,6 @@
 import {LanguageEnum, MatchQualifierEnum} from "../enum";
 import {GRAPHDB_INDEX} from "../config";
-import {ReconciliationQuery, ResultCandidates} from "../dto";
+import {QueryCondition, ReconciliationQuery, ResultCandidates} from "../dto";
 import {isURL} from "validator";
 import {ArtsdataConstants, Entities, SCHEMA_ORG_PROPERTY_URI_MAP} from "../constant";
 import {JaroWinklerDistance} from "natural";
@@ -60,7 +60,7 @@ export class MatchServiceHelper {
                 resultCandidate.description = descriptionEn || description || descriptionFr;
             }
 
-            resultCandidate.score = Math.round(Number(currentBinding["total_score"]?.value));
+            resultCandidate.score = Math.round(Number(currentBinding["total_score"]?.value)*100)/100;
             resultCandidate.match =
                 isQueryByURI ||
                 MatchServiceHelper.isAutoMatch(resultCandidate, reconciliationQuery, additionalPropertiesForAutoMatch);
@@ -69,6 +69,17 @@ export class MatchServiceHelper {
                 id: binding["type"]?.value,
                 name: binding["type_label"]?.value,
             }));
+
+            resultCandidate.features = Object.entries(currentBinding)
+                .filter(([key]) => key.endsWith("_score") && key !== "total_score")
+                .map(([key, val]: [string, {datatype:string, type:string,value:string}]) => {
+                    const id = key.replace("_score", "");
+                    return {
+                        id,
+                        name: `${id} score for the entity`,
+                        value: Math.round(parseFloat(val.value)*100)/100
+                    };
+                });
 
             candidates.push(resultCandidate);
         }
@@ -345,37 +356,21 @@ export class MatchServiceHelper {
         }]
     }
 
-    static generateSubQueryToFetchAdditionalProperties(type: string) {
+    static generateSubQueryToFetchAdditionalProperties() {
 
         let propertiesSubQuery: string = QUERIES_V2.COMMON_PROPERTIES_TO_FETCH_QUERY;
         let selectQueryFragment: string = QUERIES_V2.COMMON_SELECT_QUERY_FOR_ALL_ENTITY_PROPERTIES_SUB_QUERY;
-
-        switch (type) {
-            case Entities.PERSON:
-            case Entities.ORGANIZATION:
-            case Entities.AGENT:
-                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_AGENT_PROPERTIES_SUB_QUERY;
-                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_AGENTS_SUB_QUERY;
-                break;
-            case Entities.PLACE:
-                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_PLACE_PROPERTIES_SUB_QUERY;
-                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_PLACES_SUB_QUERY
-                break;
-            case Entities.EVENT:
-                selectQueryFragment += QUERIES_V2.SELECT_QUERY_FOR_EVENT_PROPERTIES_SUB_QUERY;
-                propertiesSubQuery += QUERIES_V2.ADDITIONAL_PROPERTIES_TO_FETCH_FOR_EVENTS_SUB_QUERY
-                break;
-        }
 
         return {selectQueryFragment, propertiesSubQuery}
 
     }
 
-    static generateBindStatementForScoreCalculation(scoreVariables: string[]) {
-        return `BIND(${scoreVariables.join(' + ')}  as ?total_score)`;
+    static generateBindStatementForScoreCalculation(scoreVariables: Set<string>) {
+        return `BIND( ${[...scoreVariables].map(v => `COALESCE(${v}, 0)`)
+            .join(' + ')}  as ?total_score)`;
     }
 
-    static generateSubQueryToURI(uri: string, type: string, scoreVariable: string, limit?: number) {
+    static generateSubQueryToURI(uri: string, type: string, scoreVariable: string, limit: number) {
         let query = QUERIES_V2.SELECT_ENTITY_BY_URI_TEMPLATE;
 
         query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type);
@@ -389,37 +384,74 @@ export class MatchServiceHelper {
         return `{ \n\t${query}\n }`;
     }
 
-    static generateSubQueryUsingLuceneQuerySearch(propertyName: string, propertyValue: string, lucenceIndex: string, type: string,
-                                                    scoreVariable: string, limit?: number) {
-        let query = QUERIES_V2.SELECT_INDEXED_ENTITY_QUERY_TEMPLATE;
+    static extractPropertyLocalName(value: string): string {
+        const cleaned = value.replace(/^<|>$/g, "")
+            .split(/[:/]/).filter(Boolean);
+        return cleaned[cleaned.length - 1];
+    }
+
+    static generateSubQueryUsingLuceneQuerySearch(propertyName: string, propertyValue: string | string[],
+                                                  lucenceIndex: string, type: string, scoreVariable: string, limit: number) {
+        let query = QUERIES_V2.SUBQUERY_TO_FETCH_INDEXED_ENTITY_TEMPLATE;
 
         query = query.replace("INDEX_PLACEHOLDER", lucenceIndex);
         query = query.replace("LUCENE_QUERY_PLACEHOLDER", `${propertyName}: ${propertyValue}`);
-        query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type||"?x");
+        query = query.replace("TYPE_PLACEHOLDER", type || "?x");
         query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
-
-        if (limit) {
-            query = query + `LIMIT ${limit}`;
-        }
+        query = query + ` LIMIT ${limit}`;
 
         return `{ \n\t${query}\n }`;
     }
 
+    static resolvedPropertyConditions(luceneIndex: string, propertyConditions: QueryCondition[], type: string,
+                                      limit: number) {
+        const scoreVariables: string[] = [];
+        const propertySubQueries: string[] = [];
 
-    static generateSubQueryForProperties(propertyName: string, propertyValue: string, lucenceIndex: string, type: string,
-                                                  scoreVariable: string, limit?: number) {
-        let query = QUERIES_V2.SELECT_INDEXED_ENTITY_QUERY_TEMPLATE;
+        propertyConditions.forEach(({propertyId, propertyValue, required}) => {
+            if (propertyId && propertyValue) {
+                const propertyVariable = this.extractPropertyLocalName(propertyId);
+                const scoreVariable = `?${propertyVariable}_score`;
+                let subQuery = MatchServiceHelper.isValidURI(propertyValue as string)
+                    ? this.generateSubqueryForUnindexedProperties(propertyId, propertyValue, scoreVariable)
+                    : this.generateSubQueryUsingLuceneQuerySearch(propertyVariable, propertyValue, luceneIndex, type,
+                        scoreVariable, limit);
 
-        query = query.replace("INDEX_PLACEHOLDER", lucenceIndex);
-        query = query.replace("LUCENE_QUERY_PLACEHOLDER", `${propertyName}: ${propertyValue}`);
-        query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type);
-        query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
+                if (!required) {
+                    subQuery = `OPTIONAL ${subQuery}\nBIND(IF( !BOUND( ${scoreVariable}),0,${scoreVariable}) as ${scoreVariable})`
+                }
 
-        if (limit) {
-            query = query + `LIMIT ${limit}`;
-        }
+                propertySubQueries.push(subQuery);
+                scoreVariables.push(scoreVariable);
+            }
+        });
 
-        return `{ \n\t${query}\n }`;
+        return {scoreVariables, propertySubQueries};
+    }
+
+    private static generateSubqueryForUnindexedProperties(propertyId: string, propertyValue: string | string[],
+                                                          scoreVariable: string) {
+        return QUERIES_V2.SUBQUERY_TO_FETCH_UNINDEXED_ENTITY_TEMPLATE
+            .replace("PROPERTY_PLACEHOLDER",
+                `${(propertyId.startsWith('<') && propertyId.endsWith('>')) ? propertyId : `<${propertyId}>`}`)
+            .replace("PROPERTY_VARIABLE_PLACEHOLDER", `<${propertyValue}>`)
+            .replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable)
+    }
+
+    static createSparqlQuery(selectVariables: string[], subQueries: string[], propertiesSubQuery: string,
+                             scoreVariables: Set<string>) {
+        const scoreVars = [...scoreVariables].join(' ');
+        return [
+            QUERIES_V2.PREFIXES,
+            `SELECT DISTINCT ${selectVariables.join(' ')}`,
+            `WHERE {`,
+            subQueries.join('\n'),
+            `# Properties to return with matching results`,
+            `{${propertiesSubQuery}}`,
+            MatchServiceHelper.generateBindStatementForScoreCalculation(scoreVariables),
+            `}${QUERIES_V2.COMMON_GROUP_BY_STATEMENT} ${scoreVars}`,
+            `ORDER BY DESC(?total_score)`
+        ].join('\n');
     }
 
 

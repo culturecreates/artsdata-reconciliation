@@ -4,7 +4,11 @@ import {ManifestService} from "../../service";
 import {MANIFEST} from "../../constant";
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import axios from 'axios';
+import dirSchema from '../../schema/dir.schema.json';
+import manifestSchema from '../../schema/manifest.schema.json';
+import langSchema from '../../schema/lang.schema.json';
+import swaggerSchema from '../../schema/openapi.schema.json';
+import typeSchema from '../../schema/type.schema.json';
 
 describe('ManifestController', () => {
     let manifestController: ManifestController;
@@ -18,32 +22,14 @@ describe('ManifestController', () => {
         }).compile();
 
         manifestController = app.get<ManifestController>(ManifestController);
-        const ajv = new Ajv({ allErrors: true });
+        const ajv = new Ajv({allErrors: true, strict: false });
         addFormats(ajv);
 
-        // Fetch manifest schema
-        const {data: manifestSchema} = await axios.get(
-            'https://raw.githubusercontent.com/reconciliation-api/specs/master/1.0-draft/schemas/manifest.json'
-        );
-
-        // Fetch referenced schemas
-        const {data: dirSchema} = await axios.get(
-            'https://raw.githubusercontent.com/reconciliation-api/specs/refs/heads/master/1.0-draft/schemas/dir.json'
-        );
-        const {data: langSchema} = await axios.get(
-            'https://raw.githubusercontent.com/reconciliation-api/specs/refs/heads/master/1.0-draft/schemas/lang.json'
-        );
-        const {data: swaggerSchema} = await axios.get(
-            'https://raw.githubusercontent.com/reconciliation-api/specs/refs/heads/master/1.0-draft/schemas/openapi.json');
-
-        const {data: typeSchema} = await axios.get(
-            'https://raw.githubusercontent.com/reconciliation-api/specs/refs/heads/master/1.0-draft/schemas/type.json');
-
         // Add schemas to Ajv
-        ajv.addSchema(dirSchema, 'dir.json');
-        ajv.addSchema(langSchema, 'lang.json');
-        ajv.addSchema(swaggerSchema, 'open-api.json');
-        ajv.addSchema(typeSchema, 'type.json');
+        ajv.addSchema(dirSchema,"https://reconciliation-api.github.io/specs/draft/schemas/dir.json");
+        ajv.addSchema(swaggerSchema,"http://swagger.io/v2/schema.json#" );
+        ajv.addSchema(typeSchema,"https://reconciliation-api.github.io/specs/draft/schemas/type.json");
+        ajv.addSchema(langSchema,"https://reconciliation-api.github.io/specs/draft/schemas/lang.json" );
 
         // Compile manifest schema
         validate = ajv.compile(manifestSchema);
@@ -55,18 +41,23 @@ describe('ManifestController', () => {
             expect(manifestController.getServiceManifest()).toBe(MANIFEST);
         });
 
-        it('should return true the manifest validation schema', async () => {
+        it('should validate the manifest against the schema and return true', async () => {
             const response = manifestController.getServiceManifest();
             const valid = validate(response);
-            if (!valid) console.error(validate.errors);
+            if (!valid) console.error(
+                validate.errors?.map((error: any) => ({
+                    message: error.message,
+                    params: error.params,
+                    instancePath: error.instancePath,
+                }))
+            )
             expect(valid).toBe(true);
         });
 
-        it('should return false when the manifest is edited to invalid schema', async () => {
+        it('should return false when the manifest is edited to an invalid schema', async () => {
             const response = manifestController.getServiceManifest();
-            (response as any)['versions'] = "test-version"
-            const valid = validate(response);
-            if (!valid) console.error(validate.errors);
+            const invalidResponse = { ...response, versions: "test-version" };
+            const valid = validate(invalidResponse);
             expect(valid).toBe(false);
         });
     });

@@ -21,7 +21,6 @@ import {
     MatchTypeEnum,
 } from "../../enum";
 import {GRAPHDB_INDEX} from "../../config";
-import {QUERIES_V2} from "../../constant/match/match-queries-v2.constants";
 
 @Injectable()
 export class MatchService {
@@ -163,11 +162,9 @@ export class MatchService {
 
                 //TODO Remove this condition once the new version is fully released
                 if (version === 'v2') {
-                    sparqlQuery = this._generateSparqlQueryV2(id, name as string, type, isQueryByURI, limit || 25,
-                        propertyConditions);
+                    sparqlQuery = this._generateSparqlQueryV2(id, name as string, type, limit || 25, propertyConditions);
                 } else {
-                    sparqlQuery = this._generateSparqlQuery(id, name as string, type, isQueryByURI, limit || 25,
-                        propertyConditions);
+                    sparqlQuery = this._generateSparqlQuery(id, name as string, type, limit || 25, propertyConditions);
                 }
 
                 const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
@@ -253,58 +250,55 @@ export class MatchService {
         return triple;
     }
 
-    private _generateSparqlQueryV2(id: string | undefined, name: string | undefined, type: string, isQueryByURI: boolean,
+    /**
+     * @private
+     * @name _generateSparqlQueryV2
+     * @description Generate SPARQL query for v2
+     * @param id
+     * @param name
+     * @param type
+     * @param limit
+     * @param propertyConditions
+     */
+    private _generateSparqlQueryV2(id: string | undefined, name: string | undefined, type: string,
                                    limit: number, propertyConditions: QueryCondition[]) {
-        const lucenceIndex = GRAPHDB_INDEX.LABELLED_ENTITIES;
-        let query: string = QUERIES_V2.PREFIXES;
-        const selectVariables: string[] = ['?entity'];
-        const subQueries: string[] = [];
-        const scoreVariables: string[] = []
+
+        const luceneIndex = GRAPHDB_INDEX.LABELLED_ENTITIES;
+        const selectVariables = ['?entity'];
+        const subQueries = [];
+        const scoreVariables = new Set<string>();
+
+        const addSubQuery = (propertyName: string, value: string, generator: Function) => {
+            const scoreVariable = `?${propertyName}_score`;
+            selectVariables.push(scoreVariable);
+            scoreVariables.add(scoreVariable);
+            subQueries.push(generator(value, type, scoreVariable, limit));
+        };
 
         if (id) {
-            if ((MatchServiceHelper.isValidURI(id) || id?.startsWith('K'))) {
-                const propertyName = 'id'
-                const scoreVariable = `?${propertyName}_score`;
-
-                selectVariables.push(scoreVariable)
-                scoreVariables.push(scoreVariable)
-
-                let uri: string = id;
-                if (id.startsWith('K')) {
-                    uri = `${ArtsdataConstants.PREFIX}${id}`;
-                }
-
-                const subQueryForName = MatchServiceHelper.generateSubQueryToURI(uri, type, scoreVariable, limit)
-                subQueries.push(subQueryForName)
-            } else {
-                Exception.badRequest("Invalid URI format");
-            }
+            const uri = id.startsWith('K') ? `${ArtsdataConstants.PREFIX}${id}` : id;
+            addSubQuery('id', uri, MatchServiceHelper.generateSubQueryToURI);
         } else if (name) {
-            const propertyName = 'name'
-            const scoreVariable = `?${propertyName}_score`;
-
-            selectVariables.push(scoreVariable)
-            scoreVariables.push(scoreVariable)
-
-            const subQueryForName = MatchServiceHelper.generateSubQueryUsingLuceneQuerySearch(propertyName,
-                name, lucenceIndex, type, scoreVariable, limit)
-            subQueries.push(subQueryForName)
+            addSubQuery('name', name, (value: string, type: string, scoreVar: string) =>
+                MatchServiceHelper.generateSubQueryUsingLuceneQuerySearch('name', value, luceneIndex, type,
+                    scoreVar, limit));
         }
-
+        // Fetch name, type and type label and disambiguatingDescription
         const {
             selectQueryFragment,
             propertiesSubQuery
-        } = MatchServiceHelper.generateSubQueryToFetchAdditionalProperties(type);
+        } = MatchServiceHelper.generateSubQueryToFetchAdditionalProperties();
 
-        const selectClause = `\nSELECT DISTINCT ${selectVariables.join(' ')}` + selectQueryFragment;
-        query += `${selectClause}\nWHERE { \n${subQueries.join('\n')}`
+        const {
+            scoreVariables: scoreVarsFromProps,
+            propertySubQueries
+        } = MatchServiceHelper.resolvedPropertyConditions(luceneIndex, propertyConditions, type, limit);
 
+        scoreVarsFromProps.forEach(scoreVariables.add, scoreVariables);
+        selectVariables.push(...scoreVarsFromProps, selectQueryFragment);
+        subQueries.push(...propertySubQueries);
 
-        query += `\n # Properties to return with matching results \n{${propertiesSubQuery}\n}`;
-        query += MatchServiceHelper.generateBindStatementForScoreCalculation(scoreVariables);
-        query += `\n}${QUERIES_V2.COMMON_GROUP_BY_STATEMENT} ${scoreVariables.join(' ')}`
-
-        return query;
+        return MatchServiceHelper.createSparqlQuery(selectVariables, subQueries, propertiesSubQuery, scoreVariables);
     }
 
 
@@ -315,28 +309,23 @@ export class MatchService {
      * @param id
      * @param name
      * @param type
-     * @param isQueryByURI
      * @param limit
      * @param propertyConditions
      */
     private _generateSparqlQuery(
-        id: string | undefined, name: string | undefined, type: string, isQueryByURI: boolean, limit: number,
+        id: string | undefined, name: string | undefined, type: string, limit: number,
         propertyConditions: QueryCondition[]): string {
+
         const graphdbIndex = MatchServiceHelper.getGraphdbIndex(type);
         let rawQuery = QUERIES.RECONCILIATION_QUERY;
 
         if (name) {
             name = this._modifyNameForLuceneScore(MatchServiceHelper.escapeSpecialCharacters(name), propertyConditions);
         }
-        if (isQueryByURI) {
-            if (MatchServiceHelper.isValidURI(id as string) || id?.startsWith('K')) {
-                id = id?.startsWith('K') ? `<${ArtsdataConstants.PREFIX}${id}>` : `<${id}>`;
-            } else {
-                Exception.badRequest("Invalid URI format");
-            }
-
+        if (id) {
+            id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX}${id}>`;
             rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER",
-                `BIND(URI_PLACEHOLDER as ?entity)`);
+                `BIND(${id} as ?entity)`);
         } else {
             rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER",
                 QUERIES.SELECT_ENTITY_QUERY_BY_KEYWORD);
@@ -403,7 +392,6 @@ export class MatchService {
             .replace("INDEX_PLACE_HOLDER", graphdbIndex)
             .replace("QUERY_PLACE_HOLDER", name ? `values ?query { "${name}" }` : "")
             .replace("QUERY_FILTER_PLACE_HOLDER", name ? "luc:query ?query ;" : "")
-            .replace("URI_PLACEHOLDER", id || "")
             .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
 
         return this._resolvePropertyConditions(rawQuery, propertyConditions);
