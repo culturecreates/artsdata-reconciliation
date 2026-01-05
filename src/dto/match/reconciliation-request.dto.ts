@@ -9,7 +9,7 @@ import {
     IsNotEmpty,
     IsNumber,
     IsOptional,
-    IsString,
+    IsString, IsUrl,
     Matches,
     Min,
     ValidateIf,
@@ -35,8 +35,8 @@ export class QueryCondition {
     propertyValue: string | string[];
 
     @ApiPropertyOptional()
-    @ValidateIf((o) => o.matchType === "property" )
-    @IsString()
+    @ValidateIf((o) => o.matchType === "property")
+    @IsUrl({}, {message: "propertyId must be a valid URL"})
     @IsNotEmpty()
     propertyId?: string;
 
