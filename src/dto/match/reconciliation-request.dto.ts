@@ -36,7 +36,7 @@ export class QueryCondition {
 
     @ApiPropertyOptional()
     @ValidateIf((o) => o.matchType === "property")
-    @IsUrl({}, {message: "propertyId must be a valid URL"})
+    @IsString()
     @IsNotEmpty()
     propertyId?: string;
 

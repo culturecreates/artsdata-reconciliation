@@ -1,4 +1,4 @@
-import {Module} from "@nestjs/common";
+import {MiddlewareConsumer, Module} from "@nestjs/common";
 import {ManifestController, MatchController} from "./controller";
 import {ArtsdataService, HttpService, ManifestService, MatchService} from "./service";
 import {ExtendController} from "./controller/extend";
@@ -7,6 +7,7 @@ import {PreviewService} from "./service/preview";
 import {PreviewController} from "./controller/preview";
 import {SuggestController} from "./controller/suggest";
 import {SuggestService} from "./service/suggest";
+import {LoggerMiddleware} from "./middleware";
 
 @Module({
     imports: [],
@@ -28,4 +29,7 @@ import {SuggestService} from "./service/suggest";
     ]
 })
 export class AppModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(LoggerMiddleware).forRoutes('*');
+    }
 }
