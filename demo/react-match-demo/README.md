@@ -1,15 +1,18 @@
 # Artsdata Reconciliation API - React Match Demo Widget
 
-This is a React widget that demonstrates how to integrate with the Artsdata Reconciliation API to search for places.
+This is a minimal React widget that demonstrates how to integrate with the Artsdata Reconciliation API to search for entities (places, organizations, events, etc.).
 
 ## Features
 
-- 🔍 Real-time place search with debouncing (max 1 request per second)
+- 🔍 Real-time entity search with 500ms debouncing
 - 📋 Dropdown display of up to 10 matching results
 - 🎨 Bootstrap UI styling
-- ✅ Comprehensive unit tests
+- ✅ Comprehensive unit tests (38 passing)
 - 📱 Responsive design
-- 🌐 Display of place name, ID, and description
+- 🌐 Display of entity name, ID, and description
+- ⚙️ Configurable entity type via HTML data attribute
+- 🎁 Minimal widget (search field + dropdown only)
+- 📤 External event dispatching for integration
 
 ## Live Demo
 
@@ -80,34 +83,126 @@ npm run test:coverage
 
 ## How to Use the Widget
 
-### Basic Usage
+### Widget Structure
 
-The widget consists of three main components:
+The React widget is **minimal and focused** - it contains ONLY the search input field and dropdown. All labels, headings, and result displays should be in your HTML page, not inside the React component.
 
-1. **PlaceSearch** - The search input with dropdown results
-2. **SelectedPlace** - Displays the selected place details
-3. **App** - Main container component
+**What the widget includes:**
+- Search input field with spinner indicator
+- Dropdown showing up to 10 results
+- Result selection handling
 
-### Integration Example
+**What's in your HTML page (outside React):**
+- Page heading and description
+- Field label ("Select a Place", etc.)
+- Footer information
+- External result display area
 
-```jsx
-import React, { useState } from 'react';
-import PlaceSearch from './components/PlaceSearch';
-import SelectedPlace from './components/SelectedPlace';
+### Basic HTML Integration
 
-function MyApp() {
-  const [selectedPlace, setSelectedPlace] = useState(null);
-
-  return (
-    <div>
-      <PlaceSearch onSelectPlace={setSelectedPlace} />
-      {selectedPlace && <SelectedPlace place={selectedPlace} />}
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- Heading (outside React) -->
+    <h1>Artsdata Reconciliation API Demo</h1>
+    <p>Search for places using the Artsdata Reconciliation API</p>
+    
+    <!-- Field label (outside React) -->
+    <label for="place-search-input">Select a Place</label>
+    
+    <!-- React widget mounts here - just search field + dropdown -->
+    <div id="root" data-entity-type="schema:Place"></div>
+    
+    <!-- Footer (outside React) -->
+    <small>Powered by <a href="https://recon.artsdata.ca">Artsdata Reconciliation API</a></small>
+    
+    <!-- External result display (outside React) -->
+    <div id="selected-result" class="mt-4">
+      <!-- Selection details appear here via custom event -->
     </div>
-  );
-}
+  </div>
+  
+  <script src="bundle.js"></script>
+  <script>
+    // Listen for selection event
+    window.addEventListener('placeSelected', function(event) {
+      const place = event.detail;
+      document.getElementById('selected-result').innerHTML = `
+        <h3>${place.name}</h3>
+        <p><strong>ID:</strong> ${place.id}</p>
+        <p><strong>Description:</strong> ${place.description}</p>
+      `;
+    });
+  </script>
+</body>
+</html>
 ```
 
-### Configuration
+### Passing Parameters to the Widget
+
+The widget is configured via HTML **data attributes** on the mounting element. This makes it easy to reuse the widget for different entity types without modifying the React code.
+
+#### Entity Type Parameter
+
+The most important parameter is `data-entity-type`, which specifies what type of entity to search for:
+
+```html
+<!-- Search for places -->
+<div id="root" data-entity-type="schema:Place"></div>
+
+<!-- Search for organizations -->
+<div id="root" data-entity-type="schema:Organization"></div>
+
+<!-- Search for events -->
+<div id="root" data-entity-type="schema:Event"></div>
+
+<!-- Search for people -->
+<div id="root" data-entity-type="schema:Person"></div>
+```
+
+**Default:** If no `data-entity-type` is specified, it defaults to `schema:Place`.
+
+#### How It Works
+
+1. The React app reads the `data-entity-type` attribute from the `#root` element
+2. This value is passed to the search API
+3. The API returns matching entities of the specified type
+4. The widget displays results in the dropdown
+
+#### Complete Example
+
+```html
+<div class="container">
+  <h1>Find a Venue</h1>
+  <label>Venue Name</label>
+  
+  <!-- Widget configured for venues (places) -->
+  <div id="root" data-entity-type="schema:Place"></div>
+</div>
+```
+
+### Configuration Options
+
+#### Debounce Delay
+
+The debounce delay (default: 500ms) can be configured in `src/hooks/useSearchPlace.js`:
+
+```javascript
+const DEBOUNCE_DELAY = 500; // Change to 1000 for 1 second delay
+```
+
+#### Result Limit
+
+The number of results (default: 10) can be configured in `src/api/artsdataApi.js`:
+
+```javascript
+const DEFAULT_LIMIT = 10; // Change to 20 for 20 results
+```
 
 #### API Endpoint
 
@@ -117,83 +212,82 @@ The API endpoint is configured in `src/api/artsdataApi.js`:
 const API_BASE_URL = 'https://recon.artsdata.ca';
 ```
 
-To use a different endpoint, modify this constant.
+## Integration with External Code
 
-#### Debounce Delay
+### Custom Event API
 
-The debounce delay (default: 1000ms) can be configured when using the `usePlaceSearch` hook:
+The widget dispatches a custom `placeSelected` event when a user selects an entity. This allows your webpage to react to selections without tightly coupling to React.
 
-```javascript
-const { searchQuery, results, loading, error, handleSearchChange } = usePlaceSearch(1500); // 1.5 seconds
-```
+**Event Details:**
 
-#### Result Limit
+- **Event Name:** `placeSelected`
+- **Event Target:** `window`
+- **Event Detail:** Selected entity object
 
-The number of results can be configured in the `searchPlaces` function call:
-
-```javascript
-const candidates = await searchPlaces(query, 15); // Fetch 15 results instead of 10
-```
-
-#### Search Type
-
-To search for different entity types, modify the request in `src/api/artsdataApi.js`:
-
-```javascript
-const requestBody = {
-  queries: [
-    {
-      type: 'schema:Organization', // Change from schema:Place to schema:Organization
-      limit: limit,
-      conditions: [
-        {
-          matchType: 'name',
-          propertyValue: searchQuery.trim(),
-        },
-      ],
-    },
-  ],
-};
-```
-
-## Component API
-
-### PlaceSearch Component
-
-**Props:**
-
-- `onSelectPlace` (Function, required) - Callback function called when a place is selected from the dropdown
-
-**Example:**
-
-```jsx
-<PlaceSearch onSelectPlace={(place) => console.log('Selected:', place)} />
-```
-
-### SelectedPlace Component
-
-**Props:**
-
-- `place` (Object, optional) - The place object to display
-
-**Place Object Structure:**
+**Entity Object Structure:**
 
 ```javascript
 {
-  id: "http://kg.artsdata.ca/resource/K10-123",
+  id: "K11-19",
   name: "Roy Thomson Hall",
-  description: "A concert hall in downtown Toronto",
-  score: 95.5,
+  description: "Toronto (ON) CA",
+  score: 3.72,
   type: [
-    { id: "schema:Place", name: "Place" }
+    { id: "http://schema.org/Place", name: "Place" }
   ]
 }
 ```
 
-**Example:**
+**Listening for Selections:**
 
-```jsx
-<SelectedPlace place={selectedPlace} />
+```javascript
+window.addEventListener('placeSelected', function(event) {
+  const entity = event.detail;
+  
+  // Use the selected entity in your application
+  console.log('Selected:', entity.name);
+  console.log('ID:', entity.id);
+  console.log('Description:', entity.description);
+  console.log('Score:', entity.score);
+  
+  // Update your UI
+  document.getElementById('result-name').textContent = entity.name;
+  document.getElementById('result-id').textContent = entity.id;
+});
+```
+
+**Complete Integration Example:**
+
+```html
+<div class="container">
+  <h1>Search Organizations</h1>
+  <label>Organization Name</label>
+  <div id="root" data-entity-type="schema:Organization"></div>
+  
+  <div id="selection-display" class="mt-4 border p-3" style="display:none;">
+    <h3>Selected Organization</h3>
+    <p><strong>Name:</strong> <span id="result-name"></span></p>
+    <p><strong>ID:</strong> <span id="result-id"></span></p>
+    <p><strong>Description:</strong> <span id="result-description"></span></p>
+  </div>
+</div>
+
+<script>
+  window.addEventListener('placeSelected', function(event) {
+    const org = event.detail;
+    
+    // Show the display section
+    document.getElementById('selection-display').style.display = 'block';
+    
+    // Update the fields
+    document.getElementById('result-name').textContent = org.name;
+    document.getElementById('result-id').textContent = org.id;
+    document.getElementById('result-description').textContent = org.description;
+    
+    // You can also submit to your backend, update a form, etc.
+    document.getElementById('hidden-org-id').value = org.id;
+  });
+</script>
 ```
 
 ## Customization

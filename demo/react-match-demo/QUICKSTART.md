@@ -1,10 +1,18 @@
 # Quick Start Guide - Artsdata React Match Widget
 
-This guide will help you integrate the Artsdata Reconciliation API React widget into your own application.
+This guide will help you integrate the Artsdata Reconciliation API React widget into your website.
+
+## What This Widget Does
+
+The widget is a **minimal search component** containing only:
+- A search input field with spinner
+- A dropdown showing matching results
+
+Everything else (headings, labels, result displays) should be in your HTML page.
 
 ## Installation
 
-### Option 1: Use the Built Widget (Recommended for Quick Start)
+### Option 1: Use the Built Widget (Recommended)
 
 1. Copy the built files from `dist/` directory
 2. Include Bootstrap CSS in your HTML:
@@ -16,83 +24,108 @@ This guide will help you integrate the Artsdata Reconciliation API React widget 
    <script src="path/to/bundle.js"></script>
    ```
 
-### Option 2: Integrate as React Components
+### Option 2: Build from Source
 
-1. Copy the source files from `src/` directory to your React project
+1. Navigate to the demo directory:
+   ```bash
+   cd demo/react-match-demo
+   ```
 2. Install dependencies:
    ```bash
-   npm install react react-dom bootstrap
+   npm install
    ```
-3. Import and use the components:
-   ```jsx
-   import PlaceSearch from './components/PlaceSearch';
-   import SelectedPlace from './components/SelectedPlace';
+3. Build for production:
+   ```bash
+   npm run build
    ```
+4. Use the files from `dist/` directory
 
 ## Basic Usage
 
-```jsx
-import React, { useState } from 'react';
-import PlaceSearch from './components/PlaceSearch';
-import SelectedPlace from './components/SelectedPlace';
+### HTML Setup
 
-function MyApp() {
-  const [selectedPlace, setSelectedPlace] = useState(null);
-
-  return (
-    <div className="container">
-      <h1>Search Places</h1>
-      <PlaceSearch onSelectPlace={setSelectedPlace} />
-      {selectedPlace && <SelectedPlace place={selectedPlace} />}
-    </div>
-  );
-}
-
-export default MyApp;
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Search Demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-5">
+    <!-- Your heading (outside React) -->
+    <h1>Find a Place</h1>
+    <p>Search for places in the Artsdata knowledge graph</p>
+    
+    <!-- Your label (outside React) -->
+    <label for="place-search-input">Select a Place</label>
+    
+    <!-- React widget mounts here -->
+    <div id="root" data-entity-type="schema:Place"></div>
+    
+    <!-- Result display (outside React) -->
+    <div id="selected-place" class="mt-4"></div>
+  </div>
+  
+  <!-- Load the widget -->
+  <script src="bundle.js"></script>
+  
+  <!-- Handle selection -->
+  <script>
+    window.addEventListener('placeSelected', function(event) {
+      const place = event.detail;
+      document.getElementById('selected-place').innerHTML = `
+        <div class="card">
+          <div class="card-body">
+            <h3>${place.name}</h3>
+            <p><strong>ID:</strong> ${place.id}</p>
+            <p><strong>Description:</strong> ${place.description}</p>
+          </div>
+        </div>
+      `;
+    });
+  </script>
+</body>
+</html>
 ```
 
-## Configuration
+## Passing Parameters to the Widget
 
-### Change API Endpoint
+### Entity Type (Required Parameter)
 
-Edit `src/api/artsdataApi.js`:
-```javascript
-const API_BASE_URL = 'https://your-api-endpoint.com';
+The widget accepts the entity type as a **data attribute** on the mounting element:
+
+```html
+<!-- Search for places -->
+<div id="root" data-entity-type="schema:Place"></div>
+
+<!-- Search for organizations -->
+<div id="root" data-entity-type="schema:Organization"></div>
+
+<!-- Search for events -->
+<div id="root" data-entity-type="schema:Event"></div>
+
+<!-- Search for people -->
+<div id="root" data-entity-type="schema:Person"></div>
 ```
 
-### Change Debounce Delay
+**Default:** If not specified, defaults to `schema:Place`.
 
-Edit the hook usage in your component:
-```javascript
-const { searchQuery, results, loading, error, handleSearchChange } = usePlaceSearch(2000); // 2 seconds
-```
+### How Parameters Work
 
-### Change Result Limit
+1. The React app reads the `data-entity-type` attribute from `#root`
+2. This value is sent to the Artsdata API
+3. Results are filtered to match the specified type
+4. The dropdown displays matching entities
 
-Edit `src/api/artsdataApi.js` in the `searchPlaces` function:
-```javascript
-const candidates = await searchPlaces(query, 20); // 20 results instead of 10
-```
+### Advanced Configuration
 
-### Search Different Entity Types
+To modify other settings (debounce delay, result limit, API endpoint), you need to rebuild from source:
 
-Modify the request body in `src/api/artsdataApi.js`:
-```javascript
-const requestBody = {
-  queries: [
-    {
-      type: 'schema:Organization', // or 'schema:Event', 'schema:Person', etc.
-      limit: limit,
-      conditions: [
-        {
-          matchType: 'name',
-          propertyValue: searchQuery.trim(),
-        },
-      ],
-    },
-  ],
-};
-```
+1. Edit `src/hooks/useSearchPlace.js` for debounce delay (default: 500ms)
+2. Edit `src/api/artsdataApi.js` for result limit (default: 10)
+3. Edit `src/api/artsdataApi.js` for API endpoint
+4. Rebuild: `npm run build`
 
 ## Styling
 
@@ -190,36 +223,36 @@ function ValidatedSearch() {
 }
 ```
 
-## Testing Your Integration
+## Event API Reference
 
-### Unit Tests
+### placeSelected Event
 
+When a user selects an entity from the dropdown, the widget dispatches a custom event:
+
+**Event Name:** `placeSelected`
+
+**Event Target:** `window`
+
+**Event Detail (object):**
 ```javascript
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import PlaceSearch from './components/PlaceSearch';
-
-test('renders search input', () => {
-  render(<PlaceSearch onSelectPlace={jest.fn()} />);
-  expect(screen.getByLabelText(/select a place/i)).toBeInTheDocument();
-});
+{
+  id: "K11-19",              // Entity ID
+  name: "Roy Thomson Hall",   // Entity name
+  description: "Toronto (ON) CA",  // Description
+  score: 3.72,                // Match score
+  type: [                     // Entity types
+    { id: "http://schema.org/Place", name: "Place" }
+  ]
+}
 ```
 
-### Integration Test
-
+**Usage:**
 ```javascript
-test('selects a place', async () => {
-  const mockOnSelect = jest.fn();
-  render(<PlaceSearch onSelectPlace={mockOnSelect} />);
-  
-  const input = screen.getByLabelText(/select a place/i);
-  fireEvent.change(input, { target: { value: 'test' } });
-  
-  await waitFor(() => {
-    const result = screen.getByText(/test place/i);
-    fireEvent.click(result);
-  });
-  
-  expect(mockOnSelect).toHaveBeenCalled();
+window.addEventListener('placeSelected', function(event) {
+  const entity = event.detail;
+  console.log('Selected:', entity.name);
+  console.log('ID:', entity.id);
+  // Use entity data in your application
 });
 ```
 
