@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artsdata Reconciliation API - React Match Demo - Standalone</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .info-box {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="info-box">
+            <h4>📝 Instructions</h4>
+            <p><strong>To test this demo:</strong></p>
+            <ol>
+                <li>Ensure the Artsdata Reconciliation API is running at <code>http://recon.artsdata.ca</code></li>
+                <li>If testing locally, the API should be available at <code>http://localhost:3000/demo</code></li>
+                <li>Open the built demo at <code>/demo/react-match-demo/dist/index.html</code> in your browser</li>
+            </ol>
+            <p><strong>How to use:</strong></p>
+            <ul>
+                <li>Type a place name (e.g., "Roy Thomson Hall", "Place des Arts", "National Arts Centre")</li>
+                <li>Results will appear after 1 second (debounced)</li>
+                <li>Click on a result to see full details</li>
+            </ul>
+        </div>
+
+        <h1 class="text-center mb-4">React Match Demo Preview</h1>
+        
+        <div class="alert alert-warning" role="alert">
+            <strong>Note:</strong> This is a standalone preview page. The actual demo is built and can be accessed at <code>/demo</code> when the NestJS server is running.
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Features Implemented ✅</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>✅ Search input with real-time place matching</li>
+                    <li>✅ Debounced API calls (max 1 request per second)</li>
+                    <li>✅ Dropdown display of up to 10 results</li>
+                    <li>✅ Display of name, ID, and description</li>
+                    <li>✅ Bootstrap UI styling</li>
+                    <li>✅ Click to select and display full details</li>
+                    <li>✅ Comprehensive unit tests (39 tests passing)</li>
+                    <li>✅ Documentation for 3rd party integration</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Technical Stack</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Frontend</h6>
+                        <ul>
+                            <li>React 18.2.0</li>
+                            <li>Bootstrap 5.3.0</li>
+                            <li>Custom debounce hook</li>
+                            <li>Webpack 5 build</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Testing</h6>
+                        <ul>
+                            <li>Jest 29</li>
+                            <li>React Testing Library 14</li>
+                            <li>70% coverage threshold</li>
+                            <li>39 passing tests</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">API Integration</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Endpoint:</strong> <code>POST http://recon.artsdata.ca/match</code></p>
+                <p><strong>Request Format:</strong></p>
+                <pre><code>{
+  "queries": [{
+    "type": "schema:Place",
+    "limit": 10,
+    "conditions": [{
+      "matchType": "name",
+      "propertyValue": "search term"
+    }]
+  }]
+}</code></pre>
+                <p><strong>Response:</strong> Array of candidates with name, ID, description, score, and type information</p>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="../README.md" class="btn btn-primary me-2">View Documentation</a>
+            <a href="dist/index.html" class="btn btn-success">Open Demo</a>
+        </div>
+    </div>
+</body>
+</html>
