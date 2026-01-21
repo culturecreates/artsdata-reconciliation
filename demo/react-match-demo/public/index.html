@@ -21,25 +21,50 @@
 </head>
 <body>
     <div class="container py-5">
-        <!-- React Widget Container -->
-        <!-- Pass entity type via data-entity-type attribute (e.g., "schema:Place", "schema:Organization") -->
-        <div id="root" data-entity-type="schema:Place"></div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Page Heading (Outside React) -->
+                <div class="text-center mb-4">
+                    <h1 class="mb-3">Artsdata Reconciliation API Demo</h1>
+                    <p class="lead text-muted">
+                        Search for places using the Artsdata Reconciliation API
+                    </p>
+                </div>
+
+                <!-- Field Label (Outside React) -->
+                <label for="place-search-input" class="form-label">Select a Place</label>
+                
+                <!-- React Widget Container (Search field and dropdown only) -->
+                <!-- Pass entity type via data-entity-type attribute (e.g., "schema:Place", "schema:Organization") -->
+                <div id="root" data-entity-type="schema:Place"></div>
+                
+                <!-- Powered By Footer (Outside React) -->
+                <div class="mt-4 text-center text-muted">
+                    <small>
+                        Powered by 
+                        <a href="https://recon.artsdata.ca" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            Artsdata Reconciliation API
+                        </a>
+                    </small>
+                </div>
         
-        <!-- External Result Display (Outside React) -->
-        <div id="external-result" class="mt-4">
-            <h3 class="text-center text-muted">Selected Place (Outside React Widget)</h3>
-            <p class="text-center text-muted mb-0">
-                <small>This area is outside the React widget to demonstrate integration with other parts of your website.</small>
-            </p>
-            <div id="external-result-content" class="mt-3" style="display: none;">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title" id="external-name"></h5>
-                        <p class="card-text">
-                            <strong>ID:</strong> <a href="#" id="external-id" target="_blank"></a><br>
-                            <strong>Description:</strong> <span id="external-description"></span><br>
-                            <strong>Score:</strong> <span id="external-score"></span>
-                        </p>
+                <!-- External Result Display (Outside React) -->
+                <div id="external-result" class="mt-4">
+                    <h3 class="text-center text-muted">Selected Place (Outside React Widget)</h3>
+                    <p class="text-center text-muted mb-0">
+                        <small>This area is outside the React widget to demonstrate integration with other parts of your website.</small>
+                    </p>
+                    <div id="external-result-content" class="mt-3" style="display: none;">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title" id="external-name"></h5>
+                                <p class="card-text">
+                                    <strong>ID:</strong> <a href="#" id="external-id" target="_blank"></a><br>
+                                    <strong>Description:</strong> <span id="external-description"></span><br>
+                                    <strong>Score:</strong> <span id="external-score"></span>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

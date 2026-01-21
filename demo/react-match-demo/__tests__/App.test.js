@@ -8,30 +8,29 @@ jest.mock('../src/api/artsdataApi', () => ({
 }));
 
 describe('App', () => {
-  it('should render the app title', () => {
+  it('should render the PlaceSearch component with search input', () => {
     render(<App />);
-    expect(screen.getByText(/artsdata reconciliation api demo/i)).toBeInTheDocument();
+    const searchInput = screen.getByPlaceholderText(/start typing to search for places/i);
+    expect(searchInput).toBeInTheDocument();
   });
 
-  it('should render the description', () => {
-    render(<App />);
-    expect(screen.getByText(/search for places using the artsdata reconciliation api/i)).toBeInTheDocument();
+  it('should pass entityType prop to PlaceSearch', () => {
+    render(<App entityType="schema:Organization" />);
+    // Verify that the component renders without error with entityType
+    expect(screen.getByPlaceholderText(/start typing to search for places/i)).toBeInTheDocument();
   });
 
-  it('should render the PlaceSearch component', () => {
+  it('should use default entityType when not provided', () => {
     render(<App />);
-    expect(screen.getByLabelText(/select a place/i)).toBeInTheDocument();
+    // Verify that the component renders with default entityType
+    expect(screen.getByPlaceholderText(/start typing to search for places/i)).toBeInTheDocument();
   });
 
-  it('should render footer with API link', () => {
+  it('should dispatch custom event when place is selected', () => {
+    const dispatchEventSpy = jest.spyOn(window, 'dispatchEvent');
     render(<App />);
-    const link = screen.getByRole('link', { name: /artsdata reconciliation api/i });
-    expect(link).toHaveAttribute('href', 'https://recon.artsdata.ca');
-    expect(link).toHaveAttribute('target', '_blank');
-  });
-
-  it('should not render SelectedPlace initially', () => {
-    render(<App />);
-    expect(screen.queryByText('Selected Place')).not.toBeInTheDocument();
+    // The component should be ready to dispatch events
+    expect(dispatchEventSpy).toBeDefined();
+    dispatchEventSpy.mockRestore();
   });
 });

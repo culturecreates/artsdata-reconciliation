@@ -68,6 +68,7 @@
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-8">
+                <!-- Page Heading (Outside React Widget) -->
                 <div class="text-center mb-4">
                     <h1 class="mb-3">Artsdata Reconciliation API Demo</h1>
                     <p class="lead text-muted">
@@ -75,41 +76,42 @@
                     </p>
                 </div>
 
-                <div class="card shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="search-container">
-                            <label for="placeSearch" class="form-label">Select a Place</label>
-                            <div class="search-input-wrapper">
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="placeSearch"
-                                    placeholder="Start typing to search for places..."
-                                    autocomplete="off"
-                                />
-                                <div id="searchSpinner" class="spinner-container" style="display: none;">
-                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                        <span class="visually-hidden">Searching...</span>
-                                    </div>
-                                </div>
+                <!-- Field Label (Outside React Widget) -->
+                <label for="placeSearch" class="form-label">Select a Place</label>
+                
+                <!-- Search Widget (This is what React renders - just the input and dropdown) -->
+                <div class="search-container">
+                    <div class="search-input-wrapper">
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="placeSearch"
+                            placeholder="Start typing to search for places..."
+                            autocomplete="off"
+                        />
+                        <div id="searchSpinner" class="spinner-container" style="display: none;">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Searching...</span>
                             </div>
-                            <div id="searchStatus" class="text-danger mt-1" style="display: none;">
-                                <small></small>
-                            </div>
-                            <div id="dropdownResults" class="dropdown-results"></div>
                         </div>
                     </div>
-                </div>
-
-                <div id="selected-in-react" style="display: none;" class="mt-4">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Selected Place (In React Widget)</h5>
-                        </div>
-                        <div class="card-body" id="selected-in-react-content"></div>
+                    <div id="searchStatus" class="text-danger mt-1" style="display: none;">
+                        <small></small>
                     </div>
+                    <div id="dropdownResults" class="dropdown-results"></div>
                 </div>
 
+                <!-- Powered By Footer (Outside React Widget) -->
+                <div class="mt-4 text-center text-muted">
+                    <small>
+                        Powered by
+                        <a href="https://recon.artsdata.ca" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            Artsdata Reconciliation API
+                        </a>
+                    </small>
+                </div>
+
+                <!-- External Result Display (Outside React Widget) -->
                 <div id="external-result" class="mt-4">
                     <h3 class="text-center text-muted">Selected Place (Outside React Widget)</h3>
                     <p class="text-center text-muted mb-0">
@@ -127,15 +129,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="mt-4 text-center text-muted">
-                    <small>
-                        Powered by
-                        <a href="https://recon.artsdata.ca" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
-                            Artsdata Reconciliation API
-                        </a>
-                    </small>
                 </div>
             </div>
         </div>
