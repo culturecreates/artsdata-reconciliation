@@ -9,6 +9,8 @@
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 0.25rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  background-color: #ffffff;
+  margin-top: 0.125rem;
 }
 
 .dropdown-item {
@@ -16,6 +18,10 @@
   border-bottom: 1px solid #f0f0f0;
   text-align: left;
   white-space: normal;
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  cursor: pointer;
 }
 
 .dropdown-item:last-child {
@@ -24,6 +30,11 @@
 
 .dropdown-item:hover {
   background-color: #f8f9fa;
+}
+
+.dropdown-item:focus {
+  background-color: #e9ecef;
+  outline: none;
 }
 
 .result-item {
