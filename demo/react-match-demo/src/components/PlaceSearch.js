@@ -51,10 +51,10 @@ const PlaceSearch = ({ onSelectPlace }) => {
 
   return (
     <div className="place-search-container" ref={dropdownRef}>
-      <div className="mb-3">
-        <label htmlFor="placeSearch" className="form-label">
-          Select a Place
-        </label>
+      <label htmlFor="placeSearch" className="form-label">
+        Select a Place
+      </label>
+      <div className="search-input-wrapper">
         <input
           type="text"
           className="form-control"
@@ -65,16 +65,18 @@ const PlaceSearch = ({ onSelectPlace }) => {
           autoComplete="off"
         />
         {loading && (
-          <div className="text-muted mt-1">
-            <small>Searching...</small>
-          </div>
-        )}
-        {error && (
-          <div className="text-danger mt-1">
-            <small>{error}</small>
+          <div className="spinner-container">
+            <div className="spinner-border spinner-border-sm text-primary" role="status">
+              <span className="visually-hidden">Searching...</span>
+            </div>
           </div>
         )}
       </div>
+      {error && (
+        <div className="text-danger mt-1">
+          <small>{error}</small>
+        </div>
+      )}
 
       {showDropdown && results.length > 0 && (
         <div className="dropdown-menu show w-100" style={{ maxHeight: '400px', overflowY: 'auto' }}>
@@ -91,10 +93,12 @@ const PlaceSearch = ({ onSelectPlace }) => {
                 onClick={() => handleSelectPlace(result)}
               >
                 <div className="result-item">
-                  <div className="fw-bold">{name}</div>
-                  <div className="text-muted small">ID: {id}</div>
+                  <div className="d-flex justify-content-between align-items-start">
+                    <div className="fw-bold flex-grow-1">{name}</div>
+                    <span className="badge bg-secondary ms-2">{id}</span>
+                  </div>
                   {description && (
-                    <div className="text-secondary small">{description}</div>
+                    <div className="text-secondary small mt-1">{description}</div>
                   )}
                 </div>
               </button>
