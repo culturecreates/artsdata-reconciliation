@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { searchPlaces } from '../api/artsdataApi';
-import { debounce } from '../utils/debounce';
 
 /**
  * Custom hook for searching places with debounce
@@ -12,47 +11,44 @@ export const usePlaceSearch = (debounceDelay = 1000) => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const abortControllerRef = useRef(null);
+  const debounceTimerRef = useRef(null);
 
-  const performSearch = useCallback(async (query) => {
-    if (!query || query.trim() === '') {
+  useEffect(() => {
+    // Clear previous timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Handle empty query
+    if (!searchQuery || searchQuery.trim() === '') {
       setResults([]);
       setLoading(false);
       return;
     }
 
-    // Abort previous request if it exists
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
+    // Set up debounced search
+    debounceTimerRef.current = setTimeout(async () => {
+      setLoading(true);
+      setError(null);
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const candidates = await searchPlaces(query, 10);
-      setResults(candidates);
-    } catch (err) {
-      if (err.name !== 'AbortError') {
+      try {
+        const candidates = await searchPlaces(searchQuery, 10);
+        setResults(candidates);
+      } catch (err) {
         setError('Failed to fetch results. Please try again.');
         setResults([]);
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    }, debounceDelay);
 
-  // Create debounced search function
-  const debouncedSearch = useCallback(
-    debounce((query) => {
-      performSearch(query);
-    }, debounceDelay),
-    [performSearch, debounceDelay]
-  );
-
-  useEffect(() => {
-    debouncedSearch(searchQuery);
-  }, [searchQuery, debouncedSearch]);
+    // Cleanup function
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [searchQuery, debounceDelay]);
 
   const handleSearchChange = (query) => {
     setSearchQuery(query);
