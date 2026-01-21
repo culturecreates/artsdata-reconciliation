@@ -33,6 +33,48 @@ npm run seed:calendar-metadata
 
 npm run test
 
+## React Match Demo
+
+A React widget demo is included to demonstrate how to integrate with the Artsdata Reconciliation API. The demo provides a place search interface with the following features:
+
+- Real-time search with debouncing (max 1 request per second)
+- Display of up to 10 matching results
+- Bootstrap UI styling
+- Full unit test coverage
+
+### Accessing the Demo
+
+Once the server is running, the demo is accessible at:
+- **Development:** `http://localhost:3000/demo`
+- **Production:** `http://recon.artsdata.ca/demo`
+
+### Building the Demo
+
+The demo is automatically built when you run:
+
+```bash
+npm run build
+```
+
+To build only the demo:
+
+```bash
+npm run build:demo
+```
+
+### Testing the Demo
+
+To run the demo's unit tests:
+
+```bash
+npm run test:demo
+```
+
+### Demo Documentation
+
+For detailed documentation on how to use and customize the React widget, see:
+- [Demo README](./demo/react-match-demo/README.md)
+
 #### And you're ready to go :)
 
 [nestjs]: https://nestjs.com

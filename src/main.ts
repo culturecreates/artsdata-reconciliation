@@ -7,11 +7,16 @@ import express from 'express';
 import * as http from 'http';
 import {ValidationPipe} from '@nestjs/common';
 import {ArtsdataService} from './service';
+import * as path from 'path';
 
 async function bootstrap() {
     const server = express();
     server.use(express.json({limit: '50mb'}));
     server.use(express.urlencoded({limit: '50mb', extended: true}));
+    
+    // Serve static files for React demo
+    const demoPath = path.join(__dirname, '..', 'demo', 'react-match-demo', 'dist');
+    server.use('/demo', express.static(demoPath));
 
     const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
     app.useGlobalPipes(new ValidationPipe());
