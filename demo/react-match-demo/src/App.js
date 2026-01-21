@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import PlaceSearch from './components/PlaceSearch';
-import SelectedPlace from './components/SelectedPlace';
 import { extractString } from './api/artsdataApi';
 
 /**
  * App component - Main application component
+ * @param {string} entityType - The entity type to search for (default: 'schema:Place')
  */
-function App() {
+function App({ entityType = 'schema:Place' }) {
   const [selectedPlace, setSelectedPlace] = useState(null);
 
   const handleSelectPlace = (place) => {
@@ -39,11 +39,9 @@ function App() {
 
         <div className="card shadow-sm">
           <div className="card-body p-4">
-            <PlaceSearch onSelectPlace={handleSelectPlace} />
+            <PlaceSearch onSelectPlace={handleSelectPlace} entityType={entityType} />
           </div>
         </div>
-
-        {selectedPlace && <SelectedPlace place={selectedPlace} />}
 
         <div className="mt-4 text-center text-muted">
           <small>

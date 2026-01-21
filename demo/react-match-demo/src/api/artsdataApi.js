@@ -9,9 +9,10 @@ const API_BASE_URL = 'https://recon.artsdata.ca';
  * Searches for places using the Artsdata Reconciliation API match service
  * @param {string} searchQuery - The search term to match
  * @param {number} limit - Maximum number of results to return (default: 10)
+ * @param {string} entityType - The entity type to search for (default: 'schema:Place')
  * @returns {Promise<Array>} Array of matching candidates
  */
-export const searchPlaces = async (searchQuery, limit = 10) => {
+export const searchPlaces = async (searchQuery, limit = 10, entityType = 'schema:Place') => {
   if (!searchQuery || searchQuery.trim() === '') {
     return [];
   }
@@ -19,7 +20,7 @@ export const searchPlaces = async (searchQuery, limit = 10) => {
   const requestBody = {
     queries: [
       {
-        type: 'schema:Place',
+        type: entityType,
         limit: limit,
         conditions: [
           {

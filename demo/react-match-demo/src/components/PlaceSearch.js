@@ -6,9 +6,10 @@ import './PlaceSearch.css';
 /**
  * PlaceSearch component - Search input with dropdown results
  * @param {Function} onSelectPlace - Callback when a place is selected
+ * @param {string} entityType - The entity type to search for (default: 'schema:Place')
  */
-const PlaceSearch = ({ onSelectPlace }) => {
-  const { searchQuery, results, loading, error, handleSearchChange } = usePlaceSearch(1000);
+const PlaceSearch = ({ onSelectPlace, entityType = 'schema:Place' }) => {
+  const { searchQuery, results, loading, error, handleSearchChange } = usePlaceSearch(500, entityType);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
 

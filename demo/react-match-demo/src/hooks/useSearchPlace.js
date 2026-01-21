@@ -3,10 +3,11 @@ import { searchPlaces } from '../api/artsdataApi';
 
 /**
  * Custom hook for searching places with debounce
- * @param {number} debounceDelay - Debounce delay in milliseconds (default: 1000)
+ * @param {number} debounceDelay - Debounce delay in milliseconds (default: 500)
+ * @param {string} entityType - The entity type to search for (default: 'schema:Place')
  * @returns {Object} Search state and functions
  */
-export const usePlaceSearch = (debounceDelay = 1000) => {
+export const usePlaceSearch = (debounceDelay = 500, entityType = 'schema:Place') => {
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,7 +33,7 @@ export const usePlaceSearch = (debounceDelay = 1000) => {
       setError(null);
 
       try {
-        const candidates = await searchPlaces(searchQuery, 10);
+        const candidates = await searchPlaces(searchQuery, 10, entityType);
         setResults(candidates);
       } catch (err) {
         setError('Failed to fetch results. Please try again.');
@@ -48,7 +49,7 @@ export const usePlaceSearch = (debounceDelay = 1000) => {
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [searchQuery, debounceDelay]);
+  }, [searchQuery, debounceDelay, entityType]);
 
   const handleSearchChange = (query) => {
     setSearchQuery(query);
