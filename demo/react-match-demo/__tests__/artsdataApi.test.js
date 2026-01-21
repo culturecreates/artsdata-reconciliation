@@ -86,13 +86,13 @@ describe('artsdataApi', () => {
         },
       ];
 
-      const mockResponse = [
-        {
-          results: {
+      const mockResponse = {
+        results: [
+          {
             candidates: mockCandidates,
           },
-        },
-      ];
+        ],
+      };
 
       fetch.mockResolvedValueOnce({
         ok: true,
@@ -104,13 +104,13 @@ describe('artsdataApi', () => {
     });
 
     it('should return empty array when API response has no candidates', async () => {
-      const mockResponse = [
-        {
-          results: {
+      const mockResponse = {
+        results: [
+          {
             candidates: [],
           },
-        },
-      ];
+        ],
+      };
 
       fetch.mockResolvedValueOnce({
         ok: true,

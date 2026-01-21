@@ -47,9 +47,9 @@ export const searchPlaces = async (searchQuery, limit = 10) => {
 
     const data = await response.json();
     
-    // The API returns an array with results
-    if (data && data.length > 0 && data[0].results) {
-      return data[0].results.candidates || [];
+    // The API returns {results: [{candidates: [...]}]}
+    if (data && data.results && data.results.length > 0) {
+      return data.results[0].candidates || [];
     }
     
     return [];
