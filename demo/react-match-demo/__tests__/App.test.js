@@ -26,7 +26,7 @@ describe('App', () => {
   it('should render footer with API link', () => {
     render(<App />);
     const link = screen.getByRole('link', { name: /artsdata reconciliation api/i });
-    expect(link).toHaveAttribute('href', 'http://recon.artsdata.ca');
+    expect(link).toHaveAttribute('href', 'https://recon.artsdata.ca');
     expect(link).toHaveAttribute('target', '_blank');
   });
 

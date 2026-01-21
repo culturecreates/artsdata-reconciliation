@@ -3,7 +3,7 @@
  * Handles communication with the Artsdata Reconciliation API
  */
 
-const API_BASE_URL = 'http://recon.artsdata.ca';
+const API_BASE_URL = 'https://recon.artsdata.ca';
 
 /**
  * Searches for places using the Artsdata Reconciliation API match service

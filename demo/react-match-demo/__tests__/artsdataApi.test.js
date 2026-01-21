@@ -45,7 +45,7 @@ describe('artsdataApi', () => {
       await searchPlaces('test', 10);
 
       expect(fetch).toHaveBeenCalledWith(
-        'http://recon.artsdata.ca/match',
+        'https://recon.artsdata.ca/match',
         expect.objectContaining({
           method: 'POST',
           headers: {

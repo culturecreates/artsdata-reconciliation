@@ -46,7 +46,7 @@ A React widget demo is included to demonstrate how to integrate with the Artsdat
 
 Once the server is running, the demo is accessible at:
 - **Development:** `http://localhost:3000/demo`
-- **Production:** `http://recon.artsdata.ca/demo`
+- **Production:** `https://recon.artsdata.ca/demo`
 
 ### Building the Demo
 

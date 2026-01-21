@@ -114,7 +114,7 @@ function MyApp() {
 The API endpoint is configured in `src/api/artsdataApi.js`:
 
 ```javascript
-const API_BASE_URL = 'http://recon.artsdata.ca';
+const API_BASE_URL = 'https://recon.artsdata.ca';
 ```
 
 To use a different endpoint, modify this constant.
@@ -226,7 +226,7 @@ headers: {
 
 The widget uses the Match service from the Artsdata Reconciliation API:
 
-- **Endpoint:** `POST http://recon.artsdata.ca/match`
+- **Endpoint:** `POST https://recon.artsdata.ca/match`
 - **Headers:** 
   - `Content-Type: application/json`
   - `Accept-Language: en` (or `fr` for French)
@@ -321,7 +321,7 @@ MIT
 
 For issues or questions about the Artsdata Reconciliation API, visit:
 - [Artsdata.ca](https://artsdata.ca)
-- [API Documentation](http://recon.artsdata.ca/api)
+- [API Documentation](https://recon.artsdata.ca/api)
 
 ## Contributing
 

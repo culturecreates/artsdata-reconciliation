@@ -8,7 +8,7 @@ This implementation successfully delivers all requirements specified in the issu
 
 1. **Simple React App** - Created a clean, modern React application with functional components
 2. **Search Field** - Implemented "Select a Place" search input
-3. **API Integration** - Calls Artsdata Reconciliation API at http://recon.artsdata.ca
+3. **API Integration** - Calls Artsdata Reconciliation API at https://recon.artsdata.ca
 4. **Match Service** - Uses POST /match endpoint with type schema:Place
 5. **Real-time Dropdown** - Shows first 10 matches as user types
 6. **Debouncing** - Implements 1-second debounce (max 1 request per second)
@@ -136,7 +136,7 @@ Three levels of documentation provided:
 
 ## Security Considerations
 
-- Uses HTTP as specified in requirements (http://recon.artsdata.ca)
+- Uses HTTP as specified in requirements (https://recon.artsdata.ca)
 - No CodeQL security vulnerabilities detected
 - Proper input sanitization
 - No sensitive data exposure

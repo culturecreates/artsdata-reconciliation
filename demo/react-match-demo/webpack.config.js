@@ -41,7 +41,7 @@ module.exports = {
     proxy: [
       {
         context: ['/match'],
-        target: 'http://recon.artsdata.ca',
+        target: 'https://recon.artsdata.ca',
         changeOrigin: true,
       },
     ],

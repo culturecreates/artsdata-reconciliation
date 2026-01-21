@@ -35,7 +35,7 @@ function App() {
             <small>
               Powered by{' '}
               <a
-                href="http://recon.artsdata.ca"
+                href="https://recon.artsdata.ca"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-decoration-none"

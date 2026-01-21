@@ -241,4 +241,4 @@ test('selects a place', async () => {
 
 For more detailed documentation, see [README.md](./README.md)
 
-For API documentation, visit: http://recon.artsdata.ca/api
+For API documentation, visit: https://recon.artsdata.ca/api
