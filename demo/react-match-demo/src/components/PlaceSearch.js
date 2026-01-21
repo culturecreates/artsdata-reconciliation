@@ -52,15 +52,12 @@ const PlaceSearch = ({ onSelectPlace, entityType = 'schema:Place' }) => {
 
   return (
     <div className="place-search-container" ref={dropdownRef}>
-      <label htmlFor="placeSearch" className="form-label">
-        Select a Place
-      </label>
       <div className="search-input-wrapper">
         <input
           type="text"
           className="form-control"
           id="placeSearch"
-          placeholder="Start typing to search for places..."
+          placeholder="Start typing to search..."
           value={searchQuery}
           onChange={handleInputChange}
           autoComplete="off"
