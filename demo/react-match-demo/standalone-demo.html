@@ -79,7 +79,7 @@
                 <!-- Field Label (Outside React Widget) -->
                 <label for="placeSearch" class="form-label">Select a Place</label>
                 
-                <!-- Search Widget (This is what React renders - just the input and dropdown) -->
+                <!-- Search Widget -->
                 <div class="search-container">
                     <div class="search-input-wrapper">
                         <input
@@ -228,21 +228,10 @@
             const description = extractString(place.description);
             const id = place.id;
 
-            // Update "in React" section
-            document.getElementById('selected-in-react').style.display = 'block';
-            document.getElementById('selected-in-react-content').innerHTML = `
-                <h6 class="card-title">${name}</h6>
-                <div class="mb-2">
-                    <strong>ID:</strong> <a href="${id}" target="_blank" rel="noopener noreferrer">${id}</a>
-                </div>
-                ${description ? `<div class="mb-2"><strong>Description:</strong><p class="mb-0 mt-1">${description}</p></div>` : ''}
-                ${place.score ? `<div class="mb-2"><strong>Match Score:</strong> ${place.score}</div>` : ''}
-            `;
-
             // Update external section
             document.getElementById('external-name').textContent = name;
             document.getElementById('external-id').textContent = id;
-            document.getElementById('external-id').href = id;
+            document.getElementById('external-id').href = `http://kg.artsdata.ca/resource/${id}`;
             document.getElementById('external-description').textContent = description || 'N/A';
             document.getElementById('external-score').textContent = place.score || 'N/A';
             document.getElementById('external-result-content').style.display = 'block';
