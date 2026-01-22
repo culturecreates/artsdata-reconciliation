@@ -54,8 +54,7 @@ npm run dev
 
 ### 2. Selection Behavior
 - Click any item in the dropdown to select it
-- The selected place information appears in TWO places:
-  1. **Inside React Widget** - A card showing full details
+- The selected place information appears:
   2. **Outside React Widget** - A separate section demonstrating external integration
 
 ### 3. External Integration
