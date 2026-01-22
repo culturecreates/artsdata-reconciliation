@@ -82,7 +82,7 @@
                 // Update external display
                 document.getElementById('external-name').textContent = place.name || '';
                 document.getElementById('external-id').textContent = place.id || '';
-                document.getElementById('external-id').href = place.id || '#';
+                document.getElementById('external-id').href = place.id ? `http://kg.artsdata.ca/resource/${place.id}` : '#';
                 document.getElementById('external-description').textContent = place.description || 'N/A';
                 document.getElementById('external-score').textContent = place.score || 'N/A';
                 
