@@ -147,7 +147,7 @@ describe('ServiceName', () => {
 ### Linting and Formatting
 - Follow ESLint + Prettier conventions
 - Use consistent indentation (2 spaces)
-- Use double quotes for strings
+- Use double quotes for strings (matches this project's convention)
 - Remove unused imports
 - Use trailing commas in multi-line arrays and objects
 - Run `npm run lint` to check for linting issues
@@ -188,7 +188,7 @@ describe('ServiceName', () => {
 - Use camelCase for variables, functions, and methods
 - Use UPPER_SNAKE_CASE for constants
 - Use descriptive names that convey purpose
-- Prefix private properties with underscore (e.g., `_propertyName`)
+- Prefix private properties with underscore (e.g., `private readonly _propertyName`) - this is the convention used in this project
 - Suffix DTOs with `.dto.ts`
 - Suffix controllers with `.controller.ts`
 - Suffix services with `.service.ts`
