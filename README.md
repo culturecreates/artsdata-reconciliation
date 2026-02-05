@@ -209,33 +209,7 @@ This application is configured for deployment on Heroku with the included `Procf
 - Node.js version is specified in `package.json` engines field
 - The buildpack will automatically detect and use Node.js
 
-### Scaling on Heroku
-
-```bash
-# Scale to multiple dynos
-heroku ps:scale web=2
-
-# Scale back to one dyno
-heroku ps:scale web=1
-```
-
 ## Development
-
-### Available Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run start` | Start the application |
-| `npm run start:dev` | Start in development mode with hot-reload |
-| `npm run start:debug` | Start in debug mode |
-| `npm run start:prod` | Start in production mode |
-| `npm run build` | Build the application |
-| `npm run format` | Format code with Prettier |
-| `npm run lint` | Lint and fix code with ESLint |
-| `npm test` | Run unit tests |
-| `npm run test:watch` | Run tests in watch mode |
-| `npm run test:cov` | Run tests with coverage |
-| `npm run test:e2e` | Run end-to-end tests |
 
 ### Running Tests
 
@@ -246,22 +220,8 @@ npm test
 # Run tests in watch mode
 npm run test:watch
 
-# Run tests with coverage report
-npm run test:cov
-
-# Run end-to-end tests
-npm run test:e2e
 ```
 
-### Code Quality
-
-```bash
-# Lint code
-npm run lint
-
-# Format code
-npm run format
-```
 
 ## API Documentation
 
@@ -341,20 +301,6 @@ docker-compose up --build
 # View detailed logs
 docker-compose logs -f
 ```
-
-## Contributing
-
-Contributions are welcome! Please follow these guidelines:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under UNLICENSED - see the package.json file for details.
 
 ## Support
 
