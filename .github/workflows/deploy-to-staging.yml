@@ -3,86 +3,21 @@ name: CI CD - Staging Server
 on:
   workflow_dispatch:
   push:
-    branches: [ 'develop' ]
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/artsdata-reconciliation
+    branches: [ 'main' ]
 
 jobs:
   test:
     uses: ./.github/workflows/run-unit-tests.yml
 
-  build-and-push-image:
+  deploy-to-heroku:
     needs: test
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+      - uses: actions/checkout@v2
+      - name: Install Heroku CLI
+        run: curl https://cli-assets.heroku.com/install.sh | sh
+      - uses: akhileshns/heroku-deploy@v3.14.15
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.PAT }}
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      - name: Make envfile
-        uses: SpicyPizza/create-envfile@v1.3
-        with:
-          envkey_ARTSDATA_ENDPOINT: ${{ secrets.ARTSDATA_ENDPOINT }}
-          envkey_ENVIRONMENT: staging
-          envkey_REPOSITORY: artsdata
-          envkey_EVENT: event-index
-          envkey_PLACE: place-index
-          envkey_ORGANIZATION: organization-index
-          envkey_PERSON: person-index
-          envkey_AGENT: agent-index
-          envkey_CONCEPT: concept-index
-          envkey_EVENT_TYPE: event-type-index
-          envkey_DEFAULT: resource-index
-          envkey_PROPERTY: property-index
-          envkey_TYPE: type-index
-          envkey_ENTITY: entity-index
-          envkey_LIVE_PERFORMANCE_WORK: live-performance-work-index
-          envkey_LABELLED_ENTITIES: all-literals
-          envkey_ARTSDATA_USER: ${{ vars.ARTSDATA_USER }}
-          envkey_ARTSDATA_PASSWORD: ${{ secrets.ARTSDATA_PASSWORD }}
-          envkey_ENABLE_EVENT_BATCH_RECONCILIATION: true
-          file_name: .env
-          fail_on_empty: false
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-  Deploy:
-    needs: build-and-push-image
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v4
-      - name: Deploy in Lightsail
-        env:
-            PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
-            HOSTNAME : ${{ vars.HOSTNAME_TEST_SERVER_2 }}
-            USER_NAME : ubuntu
-            
-        run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} ' docker login ghcr.io -u ${{ github.actor }} -p  ${{ secrets.PAT }} && docker pull ghcr.io/${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:develop && docker images &&  docker ps -q --filter name=artsdata-reconciliation | xargs -r docker rm -f && docker run -itd --restart always -p 3000:3000  --name artsdata-reconciliation ghcr.io/${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:develop && docker image prune -a -f && docker cp ./secrets/staging-reconciliation artsdata-reconciliation:./usr/src/app/secrets'
-        
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ vars.HEROKU_APP_NAME }}
+          heroku_email: ${{ vars.HEROKU_EMAIL }}
