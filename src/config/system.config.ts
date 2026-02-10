@@ -18,7 +18,7 @@ export const ARTSDATA: {
 export const APPLICATION = {
     HTTP_PORT: Number(env.PORT) || 3000,
     HTTPS_PORT: Number(env.PORT) || 443,
-    KG_URL: `https://${env.ENVIRONMENT === "production" ? "" : "staging-"}kg.artsdata.ca/resource`,
+    KG_URL: `https://${env.ENVIRONMENT === "production" ? "" : "staging."}kg.artsdata.ca/resource`,
     RECON_URL: `https://${env.ENVIRONMENT === "production" ? "" : "staging-"}recon.artsdata.ca`
 };
 
