@@ -17,6 +17,18 @@ INSERT DATA {
       "facet": true
     },
     {
+      "fieldName": "alternateName",
+      "propertyChain": [
+        "http://schema.org/alternateName"
+      ],
+      "indexed": true,
+      "stored": true,
+      "analyzed": true,
+      "multivalued": true,
+      "ignoreInvalidValues": true,
+      "facet": true
+    },
+    {
       "fieldName": "sameAs",
       "propertyChain": [
         "http://schema.org/sameAs"
@@ -52,7 +64,20 @@ INSERT DATA {
       "multivalued": true,
       "ignoreInvalidValues": true,
       "facet": true
-    }
+    },
+     {
+       "fieldName": "addressRegion",
+       "propertyChain": [
+         "http://schema.org/address",
+         "http://schema.org/addressRegion"
+       ],
+       "indexed": true,
+       "stored": true,
+       "analyzed": true,
+       "multivalued": true,
+       "ignoreInvalidValues": true,
+       "facet": true
+     }
   ],
   "languages": [],
   "types": [
