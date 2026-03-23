@@ -1,4 +1,4 @@
-import {Injectable} from "@nestjs/common";
+import {forwardRef, Inject, Injectable} from "@nestjs/common";
 import {ARTSDATA, FEATURE_FLAG} from "../../config";
 import {HttpService} from "../http";
 import {Exception} from "../../helper";
@@ -6,10 +6,31 @@ import axios from "axios";
 
 @Injectable()
 export class ArtsdataService {
-    constructor(private readonly httpService: HttpService) {
-    }
+    constructor(
+        @Inject(forwardRef(() => HttpService))
+        private readonly httpService: HttpService
+    ) {}
+
 
     private token: string;
+
+    /**
+     * Returns the current in-memory token.
+     * Used by HttpService after a successful token refresh.
+     */
+    public getToken(): string {
+        return this.token;
+    }
+
+    /**
+     * Public entry point for token refresh.
+     * Called by HttpService when GraphDB returns 401.
+     */
+    public async refreshToken(): Promise<boolean> {
+        console.log("Refreshing GraphDB token...");
+        return this.checkConnection();
+    }
+
 
     /**
      * Constructs the Artsdata SPARQL endpoint URL.
@@ -59,7 +80,7 @@ export class ArtsdataService {
         return false;
     }
 
-    private async checkConnection(): Promise<boolean> {
+    public async checkConnection(): Promise<boolean> {
         try {
             if (ARTSDATA.USER && ARTSDATA.PASSWORD) {
                 const loginUrl = `${ARTSDATA.ENDPOINT}rest/login/${ARTSDATA.USER}`;
