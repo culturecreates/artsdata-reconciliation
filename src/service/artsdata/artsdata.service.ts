@@ -1,4 +1,4 @@
-import {forwardRef, Inject, Injectable} from "@nestjs/common";
+import {Injectable} from "@nestjs/common";
 import {ARTSDATA, FEATURE_FLAG} from "../../config";
 import {HttpService} from "../http";
 import {Exception} from "../../helper";
@@ -6,32 +6,11 @@ import axios from "axios";
 
 @Injectable()
 export class ArtsdataService {
-    constructor(
-        @Inject(forwardRef(() => HttpService))
-        private readonly httpService: HttpService
-    ) {}
 
+    constructor(private readonly httpService: HttpService) {}
 
     private token: string;
-
-    /**
-     * Returns the current in-memory token.
-     * Used by HttpService after a successful token refresh.
-     */
-    public getToken(): string {
-        return this.token;
-    }
-
-    /**
-     * Public entry point for token refresh.
-     * Called by HttpService when GraphDB returns 401.
-     */
-    public async refreshToken(): Promise<boolean> {
-        console.log("Refreshing GraphDB token...");
-        return this.checkConnection();
-    }
-
-
+    
     /**
      * Constructs the Artsdata SPARQL endpoint URL.
      * @private
@@ -58,9 +37,33 @@ export class ArtsdataService {
         try {
             return await this.httpService.postRequest(sparqlEndpoint, queryParam, this.token);
         } catch (error) {
+            if (error?.response?.status === 401) {
+                console.warn("GraphDB returned 401 — token may be expired. Attempting token refresh...");
+                const refreshed = await this.refreshToken();
+                if (refreshed) {
+                    console.log("Token refreshed successfully. Retrying original request...");
+                    try {
+                        return await this.httpService.postRequest(sparqlEndpoint, queryParam, this.token);
+                    } catch (retryError) {
+                        console.error("Request failed after token refresh:", retryError.message);
+                        throw Exception.internalServerError(`SPARQL query failed after token refresh: ${retryError.message}`);
+                    }
+                }
+                console.error("Token refresh failed. Cannot retry request.");
+                throw Exception.internalServerError("GraphDB authentication failed after token refresh attempt.");
+            }
             console.error("Error executing SPARQL query:", error.message);
             throw Exception.internalServerError(`Error executing SPARQL query: ${error.message}`);
         }
+
+    }
+
+    /**
+     * Refreshes the GraphDB token by re-running the login flow.
+     */
+    public async refreshToken(): Promise<boolean> {
+        console.log("Refreshing GraphDB token...");
+        return this.checkConnection();
     }
 
     /**
