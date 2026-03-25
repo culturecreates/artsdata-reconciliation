@@ -255,7 +255,7 @@ describe("Recon Service tests", () => {
                 expectedCount: 1,
             },
             {
-                description: "It should match places with title in French",
+                description: "It should match a place whose French title is the search term",
                 queries: [
                     {
                         type: "schema:Place",
@@ -268,7 +268,7 @@ describe("Recon Service tests", () => {
                         ],
                     },
                 ],
-                expectedName: "Salle Marc Lescarbot",
+                expectedName: "le Marc Lescarbot (Pointe-de-l’église)",
                 expectedCount: 1,
             },
             {
