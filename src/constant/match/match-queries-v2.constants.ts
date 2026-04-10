@@ -79,17 +79,29 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
     (SAMPLE(?endDate) AS ?endDate)
     (SAMPLE(?locationName) AS ?locationName)
     (SAMPLE(?postalCode) AS ?postalCode)
-    (SAMPLE(?artsdataUri) AS ?locationUri)`,
+    (SAMPLE(?artsdataUri) AS ?locationUri)
+    (SAMPLE(?containedInPlaceUri) AS ?containedInPlaceUri)
+    (SAMPLE(?containsPlaceUri) AS ?containsPlaceUri)`,
 
     ADDITIONAL_PROPERTIES_TO_FETCH_FOR_EVENTS_SUB_QUERY: `
     # Start date, end date, location, location URI and postal code
-    OPTIONAL { ?entity schema:startDate ?startDate} 
-    OPTIONAL { ?entity schema:endDate ?endDate} 
-    OPTIONAL { ?entity schema:location ?location;
+    OPTIONAL { ?entity schema:startDate ?startDate }
+    OPTIONAL { ?entity schema:endDate ?endDate }
+    OPTIONAL { ?entity schema:location ?location .
         OPTIONAL { ?location schema:name ?locationName }
         OPTIONAL { ?location schema:address/schema:postalCode ?postalCode }
-        OPTIONAL { ?location schema:sameAs ?artsdataUri
-            FILTER(STRSTARTS(STR(?artsdataUri), "${ArtsdataConstants.PREFIX_INCLUDING_K}")) 
+        OPTIONAL { BIND(?location AS ?artsdataUri)
+            FILTER(STRSTARTS(STR(?artsdataUri), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
+        }
+        OPTIONAL {
+            ?location schema:containedInPlace ?parentPlace .
+            FILTER(STRSTARTS(STR(?parentPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
+            BIND(?parentPlace AS ?containedInPlaceUri)
+        }
+        OPTIONAL {
+            ?location ^schema:containedInPlace ?childPlace .
+            FILTER(STRSTARTS(STR(?childPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
+            BIND(?childPlace AS ?containsPlaceUri)
         }
     }`,
 
