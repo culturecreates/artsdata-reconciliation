@@ -48,6 +48,8 @@ export class MatchServiceHelper {
                 endDate: currentBinding["endDate"]?.value,
                 locationName: currentBinding["locationName"]?.value,
                 locationUri: currentBinding["locationUri"]?.value,
+                containedInPlaceUri: currentBinding["containedInPlaceUri"]?.value,
+                containsPlaceUri: currentBinding["containsPlaceUri"]?.value,
                 wikidata: currentBinding["wikidata"]?.value,
                 isni: currentBinding["isni"]?.value,
             };
@@ -179,6 +181,28 @@ export class MatchServiceHelper {
                     return false;
                 }
             },
+            locationRelated: (
+                a: string | undefined, b: string | undefined,
+                aParent: string | undefined, aChild: string | undefined,
+                bParent: string | undefined, bChild: string | undefined
+            ): boolean => {
+                console.log('locationRelated', { a, b, aParent, aChild, bParent, bChild });
+                if (!a || !b) return false;
+                const eq = (x: string, y: string) => {
+                    try { return matchers.exactUrl(x, y); } catch { return false; }
+                };
+                // Same place directly
+                if (eq(a, b)) return true;
+                // a is a room, b is its building
+                if (aParent && eq(aParent, b)) return true;
+                // b is a room, a is its building
+                if (bParent && eq(a, bParent)) return true;
+                // a is a building that contains b
+                if (aChild && eq(aChild, b)) return true;
+                // b is a building that contains a
+                if (bChild && eq(a, bChild)) return true;
+                return false;
+            },
         };
 
         const checkIfIsniIsExactMatch = [
@@ -224,9 +248,15 @@ export class MatchServiceHelper {
 
         const checksNameStartDateEndDatePlaceUriMatchForEvents = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name),
-            matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate
+            matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate),
+            matchers.locationRelated(
+                additionalProperties.locationUri,
+                recordFromQuery.locationUri as string | undefined,
+                additionalProperties.containedInPlaceUri,
+                additionalProperties.containsPlaceUri,
+                recordFromQuery.containedInPlaceUri as string | undefined,
+                recordFromQuery.containsPlaceUri as string | undefined,
             ),
-            matchers.exactUrl(additionalProperties.locationUri, recordFromQuery.locationUri as string,),
             matchers.closeDates(additionalProperties.startDate, recordFromQuery.startDate as string,
                 additionalProperties.endDate, recordFromQuery.endDate,
             ),
@@ -341,6 +371,8 @@ export class MatchServiceHelper {
             endDate,
             locationName,
             locationUri,
+            containedInPlaceUri: undefined,
+            containsPlaceUri: undefined,
             isni: isni ? (isni.length ? isni : undefined) : undefined,
             wikidata: wikidata ? (wikidata.length ? wikidata : undefined) : undefined,
         };
