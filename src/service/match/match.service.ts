@@ -352,19 +352,32 @@ export class MatchService {
         (SAMPLE(?endDate) AS ?endDate)
         (SAMPLE(?locationName) AS ?locationName)
         (SAMPLE(?postalCode) AS ?postalCode)
-        (SAMPLE(?artsdataUri) AS ?locationUri)`,
+        (SAMPLE(?artsdataUri) AS ?locationUri)
+        (SAMPLE(?containedInPlaceUri) AS ?containedInPlaceUri)
+        (SAMPLE(?containsPlaceUri) AS ?containsPlaceUri)`,
             );
 
             rawQuery = rawQuery.replace(
                 "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
-                `OPTIONAL { ?entity schema:startDate ?startDate} 
-      OPTIONAL { ?entity schema:endDate ?endDate} 
-      OPTIONAL { ?entity schema:location ?location;
-      OPTIONAL { ?location schema:name ?locationName }
-      OPTIONAL { ?location schema:address/schema:postalCode ?postalCode }
-      OPTIONAL { ?location schema:sameAs ?artsdataUri
-        FILTER(STRSTARTS(STR(?artsdataUri), "${ArtsdataConstants.PREFIX_INCLUDING_K}")) }
-       }`,
+                `OPTIONAL { ?entity schema:startDate ?startDate }
+        OPTIONAL { ?entity schema:endDate ?endDate }
+        OPTIONAL { ?entity schema:location ?location .
+        OPTIONAL { ?location schema:name ?locationName }
+        OPTIONAL { ?location schema:address/schema:postalCode ?postalCode }
+        OPTIONAL { BIND(?location AS ?artsdataUri)
+            FILTER(STRSTARTS(STR(?artsdataUri), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
+        }
+        OPTIONAL {
+            ?location schema:containedInPlace ?parentPlace .
+            FILTER(STRSTARTS(STR(?parentPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
+            BIND(?parentPlace AS ?containedInPlaceUri)
+        }
+        OPTIONAL {
+            ?location ^schema:containedInPlace ?childPlace .
+            FILTER(STRSTARTS(STR(?childPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
+            BIND(?childPlace AS ?containsPlaceUri)
+        }
+        }`,
             );
         } else if (type === Entities.PERSON || type === Entities.ORGANIZATION || type === Entities.AGENT) {
             rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
