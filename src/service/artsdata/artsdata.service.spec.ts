@@ -1,6 +1,7 @@
 import {Test, TestingModule} from '@nestjs/testing';
 import {ArtsdataService} from './artsdata.service';
 import {HttpService} from '../http';
+import axios from 'axios';
 
 describe('ArtsdataService — SPARQL execution and token refresh', () => {
     let artsdataService: ArtsdataService;
@@ -91,5 +92,61 @@ describe('ArtsdataService — SPARQL execution and token refresh', () => {
         // Called twice — original + one retry, no infinite loop
         expect(httpService.postRequest).toHaveBeenCalledTimes(2);
         expect(artsdataService.refreshToken).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('ArtsdataService — SPARQL update', () => {
+    let artsdataService: ArtsdataService;
+
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            providers: [
+                ArtsdataService,
+                {provide: HttpService, useValue: {postRequest: jest.fn()}},
+            ],
+        }).compile();
+
+        artsdataService = module.get<ArtsdataService>(ArtsdataService);
+        (artsdataService as any).token = 'initial-token';
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    it('should POST to the /statements endpoint with an update= parameter', async () => {
+        jest.spyOn(axios, 'post').mockResolvedValueOnce({status: 204, data: ''});
+
+        await artsdataService.executeSparqlUpdate('INSERT DATA { <ex:1> a <ex:Type> }');
+
+        expect(axios.post).toHaveBeenCalledWith(
+            expect.stringContaining('/statements'),
+            expect.stringContaining('update=INSERT'),
+            expect.objectContaining({
+                headers: expect.objectContaining({'Content-Type': 'application/x-www-form-urlencoded'}),
+            }),
+        );
+    });
+
+    it('should include Authorization header when a token is set', async () => {
+        jest.spyOn(axios, 'post').mockResolvedValueOnce({status: 204, data: ''});
+
+        await artsdataService.executeSparqlUpdate('INSERT DATA { <ex:1> a <ex:Type> }');
+
+        expect(axios.post).toHaveBeenCalledWith(
+            expect.any(String),
+            expect.any(String),
+            expect.objectContaining({
+                headers: expect.objectContaining({Authorization: 'initial-token'}),
+            }),
+        );
+    });
+
+    it('should throw an InternalServerError when the update request fails', async () => {
+        jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error('Connection refused'));
+
+        await expect(
+            artsdataService.executeSparqlUpdate('INSERT DATA {}'),
+        ).rejects.toThrow('Error executing SPARQL update: Connection refused');
     });
 });

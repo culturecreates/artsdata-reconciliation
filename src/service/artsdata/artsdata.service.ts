@@ -12,11 +12,20 @@ export class ArtsdataService {
     private token: string;
     
     /**
-     * Constructs the Artsdata SPARQL endpoint URL.
+     * Constructs the Artsdata SPARQL query endpoint URL.
      * @private
      */
     private _getArtsdataEndPoint(): string {
         const route = `repositories/${ARTSDATA.REPOSITORY}`;
+        return new URL(route, ARTSDATA.ENDPOINT).toString();
+    }
+
+    /**
+     * Constructs the Artsdata SPARQL update endpoint URL.
+     * @private
+     */
+    private _getArtsdataUpdateEndPoint(): string {
+        const route = `repositories/${ARTSDATA.REPOSITORY}/statements`;
         return new URL(route, ARTSDATA.ENDPOINT).toString();
     }
 
@@ -56,6 +65,31 @@ export class ArtsdataService {
             throw Exception.internalServerError(`Error executing SPARQL query: ${error.message}`);
         }
 
+    }
+
+    /**
+     * Executes a SPARQL update (INSERT DATA / DELETE DATA / DROP GRAPH, etc.)
+     * against the Artsdata statements endpoint.
+     * @param sparqlUpdate
+     */
+    async executeSparqlUpdate(sparqlUpdate: string): Promise<void> {
+        const updateEndpoint = this._getArtsdataUpdateEndPoint();
+        const headers: Record<string, string> = {
+            "Content-Type": "application/x-www-form-urlencoded",
+        };
+        if (this.token) {
+            headers["Authorization"] = this.token;
+        }
+        try {
+            await axios.post(
+                updateEndpoint,
+                `update=${encodeURIComponent(sparqlUpdate)}`,
+                {headers},
+            );
+        } catch (error) {
+            console.error("Error executing SPARQL update:", error.message);
+            throw Exception.internalServerError(`Error executing SPARQL update: ${error.message}`);
+        }
     }
 
     /**
