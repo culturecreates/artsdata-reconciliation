@@ -139,10 +139,10 @@ describe("Lucene index with controlled runtime dataset", () => {
 
         // Drop any leftover index/data from a previous failed run (ignore errors)
         try { await artsdataService.executeSparqlUpdate(DROP_INDEX_SPARQL); } catch (err) {
-            console.warn(`[lucene-dataset] Skipping drop index during setup (may not exist): ${err.message}`);
+            console.warn(`[lucene-dataset] Skipping drop index during setup (may not exist): ${err instanceof Error ? err.message : String(err)}`);
         }
         try { await artsdataService.executeSparqlUpdate(DROP_DATA_SPARQL); } catch (err) {
-            console.warn(`[lucene-dataset] Skipping drop data during setup (may not exist): ${err.message}`);
+            console.warn(`[lucene-dataset] Skipping drop data during setup (may not exist): ${err instanceof Error ? err.message : String(err)}`);
         }
 
         // Create the Lucene connector and insert the minimal test dataset
@@ -155,10 +155,10 @@ describe("Lucene index with controlled runtime dataset", () => {
 
     afterAll(async () => {
         try { await artsdataService.executeSparqlUpdate(DROP_INDEX_SPARQL); } catch (err) {
-            console.warn(`[lucene-dataset] Failed to drop index during teardown: ${err.message}`);
+            console.warn(`[lucene-dataset] Failed to drop index during teardown: ${err instanceof Error ? err.message : String(err)}`);
         }
         try { await artsdataService.executeSparqlUpdate(DROP_DATA_SPARQL); } catch (err) {
-            console.warn(`[lucene-dataset] Failed to drop data during teardown: ${err.message}`);
+            console.warn(`[lucene-dataset] Failed to drop data during teardown: ${err instanceof Error ? err.message : String(err)}`);
         }
     });
 
