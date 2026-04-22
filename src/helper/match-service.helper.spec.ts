@@ -512,3 +512,44 @@ describe('isAutoMatch', () => {
     });
 });
 
+describe('Lucene query with controlled inline dataset', () => {
+    it('creates a SPARQL query that joins lucene search with runtime test triples', () => {
+        const scoreVariables = new Set<string>(['?name_score']);
+        const selectVariables = [
+            '?entity',
+            '?name_score',
+            '(SAMPLE(?name_en) AS ?nameEn)',
+            '(SAMPLE(?name_default) AS ?name)',
+            '?type',
+            '?type_label',
+            '?total_score'
+        ];
+
+        const luceneSubQuery = MatchServiceHelper.generateSubQueryUsingLuceneQuerySearch(
+            'name',
+            'Jazz',
+            'test-index',
+            'schema:Event',
+            '?name_score',
+            5
+        );
+
+        const runtimeDatasetSubQuery = `{
+            VALUES (?entity ?name_en ?name_default ?type ?type_label) {
+                (<http://example.org/event/1> "Jazz Night"@en "Jazz Night" schema:Event "Event")
+            }
+        }`;
+
+        const query = MatchServiceHelper.createSparqlQuery(
+            selectVariables,
+            [luceneSubQuery, runtimeDatasetSubQuery],
+            '',
+            scoreVariables
+        );
+
+        expect(query).toContain('con:query "name: Jazz"');
+        expect(query).toContain('VALUES (?entity ?name_en ?name_default ?type ?type_label)');
+        expect(query).toContain('<http://example.org/event/1>');
+        expect(query).toContain('ORDER BY DESC(?total_score)');
+    });
+});
