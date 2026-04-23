@@ -6,7 +6,6 @@ import { GenericContainer, StartedTestContainer } from "testcontainers";
 
 export default async function globalSetup(): Promise<void> {
     console.log("Starting GraphDB for the test suites...");
-
     const container: StartedTestContainer = await new GenericContainer("ontotext/graphdb:10.8.11")
         .withExposedPorts(7200)
         .withEnvironment({"GDB_ACCEPT_EULA": "yes"})
