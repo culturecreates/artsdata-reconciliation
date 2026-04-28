@@ -2,7 +2,7 @@ import {MatchService,} from "../../service";
 import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
 import {LanguageEnum, MatchTypeEnum} from "../../enum";
-import {executeAndCompareResults, setupMatchService} from "../../../test/test-util";
+import {executeAndCompareResults, setupMatchService} from "../../../test/util/common-util";
 
 
 describe('Test reconciling places using sparql query version 2', () => {
