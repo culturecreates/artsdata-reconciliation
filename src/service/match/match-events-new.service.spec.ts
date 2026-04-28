@@ -8,7 +8,7 @@ import {
     setupMatchService,
     uploadDataSetAndCreateLuceneConnector
 } from "../../../test/util/common-util";
-import {IndexEnum} from "../../../test/enum/index.enum";
+import { IndexFileNameEnum} from "../../enum/index-names.enum";
 
 
 describe('Test reconciling events using sparql query version 2', () => {
