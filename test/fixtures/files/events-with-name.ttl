@@ -1,0 +1,15 @@
+@prefix adr:<http://kg.artsdata.ca/resource/>.
+@prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#>.
+@prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+
+adr:KE-1 rdf:type <http://schema.org/Event> ;
+    rdfs:label "A Beacon in the Night" .
+adr:KE-2 rdf:type <http://schema.org/Event> ;
+    rdfs:label "A Beacon Night" .
+adr:KE-4 rdf:type <http://schema.org/Event> ;
+    rdfs:label "A Beacon during the Night" .
+adr:KE-5 rdf:type <http://schema.org/Event> ;
+    rdfs:label "A Beautiful Night" .
+adr:KE-6 rdf:type <http://schema.org/Event> ;
+    rdfs:label "At the Night" .
