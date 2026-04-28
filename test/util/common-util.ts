@@ -144,7 +144,7 @@ async function createLuceneConnectorQuery(index: string) {
         GRAPH luc:graph { ?s ?p ?o }
     }
     WHERE {
-        GRAPH <http://test.fixtures> { ?s ?p ?o }
+        GRAPH <${testGraphURI}> { ?s ?p ?o }
     };
     
     PREFIX :<http://www.ontotext.com/connectors/lucene#>
@@ -178,6 +178,7 @@ export async function uploadDataSetAndCreateLuceneConnector(index: string, testD
         await executeSparql(lucenceConnectorQuery as string);
     } catch (error) {
         console.error("Error creating lucene connector:", error);
+        throw new Error(`Error creating lucene connector: ${error.message}`);
     }
 }
 
