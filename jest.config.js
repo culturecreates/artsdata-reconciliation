@@ -1,5 +1,3 @@
-const shouldRunGlobal = process.env.ENVIRONMENT === 'development';
-
 module.exports = {
     moduleFileExtensions: ['js', 'json', 'ts'],
     rootDir: 'src',
@@ -9,9 +7,6 @@ module.exports = {
     },
     collectCoverageFrom: ['**/*.(t|j)s'],
     coverageDirectory: '../coverage',
-    testEnvironment: 'node',
+    testEnvironment: 'node'
 
-    // These will now ONLY be defined if you run 'npm run test:dev'
-    globalSetup: shouldRunGlobal ? '../test/setup.ts' : undefined,
-    globalTeardown: shouldRunGlobal ? '../test/global-teardown.ts' : undefined,
 };
