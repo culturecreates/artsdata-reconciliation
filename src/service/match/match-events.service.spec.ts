@@ -2,12 +2,7 @@ import {MatchService,} from "../../service";
 import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
 import {MatchTypeEnum} from "../../enum";
-import {
-    dropIndexAndTheGraph,
-    executeAndCompareResults,
-    setupMatchService,
-    uploadDataSetAndCreateLuceneConnector
-} from "../../../test/util/common-util";
+import {executeAndCompareResults, setupMatchService} from "../../../test/util/common-util";
 
 
 describe('Test reconciling events using sparql query version 2', () => {
