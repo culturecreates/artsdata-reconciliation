@@ -20,10 +20,11 @@ export async function executeAndCompareResults(
         match: boolean;
         count: number
     },
-    reconciliationQuery: ReconciliationQuery
+    reconciliationQuery: ReconciliationQuery,
+    version?:string
 ) {
     const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
-        {queries: [reconciliationQuery]}, 'v2');
+        {queries: [reconciliationQuery]}, version);
 
     const allResults = result.results?.[0]?.candidates;
     const actualResult = allResults?.[0];
