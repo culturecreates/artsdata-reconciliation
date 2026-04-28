@@ -19,7 +19,7 @@ describe('Test reconciling events using sparql query version 2', () => {
     beforeAll(async () => {
         const setup = await setupMatchService();
         matchService = setup.matchService;
-        await uploadDataSetAndCreateLuceneConnector(IndexEnum.EVENT, testDatasetPath)
+        await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.EVENT, testDatasetPath)
     });
     afterAll(async () => {
         await dropIndexAndTheGraph();
