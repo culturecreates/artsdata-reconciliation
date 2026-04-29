@@ -38,7 +38,7 @@ export async function executeAndCompareResults(
     }
 
     if (expectedResult.count) {
-        expect(expectedResult.count).toBe(allResults?.length);
+        expect(allResults?.length).toBe(expectedResult.count);
     }
 
     if (expectedResult.type) {
