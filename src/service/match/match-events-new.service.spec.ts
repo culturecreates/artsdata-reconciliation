@@ -11,7 +11,7 @@ import {IndexFileNameEnum} from "../../enum/index-names.enum";
 import {MatchServiceHelper} from "../../helper";
 
 
-describe('Test reconciling events using sparql query version 2', () => {
+describe('Test reconciling events using sparql query version 1', () => {
 
     let matchService: MatchService;
     const testDatasetPath = 'test/fixtures/files/events-with-name.ttl';
