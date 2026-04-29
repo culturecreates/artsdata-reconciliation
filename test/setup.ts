@@ -1,8 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import axios from 'axios';
-import FormData from 'form-data';
-import { GenericContainer, StartedTestContainer } from "testcontainers";
+import {GenericContainer, StartedTestContainer} from "testcontainers";
 
 export default async function globalSetup(): Promise<void> {
     console.log("Starting GraphDB for the test suites...");
