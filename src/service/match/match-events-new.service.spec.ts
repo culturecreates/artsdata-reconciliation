@@ -1,14 +1,13 @@
 import {MatchService,} from "../../service";
 import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
-import {MatchTypeEnum} from "../../enum";
+import {LanguageEnum, MatchTypeEnum} from "../../enum";
 import {
     dropIndexAndTheGraph,
-    executeAndCompareResults,
     setupMatchService,
     uploadDataSetAndCreateLuceneConnector
 } from "../../../test/util/common-util";
-import { IndexFileNameEnum} from "../../enum/index-names.enum";
+import {IndexFileNameEnum} from "../../enum/index-names.enum";
 
 
 describe('Test reconciling events using sparql query version 2', () => {
@@ -33,14 +32,17 @@ describe('Test reconciling events using sparql query version 2', () => {
             limit: 1
         };
 
-        const expectedResult = {
-            id: "KE-1",
-            type: Entities.EVENT,
-            match: false,
-            count: 1
-        }
+        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+        const allResults = result.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
 
-        await executeAndCompareResults(matchService, expectedResult, reconciliationQuery);
+        expect(actualResult?.id).toBe("KE-1");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeFalsy();
+        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
+            .toBe("http://schema.org/Event");
+
     });
 
     it(`Reconcile an event entity with uri 'http://kg.artsdata.ca/resource/KE-4`, async () => {
@@ -51,14 +53,16 @@ describe('Test reconciling events using sparql query version 2', () => {
             limit: 1
         };
 
-        const expectedResult = {
-            id: "KE-4",
-            type: Entities.EVENT,
-            match: false,
-            count: 1
-        }
+        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+        const allResults = result.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
 
-        await executeAndCompareResults(matchService, expectedResult, reconciliationQuery);
+        expect(actualResult?.id).toBe("KE-4");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeTruthy();
+        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
+            .toBe("http://schema.org/Event");
     });
 });
 
