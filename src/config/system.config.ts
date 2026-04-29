@@ -1,6 +1,9 @@
 import * as dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({
+    path: process.env.NODE_ENV === "test" ? ".env.test" : ".env"
+});
+
 const {env} = process;
 
 export const ARTSDATA: {

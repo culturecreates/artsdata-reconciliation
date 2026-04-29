@@ -3,7 +3,7 @@ import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
 import {MatchTypeEnum} from "../../enum";
 import {LanguageEnum} from "../../enum";
-import {executeAndCompareResults, setupMatchService} from "../../../test/test-util";
+import {executeAndCompareResults, setupMatchService} from "../../../test/util/common-util";
 
 
 describe('Test reconciling organizations using sparql query version 2', () => {
