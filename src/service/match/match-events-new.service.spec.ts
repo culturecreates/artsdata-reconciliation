@@ -32,9 +32,11 @@ describe('Test reconciling events using sparql query version 2', () => {
             limit: 1
         };
 
-        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
             {queries: [reconciliationQuery]});
-        const allResults = result.results?.[0]?.candidates;
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
         const actualResult = allResults?.[0];
 
         expect(actualResult?.id).toBe("KE-1");
@@ -53,9 +55,11 @@ describe('Test reconciling events using sparql query version 2', () => {
             limit: 1
         };
 
-        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
             {queries: [reconciliationQuery]});
-        const allResults = result.results?.[0]?.candidates;
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
         const actualResult = allResults?.[0];
 
         expect(actualResult?.id).toBe("KE-4");
