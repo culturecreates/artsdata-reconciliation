@@ -178,7 +178,6 @@ export async function uploadDataSetAndCreateLuceneConnector(index: string, testD
         const lucenceConnectorQuery = await createLuceneConnectorQuery(index)
         await executeSparql(lucenceConnectorQuery as string);
     } catch (error) {
-        console.error("Error creating lucene connector:", error);
         throw new Error(`Error creating lucene connector: ${error.message}`);
     }
 }
