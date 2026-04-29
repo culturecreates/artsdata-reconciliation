@@ -8,20 +8,30 @@ import {
     uploadDataSetAndCreateLuceneConnector
 } from "../../../test/util/common-util";
 import {IndexFileNameEnum} from "../../enum/index-names.enum";
+import {MatchServiceHelper} from "../../helper";
 
 
 describe('Test reconciling events using sparql query version 2', () => {
 
     let matchService: MatchService;
     const testDatasetPath = 'test/fixtures/files/events-with-name.ttl';
+    let testLuceneConnectorId: string;
+    let testGraphUri: string;
 
     beforeAll(async () => {
         const setup = await setupMatchService();
         matchService = setup.matchService;
-        await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.EVENT, testDatasetPath)
+
+        const {
+            graphUri,
+            luceneConnector
+        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.EVENT, testDatasetPath)
+        testGraphUri = graphUri;
+        testLuceneConnectorId = luceneConnector;
+        jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
     });
     afterAll(async () => {
-        await dropIndexAndTheGraph();
+        await dropIndexAndTheGraph(testGraphUri,testLuceneConnectorId);
     })
 
     it('Reconcile an event with name `A Beacon in the Night`, which is exact match', async () => {

@@ -5,11 +5,8 @@ import {Test, TestingModule} from "@nestjs/testing";
 import {ManifestController, MatchController} from "../../src/controller";
 import {readFile} from 'node:fs/promises';
 import {executeSparql} from "./graphdb.util";
-
 import N3 from 'n3';
-
-const testIndex = 'test_index';
-const testGraphURI = 'http://test.fixtures';
+import { randomUUID } from 'node:crypto';
 
 export async function executeAndCompareResults(
     matchService: MatchService,
@@ -21,7 +18,7 @@ export async function executeAndCompareResults(
         count: number
     },
     reconciliationQuery: ReconciliationQuery,
-    version?:string
+    version?: string
 ) {
     const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
         {queries: [reconciliationQuery]}, version);
@@ -97,7 +94,7 @@ async function getLuceneConfigs(indexFileName: string) {
 
 }
 
-async function generateInsertQueryToLoadData(testDataFilePath: string) {
+async function generateInsertQueryToLoadData(testDataFilePath: string, graphUri: string) {
     const parser = new N3.Parser();
     const writer = new N3.Writer({format: 'N-Triples'});
     const ttl = (await readFile(testDataFilePath, 'utf8')).toString();
@@ -125,7 +122,7 @@ async function generateInsertQueryToLoadData(testDataFilePath: string) {
                         ...prefixStrings,
                         '',
                         'INSERT DATA {',
-                        `  GRAPH <${testGraphURI}> {`,
+                        `  GRAPH <${graphUri}> {`,
                         triplesBlock.trim().split('\n').map(line => `    ${line}`).join('\n'),
                         '  }',
                         '}'
@@ -138,28 +135,27 @@ async function generateInsertQueryToLoadData(testDataFilePath: string) {
     });
 }
 
-async function createLuceneConnectorQuery(index: string) {
+async function createLuceneConnectorQuery(index: string, graphUri: string, luceneConnector: string) {
     let insertQueryTemplate = `
     PREFIX luc: <http://www.ontotext.com/connectors/lucene#>
     INSERT {
         GRAPH luc:graph { ?s ?p ?o }
     }
     WHERE {
-        GRAPH <${testGraphURI}> { ?s ?p ?o }
+        GRAPH <${graphUri}> { ?s ?p ?o }
     };
     
     PREFIX :<http://www.ontotext.com/connectors/lucene#>
     PREFIX inst:<http://www.ontotext.com/connectors/lucene/instance#>
     
     INSERT DATA {    
-    inst:INDEX_IDENTIER_PLACEHOLDER :createConnector '''
+    inst:${luceneConnector} :createConnector '''
     LUCENE_CONFIG_PLACEHOLDER`;
 
     const luceneIndexConfigModified = await getLuceneConfigs(index);
 
     return insertQueryTemplate
         .replace('LUCENE_CONFIG_PLACEHOLDER', luceneIndexConfigModified)
-        .replace('INDEX_IDENTIER_PLACEHOLDER', testIndex || '')
         .concat(`''' .}`);
 }
 
@@ -170,27 +166,31 @@ async function createLuceneConnectorQuery(index: string) {
  * @returns A string representing the SPARQL INSERT query.
  */
 export async function uploadDataSetAndCreateLuceneConnector(index: string, testDataFilePath: string) {
+    const uniqueId = randomUUID();
+    const testGraphUri = `http://test.fixtures/${uniqueId}`;
+    const testLuceneConnector = `test_index-${uniqueId}`
+
     try {//Update dataset
-        const indexQuery = await generateInsertQueryToLoadData(testDataFilePath);
+        const indexQuery = await generateInsertQueryToLoadData(testDataFilePath, testGraphUri);
         await executeSparql(indexQuery as string);
 
         //Create lucene connector
-        const lucenceConnectorQuery = await createLuceneConnectorQuery(index)
+        const lucenceConnectorQuery = await createLuceneConnectorQuery(index, testGraphUri, testLuceneConnector)
         await executeSparql(lucenceConnectorQuery as string);
+        return {graphUri: testGraphUri, luceneConnector: testLuceneConnector};
     } catch (error) {
         throw new Error(`Error creating lucene connector: ${error.message}`);
     }
 }
 
-
-export async function dropIndexAndTheGraph() {
+export async function dropIndexAndTheGraph(graphUri: string, LuceneConnectorId: string) {
     const dropIndexQuery = `
         PREFIX luc-index: <http://www.ontotext.com/connectors/lucene/instance#>
         PREFIX luc: <http://www.ontotext.com/connectors/lucene#>
         INSERT DATA {
-            luc-index:${testIndex} luc:dropConnector [] .
+            luc-index:${LuceneConnectorId} luc:dropConnector [] .
         } ;
-        DROP GRAPH <${testGraphURI}> 
+        DROP GRAPH <${graphUri}> 
         `
     await executeSparql(dropIndexQuery);
 }
