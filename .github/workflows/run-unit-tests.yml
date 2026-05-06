@@ -11,10 +11,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Extract statements file
-        run: |
-          unzip ./test/graph-db/data/test-data-set.nq.zip -d ./test/
-
       - name: Run GraphDB
         run: docker compose -f "test/graph-db/docker-compose.yml" up -d --build
 
@@ -31,25 +27,11 @@ jobs:
           --header 'Content-Type: multipart/form-data' \
           --form 'config=@"./test/graph-db/data/config.ttl"'
 
-      - name: Import repository data
-        run: |
-          curl 'http://127.0.0.1:7200/repositories/artsdata/statements' \
-          --header 'Content-Type: application/n-quads' \
-          --data-binary '@./test/test-data-set.nq'
-
-      - name: Create index
-        run: |
-          for file in ./seed/sparql/index/*.sparql; do
-            curl -X POST -H "Content-Type: application/sparql-update" \
-              --data-binary @"$file" \
-              "http://localhost:7200/repositories/artsdata/statements"
-          done
-
       - name: Ensure .env exists
         run: |
           touch .env
-          echo 'ARTSDATA_ENDPOINT="http://127.0.0.1:7200/"' >> .env
-          echo 'REPOSITORY="artsdata"' >> .env
+          echo 'ARTSDATA_ENDPOINT="http://127.0.0.1:7200/"' >> .env.test
+          echo 'REPOSITORY="recon-test"' >> .env.test
 
       - name: Setup Node
         uses: actions/setup-node@v4
