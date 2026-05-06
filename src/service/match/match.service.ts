@@ -263,8 +263,7 @@ export class MatchService {
      */
     private _generateSparqlQueryV2(id: string | undefined, name: string | undefined, type: string,
                                    limit: number, propertyConditions: QueryCondition[]) {
-
-        const luceneIndex = GRAPHDB_INDEX.LABELLED_ENTITIES;
+        const luceneIndex = MatchServiceHelper.getGraphdbIndex(type, SparqlVersionEnum.V2);
         const selectVariables = ['?entity'];
         const subQueries = [];
         const scoreVariables = new Set<string>();
