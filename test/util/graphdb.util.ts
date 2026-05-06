@@ -10,8 +10,8 @@ export async function executeSparql(updateQuery: string) {
         .setEndpoints([`${ARTSDATA.ENDPOINT}repositories/${ARTSDATA.REPOSITORY}`])
         .setHeaders({})
         .setDefaultRDFMimeType('')
-        .setReadTimeout(1000)
-        .setWriteTimeout(1000);
+        .setReadTimeout(3000)
+        .setWriteTimeout(3000);
 
     if (ARTSDATA.USER) {
         config.useGdbTokenAuthentication(ARTSDATA.USER, ARTSDATA.USER);
@@ -23,7 +23,12 @@ export async function executeSparql(updateQuery: string) {
         .setQuery(updateQuery)
         .setContentType(http.QueryContentType.X_WWW_FORM_URLENCODED)
         .setInference(true)
+        .setInference(true)
         .setTimeout(5);
-
-    return repository.update(payload);
+    try {
+        return repository.update(payload);
+    } catch (e) {
+        console.error('Error executing SPARQL query:', e);
+        throw e;
+    }
 }
