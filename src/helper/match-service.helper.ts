@@ -5,6 +5,7 @@ import {isURL} from "validator";
 import {ArtsdataConstants, Entities, SCHEMA_ORG_PROPERTY_URI_MAP} from "../constant";
 import {JaroWinklerDistance} from "natural";
 import {QUERIES_V2} from "../constant/match/match-queries-v2.constants";
+import {SparqlVersionEnum} from "../enum/sparql-versions.enum";
 
 export class MatchServiceHelper {
 
@@ -87,7 +88,11 @@ export class MatchServiceHelper {
         return candidates;
     }
 
-    static getGraphdbIndex(type: string): string {
+    static getGraphdbIndex(type: string, version?:SparqlVersionEnum): string {
+        if(version === SparqlVersionEnum.V2){
+            return GRAPHDB_INDEX.LABELLED_ENTITIES
+        }
+
         switch (type) {
             case "schema:Event":
                 return GRAPHDB_INDEX.EVENT;

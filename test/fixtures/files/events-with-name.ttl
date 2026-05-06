@@ -1,0 +1,37 @@
+@prefix adr:<http://kg.artsdata.ca/resource/>.
+@prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#>.
+@prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix schema:<http://schema.org/>.
+@prefix xsd:<http://www.w3.org/2001/XMLSchema#>.
+
+
+adr:KE-1 rdf:type <http://schema.org/Event> ;
+    rdfs:label "A Beacon in the Night" .
+
+adr:KE-2 rdf:type <http://schema.org/Event> ;
+    rdfs:label "A Beacon AND Night" .
+
+adr:KE-4 rdf:type <http://schema.org/Event> ;
+    rdfs:label "A Beacon during the Night" .
+
+adr:KE-5 rdf:type <http://schema.org/Event> ;
+    rdfs:label "A Beautiful Night" .
+
+adr:KE-6 rdf:type <http://schema.org/Event> ;
+    rdfs:label "At the Night" ;
+    schema:startDate "2025-12-28T13:00:00-04:00"^^xsd:date.
+
+adr:KE-7 rdf:type <http://schema.org/Event> ;
+    rdfs:label "Pierre-Yves Roy-Desmarais" .
+
+adr:KE-8 rdf:type <http://schema.org/Event> ;
+    rdfs:label "Banx & Ranx || FMG 2023" .
+
+adr:KE-9 rdf:type <http://schema.org/Event> ;
+    rdfs:label "Parcours citoyenne : Maï Nguyen (Vietnam)" .
+
+adr:KE-10 rdf:type <http://schema.org/Event> ;
+    rdfs:label "Kev - M'en c*lisse, j'essaye [Trois-Rivières] 18+" .
+
+adr:KE-11 rdf:type <http://schema.org/Event> ;
+    rdfs:label "Emily D’Angelo" .

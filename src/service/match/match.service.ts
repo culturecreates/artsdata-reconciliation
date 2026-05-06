@@ -21,6 +21,7 @@ import {
     MatchTypeEnum,
 } from "../../enum";
 import {GRAPHDB_INDEX} from "../../config";
+import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
 
 @Injectable()
 export class MatchService {
@@ -161,7 +162,7 @@ export class MatchService {
                 const isQueryByURI: boolean = !!id;
 
                 //TODO Remove this condition once the new version is fully released
-                if (version === 'v2') {
+                if (version === SparqlVersionEnum.V2) {
                     sparqlQuery = this._generateSparqlQueryV2(id, name as string, type, limit || 25, propertyConditions);
                 } else {
                     sparqlQuery = this._generateSparqlQuery(id, name as string, type, limit || 25, propertyConditions);
@@ -262,8 +263,7 @@ export class MatchService {
      */
     private _generateSparqlQueryV2(id: string | undefined, name: string | undefined, type: string,
                                    limit: number, propertyConditions: QueryCondition[]) {
-
-        const luceneIndex = GRAPHDB_INDEX.LABELLED_ENTITIES;
+        const luceneIndex = MatchServiceHelper.getGraphdbIndex(type, SparqlVersionEnum.V2);
         const selectVariables = ['?entity'];
         const subQueries = [];
         const scoreVariables = new Set<string>();
