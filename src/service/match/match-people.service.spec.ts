@@ -3,76 +3,150 @@ import { ReconciliationQuery } from "../../dto";
 import { Entities } from "../../constant";
 import { MatchTypeEnum } from "../../enum";
 import { LanguageEnum } from "../../enum";
-import { setupMatchService } from "../../../test/util/common-util";
+import {
+    dropIndexAndTheGraph,
+    setupMatchService,
+    uploadDataSetAndCreateLuceneConnector
+} from "../../../test/util/common-util";
+import {IndexFileNameEnum} from "../../enum/index-names.enum";
+import {MatchServiceHelper} from "../../helper";
+import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
 
 
-describe('Test reconciling people using sparql query version 2', () => {
+describe('Test reconciling person using sparql query version 1', () => {
 
     let matchService: MatchService;
+    const testDatasetPath = 'test/fixtures/files/places-people-and-organizations-with-name.ttl';
+    let testLuceneConnectorId: string;
+    let testGraphUri: string;
 
     beforeAll(async () => {
         const setup = await setupMatchService();
         matchService = setup.matchService;
-    });
 
-    it(`Fuzzy match person name 'Jérémy Des'`, async () => {
+        const {
+            graphUri,
+            luceneConnector
+        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.PERSON, testDatasetPath)
+        testGraphUri = graphUri;
+        testLuceneConnectorId = luceneConnector;
+        jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
+    });
+    afterAll(async () => {
+        await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
+    })
+
+    it('Reconcile a person with name `Persona bell`, which is exact match', async () => {
+
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PERSON,
-            conditions: [{
-                matchType: MatchTypeEnum.NAME,
-                propertyValue: "Jérémy De"
-            }],
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Persona bell"}],
             limit: 1
         };
 
-        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, { queries: [reconciliationQuery] }, "v2");
-        const candidate = result.results?.[0]?.candidates?.[0];
-        expect(candidate.name).toBe("Jérémy Desmarais");
-        expect(candidate.id).toBe("K2-2791");
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V2);
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KPR-1");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeFalsy();
+        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Person")?.id)
+            .toBe("http://schema.org/Person");
+
     });
 
-    it(`Reconcile person with name and wikidata ID`, async () => {
+    it(`Reconcile an person entity with uri 'http://kg.artsdata.ca/resource/KPR-1`, async () => {
+
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PERSON,
-            conditions: [
-                {
-                    matchType: MatchTypeEnum.NAME,
-                    propertyValue: "Jérémy Desmarais"
-                },
-                {
-                    matchType: MatchTypeEnum.PROPERTY,
-                    propertyId: "http://schema.org/sameAs",
-                    propertyValue: "http://www.wikidata.org/entity/Q111454795"
-                }
-            ],
+            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KPR-1"}],
             limit: 1
         };
 
-        const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, { queries: [reconciliationQuery] }, "v2");
-        const candidate = result.results?.[0]?.candidates?.[0];
-        expect(candidate).toBeDefined();
-        expect(candidate.name).toBe("Jérémy Desmarais");
-        expect(candidate.id).toBe("K2-2791");
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V2);
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KPR-1");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeTruthy();
+        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Person")?.id)
+            .toBe("http://schema.org/Person");
     });
-
-    // Match name by searching without accents
-    // The lucene analylzer should be ascii folding to match "Jeremy" to "Jérémy"
-    // NOTE: This is avandanced and may be commented out for future
-    // it(`Reconcile person Jeremy Desmarais`, async () => {
-    //     const reconciliationQuery: ReconciliationQuery = {
-    //         type: Entities.PERSON,
-    //         conditions: [{
-    //             matchType: MatchTypeEnum.NAME,
-    //             propertyValue: "Jeremy Desmarais"
-    //         }],
-    //         limit: 5
-    //     };
-    //
-    //     const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH, { queries: [reconciliationQuery] }, "v2");
-    //     const candidate = result.results?.[0]?.candidates?.[0];
-    //     expect(candidate.name).toBe("Jérémy Desmarais");
-    //     expect(candidate.id).toBe("K2-2791");
-    // });
-
 });
 
+describe('Test reconciling person using sparql query version 2', () => {
+
+    let matchService: MatchService;
+    const testDatasetPath = 'test/fixtures/files/places-people-and-organizations-with-name.ttl';
+    let testLuceneConnectorId: string;
+    let testGraphUri: string;
+
+    beforeAll(async () => {
+        const setup = await setupMatchService();
+        matchService = setup.matchService;
+
+        const {
+            graphUri,
+            luceneConnector
+        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.ALL_LITERALS, testDatasetPath)
+        testGraphUri = graphUri;
+        testLuceneConnectorId = luceneConnector;
+        jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
+    });
+    afterAll(async () => {
+        await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
+    })
+
+    it('Reconcile an organization with name `Persona bell`, which is exact match', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PERSON,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Persona bell"}],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V2);
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KPR-1");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeFalsy();
+        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Person")?.id)
+            .toBe("http://schema.org/Person");
+
+    });
+
+    it(`Reconcile an organization entity with uri 'http://kg.artsdata.ca/resource/KPR-1`, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PERSON,
+            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KPR-1"}],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V2);
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KPR-1");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeTruthy();
+        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Person")?.id)
+            .toBe("http://schema.org/Person");
+    });
+});
