@@ -27,9 +27,9 @@ jobs:
           --header 'Content-Type: multipart/form-data' \
           --form 'config=@"./test/graph-db/data/config.ttl"'
 
-      - name: Ensure .env exists
+      - name: Ensure .env.test exists
         run: |
-          touch .env
+          touch .env.test
           echo 'ARTSDATA_ENDPOINT="http://127.0.0.1:7200/"' >> .env.test
           echo 'REPOSITORY="recon-test"' >> .env.test
 
