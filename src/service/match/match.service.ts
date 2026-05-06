@@ -21,6 +21,7 @@ import {
     MatchTypeEnum,
 } from "../../enum";
 import {GRAPHDB_INDEX} from "../../config";
+import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
 
 @Injectable()
 export class MatchService {
@@ -161,7 +162,7 @@ export class MatchService {
                 const isQueryByURI: boolean = !!id;
 
                 //TODO Remove this condition once the new version is fully released
-                if (version === 'v2') {
+                if (version === SparqlVersionEnum.V2) {
                     sparqlQuery = this._generateSparqlQueryV2(id, name as string, type, limit || 25, propertyConditions);
                 } else {
                     sparqlQuery = this._generateSparqlQuery(id, name as string, type, limit || 25, propertyConditions);
