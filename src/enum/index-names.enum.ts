@@ -1,4 +1,6 @@
 export enum IndexFileNameEnum {
     EVENT = "event.index.sparql",
+    PLACE = "place.index.sparql",
+    ORGANIZATION = "organization.index.sparql",
     ALL_LITERALS = "all-literals.index.sparql"
 }
