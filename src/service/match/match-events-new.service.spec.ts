@@ -25,7 +25,7 @@ describe('Test reconciling events using sparql query version 1', () => {
         const {
             graphUri,
             luceneConnector
-        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.EVENT, testDatasetPath)
+        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.ALL_LITERALS, testDatasetPath)
         testGraphUri = graphUri;
         testLuceneConnectorId = luceneConnector;
         jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
@@ -43,7 +43,7 @@ describe('Test reconciling events using sparql query version 1', () => {
         };
 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
-            {queries: [reconciliationQuery]});
+            {queries: [reconciliationQuery]},"V2");
 
         expect(response.results).toHaveLength(1);
         const allResults = response.results?.[0]?.candidates;
@@ -66,7 +66,7 @@ describe('Test reconciling events using sparql query version 1', () => {
         };
 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
-            {queries: [reconciliationQuery]});
+            {queries: [reconciliationQuery]},"V2");
 
         expect(response.results).toHaveLength(1);
         const allResults = response.results?.[0]?.candidates;

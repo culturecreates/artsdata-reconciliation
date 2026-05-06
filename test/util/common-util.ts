@@ -6,7 +6,7 @@ import {ManifestController, MatchController} from "../../src/controller";
 import {readFile} from 'node:fs/promises';
 import {executeSparql} from "./graphdb.util";
 import N3 from 'n3';
-import { randomUUID } from 'node:crypto';
+import {randomUUID} from 'node:crypto';
 
 export async function executeAndCompareResults(
     matchService: MatchService,
@@ -89,7 +89,15 @@ async function getLuceneConfigs(indexFileName: string) {
 
     luceneConfigExtractJson.importGraph = true;
     luceneConfigExtractJson.readonly = true;
-
+    let lucenceConfigFields = luceneConfigExtractJson.fields;
+    if (lucenceConfigFields?.length) {
+        luceneConfigExtractJson.fields = lucenceConfigFields.map((field: any) => {
+            if (field.valueFilter) {
+                delete field.valueFilter;
+            }
+            return field;
+        })
+    }
     return JSON.stringify(luceneConfigExtractJson);
 
 }
@@ -168,7 +176,7 @@ async function createLuceneConnectorQuery(index: string, graphUri: string, lucen
 export async function uploadDataSetAndCreateLuceneConnector(index: string, testDataFilePath: string) {
     const uniqueId = randomUUID();
     const testGraphUri = `http://test.fixtures/${uniqueId}`;
-    const testLuceneConnector = `test_index-${uniqueId}`
+    const testLuceneConnector = `test-index-${uniqueId}`
 
     try {//Update dataset
         const indexQuery = await generateInsertQueryToLoadData(testDataFilePath, testGraphUri);
