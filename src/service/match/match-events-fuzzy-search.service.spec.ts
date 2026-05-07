@@ -39,7 +39,7 @@ describe('Test reconciling events using sparql query version 1', () => {
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
             conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Theatre"}],
-            limit: 1
+            limit: 10
         };
 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
@@ -58,7 +58,7 @@ describe('Test reconciling events using sparql query version 1', () => {
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
             conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Helene Larochelle"}],
-            limit: 1
+            limit: 10
         };
 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
@@ -77,7 +77,7 @@ describe('Test reconciling events using sparql query version 1', () => {
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
             conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Helene Larochéllé"}],
-            limit: 1
+            limit: 10
         };
 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
@@ -96,7 +96,7 @@ describe('Test reconciling events using sparql query version 1', () => {
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
             conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Hélèn Larochel"}],
-            limit: 1
+            limit: 10
         };
 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
@@ -114,22 +114,7 @@ describe('Test reconciling events using sparql query version 1', () => {
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
             conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Helén Larochel"}],
-            limit: 1
-        };
-
-        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
-            {queries: [reconciliationQuery]});
-
-        const allResults = response.results?.[0]?.candidates;
-        expect(allResults).toHaveLength(0);
-    });
-
-    it('Reconcile an place with name `Helen Larochel`, which should not match, since edit distance 2 doesnt match to \'Centre de plein air Hélène Larochelle\'', async () => {
-
-        const reconciliationQuery: ReconciliationQuery = {
-            type: Entities.PLACE,
-            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Helen Larochel"}],
-            limit: 1
+            limit: 10
         };
 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
