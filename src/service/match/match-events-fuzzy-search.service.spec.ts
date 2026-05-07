@@ -11,7 +11,7 @@ import {IndexFileNameEnum} from "../../enum/index-names.enum";
 import {MatchServiceHelper} from "../../helper";
 
 
-describe('Test reconciling events using sparql query version 1', () => {
+describe('Test reconciling using fuzzy search v1', () => {
 
     let matchService: MatchService;
     const testDatasetPath = 'test/fixtures/files/places-for-fuzzy-search.ttl';
