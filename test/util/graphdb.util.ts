@@ -9,9 +9,7 @@ export async function executeSparql(updateQuery: string) {
     const config = new RepositoryClientConfig(ARTSDATA.ENDPOINT)
         .setEndpoints([`${ARTSDATA.ENDPOINT}repositories/${ARTSDATA.REPOSITORY}`])
         .setHeaders({})
-        .setDefaultRDFMimeType('')
-        .setReadTimeout(3000)
-        .setWriteTimeout(3000);
+        .setDefaultRDFMimeType('');
 
     if (ARTSDATA.USER) {
         config.useGdbTokenAuthentication(ARTSDATA.USER, ARTSDATA.USER);
