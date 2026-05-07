@@ -187,6 +187,8 @@ export async function uploadDataSetAndCreateLuceneConnector(index: string, testD
         await executeSparql(lucenceConnectorQuery as string);
         return {graphUri: testGraphUri, luceneConnector: testLuceneConnector};
     } catch (error) {
+        await dropIndexAndTheGraph(testGraphUri, testLuceneConnector)
+        console.log(`Error creating lucene connector: ${error.message}`);
         throw new Error(`Error creating lucene connector: ${error.message}`);
     }
 }
