@@ -9,7 +9,6 @@ import {
 } from "../../../test/util/common-util";
 import {IndexFileNameEnum} from "../../enum/index-names.enum";
 import {MatchServiceHelper} from "../../helper";
-import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
 
 
 describe('Test reconciling events using sparql query version 1', () => {
@@ -32,10 +31,10 @@ describe('Test reconciling events using sparql query version 1', () => {
         jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
     });
     afterAll(async () => {
-        await dropIndexAndTheGraph(testGraphUri,testLuceneConnectorId);
+        await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
     })
 
-    it('Reconcile an place with name `Theatre`, which is fuzzy match to Théâtre de la Cour des Arts', async () => {
+    it('Reconcile an place with name `Theatre`, which is fuzzy match to \'Théâtre de la Cour des Arts\'', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
@@ -53,6 +52,95 @@ describe('Test reconciling events using sparql query version 1', () => {
         expect(actualResult?.id).toBe("KP-4");
 
     });
+
+    it('Reconcile an place with name `Helene Larochelle`, which is fuzzy match to \'Centre de plein air Hélène Larochelle\'', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Helene Larochelle"}],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KP-5");
+
+    });
+
+    it('Reconcile an place with name `Helene Larochéllé`, which is fuzzy match with edit distance 2 \'Centre de plein air Hélène Larochelle\'', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Helene Larochéllé"}],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KP-5");
+
+    });
+
+    it('Reconcile an place with name `Helén Larochel`, which should match, since edit distance 2 match to \'Centre de plein air Hélène Larochelle\'', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Hélèn Larochel"}],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KP-5");
+    });
+
+    it('Reconcile an place with name `Helén Larochel`, which should not match, since edit distance 2 doesnt match to \'Centre de plein air Hélène Larochelle\'', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Helén Larochel"}],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        expect(allResults).toHaveLength(0);
+    });
+
+    it('Reconcile an place with name `Helen Larochel`, which should not match, since edit distance 2 doesnt match to \'Centre de plein air Hélène Larochelle\'', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Helen Larochel"}],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        expect(allResults).toHaveLength(0);
+    });
+
+
+
 
 });
 

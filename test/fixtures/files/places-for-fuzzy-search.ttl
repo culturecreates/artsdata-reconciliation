@@ -22,6 +22,6 @@ adr:KP-5 a schema:Place ;
     schema:name "Centre de plein air Hélène Larochelle" ;
     rdfs:label "Centre de plein air Hélène Larochelle" .
 
-adr:KP-5 a schema:Place ;
+adr:KP-6 a schema:Place ;
     schema:name "ODD Gallery Dënäkär Zho" ;
     rdfs:label "ODD Gallery Dënäkär Zho" .
