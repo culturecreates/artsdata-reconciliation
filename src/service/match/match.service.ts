@@ -304,7 +304,7 @@ export class MatchService {
         let rawQuery = QUERIES.RECONCILIATION_QUERY;
 
         if (name) {
-            name = this._modifyNameForLuceneScore(MatchServiceHelper.transformSearchQuery(name), propertyConditions);
+            name = this._modifyNameForLuceneScore(MatchServiceHelper.transformSearchQuery(name, 'name'), propertyConditions);
         }
         if (id) {
             id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX}${id}>`;
@@ -404,26 +404,28 @@ export class MatchService {
             "<https://schema.org/location>/<https://schema.org/address>/<https://schema.org/postalCode>": "locationPostalCode",
         };
 
-        return propertyConditions
+        const luceneQuery = propertyConditions
             .filter((condition) => condition.matchType === MatchTypeEnum.PROPERTY)
             .reduce((query, condition) => {
                 Object.entries(propertyMap).forEach(([key, value]) => {
                     if (condition.propertyId?.includes(key)) {
-                        query += this.resolvePropertyValueForLucene(
+                        query = `${query} OR ${this.resolvePropertyValueForLucene(
                             condition.propertyValue,
                             value,
-                        );
+                        )}`;
                     }
                 });
                 return query;
             }, `${name}`);
+
+        return `"${luceneQuery}" ;`;
     }
 
     private resolvePropertyValueForLucene(propertyValue: string | string[], propertyId: string): string {
         const values = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
         return values
             .map((value) =>
-                ` ${propertyId}: ${MatchServiceHelper.transformSearchQuery(value)}`)
+                `${MatchServiceHelper.transformSearchQuery(value, propertyId)}`)
             .join(" ");
     }
 

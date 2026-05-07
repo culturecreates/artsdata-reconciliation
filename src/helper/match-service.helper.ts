@@ -9,15 +9,20 @@ import {SparqlVersionEnum} from "../enum/sparql-versions.enum";
 
 export class MatchServiceHelper {
 
-    static transformSearchQuery(inputString: string) {
+    static transformSearchQuery(inputString: string, lucenceFieldName: string) {
+        const isNameProperty = lucenceFieldName.toLowerCase() === 'name';
+
         // Remove common lucene special chars
         inputString = inputString.replace(/[+\-&|!(){}\[\]^"~*?:\\\/]/g, ' ')
             .replace(/\s+/g, ' ')
             .trim();
-        const terms = inputString.toLowerCase().split(/\s+/);
+        let terms: string[] = [inputString];
+        if (isNameProperty) {
+            terms = inputString.toLowerCase().split(/\s+/)
+        }
         const fuzzyTerms = terms.map(term => `${term}~2`);
-        const nameQuery = fuzzyTerms.map(term => `name:${term}`).join(' AND ');
-        return `"(${nameQuery})^3";`;
+        const nameQuery = fuzzyTerms.map(term => `${lucenceFieldName}:${term}`).join(' AND ');
+        return isNameProperty ? `(${nameQuery})^3` : `(${nameQuery})`;
     }
 
     static formatReconciliationResponse(responseLanguage: LanguageEnum, sparqlResponse: any,
@@ -60,7 +65,7 @@ export class MatchServiceHelper {
                 resultCandidate.description = descriptionEn || description || descriptionFr;
             }
 
-            resultCandidate.score = Math.round(Number(currentBinding["total_score"]?.value)*100)/100;
+            resultCandidate.score = Math.round(Number(currentBinding["total_score"]?.value) * 100) / 100;
             resultCandidate.match =
                 isQueryByURI ||
                 MatchServiceHelper.isAutoMatch(resultCandidate, reconciliationQuery, additionalPropertiesForAutoMatch);
@@ -72,12 +77,12 @@ export class MatchServiceHelper {
 
             resultCandidate.features = Object.entries(currentBinding)
                 .filter(([key]) => key.endsWith("_score") && key !== "total_score")
-                .map(([key, val]: [string, {datatype:string, type:string,value:string}]) => {
+                .map(([key, val]: [string, { datatype: string, type: string, value: string }]) => {
                     const id = key.replace("_score", "");
                     return {
                         id,
                         name: `${id} score for the entity`,
-                        value: Math.round(parseFloat(val.value)*100)/100
+                        value: Math.round(parseFloat(val.value) * 100) / 100
                     };
                 });
 
@@ -87,8 +92,8 @@ export class MatchServiceHelper {
         return candidates;
     }
 
-    static getGraphdbIndex(type: string, version?:SparqlVersionEnum): string {
-        if(version === SparqlVersionEnum.V2){
+    static getGraphdbIndex(type: string, version?: SparqlVersionEnum): string {
+        if (version === SparqlVersionEnum.V2) {
             return GRAPHDB_INDEX.LABELLED_ENTITIES
         }
 
