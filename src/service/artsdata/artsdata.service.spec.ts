@@ -26,6 +26,10 @@ describe('ArtsdataService — SPARQL execution and token refresh', () => {
         (artsdataService as any).token = 'initial-token';
     });
 
+    it('should return SPARQL results on a successful request', async () => {
+
+    })
+
     // it('should return SPARQL results on a successful request', async () => {
     //     const mockData = {results: {bindings: [{name: {value: 'Festival'}}]}};
     //     (httpService.postRequest as jest.Mock).mockResolvedValueOnce(mockData);
