@@ -9,16 +9,15 @@ import {SparqlVersionEnum} from "../enum/sparql-versions.enum";
 
 export class MatchServiceHelper {
 
-    static escapeSpecialCharacters(inputString: string) {
-        const luceneSpecialChars = ["+", "-", "!", "(", ")", "||", "{", "}", "[", "]", "^", "\"", "~", "*", "?",
-            ":", "\\", "/", "&&", "AND", "OR", "NOT", "TO",];
-        return Array.from(inputString)
-            .map(char =>
-                luceneSpecialChars.includes(char)
-                    ? (char === "\\" ? `\\${char}` : `\\\\${char}`)
-                    : char
-            )
-            .join("");
+    static transformSearchQuery(inputString: string) {
+        // Remove common lucene special chars
+        inputString = inputString.replace(/[+\-&|!(){}\[\]^"~*?:\\\/]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+        const terms = inputString.toLowerCase().split(/\s+/);
+        const fuzzyTerms = terms.map(term => `${term}~2`);
+        const nameQuery = fuzzyTerms.map(term => `name:${term}`).join(' AND ');
+        return `"(${nameQuery})^3";`;
     }
 
     static formatReconciliationResponse(responseLanguage: LanguageEnum, sparqlResponse: any,
