@@ -6,6 +6,7 @@ import {ArtsdataConstants, Entities, SCHEMA_ORG_PROPERTY_URI_MAP} from "../const
 import {JaroWinklerDistance} from "natural";
 import {QUERIES_V2} from "../constant/match/match-queries-v2.constants";
 import {SparqlVersionEnum} from "../enum/sparql-versions.enum";
+import {RecordFromQuery} from "../interface/match.interface";
 
 export class MatchServiceHelper {
 
@@ -30,6 +31,9 @@ export class MatchServiceHelper {
         const bindings = sparqlResponse?.results?.bindings || [];
         const uniqueIds = [...new Set(bindings.map((binding: any) => binding["entity"].value))];
         const candidates: ResultCandidates[] = [];
+        const recordFromQuery: RecordFromQuery = this.extractRecordFromQuery(reconciliationQuery);
+        const resultCandidateIdIfOnlyExactNameMatch =
+            this._getResultCandidateIdIfOnlyExactNameMatch(bindings, recordFromQuery.name);
 
         for (const currentId of uniqueIds) {
             const currentBindings = bindings
@@ -64,11 +68,11 @@ export class MatchServiceHelper {
                 resultCandidate.name = nameEn || name || nameFr;
                 resultCandidate.description = descriptionEn || description || descriptionFr;
             }
-
             resultCandidate.score = Math.round(Number(currentBinding["total_score"]?.value) * 100) / 100;
             resultCandidate.match =
-                isQueryByURI ||
-                MatchServiceHelper.isAutoMatch(resultCandidate, reconciliationQuery, additionalPropertiesForAutoMatch);
+                isQueryByURI || resultCandidate.id === resultCandidateIdIfOnlyExactNameMatch ||
+                MatchServiceHelper.isAutoMatch(resultCandidate, reconciliationQuery, additionalPropertiesForAutoMatch,
+                    recordFromQuery);
 
             resultCandidate.type = currentBindings.map((binding: any) => ({
                 id: binding["type"]?.value,
@@ -128,9 +132,9 @@ export class MatchServiceHelper {
         return !!(query?.match(artsdataIdPattern) || (this.isValidURI(query) && query.startsWith(ArtsdataConstants.PREFIX)));
     }
 
-    static isAutoMatch(recordFetched: { [key: string]: any }, reconciliationQuery: ReconciliationQuery,
-                       additionalProperties: any): boolean {
-        const recordFromQuery = this.formatReconciliationQuery(reconciliationQuery);
+    static isAutoMatch(recordFetched: {
+        [key: string]: any;
+    }, reconciliationQuery: ReconciliationQuery, additionalProperties: any, recordFromQuery: RecordFromQuery): boolean {
 
         function cleanName(name: string) {
             return name
@@ -272,7 +276,7 @@ export class MatchServiceHelper {
         }
     }
 
-    private static formatReconciliationQuery(reconciliationQuery: ReconciliationQuery) {
+    private static extractRecordFromQuery(reconciliationQuery: ReconciliationQuery) {
         const {conditions} = reconciliationQuery;
         const name = conditions.find((condition) => condition.matchType === "name")
             ?.propertyValue as string | undefined;
@@ -352,7 +356,7 @@ export class MatchServiceHelper {
             locationUri,
             isni: isni ? (isni.length ? isni : undefined) : undefined,
             wikidata: wikidata ? (wikidata.length ? wikidata : undefined) : undefined,
-        };
+        } as RecordFromQuery;
     }
 
     static getAllQualifiers() {
@@ -464,4 +468,26 @@ export class MatchServiceHelper {
     }
 
 
+    private static _getResultCandidateIdIfOnlyExactNameMatch(bindings: any[], searchString: string | undefined): string | undefined {
+        if (!searchString) return undefined;
+
+        // 1. Identify which records contain an exact match
+        const matchedRecords = bindings.filter(item => {
+            return [
+                item.name?.value,
+                item.nameEn?.value,
+                item.nameFr?.value
+            ].some(val => val === searchString);
+        });
+
+        // 2. Return the entity ID ONLY if exactly one record matched
+        if (matchedRecords.length === 1) {
+            const uniqueMatch = matchedRecords[0];
+            // Safely extract the ID from the entity value
+            return uniqueMatch.entity?.value?.split(ArtsdataConstants.PREFIX).pop();
+        }
+
+        // Return undefined if 0 or 2+ matches found (Case 2 & 3)
+        return undefined;
+    }
 }
