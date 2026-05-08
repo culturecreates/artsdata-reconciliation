@@ -25,3 +25,11 @@ adr:KP-5 a schema:Place ;
 adr:KP-6 a schema:Place ;
     schema:name "ODD Gallery Dënäkär Zho" ;
     rdfs:label "ODD Gallery Dënäkär Zho" .
+
+adr:KP-7 a schema:Place ;
+    schema:name "Place with common name" ;
+    rdfs:label "Place with common name" .
+
+adr:KP-8 a schema:Place ;
+    schema:name "Place with common name" ;
+    rdfs:label "Place with common name" .

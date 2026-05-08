@@ -124,6 +124,42 @@ describe('Test reconciling using fuzzy search v1', () => {
         expect(allResults).toHaveLength(0);
     });
 
+    it('Expect exact name to set match:true', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Arts Court"}],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KP-1");
+        expect(actualResult.match).toBe(true);
+    });
+
+    it('Expect exact name to set match:false when more than one exact match', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Place with common name"}],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const firstResult = allResults?.[0];
+        console.log("firstResult", firstResult);
+        expect(["KP-7", "KP-8"]).toContain(firstResult?.id);
+        expect(firstResult?.match).toBe(false);
+    });
+
 
 
 
