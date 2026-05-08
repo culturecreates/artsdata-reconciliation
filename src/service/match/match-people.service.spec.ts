@@ -13,7 +13,7 @@ import {MatchServiceHelper} from "../../helper";
 import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
 
 
-describe('Test reconciling person using sparql query version 1', () => {
+describe('Test matching person using sparql query v1', () => {
 
     let matchService: MatchService;
     const testDatasetPath = 'test/fixtures/files/places-people-and-organizations-with-name.ttl';

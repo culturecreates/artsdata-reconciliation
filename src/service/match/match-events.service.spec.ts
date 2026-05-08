@@ -12,7 +12,7 @@ import {MatchServiceHelper} from "../../helper";
 import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
 
 
-describe('Test reconciling events using sparql query version 1', () => {
+describe('Test matching events using sparql query v1', () => {
 
     let matchService: MatchService;
     const testDatasetPath = 'test/fixtures/files/events-with-name.ttl';

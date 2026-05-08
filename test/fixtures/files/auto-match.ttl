@@ -1,0 +1,47 @@
+@prefix adr:<http://kg.artsdata.ca/resource/>.
+@prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#>.
+@prefix schema:<http://schema.org/>.
+
+adr:KPR-1 a schema:Person ;
+    schema:name "Person with common name" ;
+    rdfs:label "Person with common name" .
+
+adr:KPR-2 a schema:Person ;
+    schema:name "Person with common name" ;
+    rdfs:label "Person with common name" .
+
+adr:KPR-3 a schema:Person ;
+    schema:name "Paul Sebastian" ;
+    rdfs:label "Paul Sebastian" .
+
+adr:KPR-4 a schema:Person ;
+    schema:name "Paul Samuel" ;
+    rdfs:label "Paul Samuel" .
+
+adr:KPR-5 a schema:Person ;
+    schema:name "Person Xavier" ;
+    rdfs:label "Person Xavier" .
+
+# Places
+
+adr:KP-1 a schema:Place ;
+    schema:name "Arts Court" ;
+    rdfs:label "Arts Court" ;
+    schema:address [
+        schema:postalCode "H0H 0H0" ;
+    ] .
+
+adr:KP-7 a schema:Place ;
+    schema:name "Place with common name" ;
+    rdfs:label "Place with common name" ;
+     schema:address [
+        schema:postalCode "H0H 0H0" ;
+    ] .
+
+adr:KP-8 a schema:Place ;
+    schema:name "Place with common name" ;
+    rdfs:label "Place with common name" ;
+     schema:address [
+        schema:postalCode "H0H 0H0" ;
+    ] .
+

@@ -13,7 +13,7 @@ import {MatchServiceHelper} from "../../helper";
 import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
 
 
-describe('Test reconciling Place using sparql query version 1', () => {
+describe('Test matching Place using sparql query v1', () => {
 
     let matchService: MatchService;
     const testDatasetPath = 'test/fixtures/files/places-people-and-organizations-with-name.ttl';
@@ -59,11 +59,11 @@ describe('Test reconciling Place using sparql query version 1', () => {
 
     });
 
-    it('Reconcile a Place with name `Place`, which a close match of name', async () => {
+    it('Reconcile a Place with name `Plas Bell`, which a close match of name', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
-            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Place"}],
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Plas Bell"}],
             limit: 1
         };
 
@@ -228,7 +228,7 @@ describe('Test reconciling Place using sparql query version 1', () => {
 
     });
 
-    it('It should find alternate names', async () => {
+    it('It should find by name', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: "schema:Place",
@@ -236,7 +236,7 @@ describe('Test reconciling Place using sparql query version 1', () => {
             conditions: [
                 {
                     matchType: "name",
-                    propertyValue: "Place des arts de Montréal"
+                    propertyValue: "Place des arts"
                 }
             ]
         }
@@ -264,7 +264,7 @@ describe('Test reconciling Place using sparql query version 1', () => {
             conditions: [
                 {
                     matchType: "name",
-                    propertyValue: "Place des arts de Montréal"
+                    propertyValue: "Place des arts"
                 }
             ]
         }

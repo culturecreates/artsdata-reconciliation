@@ -17,8 +17,9 @@ describe('isAutoMatch', () => {
             ],
         };
         const additionalProperties = {postalCode: 'H7N 0E4'};
-
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
 
         expect(result).toBe(true);
     });
@@ -37,8 +38,9 @@ describe('isAutoMatch', () => {
             ],
         };
         const additionalProperties = {postalCode: 'H7N 055'};
-
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
 
         expect(result).toBe(false);
     });
@@ -53,7 +55,7 @@ describe('isAutoMatch', () => {
                     propertyId: "<http://schema.org/postalCode>",
                     propertyValue: "H7N 0E4",
                     matchType: "property",
-                },{
+                }, {
                     propertyId: "<http://schema.org/address>/<http://schema.org/addressLocality>",
                     propertyValue: "Lavel",
                     matchType: "property",
@@ -62,7 +64,9 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval'};
 
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
 
         expect(result).toBe(true);
     });
@@ -77,7 +81,7 @@ describe('isAutoMatch', () => {
                     propertyId: "<http://schema.org/address>/<http://schema.org/addressLocality>",
                     propertyValue: "Laval",
                     matchType: "property",
-                },{
+                }, {
                     propertyId: "<http://schema.org/postalCode>",
                     propertyValue: "H7N 0E5",
                     matchType: "property",
@@ -86,7 +90,9 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval'};
 
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
 
         expect(result).toBe(false);
     });
@@ -100,16 +106,18 @@ describe('isAutoMatch', () => {
                     propertyId: "<http://schema.org/address>/<http://schema.org/addressLocality>",
                     propertyValue: "Laval",
                     matchType: "property",
-                },{
+                }, {
                     propertyId: "<http://schema.org/postalCode>",
                     propertyValue: "H7N 0E5",
                     matchType: "property",
                 }
             ],
         };
-        const additionalProperties = { addressLocality: 'Laval'};
+        const additionalProperties = {addressLocality: 'Laval'};
 
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
 
         expect(result).toBe(true);
     });
@@ -128,7 +136,9 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval'};
 
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
 
         expect(result).toBe(true);
     });
@@ -148,7 +158,9 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval'};
 
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
 
         expect(result).toBe(true);
     });
@@ -167,7 +179,9 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {addressLocality: 'Laval'};
 
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
 
         expect(result).toBe(true);
     });
@@ -187,7 +201,9 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {url: "http://www.placebell.ca/fr"};
 
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
 
         expect(result).toBe(true);
     });
@@ -207,7 +223,9 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {url: 'http://www.placebell.ca/fr'};
 
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
 
         expect(result).toBe(true);
     });
@@ -227,7 +245,9 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {url: 'http://www.placebell.ca/wrong-url'};
 
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
 
         expect(result).toBe(false);
     });
@@ -254,7 +274,9 @@ describe('isAutoMatch', () => {
             wikidata: 'http://www.wikidata.org/entity/Q12345'
         };
 
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
 
         expect(result).toBe(true);
     });
@@ -275,7 +297,9 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {startDate: '2023-01-01'};
 
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
 
         expect(result).toBe(false);
     });
@@ -295,7 +319,9 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {startDate: '2023-02-01'};
 
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
 
         expect(result).toBe(false);
     });
@@ -320,7 +346,9 @@ describe('isAutoMatch', () => {
             endDate: '2023-01-02',
             locationUri: 'http://kg.artsdata.ca/resource/K11-240',
         };
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
         expect(result).toBe(true);
     });
 
@@ -338,7 +366,10 @@ describe('isAutoMatch', () => {
             ],
         };
         const additionalProperties = {locationUri: 'http://kg.artsdata.ca/resource/K22-240'};
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
         expect(result).toBe(false);
     });
 
@@ -364,7 +395,9 @@ describe('isAutoMatch', () => {
             locationName: 'Place Bell',
             postalCode: 'H7N 0E4',
         };
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
         expect(result).toBe(true);
     });
 
@@ -384,7 +417,9 @@ describe('isAutoMatch', () => {
             endDate: '2023-01-02',
             postalCode: '77N 0E4',
         };
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
         expect(result).toBe(false);
     });
 
@@ -406,7 +441,9 @@ describe('isAutoMatch', () => {
             startDate: '2023-01-01',
             locationUri: 'http://kg.artsdata.ca/resource/K11-240'
         };
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
         expect(result).toBe(true);
     });
 
@@ -438,7 +475,9 @@ describe('isAutoMatch', () => {
             endDate: '2023-01-02T18:00:00Z',
             locationUri: 'http://kg.artsdata.ca/resource/K11-240'
         };
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
         expect(result).toBe(true);
     });
 
@@ -455,7 +494,9 @@ describe('isAutoMatch', () => {
             startDate: '2023-01-01',
             endDate: '2023-01-02',
         };
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
         expect(result).toBe(false);
     });
 
@@ -479,9 +520,11 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {
             startDate: '2023-01-01T10:00:00Z',
-            locationUri:'http://kg.artsdata.ca/resource/K11-240'
+            locationUri: 'http://kg.artsdata.ca/resource/K11-240'
         };
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
         expect(result).toBe(true);
     });
 
@@ -505,9 +548,11 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {
             startDate: '2023-01-01T10:00:00Z',
-            locationUri:'http://kg.artsdata.ca/resource/K11-240'
+            locationUri: 'http://kg.artsdata.ca/resource/K11-240'
         };
-        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties);
+        const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
+        const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
+            recordFromQuery);
         expect(result).toBe(true);
     });
 });

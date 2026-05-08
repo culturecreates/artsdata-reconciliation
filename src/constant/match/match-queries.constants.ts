@@ -50,7 +50,6 @@ export const QUERIES = {
 
   SELECT_ENTITY_QUERY_BY_KEYWORD: `
  SELECT ?entity ?total_score WHERE {
-   QUERY_PLACE_HOLDER
    ?search a luc-index:INDEX_PLACE_HOLDER;
      QUERY_FILTER_PLACE_HOLDER
      luc:entities ?entity.

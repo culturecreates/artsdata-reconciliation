@@ -153,7 +153,7 @@ describe('Test reconciling events using sparql query version 1', () => {
             conditions: [
                 {
                     matchType: "name",
-                    propertyValue: "j'essaye [Trois-Rivès]"
+                    propertyValue: "j'essaye [Trois-Rivieres]"
                 }
             ]
         }

@@ -2,25 +2,9 @@ import {Injectable} from "@nestjs/common";
 import {ArtsdataService} from "../artsdata";
 import {ManifestService} from "../manifest";
 import {Exception, MatchServiceHelper} from "../../helper";
-import {
-    ArtsdataConstants,
-    ArtsdataProperties,
-    Entities,
-    QUERIES,
-} from "../../constant";
-import {
-    QueryCondition,
-    ReconciliationRequest,
-    ReconciliationResponse,
-    ReconciliationResults,
-} from "../../dto";
-import {
-    LanguageEnum,
-    MatchQualifierEnum,
-    MatchQuantifierEnum,
-    MatchTypeEnum,
-} from "../../enum";
-import {GRAPHDB_INDEX} from "../../config";
+import {ArtsdataConstants, ArtsdataProperties, Entities, QUERIES,} from "../../constant";
+import {QueryCondition, ReconciliationRequest, ReconciliationResponse, ReconciliationResults,} from "../../dto";
+import {LanguageEnum, MatchQualifierEnum, MatchQuantifierEnum, MatchTypeEnum,} from "../../enum";
 import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
 
 @Injectable()
@@ -320,7 +304,7 @@ export class MatchService {
         let rawQuery = QUERIES.RECONCILIATION_QUERY;
 
         if (name) {
-            name = this._modifyNameForLuceneScore(MatchServiceHelper.escapeSpecialCharacters(name), propertyConditions);
+            name = this._modifyNameForLuceneScore(MatchServiceHelper.transformSearchQuery(name, 'name'), propertyConditions);
         }
         if (id) {
             id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX}${id}>`;
@@ -390,8 +374,7 @@ export class MatchService {
 
         rawQuery = rawQuery
             .replace("INDEX_PLACE_HOLDER", graphdbIndex)
-            .replace("QUERY_PLACE_HOLDER", name ? `values ?query { "${name}" }` : "")
-            .replace("QUERY_FILTER_PLACE_HOLDER", name ? "luc:query ?query ;" : "")
+            .replace("QUERY_FILTER_PLACE_HOLDER", name ? `luc:query ${name}` : "")
             .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
 
         return this._resolvePropertyConditions(rawQuery, propertyConditions);
@@ -421,26 +404,28 @@ export class MatchService {
             "<https://schema.org/location>/<https://schema.org/address>/<https://schema.org/postalCode>": "locationPostalCode",
         };
 
-        return propertyConditions
+        const luceneQuery = propertyConditions
             .filter((condition) => condition.matchType === MatchTypeEnum.PROPERTY)
             .reduce((query, condition) => {
                 Object.entries(propertyMap).forEach(([key, value]) => {
                     if (condition.propertyId?.includes(key)) {
-                        query += this.resolvePropertyValueForLucene(
+                        query = `${query} OR ${this.resolvePropertyValueForLucene(
                             condition.propertyValue,
                             value,
-                        );
+                        )}`;
                     }
                 });
                 return query;
-            }, `name: ${name}`);
+            }, `${name}`);
+
+        return `"${luceneQuery}" ;`;
     }
 
     private resolvePropertyValueForLucene(propertyValue: string | string[], propertyId: string): string {
         const values = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
         return values
             .map((value) =>
-                ` ${propertyId}: ${MatchServiceHelper.escapeSpecialCharacters(value)}`)
+                `${MatchServiceHelper.transformSearchQuery(value, propertyId)}`)
             .join(" ");
     }
 

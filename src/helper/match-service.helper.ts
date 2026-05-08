@@ -6,19 +6,24 @@ import {ArtsdataConstants, Entities, SCHEMA_ORG_PROPERTY_URI_MAP} from "../const
 import {JaroWinklerDistance} from "natural";
 import {QUERIES_V2} from "../constant/match/match-queries-v2.constants";
 import {SparqlVersionEnum} from "../enum/sparql-versions.enum";
+import {RecordFromQuery} from "../interface/match.interface";
 
 export class MatchServiceHelper {
 
-    static escapeSpecialCharacters(inputString: string) {
-        const luceneSpecialChars = ["+", "-", "!", "(", ")", "||", "{", "}", "[", "]", "^", "\"", "~", "*", "?",
-            ":", "\\", "/", "&&", "AND", "OR", "NOT", "TO",];
-        return Array.from(inputString)
-            .map(char =>
-                luceneSpecialChars.includes(char)
-                    ? (char === "\\" ? `\\${char}` : `\\\\${char}`)
-                    : char
-            )
-            .join("");
+    static transformSearchQuery(inputString: string, lucenceFieldName: string) {
+        const isNameProperty = lucenceFieldName.toLowerCase() === 'name';
+
+        // Remove common lucene special chars
+        inputString = inputString.replace(/[+\-&|!(){}\[\]^"~*?:\\\/]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+        let terms: string[] = [inputString];
+        if (isNameProperty) {
+            terms = inputString.toLowerCase().split(/\s+/)
+        }
+        const fuzzyTerms = terms.map(term => `${term}~2`);
+        const nameQuery = fuzzyTerms.map(term => `${lucenceFieldName}:${term}`).join(' AND ');
+        return isNameProperty ? `(${nameQuery})^3` : `(${nameQuery})`;
     }
 
     static formatReconciliationResponse(responseLanguage: LanguageEnum, sparqlResponse: any,
@@ -26,6 +31,7 @@ export class MatchServiceHelper {
         const bindings = sparqlResponse?.results?.bindings || [];
         const uniqueIds = [...new Set(bindings.map((binding: any) => binding["entity"].value))];
         const candidates: ResultCandidates[] = [];
+        const recordFromQuery: RecordFromQuery = this.extractRecordFromQuery(reconciliationQuery);
 
         for (const currentId of uniqueIds) {
             const currentBindings = bindings
@@ -60,11 +66,11 @@ export class MatchServiceHelper {
                 resultCandidate.name = nameEn || name || nameFr;
                 resultCandidate.description = descriptionEn || description || descriptionFr;
             }
-
-            resultCandidate.score = Math.round(Number(currentBinding["total_score"]?.value)*100)/100;
+            resultCandidate.score = Math.round(Number(currentBinding["total_score"]?.value) * 100) / 100;
             resultCandidate.match =
                 isQueryByURI ||
-                MatchServiceHelper.isAutoMatch(resultCandidate, reconciliationQuery, additionalPropertiesForAutoMatch);
+                MatchServiceHelper.isAutoMatch(resultCandidate, reconciliationQuery, additionalPropertiesForAutoMatch,
+                    recordFromQuery);
 
             resultCandidate.type = currentBindings.map((binding: any) => ({
                 id: binding["type"]?.value,
@@ -73,23 +79,28 @@ export class MatchServiceHelper {
 
             resultCandidate.features = Object.entries(currentBinding)
                 .filter(([key]) => key.endsWith("_score") && key !== "total_score")
-                .map(([key, val]: [string, {datatype:string, type:string,value:string}]) => {
+                .map(([key, val]: [string, { datatype: string, type: string, value: string }]) => {
                     const id = key.replace("_score", "");
                     return {
                         id,
                         name: `${id} score for the entity`,
-                        value: Math.round(parseFloat(val.value)*100)/100
+                        value: Math.round(parseFloat(val.value) * 100) / 100
                     };
                 });
 
             candidates.push(resultCandidate);
         }
 
-        return candidates;
+        // If there are multiple results with match = true, then set all of them to false
+        const matchCount = candidates.filter(candidate => candidate.match).length;
+
+        return matchCount > 1
+            ? candidates.map(candidate => ({...candidate, match: false}))
+            : candidates;
     }
 
-    static getGraphdbIndex(type: string, version?:SparqlVersionEnum): string {
-        if(version === SparqlVersionEnum.V2){
+    static getGraphdbIndex(type: string, version?: SparqlVersionEnum): string {
+        if (version === SparqlVersionEnum.V2) {
             return GRAPHDB_INDEX.LABELLED_ENTITIES
         }
 
@@ -124,9 +135,9 @@ export class MatchServiceHelper {
         return !!(query?.match(artsdataIdPattern) || (this.isValidURI(query) && query.startsWith(ArtsdataConstants.PREFIX)));
     }
 
-    static isAutoMatch(recordFetched: { [key: string]: any }, reconciliationQuery: ReconciliationQuery,
-                       additionalProperties: any): boolean {
-        const recordFromQuery = this.formatReconciliationQuery(reconciliationQuery);
+    static isAutoMatch(recordFetched: {
+        [key: string]: any;
+    }, reconciliationQuery: ReconciliationQuery, additionalProperties: any, recordFromQuery: RecordFromQuery): boolean {
 
         function cleanName(name: string) {
             return name
@@ -268,7 +279,7 @@ export class MatchServiceHelper {
         }
     }
 
-    private static formatReconciliationQuery(reconciliationQuery: ReconciliationQuery) {
+    private static extractRecordFromQuery(reconciliationQuery: ReconciliationQuery) {
         const {conditions} = reconciliationQuery;
         const name = conditions.find((condition) => condition.matchType === "name")
             ?.propertyValue as string | undefined;
@@ -348,7 +359,7 @@ export class MatchServiceHelper {
             locationUri,
             isni: isni ? (isni.length ? isni : undefined) : undefined,
             wikidata: wikidata ? (wikidata.length ? wikidata : undefined) : undefined,
-        };
+        } as RecordFromQuery;
     }
 
     static getAllQualifiers() {
@@ -458,6 +469,5 @@ export class MatchServiceHelper {
             `ORDER BY DESC(?total_score)`
         ].join('\n');
     }
-
 
 }

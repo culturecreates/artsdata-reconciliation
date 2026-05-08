@@ -11,7 +11,7 @@ import {IndexFileNameEnum} from "../../enum/index-names.enum";
 import {MatchServiceHelper} from "../../helper";
 import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
 
-describe('Test reconciling organizations using sparql query version 1', () => {
+describe('Test matching organizations using sparql query v1', () => {
 
     let matchService: MatchService;
     const testDatasetPath = 'test/fixtures/files/places-people-and-organizations-with-name.ttl';
