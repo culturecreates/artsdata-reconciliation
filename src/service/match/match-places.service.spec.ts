@@ -312,7 +312,7 @@ describe('Test reconciling Place using sparql query version 1', () => {
 
         expect(actualResult?.id).toBe("KP-3");
         expect(allResults?.length).toBe(1);
-        expect(actualResult?.match).toBeFalsy();
+        expect(actualResult?.match).toBeTruthy();
         expect(actualResult?.type?.find(type => type.id === "http://schema.org/Place")?.id)
             .toBe("http://schema.org/Place");
 
