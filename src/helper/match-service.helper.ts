@@ -465,27 +465,4 @@ export class MatchServiceHelper {
         ].join('\n');
     }
 
-
-    private static _getResultCandidateIdIfOnlyExactNameMatch(bindings: any[], searchString: string | undefined): string | undefined {
-        if (!searchString) return undefined;
-
-        // 1. Identify which records contain an exact match
-        const matchedRecords = bindings.filter(item => {
-            return [
-                item.name?.value,
-                item.nameEn?.value,
-                item.nameFr?.value
-            ].some(val => val === searchString);
-        });
-
-        // 2. Return the entity ID ONLY if exactly one record matched
-        if (matchedRecords.length === 1) {
-            const uniqueMatch = matchedRecords[0];
-            // Safely extract the ID from the entity value
-            return uniqueMatch.entity?.value?.split(ArtsdataConstants.PREFIX).pop();
-        }
-
-        // Return undefined if 0 or 2+ matches found (Case 2 & 3)
-        return undefined;
-    }
 }
