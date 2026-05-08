@@ -32,8 +32,6 @@ export class MatchServiceHelper {
         const uniqueIds = [...new Set(bindings.map((binding: any) => binding["entity"].value))];
         const candidates: ResultCandidates[] = [];
         const recordFromQuery: RecordFromQuery = this.extractRecordFromQuery(reconciliationQuery);
-        const resultCandidateIdIfOnlyExactNameMatch =
-            this._getResultCandidateIdIfOnlyExactNameMatch(bindings, recordFromQuery.name);
 
         for (const currentId of uniqueIds) {
             const currentBindings = bindings
@@ -70,7 +68,7 @@ export class MatchServiceHelper {
             }
             resultCandidate.score = Math.round(Number(currentBinding["total_score"]?.value) * 100) / 100;
             resultCandidate.match =
-                isQueryByURI || resultCandidate.id === resultCandidateIdIfOnlyExactNameMatch ||
+                isQueryByURI ||
                 MatchServiceHelper.isAutoMatch(resultCandidate, reconciliationQuery, additionalPropertiesForAutoMatch,
                     recordFromQuery);
 
