@@ -53,7 +53,7 @@ describe('Test reconciling person using sparql query version 1', () => {
 
         expect(actualResult?.id).toBe("KPR-1");
         expect(allResults?.length).toBe(1);
-        expect(actualResult?.match).toBeFalsy();
+        expect(actualResult?.match).toBeTruthy();
         expect(actualResult?.type?.find(type => type.id === "http://schema.org/Person")?.id)
             .toBe("http://schema.org/Person");
 
@@ -122,7 +122,7 @@ describe('Test reconciling person using sparql query version 2', () => {
 
         expect(actualResult?.id).toBe("KPR-1");
         expect(allResults?.length).toBe(1);
-        expect(actualResult?.match).toBeFalsy();
+        expect(actualResult?.match).toBeTruthy();
         expect(actualResult?.type?.find(type => type.id === "http://schema.org/Person")?.id)
             .toBe("http://schema.org/Person");
 

@@ -195,9 +195,9 @@ export class MatchServiceHelper {
             matchers.exact(additionalProperties.wikidata, recordFromQuery.wikidata),
         ];
 
-        const checkIfNameIsCloseAndWikidataIdIsExact = [
+        const checkIfNameIsCloseAndWikidataIdIsNotDifferentIfBothPresent = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name),
-            matchers.exact(additionalProperties.wikidata, recordFromQuery.wikidata),
+            matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata),
         ];
 
         // Name should be close match and postal code should be exact match, wikidata should be exact match if present
@@ -263,7 +263,7 @@ export class MatchServiceHelper {
             return (
                 checkIfWikidataIdIsExactMatch.every(Boolean) ||
                 checkIfIsniIsExactMatch.every(Boolean) ||
-                checkIfNameIsCloseAndWikidataIdIsExact.every(Boolean)
+                checkIfNameIsCloseAndWikidataIdIsNotDifferentIfBothPresent.every(Boolean)
             );
         }
     }
