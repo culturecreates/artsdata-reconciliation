@@ -3,6 +3,8 @@
 @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix schema: <http://schema.org/> .
 
+# Places 
+
 adr:KP-1 a schema:Place ;
     rdfs:label "Place Bell" ;
     schema:name "Place Bell" .
@@ -22,10 +24,33 @@ adr:KP3-address a schema:PostalAddress ;
     schema:streetAddress "175, rue Sainte-Catherine Ouest" ;
     schema:addressLocality "Toronto" .
 
+adr:Place1 a schema:Place ;
+    rdfs:label "Place 1" ;
+    schema:name "Place 1" ;
+    schema:alternateName "Another name" .
+
+# Persons
+
 adr:KPR-1 a schema:Person ;
     rdfs:label "Persona bell" ;
      schema:name "Persona bell" .
 
+adr:WarrenSonoda a schema:Person ;
+    rdfs:label "Warren P. Sonoda" ;
+     schema:name "Warren P. Sonoda" .
+
+adr:GarretWillie a schema:Person ;
+    rdfs:label "Garret T. Willie" ;
+     schema:name "Garret T. Willie" .
+
+adr:WarrenHoyano a schema:Person ;
+    rdfs:label "Warren Hoyano" ;
+     schema:name "Warren Hoyano" .
+
+
+# Organizations
+
 adr:KO-1 a schema:Organization ;
     rdfs:label "Place Bell" ;
     schema:name "Place Bell" .
+

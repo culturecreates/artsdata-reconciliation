@@ -316,6 +316,30 @@ describe('Test matching Place using sparql query v1', () => {
 
     });
 
+    it('Match Place with alternate name', async () => {
+
+        const reconciliationQuery: ReconciliationQuery =  {
+            type: "schema:Place",
+            limit: 1,
+            conditions: [
+                {
+                    matchType: "name",
+                    propertyValue: "Alternate Name",
+                }
+            ],
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("Place1");
+        expect(actualResult?.match).toBeTruthy();
+    });
+
 });
 
 describe('Test reconciling place using sparql query version 2', () => {

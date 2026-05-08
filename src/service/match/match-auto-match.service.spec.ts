@@ -9,6 +9,7 @@ import {
 } from "../../../test/util/common-util";
 import {IndexFileNameEnum} from "../../enum/index-names.enum";
 import {MatchServiceHelper} from "../../helper";
+import { SparqlVersionEnum } from "src/enum/sparql-versions.enum";
 
 
 describe('Test auto-match Persons using sparql query v1', () => {
@@ -71,7 +72,7 @@ describe('Test auto-match Persons using sparql query v1', () => {
 
 });
 
-describe('Test matching Places using fuzzy search v1', () => {
+describe('Test auto-matching Places using sparql query v1', () => {
 
     let matchService: MatchService;
     const testDatasetPath = 'test/fixtures/files/auto-match.ttl';
@@ -151,5 +152,25 @@ describe('Test matching Places using fuzzy search v1', () => {
         const firstResult = allResults?.[0];
         expect(["KP-7", "KP-8"]).toContain(firstResult?.id);
         expect(firstResult?.match).toBe(false);
+    });
+
+    it(`Auto-match Place with alternate name`, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Alternate Name"}],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        console.log("allResults", allResults);
+        expect(actualResult?.id).toBe("Place1");
+        expect(actualResult?.match).toBeTruthy();
     });
 });

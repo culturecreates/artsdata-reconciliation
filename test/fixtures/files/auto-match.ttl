@@ -45,3 +45,8 @@ adr:KP-8 a schema:Place ;
         schema:postalCode "H0H 0H0" ;
     ] .
 
+
+adr:Place1 a schema:Place ;
+    rdfs:label "Place 1" ;
+    schema:name "Place 1" ;
+    schema:alternateName "Alternate Name" .
