@@ -91,7 +91,12 @@ export class MatchServiceHelper {
             candidates.push(resultCandidate);
         }
 
-        return candidates;
+        // If there are multiple results with match = true, then set all of them to false
+        const matchCount = candidates.filter(candidate => candidate.match).length;
+
+        return matchCount > 1
+            ? candidates.map(candidate => ({...candidate, match: false}))
+            : candidates;
     }
 
     static getGraphdbIndex(type: string, version?: SparqlVersionEnum): string {
