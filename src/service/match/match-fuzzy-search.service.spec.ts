@@ -1,7 +1,7 @@
-import {MatchService,} from "../../service";
+import {MatchService,} from "..";
 import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
-import {LanguageEnum, MatchTypeEnum} from "../../enum";
+import {LanguageEnum, MatchQuantifierEnum, MatchTypeEnum} from "../../enum";
 import {
     dropIndexAndTheGraph,
     setupMatchService,
@@ -11,7 +11,7 @@ import {IndexFileNameEnum} from "../../enum/index-names.enum";
 import {MatchServiceHelper} from "../../helper";
 
 
-describe('Test reconciling using fuzzy search v1', () => {
+describe('Test matching Places using fuzzy search v1', () => {
 
     let matchService: MatchService;
     const testDatasetPath = 'test/fixtures/files/places-for-fuzzy-search.ttl';
@@ -34,7 +34,7 @@ describe('Test reconciling using fuzzy search v1', () => {
         await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
     })
 
-    it('Reconcile an place with name `Theatre`, which is fuzzy match to \'Théâtre de la Cour des Arts\'', async () => {
+    it('Reconcile a place with name `Theatre`, which is fuzzy match to \'Théâtre de la Cour des Arts\'', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
@@ -53,7 +53,7 @@ describe('Test reconciling using fuzzy search v1', () => {
 
     });
 
-    it('Reconcile an place with name `Helene Larochelle`, which is fuzzy match to \'Centre de plein air Hélène Larochelle\'', async () => {
+    it('Reconcile a place with name `Helene Larochelle`, which is fuzzy match to \'Centre de plein air Hélène Larochelle\'', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
@@ -72,7 +72,7 @@ describe('Test reconciling using fuzzy search v1', () => {
 
     });
 
-    it('Reconcile an place with name `Helene Larochéllé`, which is fuzzy match with edit distance 2 \'Centre de plein air Hélène Larochelle\'', async () => {
+    it('Reconcile a place with name `Helene Larochéllé`, which is fuzzy match with edit distance 2 \'Centre de plein air Hélène Larochelle\'', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
@@ -91,7 +91,7 @@ describe('Test reconciling using fuzzy search v1', () => {
 
     });
 
-    it('Reconcile an place with name `Helén Larochel`, which should match, since edit distance 2 match to \'Centre de plein air Hélène Larochelle\'', async () => {
+    it('Reconcile a place with name `Helén Larochel`, which should match, since edit distance 2 match to \'Centre de plein air Hélène Larochelle\'', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
@@ -109,7 +109,7 @@ describe('Test reconciling using fuzzy search v1', () => {
         expect(actualResult?.id).toBe("KP-5");
     });
 
-    it('Reconcile an place with name `Helén Larochel`, which should not match, since edit distance 2 doesnt match to \'Centre de plein air Hélène Larochelle\'', async () => {
+    it('Reconcile a place with name `Helén Larochel`, which should not match, since edit distance 2 doesnt match to \'Centre de plein air Hélène Larochelle\'', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,

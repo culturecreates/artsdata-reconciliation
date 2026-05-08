@@ -5,7 +5,6 @@
 
 adr:KP-1 a schema:Place ;
     rdfs:label "Place Bell" ;
-    schema:name "Place Bell" ;
     schema:name "Place Bell" .
 
 adr:KP-2 a schema:Place ;

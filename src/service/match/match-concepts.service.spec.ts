@@ -10,7 +10,7 @@ import {MatchServiceHelper} from "../../helper";
 import {ReconciliationQuery} from "../../dto";
 import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
 
-describe('Test reconciling events using sparql query version 1', () => {
+describe('Test matching Concepts using sparql query v1', () => {
 
     let matchService: MatchService;
     const testDatasetPath = 'test/fixtures/files/concepts.ttl';
