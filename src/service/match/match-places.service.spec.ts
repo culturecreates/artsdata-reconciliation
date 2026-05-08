@@ -1,5 +1,5 @@
 import {MatchService,} from "../../service";
-import {ReconciliationQuery} from "../../dto";
+import {ReconciliationQuery, ReconciliationResults} from "../../dto";
 import {Entities} from "../../constant";
 import {LanguageEnum, MatchTypeEnum} from "../../enum";
 import {
@@ -11,8 +11,6 @@ import {
 import {IndexFileNameEnum} from "../../enum/index-names.enum";
 import {MatchServiceHelper} from "../../helper";
 import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
-
-
 describe('Test matching Place using sparql query v1', () => {
 
     let matchService: MatchService;
@@ -391,3 +389,4 @@ describe('Test reconciling place using sparql query version 2', () => {
             .toBe("http://schema.org/Place");
     });
 });
+
