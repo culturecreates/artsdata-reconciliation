@@ -45,7 +45,7 @@ describe('Test matching person using sparql query v1', () => {
         };
 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
-            {queries: [reconciliationQuery]}, SparqlVersionEnum.V2);
+            {queries: [reconciliationQuery]});
 
         expect(response.results).toHaveLength(1);
         const allResults = response.results?.[0]?.candidates;
@@ -68,7 +68,7 @@ describe('Test matching person using sparql query v1', () => {
         };
 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
-            {queries: [reconciliationQuery]}, SparqlVersionEnum.V2);
+            {queries: [reconciliationQuery]});
 
         expect(response.results).toHaveLength(1);
         const allResults = response.results?.[0]?.candidates;
@@ -80,6 +80,45 @@ describe('Test matching person using sparql query v1', () => {
         expect(actualResult?.type?.find(type => type.id === "http://schema.org/Person")?.id)
             .toBe("http://schema.org/Person");
     });
+
+    it('Match initial in name without edit distance', async () => {
+
+        // Words with less than 3 characters should not be considered in edit distance calculation, 
+        // so "Warren H" should not match "Warren P. Sonoda"
+        // and "Warren H" should not match "Garret T. Willie"
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PERSON,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Warren H"}],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+
+        const allResults = response.results?.[0]?.candidates;
+        expect(allResults?.some(result => result.id === "WarrenSonoda")).toBeFalsy();
+        expect(allResults?.some(result => result.id === "GarretWillie")).toBeFalsy();
+    });
+
+     it('Match person with full name including initial ', async () => {
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PERSON,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Warren P. Sonoda"}],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+        expect(actualResult?.id).toBe("WarrenSonoda");
+        expect(actualResult?.match).toBeTruthy();
+    });
+
+
 });
 
 describe('Test reconciling person using sparql query version 2', () => {

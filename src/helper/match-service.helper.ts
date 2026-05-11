@@ -18,12 +18,23 @@ export class MatchServiceHelper {
             .replace(/\s+/g, ' ')
             .trim();
         let terms: string[] = [inputString];
+
         if (isNameProperty) {
             terms = inputString.toLowerCase().split(/\s+/)
         }
-        const fuzzyTerms = terms.map(term => `${term}~2`);
+
+        const fuzzyTerms = terms.map(term => {
+            return term.length < 3 ? term : `${term}~2`
+        });
+
         const nameQuery = fuzzyTerms.map(term => `${lucenceFieldName}:${term}`).join(' AND ');
-        return isNameProperty ? `(${nameQuery})^3` : `(${nameQuery})`;
+
+        if (isNameProperty) {
+            const alternateNameQuery = fuzzyTerms.map(term => `alternateName:${term}`).join(' AND ');
+            return `(${nameQuery})^3 OR (${alternateNameQuery})`
+        } else {
+            return `(${nameQuery})`
+        }
     }
 
     static formatReconciliationResponse(responseLanguage: LanguageEnum, sparqlResponse: any,
@@ -57,6 +68,7 @@ export class MatchServiceHelper {
                 locationUri: currentBinding["locationUri"]?.value,
                 wikidata: currentBinding["wikidata"]?.value,
                 isni: currentBinding["isni"]?.value,
+                alternateName: currentBinding["alternateName"]?.value,
             };
 
             if (responseLanguage === LanguageEnum.FRENCH) {
@@ -152,9 +164,9 @@ export class MatchServiceHelper {
         }
 
         const matchers = {
-            veryClose: (a: string | undefined, b: string | undefined) => {
+            veryClose: (a: string | undefined, b: string | undefined, alternateName?: string | undefined) => {
                 if (!a || !b) return false;
-                return nameSimilarity(a, b);
+                return nameSimilarity(a, b) || (alternateName ? nameSimilarity(alternateName, b) : false);
             },
             exactDate: (a: string | undefined, b: string | undefined) => {
                 if (!a || !b) return false;
@@ -207,13 +219,13 @@ export class MatchServiceHelper {
         ];
 
         const checkIfNameIsCloseAndWikidataIdIsNotDifferentIfBothPresent = [
-            matchers.veryClose(recordFetched.name, recordFromQuery.name),
+            matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata),
         ];
 
         // Name should be close match and postal code should be exact match, wikidata should be exact match if present
         const checkIfNameIsClosePostalCodeIsExactAndWikidataIsNotDifferent = [
-            matchers.veryClose(recordFetched.name, recordFromQuery.name),
+            matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.exact(additionalProperties.postalCode, recordFromQuery.postalCode),
             matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
         ];
@@ -221,7 +233,7 @@ export class MatchServiceHelper {
         //Name and address locality should be close match, postal code and wikidata should be exact match if present
         const checkIfNameAddressLocalityAreCloseAndPostalCodeAndWikidataIsNotDifferentForPlace =
             [
-                matchers.veryClose(recordFetched.name, recordFromQuery.name),
+                matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
                 matchers.notDifferentIfBothExists(additionalProperties.postalCode, recordFromQuery.postalCode),
                 matchers.veryClose(additionalProperties.addressLocality, recordFromQuery.addressLocality),
                 matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
@@ -229,7 +241,7 @@ export class MatchServiceHelper {
 
         //Name is very close and URL is exact match, postal code and wikidata should be exact match if present
         const checkIfNameIsCloseUrlIsExactAndPostalCodeAndWikidataIsNotDifferentForPlace = [
-            matchers.veryClose(recordFetched.name, recordFromQuery.name),
+            matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.exactUrl(
                 additionalProperties.url,
                 recordFromQuery.url as string,
@@ -239,7 +251,7 @@ export class MatchServiceHelper {
         ];
 
         const checksNameStartDateEndDatePlaceUriMatchForEvents = [
-            matchers.veryClose(recordFetched.name, recordFromQuery.name),
+            matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate
             ),
             matchers.exactUrl(additionalProperties.locationUri, recordFromQuery.locationUri as string,),
@@ -249,7 +261,7 @@ export class MatchServiceHelper {
         ];
 
         const checksNameStartDateEndDatePlaceNamePostalCodeMatchForEvents = [
-            matchers.veryClose(recordFetched.name, recordFromQuery.name),
+            matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate),
             matchers.exact(additionalProperties.postalCode, recordFromQuery.postalCode),
             matchers.veryClose(additionalProperties.locationName, recordFromQuery.locationName),

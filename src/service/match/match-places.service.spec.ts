@@ -1,5 +1,5 @@
 import {MatchService,} from "../../service";
-import {ReconciliationQuery} from "../../dto";
+import {ReconciliationQuery, ReconciliationResults} from "../../dto";
 import {Entities} from "../../constant";
 import {LanguageEnum, MatchTypeEnum} from "../../enum";
 import {
@@ -11,8 +11,6 @@ import {
 import {IndexFileNameEnum} from "../../enum/index-names.enum";
 import {MatchServiceHelper} from "../../helper";
 import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
-
-
 describe('Test matching Place using sparql query v1', () => {
 
     let matchService: MatchService;
@@ -318,6 +316,31 @@ describe('Test matching Place using sparql query v1', () => {
 
     });
 
+    it('Match Place with alternate name', async () => {
+
+        const reconciliationQuery: ReconciliationQuery =  {
+            type: "schema:Place",
+            limit: 1,
+            conditions: [
+                {
+                    matchType: "name",
+                    propertyValue: "Alternate Name",
+                }
+            ],
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("Place1");
+        expect(actualResult?.match).toBeFalsy();
+
+    });
+
 });
 
 describe('Test reconciling place using sparql query version 2', () => {
@@ -391,3 +414,4 @@ describe('Test reconciling place using sparql query version 2', () => {
             .toBe("http://schema.org/Place");
     });
 });
+
