@@ -23,7 +23,12 @@ export class MatchServiceHelper {
         }
         const fuzzyTerms = terms.map(term => `${term}~2`);
         const nameQuery = fuzzyTerms.map(term => `${lucenceFieldName}:${term}`).join(' AND ');
-        return isNameProperty ? `(${nameQuery})^3` : `(${nameQuery})`;
+        if (isNameProperty) {
+            const alternateNameQuery = fuzzyTerms.map(term => `alternateName:${term}`).join(' AND ');
+            return `(${nameQuery})^3 OR (${alternateNameQuery})`
+        } else {
+            return `(${nameQuery})`
+        }
     }
 
     static formatReconciliationResponse(responseLanguage: LanguageEnum, sparqlResponse: any,
