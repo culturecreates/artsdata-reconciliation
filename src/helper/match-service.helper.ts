@@ -18,11 +18,17 @@ export class MatchServiceHelper {
             .replace(/\s+/g, ' ')
             .trim();
         let terms: string[] = [inputString];
+
         if (isNameProperty) {
             terms = inputString.toLowerCase().split(/\s+/)
         }
-        const fuzzyTerms = terms.map(term => `${term}~2`);
+
+        const fuzzyTerms = terms.map(term => {
+            return term.length < 3 ? term : `${term}~2`
+        });
+
         const nameQuery = fuzzyTerms.map(term => `${lucenceFieldName}:${term}`).join(' AND ');
+
         if (isNameProperty) {
             const alternateNameQuery = fuzzyTerms.map(term => `alternateName:${term}`).join(' AND ');
             return `(${nameQuery})^3 OR (${alternateNameQuery})`
