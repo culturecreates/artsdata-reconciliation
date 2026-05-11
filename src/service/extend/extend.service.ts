@@ -117,7 +117,11 @@ export class ExtendService {
                 .map(prop => `\t\tOPTIONAL {?${id} schema:${prop} ?${id}_${prop}.}`).join("\n");
 
         }
-        return `OPTIONAL {?uri schema:${id} ?${id}. ${expandedTriples ? `\n${expandedTriples}\n` : ""}}\n`;
+        let propertyId = id;
+        if(MatchServiceHelper.isValidURI(id)){
+            propertyId = id.split('http://schema.org/')[1];
+        }
+        return `OPTIONAL {?uri schema:${propertyId} ?${propertyId}. ${expandedTriples ? `\n${expandedTriples}\n` : ""}}\n`;
     }
 
     private _formatResult(ids: string[], result: any): DataExtensionResponseDTO {
