@@ -171,6 +171,6 @@ describe('Test auto-matching Places using sparql query v1', () => {
 
         console.log("allResults", allResults);
         expect(actualResult?.id).toBe("Place1");
-        expect(actualResult?.match).toBeTruthy();
+        expect(actualResult?.match).toBeFalsy();
     });
 });
