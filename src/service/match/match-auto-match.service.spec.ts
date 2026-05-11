@@ -9,7 +9,6 @@ import {
 } from "../../../test/util/common-util";
 import {IndexFileNameEnum} from "../../enum/index-names.enum";
 import {MatchServiceHelper} from "../../helper";
-import { SparqlVersionEnum } from "src/enum/sparql-versions.enum";
 
 
 describe('Test auto-match Persons using sparql query v1', () => {
@@ -158,7 +157,17 @@ describe('Test auto-matching Places using sparql query v1', () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
-            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Alternate Name"}],
+            conditions: [
+                {
+                    matchType: MatchTypeEnum.NAME,
+                    propertyValue: "Alternate Name"
+                },
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/address>/<http://schema.org/postalCode>",
+                    "propertyValue": "H0B 0HB",
+                    "required": false
+                }],
             limit: 10
         };
 
@@ -171,6 +180,6 @@ describe('Test auto-matching Places using sparql query v1', () => {
 
         console.log("allResults", allResults);
         expect(actualResult?.id).toBe("Place1");
-        expect(actualResult?.match).toBeFalsy();
+        expect(actualResult?.match).toBeTruthy();
     });
 });

@@ -85,7 +85,7 @@ describe('Test matching person using sparql query v1', () => {
 
         // Words with less than 3 characters should not be considered in edit distance calculation, 
         // so "Warren H" should not match "Warren P. Sonoda"
-        // and "Warrem H" should match "Garret T. Willie"
+        // and "Warren H" should not match "Garret T. Willie"
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PERSON,
             conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Warren H"}],
