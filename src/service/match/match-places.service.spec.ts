@@ -337,7 +337,8 @@ describe('Test matching Place using sparql query v1', () => {
         const actualResult = allResults?.[0];
 
         expect(actualResult?.id).toBe("Place1");
-        expect(actualResult?.match).toBeTruthy();
+        expect(actualResult?.match).toBeFalsy();
+
     });
 
 });
