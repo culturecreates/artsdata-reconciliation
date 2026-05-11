@@ -27,7 +27,7 @@ adr:KP3-address a schema:PostalAddress ;
 adr:Place1 a schema:Place ;
     rdfs:label "Place 1" ;
     schema:name "Place 1" ;
-    schema:alternateName "Another name" .
+    schema:alternateName "Alternate Name" .
 
 # Persons
 
