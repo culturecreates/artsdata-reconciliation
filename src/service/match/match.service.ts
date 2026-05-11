@@ -318,13 +318,16 @@ export class MatchService {
         if (type === Entities.PLACE) {
             rawQuery = rawQuery.replace(
                 "ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
-                `(SAMPLE(?postalCode) AS ?postalCode) \n (SAMPLE(?addressLocality) AS ?addressLocality)
-        (SAMPLE(?wikidata) AS ?wikidata)`,
+                `(SAMPLE(?postalCode) AS ?postalCode)
+                (SAMPLE(?addressLocality) AS ?addressLocality)
+                (SAMPLE(?wikidata) AS ?wikidata)
+                (SAMPLE(?alternateName) AS ?alternateName)`,
             );
 
             rawQuery = rawQuery.replace(
                 "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
                 `
+          OPTIONAL { ?entity schema:alternateName ?alternateName} 
           OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode }
           OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality }
           OPTIONAL { ?entity schema:sameAs ?wikidata 
@@ -336,29 +339,33 @@ export class MatchService {
         (SAMPLE(?endDate) AS ?endDate)
         (SAMPLE(?locationName) AS ?locationName)
         (SAMPLE(?postalCode) AS ?postalCode)
-        (SAMPLE(?artsdataUri) AS ?locationUri)`,
+        (SAMPLE(?artsdataUri) AS ?locationUri)
+        (SAMPLE(?alternateName) AS ?alternateName)`,
             );
 
             rawQuery = rawQuery.replace(
                 "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
-                `OPTIONAL { ?entity schema:startDate ?startDate} 
-      OPTIONAL { ?entity schema:endDate ?endDate} 
-      OPTIONAL { ?entity schema:location ?location;
-      OPTIONAL { ?location schema:name ?locationName }
-      OPTIONAL { ?location schema:address/schema:postalCode ?postalCode }
-      OPTIONAL { ?location schema:sameAs ?artsdataUri
-        FILTER(STRSTARTS(STR(?artsdataUri), "${ArtsdataConstants.PREFIX_INCLUDING_K}")) }
-       }`,
+                `OPTIONAL { ?entity schema:startDate ?startDate}
+                OPTIONAL { ?entity schema:alternateName ?alternateName}  
+                OPTIONAL { ?entity schema:endDate ?endDate} 
+                OPTIONAL { ?entity schema:location ?location;
+                OPTIONAL { ?location schema:name ?locationName }
+                OPTIONAL { ?location schema:address/schema:postalCode ?postalCode }
+                OPTIONAL { ?location schema:sameAs ?artsdataUri
+                FILTER(STRSTARTS(STR(?artsdataUri), "${ArtsdataConstants.PREFIX_INCLUDING_K}")) }
+                }`,
             );
         } else if (type === Entities.PERSON || type === Entities.ORGANIZATION || type === Entities.AGENT) {
             rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
                 `(SAMPLE(?wikidata) AS ?wikidata)
-        (SAMPLE(?isni) AS ?isni)`,
+                            (SAMPLE(?alternateName) AS ?alternateName)
+                            (SAMPLE(?isni) AS ?isni)`,
             );
 
             rawQuery = rawQuery.replace(
                 "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
-                `OPTIONAL { ?entity schema:sameAs ?sameAs 
+                `   OPTIONAL { ?entity schema:alternateName ?alternateName}  
+                OPTIONAL { ?entity schema:sameAs ?sameAs 
       OPTIONAL {BIND(?sameAs AS ?wikidata)
         FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
       }
