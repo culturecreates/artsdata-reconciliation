@@ -96,6 +96,74 @@ describe('Test auto-match Persons using sparql query v1', () => {
 
 });
 
+describe('Test auto-match Organizations using sparql query v1', () => {
+
+    let matchService: MatchService;
+    const testDatasetPath = 'test/fixtures/files/auto-match.ttl';
+    let testLuceneConnectorId: string;
+    let testGraphUri: string;
+
+    beforeAll(async () => {
+        const setup = await setupMatchService();
+        matchService = setup.matchService;
+
+        const {
+            graphUri,
+            luceneConnector
+        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.ORGANIZATION, testDatasetPath)
+        testGraphUri = graphUri;
+        testLuceneConnectorId = luceneConnector;
+        jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
+    });
+    afterAll(async () => {
+        await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
+    })
+
+    it('Expect exact name to set match:true for organizations', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ORGANIZATION,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Organization in Ottawa"}],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("Org2");
+        expect(actualResult.match).toBeTruthy()
+    });
+
+    it('Expect exact wikidata id to set match:true for organizations', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ORGANIZATION,
+            conditions: [
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/sameAs>",
+                    "propertyValue": "http://www.wikidata.org/entity/Q111",
+                    "required": true
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("Org1");
+        expect(actualResult.match).toBeTruthy()
+    });
+
+});
+
 describe('Test auto-matching Places using sparql query v1', () => {
 
     let matchService: MatchService;

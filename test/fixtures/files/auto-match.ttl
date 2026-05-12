@@ -54,3 +54,14 @@ adr:Place1 a schema:Place ;
             schema:postalCode "H0B 0HB" ;
         ] ;
     schema:alternateName "Alternate Name" .
+
+# Organizations
+
+adr:Org1 a schema:Organization ;
+    rdfs:label "Organization in Montreal" ;
+    schema:name "Organization in Montreal" ;
+  schema:sameAs <http://www.wikidata.org/entity/Q111>.
+
+adr:Org2 a schema:Organization ;
+    rdfs:label "Organization in Ottawa" ;
+    schema:name "Organization in Ottawa" ;.
