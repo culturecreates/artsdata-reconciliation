@@ -162,6 +162,30 @@ describe('Test auto-match Organizations using sparql query v1', () => {
         expect(actualResult.match).toBeTruthy()
     });
 
+    it('Expect exact ISNI id to set match:true for organizations', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ORGANIZATION,
+            conditions: [
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/sameAs>",
+                    "propertyValue": "https://isni.org/isni/123",
+                    "required": true
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("Org2");
+        expect(actualResult.match).toBeTruthy()
+    });
 });
 
 describe('Test auto-matching Places using sparql query v1', () => {

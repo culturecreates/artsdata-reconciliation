@@ -64,4 +64,5 @@ adr:Org1 a schema:Organization ;
 
 adr:Org2 a schema:Organization ;
     rdfs:label "Organization in Ottawa" ;
-    schema:name "Organization in Ottawa" ;.
+    schema:name "Organization in Ottawa" ;
+    schema:sameAs <https://isni.org/isni/123>.
