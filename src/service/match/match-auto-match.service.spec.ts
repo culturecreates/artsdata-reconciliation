@@ -52,6 +52,31 @@ describe('Test auto-match Persons using sparql query v1', () => {
         expect(actualResult.match).toBeTruthy()
     });
 
+    it('Expect exact wikidata id to set match:true', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PERSON,
+            conditions: [
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/sameAs>",
+                    "propertyValue": "http://www.wikidata.org/entity/Q123",
+                    "required": true
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KPR-5");
+        expect(actualResult.match).toBeTruthy()
+    });
+
     it('Expect exact name to set match:false when more than one exact match', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
