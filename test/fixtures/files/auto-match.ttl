@@ -28,6 +28,7 @@ adr:KPR-5 a schema:Person ;
 adr:KP-1 a schema:Place ;
     schema:name "Arts Court" ;
     rdfs:label "Arts Court" ;
+    schema:sameAs <http://www.wikidata.org/entity/Q101>;
     schema:address [
         schema:postalCode "H0H 0H0" ;
     ] .

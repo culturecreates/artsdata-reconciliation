@@ -211,7 +211,7 @@ describe('Test auto-matching Places using sparql query v1', () => {
         await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
     })
 
-    it('Expect exact name to set match:true', async () => {
+    it('Expect exact name to set match:true for Place', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
@@ -241,7 +241,7 @@ describe('Test auto-matching Places using sparql query v1', () => {
         expect(actualResult?.match).toBe(true);
     });
 
-    it('Expect exact name to set match:false when more than one exact match', async () => {
+    it('Expect exact name to set match:false when more than one exact match for Place', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
@@ -270,7 +270,7 @@ describe('Test auto-matching Places using sparql query v1', () => {
         expect(firstResult?.match).toBe(false);
     });
 
-    it(`Auto-match Place with alternate name`, async () => {
+    it(`Auto-match Place with alternate name for Place`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
@@ -298,5 +298,30 @@ describe('Test auto-matching Places using sparql query v1', () => {
         console.log("allResults", allResults);
         expect(actualResult?.id).toBe("Place1");
         expect(actualResult?.match).toBeTruthy();
+    });
+
+    it('Expect exact wikidata id to set match:true for Place', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/sameAs>",
+                    "propertyValue": "http://www.wikidata.org/entity/Q101",
+                    "required": true
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KP-1");
+        expect(actualResult.match).toBeTruthy()
     });
 });
