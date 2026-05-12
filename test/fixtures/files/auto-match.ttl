@@ -20,7 +20,8 @@ adr:KPR-4 a schema:Person ;
 
 adr:KPR-5 a schema:Person ;
     schema:name "Person Xavier" ;
-    rdfs:label "Person Xavier" .
+    rdfs:label "Person Xavier" ;
+    schema:sameAs <http://www.wikidata.org/entity/Q123>.
 
 # Places
 
