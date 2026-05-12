@@ -1,8 +1,7 @@
 import {MatchService,} from "../../service";
-import {MatchServiceHelper} from "../../helper";
 import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
-import {LanguageEnum, MatchTypeEnum, LanguageEnum} from "../../enum";
+import {LanguageEnum, MatchTypeEnum} from "../../enum";
 import {
     dropIndexAndTheGraph,
     setupMatchService,
@@ -154,17 +153,9 @@ describe('Test reconciling events using sparql query version 2', () => {
 
 describe('locationRelated matcher — containment-aware location matching', () => {
 
-    const baseQuery: ReconciliationQuery = {
-        type: Entities.EVENT,
-        conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Romeo & Juliet"}],
-        limit: 5
-    };
-
     const baseRecord = {name: "Romeo & Juliet"};
 
     it('auto-matches when query location is the room and graph location is the building (containedInPlace)', () => {
-        // Graph candidate: location = K2-5487 (building), containsPlace = K2-6080 (room)
-        // Query: locationUri = K2-6080 (room)
         const additionalProperties = {
             startDate: "2026-04-25T19:30:00-07:00",
             endDate: undefined,
@@ -176,32 +167,37 @@ describe('locationRelated matcher — containment-aware location matching', () =
             url: undefined,
             wikidata: undefined,
             isni: undefined,
+            alternateName: undefined,
+            addressLocality: undefined,
         };
 
-        const queryWithLocation: ReconciliationQuery = {
-            ...baseQuery,
-            conditions: [
-                {matchType: MatchTypeEnum.NAME, propertyValue: "Romeo & Juliet"},
-                {
-                    matchType: MatchTypeEnum.PROPERTY,
-                    propertyId: "schema:startDate",
-                    propertyValue: "2026-04-25T19:30:00-07:00"
-                },
-                {
-                    matchType: MatchTypeEnum.PROPERTY,
-                    propertyId: "schema:location",
-                    propertyValue: "http://kg.artsdata.ca/resource/K2-6080"
-                }
-            ]
+        const query: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Romeo & Juliet"}],
+            limit: 5
         };
 
-        const result = MatchServiceHelper.isAutoMatch(baseRecord, queryWithLocation, additionalProperties);
+        const recordFromQuery = {
+            name: "Romeo & Juliet",
+            startDate: "2026-04-25T19:30:00-07:00",
+            endDate: undefined,
+            locationUri: "http://kg.artsdata.ca/resource/K2-6080",
+            containedInPlaceUri: undefined,
+            containsPlaceUri: undefined,
+            postalCode: undefined,
+            addressLocality: undefined,
+            addressRegion: undefined,
+            url: undefined,
+            locationName: undefined,
+            wikidata: undefined,
+            isni: undefined,
+        };
+
+        const result = MatchServiceHelper.isAutoMatch(baseRecord, query, additionalProperties, recordFromQuery);
         expect(result).toBe(true);
     });
 
     it('auto-matches when query location is the building and graph location is the room (containsPlace)', () => {
-        // Graph candidate: location = K2-6080 (room), containedInPlace = K2-5487 (building)
-        // Query: locationUri = K2-5487 (building)
         const additionalProperties = {
             startDate: "2026-04-25T19:30:00-07:00",
             endDate: undefined,
@@ -213,32 +209,37 @@ describe('locationRelated matcher — containment-aware location matching', () =
             url: undefined,
             wikidata: undefined,
             isni: undefined,
+            alternateName: undefined,
+            addressLocality: undefined,
         };
 
-        const queryWithLocation: ReconciliationQuery = {
-            ...baseQuery,
-            conditions: [
-                {matchType: MatchTypeEnum.NAME, propertyValue: "Romeo & Juliet"},
-                {
-                    matchType: MatchTypeEnum.PROPERTY,
-                    propertyId: "schema:startDate",
-                    propertyValue: "2026-04-25T19:30:00-07:00"
-                },
-                {
-                    matchType: MatchTypeEnum.PROPERTY,
-                    propertyId: "schema:location",
-                    propertyValue: "http://kg.artsdata.ca/resource/K2-5487"
-                }
-            ]
+        const query: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Romeo & Juliet"}],
+            limit: 5
         };
 
-        const result = MatchServiceHelper.isAutoMatch(baseRecord, queryWithLocation, additionalProperties);
+        const recordFromQuery = {
+            name: "Romeo & Juliet",
+            startDate: "2026-04-25T19:30:00-07:00",
+            endDate: undefined,
+            locationUri: "http://kg.artsdata.ca/resource/K2-5487",
+            containedInPlaceUri: undefined,
+            containsPlaceUri: undefined,
+            postalCode: undefined,
+            addressLocality: undefined,
+            addressRegion: undefined,
+            url: undefined,
+            locationName: undefined,
+            wikidata: undefined,
+            isni: undefined,
+        };
+
+        const result = MatchServiceHelper.isAutoMatch(baseRecord, query, additionalProperties, recordFromQuery);
         expect(result).toBe(true);
     });
 
     it('does not auto-match when location is unrelated to the graph location', () => {
-        // Graph candidate: location = K2-6080 (room), containedInPlace = K2-5487 (building)
-        // Query: locationUri = K11-19 (Roy Thomson Hall — completely unrelated)
         const additionalProperties = {
             startDate: "2026-04-25T19:30:00-07:00",
             endDate: undefined,
@@ -250,26 +251,33 @@ describe('locationRelated matcher — containment-aware location matching', () =
             url: undefined,
             wikidata: undefined,
             isni: undefined,
+            alternateName: undefined,
+            addressLocality: undefined,
         };
 
-        const queryWithLocation: ReconciliationQuery = {
-            ...baseQuery,
-            conditions: [
-                {matchType: MatchTypeEnum.NAME, propertyValue: "Romeo & Juliet"},
-                {
-                    matchType: MatchTypeEnum.PROPERTY,
-                    propertyId: "schema:startDate",
-                    propertyValue: "2026-04-25T19:30:00-07:00"
-                },
-                {
-                    matchType: MatchTypeEnum.PROPERTY,
-                    propertyId: "schema:location",
-                    propertyValue: "http://kg.artsdata.ca/resource/K11-19"
-                }
-            ]
+        const query: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Romeo & Juliet"}],
+            limit: 5
         };
 
-        const result = MatchServiceHelper.isAutoMatch(baseRecord, queryWithLocation, additionalProperties);
+        const recordFromQuery = {
+            name: "Romeo & Juliet",
+            startDate: "2026-04-25T19:30:00-07:00",
+            endDate: undefined,
+            locationUri: "http://kg.artsdata.ca/resource/K11-19",
+            containedInPlaceUri: undefined,
+            containsPlaceUri: undefined,
+            postalCode: undefined,
+            addressLocality: undefined,
+            addressRegion: undefined,
+            url: undefined,
+            locationName: undefined,
+            wikidata: undefined,
+            isni: undefined,
+        };
+
+        const result = MatchServiceHelper.isAutoMatch(baseRecord, query, additionalProperties, recordFromQuery);
         expect(result).toBe(false);
     });
 
@@ -285,27 +293,34 @@ describe('locationRelated matcher — containment-aware location matching', () =
             url: undefined,
             wikidata: undefined,
             isni: undefined,
+            alternateName: undefined,
+            addressLocality: undefined,
         };
 
-        const queryWithLocation: ReconciliationQuery = {
-            ...baseQuery,
-            conditions: [
-                {matchType: MatchTypeEnum.NAME, propertyValue: "Romeo & Juliet"},
-                {
-                    matchType: MatchTypeEnum.PROPERTY,
-                    propertyId: "schema:startDate",
-                    propertyValue: "2026-04-25T19:30:00-07:00"
-                },
-                {
-                    matchType: MatchTypeEnum.PROPERTY,
-                    propertyId: "schema:location",
-                    propertyValue: "http://kg.artsdata.ca/resource/K2-6080"
-                }
-            ]
+        const query: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Romeo & Juliet"}],
+            limit: 5
+        };
+
+        const recordFromQuery = {
+            name: "Romeo & Juliet",
+            startDate: "2026-04-25T19:30:00-07:00",
+            endDate: undefined,
+            locationUri: "http://kg.artsdata.ca/resource/K2-6080",
+            containedInPlaceUri: undefined,
+            containsPlaceUri: undefined,
+            postalCode: undefined,
+            addressLocality: undefined,
+            addressRegion: undefined,
+            url: undefined,
+            locationName: undefined,
+            wikidata: undefined,
+            isni: undefined,
         };
 
         const differentNameRecord = {name: "Hamlet"};
-        const result = MatchServiceHelper.isAutoMatch(differentNameRecord, queryWithLocation, additionalProperties);
+        const result = MatchServiceHelper.isAutoMatch(differentNameRecord, query, additionalProperties, recordFromQuery);
         expect(result).toBe(false);
     });
 });
