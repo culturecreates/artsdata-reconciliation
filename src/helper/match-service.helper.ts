@@ -195,7 +195,7 @@ export class MatchServiceHelper {
             exact: (a: string | undefined, b: string | undefined, excludeSpace?: boolean) => {
                 if (!a || !b) return false;
                 if (excludeSpace) {
-                    return a.replaceAll(' ', '').toLowerCase() === a.replaceAll(' ', '').toLowerCase();
+                    return a.replaceAll(' ', '').toLowerCase() === b.replaceAll(' ', '').toLowerCase();
                 }
                 return a === b;
             },
