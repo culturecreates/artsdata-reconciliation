@@ -31,6 +31,7 @@ adr:KP-1 a schema:Place ;
     schema:sameAs <http://www.wikidata.org/entity/Q101>;
     schema:address [
         schema:postalCode "H0H 0H0" ;
+        schema:addressLocality "Laval" ;
     ] .
 
 adr:KP-7 a schema:Place ;
