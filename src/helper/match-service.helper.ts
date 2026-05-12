@@ -210,25 +210,24 @@ export class MatchServiceHelper {
                 }
             },
             locationRelated: (
-                a: string | undefined, b: string | undefined,
-                aParent: string | undefined, aChild: string | undefined,
-                bParent: string | undefined, bChild: string | undefined
+                locationUri: string | undefined, locationUriFromQuery: string | undefined,
+                containedInPlaceUri: string | undefined, containsPlaceUri: string | undefined,
+                containedInPlaceUriFromQuery: string | undefined, containsPlaceUriFromQuery: string | undefined
             ): boolean => {
-                console.log('locationRelated', { a, b, aParent, aChild, bParent, bChild });
-                if (!a || !b) return false;
+                if (!locationUri || !locationUriFromQuery) return false;
                 const eq = (x: string, y: string) => {
                     try { return matchers.exactUrl(x, y); } catch { return false; }
                 };
                 // Same place directly
-                if (eq(a, b)) return true;
-                // a is a room, b is its building
-                if (aParent && eq(aParent, b)) return true;
-                // b is a room, a is its building
-                if (bParent && eq(a, bParent)) return true;
-                // a is a building that contains b
-                if (aChild && eq(aChild, b)) return true;
-                // b is a building that contains a
-                if (bChild && eq(a, bChild)) return true;
+                if (eq(locationUri, locationUriFromQuery)) return true;
+                // locationUri is a room, locationUriFromQuery is its building
+                if (containedInPlaceUri && eq(containedInPlaceUri, locationUriFromQuery)) return true;
+                // locationUriFromQuery is a room, locationUri is its building
+                if (containedInPlaceUriFromQuery && eq(locationUri, containedInPlaceUriFromQuery)) return true;
+                // locationUri is a building that contains locationUriFromQuery
+                if (containsPlaceUri && eq(containsPlaceUri, locationUriFromQuery)) return true;
+                // locationUriFromQuery is a building that contains locationUri
+                if (containsPlaceUriFromQuery && eq(locationUri, containsPlaceUriFromQuery)) return true;
                 return false;
             },
         };
