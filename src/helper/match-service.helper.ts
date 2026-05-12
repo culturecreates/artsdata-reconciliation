@@ -238,7 +238,6 @@ export class MatchServiceHelper {
         const checkIfNameIsClosePostalCodeIsExactAndWikidataIsNotDifferent = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.exact(additionalProperties.postalCode, recordFromQuery.postalCode, true),
-            matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata),
             matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
         ];
 

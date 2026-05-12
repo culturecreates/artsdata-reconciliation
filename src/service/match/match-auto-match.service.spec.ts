@@ -369,4 +369,36 @@ describe('Test auto-matching Places using sparql query v1', () => {
         expect(actualResultForQueryWithoutASpace?.id).toBe("KP-1");
         expect(actualResultForQueryWithoutASpace.match).toBeTruthy()
     });
+
+    it('Expect exact name and postal code, however DIFFERENT WIKIDATA ID to set match:false for Place', async () => {
+
+        const reconciliationQueryWithPostalCodeWithSpace: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Arts Court"},
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/address>/<http://schema.org/postalCode>",
+                    "propertyValue": "H0H 0H0",
+                    "required": true
+                },
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/sameAs>",
+                    "propertyValue": "http://www.wikidata.org/entity/DifferentID",
+                    "required": false
+                }
+            ],
+            limit: 10
+        };
+
+
+        const responseForQueryWithPostalCodeWithSpace = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQueryWithPostalCodeWithSpace]});
+
+        const allResults = responseForQueryWithPostalCodeWithSpace.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KP-1");
+        expect(actualResult.match).toBeFalsy()
+    });
 });
