@@ -52,6 +52,31 @@ describe('Test auto-match Persons using sparql query v1', () => {
         expect(actualResult.match).toBeTruthy()
     });
 
+    it('Expect exact wikidata id to set match:true', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PERSON,
+            conditions: [
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/sameAs>",
+                    "propertyValue": "http://www.wikidata.org/entity/Q123",
+                    "required": true
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KPR-5");
+        expect(actualResult.match).toBeTruthy()
+    });
+
     it('Expect exact name to set match:false when more than one exact match', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
@@ -69,6 +94,98 @@ describe('Test auto-match Persons using sparql query v1', () => {
         expect(firstResult?.match).toBe(false);
     });
 
+});
+
+describe('Test auto-match Organizations using sparql query v1', () => {
+
+    let matchService: MatchService;
+    const testDatasetPath = 'test/fixtures/files/auto-match.ttl';
+    let testLuceneConnectorId: string;
+    let testGraphUri: string;
+
+    beforeAll(async () => {
+        const setup = await setupMatchService();
+        matchService = setup.matchService;
+
+        const {
+            graphUri,
+            luceneConnector
+        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.ORGANIZATION, testDatasetPath)
+        testGraphUri = graphUri;
+        testLuceneConnectorId = luceneConnector;
+        jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
+    });
+    afterAll(async () => {
+        await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
+    })
+
+    it('Expect exact name to set match:true for organizations', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ORGANIZATION,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Organization in Ottawa"}],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("Org2");
+        expect(actualResult.match).toBeTruthy()
+    });
+
+    it('Expect exact wikidata id to set match:true for organizations', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ORGANIZATION,
+            conditions: [
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/sameAs>",
+                    "propertyValue": "http://www.wikidata.org/entity/Q111",
+                    "required": true
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("Org1");
+        expect(actualResult.match).toBeTruthy()
+    });
+
+    it('Expect exact ISNI id to set match:true for organizations', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ORGANIZATION,
+            conditions: [
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/sameAs>",
+                    "propertyValue": "https://isni.org/isni/123",
+                    "required": true
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("Org2");
+        expect(actualResult.match).toBeTruthy()
+    });
 });
 
 describe('Test auto-matching Places using sparql query v1', () => {
@@ -94,7 +211,7 @@ describe('Test auto-matching Places using sparql query v1', () => {
         await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
     })
 
-    it('Expect exact name to set match:true', async () => {
+    it('Expect exact name to set match:true for Place', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
@@ -124,7 +241,7 @@ describe('Test auto-matching Places using sparql query v1', () => {
         expect(actualResult?.match).toBe(true);
     });
 
-    it('Expect exact name to set match:false when more than one exact match', async () => {
+    it('Expect exact name to set match:false when more than one exact match for Place', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
@@ -153,7 +270,7 @@ describe('Test auto-matching Places using sparql query v1', () => {
         expect(firstResult?.match).toBe(false);
     });
 
-    it(`Auto-match Place with alternate name`, async () => {
+    it(`Auto-match Place with alternate name for Place`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
@@ -181,5 +298,183 @@ describe('Test auto-matching Places using sparql query v1', () => {
         console.log("allResults", allResults);
         expect(actualResult?.id).toBe("Place1");
         expect(actualResult?.match).toBeTruthy();
+    });
+
+    it('Expect exact wikidata id to set match:true for Place', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/sameAs>",
+                    "propertyValue": "http://www.wikidata.org/entity/Q101",
+                    "required": true
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KP-1");
+        expect(actualResult.match).toBeTruthy()
+    });
+
+    it('Expect exact name and postal code to set match:true for Place', async () => {
+
+        const reconciliationQueryWithPostalCodeWithSpace: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Arts Court"},
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/address>/<http://schema.org/postalCode>",
+                    "propertyValue": "H0H 0H0",
+                    "required": true
+                }
+            ],
+            limit: 10
+        };
+
+        const reconciliationQueryWithPostalCodeWithOutSpace: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Arts Court"},
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/address>/<http://schema.org/postalCode>",
+                    "propertyValue": "H0H0H0",
+                    "required": false
+                }
+            ],
+            limit: 10
+        };
+        const responseForQueryWithPostalCodeWithSpace = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQueryWithPostalCodeWithSpace]});
+
+        const allResults = responseForQueryWithPostalCodeWithSpace.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KP-1");
+        expect(actualResult.match).toBeTruthy()
+
+        const responseForQueryWithPostalCodeWithOUtSpace = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQueryWithPostalCodeWithOutSpace]});
+        const allResultsForQueryWithoutASpace = responseForQueryWithPostalCodeWithOUtSpace.results?.[0]?.candidates;
+        const actualResultForQueryWithoutASpace = allResultsForQueryWithoutASpace?.[0];
+
+        expect(actualResultForQueryWithoutASpace?.id).toBe("KP-1");
+        expect(actualResultForQueryWithoutASpace.match).toBeTruthy()
+    });
+
+    it('Expect exact name and postal code, however DIFFERENT WIKIDATA ID to set match:false for Place', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Arts Court"},
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/address>/<http://schema.org/postalCode>",
+                    "propertyValue": "H0H 0H0",
+                    "required": true
+                },
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/sameAs>",
+                    "propertyValue": "http://www.wikidata.org/entity/DifferentID",
+                    "required": false
+                }
+            ],
+            limit: 10
+        };
+
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KP-1");
+        expect(actualResult.match).toBeFalsy()
+    });
+
+    it('Expect exact name and locality, to set match:true for Place', async () => {
+
+        const reconciliationQueryWithMatchingLocality: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Arts Court"},
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/address>/<http://schema.org/addressLocality>",
+                    "propertyValue": "Laval",
+                    "required": true
+                }
+            ],
+            limit: 10
+        };
+
+        const reconciliationQueryWithUnmatchingLocality: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Arts Court"},
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/address>/<http://schema.org/addressLocality>",
+                    "propertyValue": "Different Locality",
+                    "required": false
+                }
+            ],
+            limit: 10
+        };
+
+        // Matching Locality
+        const responseForQueryWithMatchingLocality = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQueryWithMatchingLocality]});
+
+        const allResults = responseForQueryWithMatchingLocality.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KP-1");
+        expect(actualResult.match).toBeTruthy()
+
+        // UnMatching Locality
+        const responseForQueryWithUnmatchingLocality = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQueryWithUnmatchingLocality]});
+
+        const allResultsForQueryWithUnmatchingLocality = responseForQueryWithUnmatchingLocality.results?.[0]?.candidates;
+        const resultForQueryWithUnmatchingLocality = allResultsForQueryWithUnmatchingLocality?.[0];
+
+        expect(resultForQueryWithUnmatchingLocality?.id).toBe("KP-1");
+        expect(resultForQueryWithUnmatchingLocality.match).toBeFalsy()
+
+    });
+
+    it('Expect exact name and url to match:true for Place', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Arts Court"},
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/url>",
+                    "propertyValue": "http://valid-url.com",
+                    "required": true
+                }
+            ],
+            limit: 10
+        };
+
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KP-1");
+        expect(actualResult.match).toBeTruthy()
     });
 });

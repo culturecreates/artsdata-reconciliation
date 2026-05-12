@@ -20,15 +20,19 @@ adr:KPR-4 a schema:Person ;
 
 adr:KPR-5 a schema:Person ;
     schema:name "Person Xavier" ;
-    rdfs:label "Person Xavier" .
+    rdfs:label "Person Xavier" ;
+    schema:sameAs <http://www.wikidata.org/entity/Q123>.
 
 # Places
 
 adr:KP-1 a schema:Place ;
     schema:name "Arts Court" ;
     rdfs:label "Arts Court" ;
+    schema:url <http://valid-url.com> ;
+    schema:sameAs <http://www.wikidata.org/entity/Q101>;
     schema:address [
         schema:postalCode "H0H 0H0" ;
+        schema:addressLocality "Laval" ;
     ] .
 
 adr:KP-7 a schema:Place ;
@@ -53,3 +57,15 @@ adr:Place1 a schema:Place ;
             schema:postalCode "H0B 0HB" ;
         ] ;
     schema:alternateName "Alternate Name" .
+
+# Organizations
+
+adr:Org1 a schema:Organization ;
+    rdfs:label "Organization in Montreal" ;
+    schema:name "Organization in Montreal" ;
+  schema:sameAs <http://www.wikidata.org/entity/Q111>.
+
+adr:Org2 a schema:Organization ;
+    rdfs:label "Organization in Ottawa" ;
+    schema:name "Organization in Ottawa" ;
+    schema:sameAs <https://isni.org/isni/123>.
