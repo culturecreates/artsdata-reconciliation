@@ -451,4 +451,30 @@ describe('Test auto-matching Places using sparql query v1', () => {
         expect(resultForQueryWithUnmatchingLocality.match).toBeFalsy()
 
     });
+
+    it('Expect exact name and url to match:true for Place', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Arts Court"},
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/url>",
+                    "propertyValue": "http://valid-url.com",
+                    "required": true
+                }
+            ],
+            limit: 10
+        };
+
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KP-1");
+        expect(actualResult.match).toBeTruthy()
+    });
 });
