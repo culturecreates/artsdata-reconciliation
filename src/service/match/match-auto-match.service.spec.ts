@@ -324,4 +324,49 @@ describe('Test auto-matching Places using sparql query v1', () => {
         expect(actualResult?.id).toBe("KP-1");
         expect(actualResult.match).toBeTruthy()
     });
+
+    it('Expect exact name and postal code to set match:true for Place', async () => {
+
+        const reconciliationQueryWithPostalCodeWithSpace: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Arts Court"},
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/address>/<http://schema.org/postalCode>",
+                    "propertyValue": "H0H 0H0",
+                    "required": true
+                }
+            ],
+            limit: 10
+        };
+
+        const reconciliationQueryWithPostalCodeWithOutSpace: ReconciliationQuery = {
+            type: Entities.PLACE,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Arts Court"},
+                {
+                    "matchType": MatchTypeEnum.PROPERTY,
+                    "propertyId": "<http://schema.org/address>/<http://schema.org/postalCode>",
+                    "propertyValue": "H0H0H0",
+                    "required": false
+                }
+            ],
+            limit: 10
+        };
+        const responseForQueryWithPostalCodeWithSpace = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQueryWithPostalCodeWithSpace]});
+
+        const allResults = responseForQueryWithPostalCodeWithSpace.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KP-1");
+        expect(actualResult.match).toBeTruthy()
+
+        const responseForQueryWithPostalCodeWithOUtSpace = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQueryWithPostalCodeWithOutSpace]});
+        const allResultsForQueryWithoutASpace = responseForQueryWithPostalCodeWithOUtSpace.results?.[0]?.candidates;
+        const actualResultForQueryWithoutASpace = allResultsForQueryWithoutASpace?.[0];
+
+        expect(actualResultForQueryWithoutASpace?.id).toBe("KP-1");
+        expect(actualResultForQueryWithoutASpace.match).toBeTruthy()
+    });
 });

@@ -192,8 +192,11 @@ export class MatchServiceHelper {
                 //if the difference between the two dates is greater than 24 hours (86400000 milliseconds), return false
                 return Math.abs(dateStampA - dateStampB) <= 86400000;
             },
-            exact: (a: string | undefined, b: string | undefined) => {
+            exact: (a: string | undefined, b: string | undefined, excludeSpace?: boolean) => {
                 if (!a || !b) return false;
+                if (excludeSpace) {
+                    return a.replaceAll(' ', '').toLowerCase() === a.replaceAll(' ', '').toLowerCase();
+                }
                 return a === b;
             },
             notDifferentIfBothExists: (a: string | undefined, b: string | undefined) => {
@@ -234,7 +237,8 @@ export class MatchServiceHelper {
         // Name should be close match and postal code should be exact match, wikidata should be exact match if present
         const checkIfNameIsClosePostalCodeIsExactAndWikidataIsNotDifferent = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
-            matchers.exact(additionalProperties.postalCode, recordFromQuery.postalCode),
+            matchers.exact(additionalProperties.postalCode, recordFromQuery.postalCode, true),
+            matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata),
             matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
         ];
 
@@ -271,7 +275,7 @@ export class MatchServiceHelper {
         const checksNameStartDateEndDatePlaceNamePostalCodeMatchForEvents = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate),
-            matchers.exact(additionalProperties.postalCode, recordFromQuery.postalCode),
+            matchers.exact(additionalProperties.postalCode, recordFromQuery.postalCode, true),
             matchers.veryClose(additionalProperties.locationName, recordFromQuery.locationName),
             matchers.closeDates(
                 additionalProperties.startDate, recordFromQuery.startDate as string, additionalProperties.endDate,
