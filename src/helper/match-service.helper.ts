@@ -12,11 +12,19 @@ export class MatchServiceHelper {
 
     static transformSearchQuery(inputString: string, lucenceFieldName: string) {
         const isNameProperty = lucenceFieldName.toLowerCase() === 'name';
+        inputString = inputString.trim();
+        const isInputStringURI = MatchServiceHelper.isValidURI(inputString);
 
-        // Remove common lucene special chars
-        inputString = inputString.replace(/[+\-&|!(){}\[\]^"~*?:\\\/]/g, ' ')
-            .replace(/\s+/g, ' ')
-            .trim();
+        if (isInputStringURI) {
+            // Escape special characters in the URI
+            inputString = `\\"${inputString}\\"`
+        } else {
+            // Remove common lucene special chars
+            inputString = inputString.replace(/[+\-&|!(){}\[\]^"~*?:\\\/]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
         let terms: string[] = [inputString];
 
         if (isNameProperty) {
@@ -24,7 +32,7 @@ export class MatchServiceHelper {
         }
 
         const fuzzyTerms = terms.map(term => {
-            return term.length < 3 ? term : `${term}~2`
+            return term.length < 3 ? term : isInputStringURI ? `${term}` : `${term}~2`;
         });
 
         const nameQuery = fuzzyTerms.map(term => `${lucenceFieldName}:${term}`).join(' AND ');
