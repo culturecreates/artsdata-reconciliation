@@ -220,7 +220,7 @@ export class MatchService {
                 case MatchQualifierEnum.REGEX_MATCH:
                     const objectId = `?obj_${index + 1}`;
                     triple = `?entity ${formattedPropertyId} ${objectId}
-          FILTER REGEX(${objectId}, ${formattedConditionValue}, "i").`;
+          FILTER REGEX(str(${objectId}), ${formattedConditionValue}, "i").`;
                     break;
                 default:
                     Exception.badRequest("Unsupported match qualifier");
