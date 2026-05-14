@@ -81,7 +81,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
     (SAMPLE(?postalCode) AS ?postalCode)
     (SAMPLE(?artsdataUri) AS ?locationUri)
     (SAMPLE(?locationContainedIn) AS ?locationContainedIn)
-    (SAMPLE(?containsPlaceUri) AS ?containsPlaceUri)`,
+    (SAMPLE(?locationContains) AS ?locationContains)`,
 
     ADDITIONAL_PROPERTIES_TO_FETCH_FOR_EVENTS_SUB_QUERY: `
     # Start date, end date, location, location URI and postal code
@@ -101,7 +101,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
         OPTIONAL {
             ?location ^schema:containedInPlace ?childPlace .
             FILTER(STRSTARTS(STR(?childPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
-            BIND(?childPlace AS ?containsPlaceUri)
+            BIND(?childPlace AS ?locationContains)
         }
     }`,
 

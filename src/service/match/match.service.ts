@@ -342,7 +342,7 @@ export class MatchService {
         (SAMPLE(?artsdataUri) AS ?locationUri)
         (SAMPLE(?alternateName) AS ?alternateName)
         (SAMPLE(?locationContainedIn) AS ?locationContainedIn)
-        (SAMPLE(?containsPlaceUri) AS ?containsPlaceUri)`,
+        (SAMPLE(?locationContains) AS ?locationContains)`,
             );
 
             rawQuery = rawQuery.replace(
@@ -364,7 +364,7 @@ export class MatchService {
         OPTIONAL {
             ?location ^schema:containedInPlace ?childPlace .
             FILTER(STRSTARTS(STR(?childPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
-            BIND(?childPlace AS ?containsPlaceUri)
+            BIND(?childPlace AS ?locationContains)
         }
         }`,
             );

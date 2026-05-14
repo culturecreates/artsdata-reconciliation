@@ -10,7 +10,7 @@ export interface RecordFromQuery {
     locationUri: string | undefined;
     isni: string | undefined;
     wikidata: string | undefined;
-    containsPlaceUri: string | undefined;
+    locationContains: string | undefined;
     locationContainedIn: string | undefined;
 }
 

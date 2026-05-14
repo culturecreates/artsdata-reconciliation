@@ -67,7 +67,7 @@ export class MatchServiceHelper {
                 locationName: currentBinding["locationName"]?.value,
                 locationUri: currentBinding["locationUri"]?.value,
                 locationContainedIn: currentBinding["locationContainedIn"]?.value,
-                containsPlaceUri: currentBinding["containsPlaceUri"]?.value,
+                locationContains: currentBinding["locationContains"]?.value,
                 wikidata: currentBinding["wikidata"]?.value,
                 isni: currentBinding["isni"]?.value,
                 alternateName: currentBinding["alternateName"]?.value,
@@ -211,12 +211,16 @@ export class MatchServiceHelper {
             },
             locationRelated: (
                 locationUri: string | undefined, locationUriFromQuery: string | undefined,
-                locationContainedIn: string | undefined, containsPlaceUri: string | undefined,
-                locationContainedInFromQuery: string | undefined, containsPlaceUriFromQuery: string | undefined
+                locationContainedIn: string | undefined, locationContains: string | undefined,
+                locationContainedInFromQuery: string | undefined, locationContainsFromQuery: string | undefined
             ): boolean => {
                 if (!locationUri || !locationUriFromQuery) return false;
                 const eq = (x: string, y: string) => {
-                    try { return matchers.exactUrl(x, y); } catch { return false; }
+                    try {
+                        return matchers.exactUrl(x, y);
+                    } catch {
+                        return false;
+                    }
                 };
                 // Same place directly
                 if (eq(locationUri, locationUriFromQuery)) return true;
@@ -225,9 +229,9 @@ export class MatchServiceHelper {
                 // locationUriFromQuery is a room, locationUri is its building
                 if (locationContainedInFromQuery && eq(locationUri, locationContainedInFromQuery)) return true;
                 // locationUri is a building that contains locationUriFromQuery
-                if (containsPlaceUri && eq(containsPlaceUri, locationUriFromQuery)) return true;
+                if (locationContains && eq(locationContains, locationUriFromQuery)) return true;
                 // locationUriFromQuery is a building that contains locationUri
-                if (containsPlaceUriFromQuery && eq(locationUri, containsPlaceUriFromQuery)) return true;
+                if (locationContainsFromQuery && eq(locationUri, locationContainsFromQuery)) return true;
                 return false;
             },
         };
@@ -280,9 +284,9 @@ export class MatchServiceHelper {
                 additionalProperties.locationUri,
                 recordFromQuery.locationUri as string | undefined,
                 additionalProperties.locationContainedIn,
-                additionalProperties.containsPlaceUri,
+                additionalProperties.locationContains,
                 recordFromQuery.locationContainedIn as string | undefined,
-                recordFromQuery.containsPlaceUri as string | undefined,
+                recordFromQuery.locationContains as string | undefined,
             ),
             matchers.closeDates(additionalProperties.startDate, recordFromQuery.startDate as string,
                 additionalProperties.endDate, recordFromQuery.endDate,
@@ -399,7 +403,7 @@ export class MatchServiceHelper {
             locationName,
             locationUri,
             locationContainedIn: undefined,
-            containsPlaceUri: undefined,
+            locationContains: undefined,
             isni: isni ? (isni.length ? isni : undefined) : undefined,
             wikidata: wikidata ? (wikidata.length ? wikidata : undefined) : undefined,
         } as RecordFromQuery;
