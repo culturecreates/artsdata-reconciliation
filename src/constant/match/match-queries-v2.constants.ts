@@ -80,7 +80,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
     (SAMPLE(?locationName) AS ?locationName)
     (SAMPLE(?postalCode) AS ?postalCode)
     (SAMPLE(?artsdataUri) AS ?locationUri)
-    (SAMPLE(?containedInPlaceUri) AS ?containedInPlaceUri)
+    (SAMPLE(?locationContainedIn) AS ?locationContainedIn)
     (SAMPLE(?containsPlaceUri) AS ?containsPlaceUri)`,
 
     ADDITIONAL_PROPERTIES_TO_FETCH_FOR_EVENTS_SUB_QUERY: `
@@ -96,7 +96,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
         OPTIONAL {
             ?location schema:containedInPlace ?parentPlace .
             FILTER(STRSTARTS(STR(?parentPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
-            BIND(?parentPlace AS ?containedInPlaceUri)
+            BIND(?parentPlace AS ?locationContainedIn)
         }
         OPTIONAL {
             ?location ^schema:containedInPlace ?childPlace .

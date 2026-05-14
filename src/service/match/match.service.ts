@@ -341,7 +341,7 @@ export class MatchService {
         (SAMPLE(?postalCode) AS ?postalCode)
         (SAMPLE(?artsdataUri) AS ?locationUri)
         (SAMPLE(?alternateName) AS ?alternateName)
-        (SAMPLE(?containedInPlaceUri) AS ?containedInPlaceUri)
+        (SAMPLE(?locationContainedIn) AS ?locationContainedIn)
         (SAMPLE(?containsPlaceUri) AS ?containsPlaceUri)`,
             );
 
@@ -359,7 +359,7 @@ export class MatchService {
         OPTIONAL {
             ?location schema:containedInPlace ?parentPlace .
             FILTER(STRSTARTS(STR(?parentPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
-            BIND(?parentPlace AS ?containedInPlaceUri)
+            BIND(?parentPlace AS ?locationContainedIn)
         }
         OPTIONAL {
             ?location ^schema:containedInPlace ?childPlace .
