@@ -196,42 +196,39 @@ export class MatchServiceHelper {
             },
             exactUrl: (a: string, b: string) => {
                 if (a && b) {
-                    const urlA = new URL(a.toLowerCase());
-                    const urlB = new URL(b.toLowerCase());
+                    try {
+                        const urlA = new URL(a.toLowerCase());
+                        const urlB = new URL(b.toLowerCase());
 
-                    let hostA = urlA.hostname;
-                    let hostB = urlB.hostname;
-                    // Normalize path (remove trailing slash unless root)
-                    let pathA = urlA.pathname.replace(/\/+$/, "") || "/";
-                    let pathB = urlB.pathname.replace(/\/+$/, "") || "/";
-                    return `${hostA}${pathA}` === `${hostB}${pathB}`;
+                        let hostA = urlA.hostname;
+                        let hostB = urlB.hostname;
+                        // Normalize path (remove trailing slash unless root)
+                        let pathA = urlA.pathname.replace(/\/+$/, "") || "/";
+                        let pathB = urlB.pathname.replace(/\/+$/, "") || "/";
+                        return `${hostA}${pathA}` === `${hostB}${pathB}`;
+                    } catch (e) {
+                        return false;
+                    }
                 } else {
                     return false;
                 }
             },
-            locationRelated: (
+            exactLocationOrRelated: (
                 locationUri: string | undefined, locationUriFromQuery: string | undefined,
                 locationContainedIn: string | undefined, locationContains: string | undefined,
                 locationContainedInFromQuery: string | undefined, locationContainsFromQuery: string | undefined
             ): boolean => {
                 if (!locationUri || !locationUriFromQuery) return false;
-                const eq = (x: string, y: string) => {
-                    try {
-                        return matchers.exactUrl(x, y);
-                    } catch {
-                        return false;
-                    }
-                };
                 // Same place directly
-                if (eq(locationUri, locationUriFromQuery)) return true;
+                if (matchers.exactUrl(locationUri, locationUriFromQuery)) return true;
                 // locationUri is a room, locationUriFromQuery is its building
-                if (locationContainedIn && eq(locationContainedIn, locationUriFromQuery)) return true;
+                if (locationContainedIn && matchers.exactUrl(locationContainedIn, locationUriFromQuery)) return true;
                 // locationUriFromQuery is a room, locationUri is its building
-                if (locationContainedInFromQuery && eq(locationUri, locationContainedInFromQuery)) return true;
+                if (locationContainedInFromQuery && matchers.exactUrl(locationUri, locationContainedInFromQuery)) return true;
                 // locationUri is a building that contains locationUriFromQuery
-                if (locationContains && eq(locationContains, locationUriFromQuery)) return true;
+                if (locationContains && matchers.exactUrl(locationContains, locationUriFromQuery)) return true;
                 // locationUriFromQuery is a building that contains locationUri
-                if (locationContainsFromQuery && eq(locationUri, locationContainsFromQuery)) return true;
+                if (locationContainsFromQuery && matchers.exactUrl(locationUri, locationContainsFromQuery)) return true;
                 return false;
             },
         };
@@ -280,7 +277,7 @@ export class MatchServiceHelper {
         const checksNameStartDateEndDatePlaceUriMatchForEvents = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate),
-            matchers.locationRelated(
+            matchers.exactLocationOrRelated(
                 additionalProperties.locationUri,
                 recordFromQuery.locationUri as string | undefined,
                 additionalProperties.locationContainedIn,
