@@ -76,11 +76,18 @@ export class MatchService {
      * @description Resolve property value
      * @param value
      * @param property
+     * @param matchQualifier
      * @return {string}
      */
-    private _resolvePropertyValue(value: string | string[], property: string): string | string[] {
+    private _resolvePropertyValue(value: string | string[], property: string,
+                                  matchQualifier: MatchQualifierEnum | undefined): string | string[] {
+
         if (Array.isArray(value)) {
-            return value.flatMap((val) => this._resolvePropertyValue(val, property));
+            return value.flatMap((val) => this._resolvePropertyValue(val, property, matchQualifier));
+        }
+
+        if (matchQualifier === MatchQualifierEnum.REGEX_MATCH) {
+            return `"${value}"`;
         }
 
         if (MatchServiceHelper.isValidURI(value)) {
@@ -117,7 +124,7 @@ export class MatchService {
     private _generateTripleFromCondition(condition: QueryCondition, index: number,): string {
         const {required, propertyId, propertyValue: rawConditionValue, matchQualifier, matchQuantifier} = condition;
         const formattedConditionValue =
-            this._resolvePropertyValue(rawConditionValue, propertyId as string,);
+            this._resolvePropertyValue(rawConditionValue, propertyId as string, matchQualifier);
         const formattedPropertyId: string = MatchServiceHelper.isValidURI(propertyId as string)
             ? this._resolvePropertyPath(propertyId as string)
             : `${propertyId}`;
