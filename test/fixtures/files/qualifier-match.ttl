@@ -7,3 +7,8 @@ adr:Organization1 a schema:Organization ;
     schema:name "Culture creates" ;
     rdfs:label "Culture creates" ;
     schema:url "http://culturecreates.com" .
+
+adr:Organization2 a schema:Organization ;
+    schema:name "Another organization" ;
+    rdfs:label "Another organization" ;
+    schema:url <https://anotherorganization.com> .

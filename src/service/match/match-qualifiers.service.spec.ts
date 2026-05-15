@@ -34,7 +34,7 @@ describe('Test matching Organization using qualifier RegexMatch using sparql que
         await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
     })
 
-    it('Should match culture creates, if search by just domain name \'culturecreates.com\'', async () => {
+    it('Should match string "url" by just domain name \'culturecreates.com\'', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.ORGANIZATION,
@@ -45,7 +45,7 @@ describe('Test matching Organization using qualifier RegexMatch using sparql que
                 required: true,
                 matchQualifier: MatchQualifierEnum.REGEX_MATCH
             }],
-            limit: 1
+            limit: 10
         };
 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
@@ -59,7 +59,7 @@ describe('Test matching Organization using qualifier RegexMatch using sparql que
 
     });
 
-    it('Should match culture creates, if search by valid URL', async () => {
+    it('Should match string "url" using complete URL', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.ORGANIZATION,
@@ -70,7 +70,32 @@ describe('Test matching Organization using qualifier RegexMatch using sparql que
                 required: true,
                 matchQualifier: MatchQualifierEnum.REGEX_MATCH
             }],
-            limit: 1
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V1);
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+        console.log("Actual result: ", actualResult);
+
+        expect(actualResult?.id).toBe("Organization1");
+
+    });
+
+    it('Should match string "url" using regex modifier to allow http or https', async () => {
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ORGANIZATION,
+            conditions: [{
+                matchType: "property",
+                propertyId: "http://schema.org/url",
+                propertyValue: "https?://culturecreates.com",
+                required: true,
+                matchQualifier: MatchQualifierEnum.REGEX_MATCH
+            }],
+            limit: 10
         };
 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
@@ -84,18 +109,39 @@ describe('Test matching Organization using qualifier RegexMatch using sparql que
 
     });
 
-    it('Should match culturecreates, if search by regex keyword', async () => {
+    it('Should NOT match string "url" without REGEX qualifier', async () => {
+        // a string "url" is converted to URI unless using REGEX_MATCH qualifier
+        // All schema:url values should be stored as <URI> in the core graph
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ORGANIZATION,
+            conditions: [{
+                matchType: "property",
+                propertyId: "http://schema.org/url",
+                propertyValue: "http://culturecreates.com",
+                required: true
+            }],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V1);
+
+        const allResults = response.results?.[0]?.candidates;
+        expect(allResults).toHaveLength(0);
+
+    });
+
+    it('Should match URI <url> without REGEX qualifier', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.ORGANIZATION,
             conditions: [{
                 matchType: "property",
                 propertyId: "http://schema.org/url",
-                propertyValue: "https?://culturecreates.com",
-                required: true,
-                matchQualifier: MatchQualifierEnum.REGEX_MATCH
+                propertyValue: "https://anotherorganization.com",
+                required: true
             }],
-            limit: 1
+            limit: 10
         };
 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
@@ -105,7 +151,32 @@ describe('Test matching Organization using qualifier RegexMatch using sparql que
         const allResults = response.results?.[0]?.candidates;
         const actualResult = allResults?.[0];
 
-        expect(actualResult?.id).toBe("Organization1");
+        expect(actualResult?.id).toBe("Organization2");
+
+    });
+
+     it('Should match URI <url> using REGEX qualifier', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ORGANIZATION,
+            conditions: [{
+                matchType: "property",
+                propertyId: "http://schema.org/url",
+                propertyValue: "anotherorganization.?com",
+                required: true,
+                matchQualifier: MatchQualifierEnum.REGEX_MATCH
+            }],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V1);
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("Organization2");
 
     });
 
