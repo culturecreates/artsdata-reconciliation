@@ -1,0 +1,9 @@
+@prefix adr:<http://kg.artsdata.ca/resource/>.
+@prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#>.
+@prefix schema:<http://schema.org/>.
+@prefix xsd:<http://www.w3.org/2001/XMLSchema#>.
+
+adr:Organization1 a schema:Organization ;
+    schema:name "Culture creates" ;
+    rdfs:label "Culture creates" ;
+    schema:url "http://culturecreates.com" .
