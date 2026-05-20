@@ -155,7 +155,7 @@ describe('Test matching Organization using qualifier RegexMatch using sparql que
 
     });
 
-     it('Should match URI <url> using REGEX qualifier', async () => {
+    it('Should match URI <url> using REGEX qualifier', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.ORGANIZATION,
@@ -177,6 +177,56 @@ describe('Test matching Organization using qualifier RegexMatch using sparql que
         const actualResult = allResults?.[0];
 
         expect(actualResult?.id).toBe("Organization2");
+
+    });
+
+    it('Should match name containing  special char ' + ' using REGEX qualifier', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ORGANIZATION,
+            conditions: [{
+                matchType: "property",
+                propertyId: "http://schema.org/name",
+                propertyValue: "Arts \\+ Culture",
+                required: true,
+                matchQualifier: MatchQualifierEnum.REGEX_MATCH
+            }],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V1);
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("Organization3");
+
+    });
+
+    it(`Should match name containing special char '+' using REGEX expression containing '.'`, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ORGANIZATION,
+            conditions: [{
+                matchType: "property",
+                propertyId: "http://schema.org/name",
+                propertyValue: "Arts . Culture",
+                required: true,
+                matchQualifier: MatchQualifierEnum.REGEX_MATCH
+            }],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V1);
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("Organization3");
 
     });
 
