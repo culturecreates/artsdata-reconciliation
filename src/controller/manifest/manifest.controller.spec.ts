@@ -54,6 +54,16 @@ describe('ManifestController', () => {
             expect(valid).toBe(true);
         });
 
+        it("should use http for Artsdata view URI template", () => {
+            const response = manifestController.getServiceManifest();
+            expect(response).toBeDefined();
+            if (!response) {
+                return;
+            }
+            expect(response.view.url).toMatch(/^http:\/\/.*kg\.artsdata\.ca\/resource\/\{\{id\}\}$/);
+            expect(response.view.url).not.toContain("https://");
+        });
+
         it('should return false when the manifest is edited to an invalid schema', async () => {
             const response = manifestController.getServiceManifest();
             const invalidResponse = { ...response, versions: "test-version" };
