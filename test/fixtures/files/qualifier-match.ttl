@@ -12,3 +12,8 @@ adr:Organization2 a schema:Organization ;
     schema:name "Another organization" ;
     rdfs:label "Another organization" ;
     schema:url <https://anotherorganization.com> .
+
+adr:Organization3 a schema:Organization ;
+    schema:name "BC Alliance for Arts + Culture" ;
+    rdfs:label "BC Alliance for Arts + Culture" ;
+    schema:url <https://organization.com> .

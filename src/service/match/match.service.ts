@@ -87,7 +87,7 @@ export class MatchService {
         }
 
         if (matchQualifier === MatchQualifierEnum.REGEX_MATCH) {
-            return `"${value}"`;
+            return `"${value.replace("\\","\\\\")}"`;
         }
 
         if (MatchServiceHelper.isValidURI(value)) {
