@@ -35,7 +35,7 @@ describe('Test matching events using sparql query v1', () => {
         await dropIndexAndTheGraph(testGraphUri,testLuceneConnectorId);
     })
 
-    it('Reconcile an event with name `A Beacon in the Night`, which is exact match', async () => {
+    it('Reconcile an event with name `A Beacon in the Night`, which is not exact match', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -58,7 +58,7 @@ describe('Test matching events using sparql query v1', () => {
 
     });
 
-    it(`Reconcile an event entity with uri 'http://kg.artsdata.ca/resource/KE-4`, async () => {
+    it(`Reconcile an event entity with uri 'http://kg.artsdata.ca/resource/KE-4, which is a true match`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -104,7 +104,7 @@ describe('Test reconciling events using sparql query version 2', () => {
         await dropIndexAndTheGraph(testGraphUri,testLuceneConnectorId);
     })
 
-    it('Reconcile an event with name `A Beacon in the Night`, which is exact match', async () => {
+    it('Reconcile an event with name `A Beacon in the Night`, which is not exact match', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -127,7 +127,7 @@ describe('Test reconciling events using sparql query version 2', () => {
 
     });
 
-    it(`Reconcile an event entity with uri 'http://kg.artsdata.ca/resource/KE-4`, async () => {
+    it(`Reconcile an event entity with uri 'http://kg.artsdata.ca/resource/KE-4, which is a exact match`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
