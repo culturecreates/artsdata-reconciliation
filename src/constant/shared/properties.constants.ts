@@ -18,6 +18,12 @@ export const ArtsdataConstants = {
     PREFIX_INCLUDING_K: "http://kg.artsdata.ca/resource/K",
 };
 
+export const PREFIXES = {
+    SCHEMA: "http://schema.org/",
+    SKOS: "http://www.w3.org/2004/02/skos/core#",
+    ADO: "http://kg.artsdata.ca/ontology/"
+};
+
 export const Entities = {
     EVENT: "schema:Event",
     PLACE: "schema:Place",

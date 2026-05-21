@@ -127,7 +127,7 @@ export class MatchService {
     private _generateTripleFromCondition(condition: QueryCondition, index: number,): string {
         const {required, propertyId, propertyValue: rawConditionValue, matchQualifier, matchQuantifier} = condition;
 
-        const propertyIdSubstituted = propertyId?.replace("schema:", "http://schema.org/");
+        const propertyIdSubstituted = propertyId ? MatchServiceHelper.substitutePrefix(propertyId as string) : propertyId;
 
         const formattedConditionValue =
             this._resolvePropertyValue(rawConditionValue, propertyIdSubstituted as string, matchQualifier);
