@@ -6,10 +6,15 @@
 
 
 adr:KE-1 rdf:type <http://schema.org/Event> ;
-    rdfs:label "A Beacon in the Night" .
+    rdfs:label "A Beacon in the Night" ;
+    schema:name "A Beacon in the Night";
+    schema:startDate "2025-01-01"^^xsd:date
+    .
 
 adr:KE-2 rdf:type <http://schema.org/Event> ;
-    rdfs:label "A Beacon AND Night" .
+    rdfs:label "A Beacon AND Night" ;
+    schema:name "A Beacon AND Night" ;
+    schema:startDate "2025-02-02"^^xsd:date.
 
 adr:KE-4 rdf:type <http://schema.org/Event> ;
     rdfs:label "A Beacon during the Night" .
@@ -35,3 +40,5 @@ adr:KE-10 rdf:type <http://schema.org/Event> ;
 
 adr:KE-11 rdf:type <http://schema.org/Event> ;
     rdfs:label "Emily D’Angelo" .
+
+
