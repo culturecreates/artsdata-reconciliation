@@ -8,8 +8,7 @@
 adr:KE-1 rdf:type <http://schema.org/Event> ;
     rdfs:label "A Beacon in the Night" ;
     schema:name "A Beacon in the Night";
-    schema:startDate "2025-01-01"^^xsd:date
-    .
+    schema:startDate "2025-01-01"^^xsd:date.
 
 adr:KE-2 rdf:type <http://schema.org/Event> ;
     rdfs:label "A Beacon AND Night" ;
@@ -17,7 +16,8 @@ adr:KE-2 rdf:type <http://schema.org/Event> ;
     schema:startDate "2025-02-02"^^xsd:date.
 
 adr:KE-4 rdf:type <http://schema.org/Event> ;
-    rdfs:label "A Beacon during the Night" .
+    rdfs:label "A Beacon during the Night";
+    schema:startDate "2025-03-03T17:00:00-05:00"^^xsd:dateTime.
 
 adr:KE-5 rdf:type <http://schema.org/Event> ;
     rdfs:label "A Beautiful Night" .

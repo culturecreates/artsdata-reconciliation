@@ -119,6 +119,36 @@ describe('Test matching events using sparql query v1', () => {
 
     });
 
+    it('Reconcile an event with name `Beacon Night` and start Date `2025-03-03`, which is should match an event startDate datatype is xsd:dateTime', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {matchType: MatchTypeEnum.NAME, propertyValue: "Beacon Night"},
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-03-03",
+                    propertyId: "schema:startDate",
+                    required: true
+                }
+
+            ],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KE-4");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeFalsy();
+
+    });
+
     it(`Reconcile an event entity with uri 'http://kg.artsdata.ca/resource/KE-4, which is a true match`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
