@@ -87,7 +87,7 @@ export class MatchService {
         }
 
         if (matchQualifier === MatchQualifierEnum.REGEX_MATCH) {
-            return `"${value.replace("\\","\\\\")}"`;
+            return `"${value.replace("\\", "\\\\")}"`;
         }
 
         if (MatchServiceHelper.isValidURI(value)) {
@@ -126,11 +126,14 @@ export class MatchService {
      */
     private _generateTripleFromCondition(condition: QueryCondition, index: number,): string {
         const {required, propertyId, propertyValue: rawConditionValue, matchQualifier, matchQuantifier} = condition;
+
+        const propertyIdSubstituted = propertyId?.replace("schema:", "http://schema.org/");
+
         const formattedConditionValue =
-            this._resolvePropertyValue(rawConditionValue, propertyId as string, matchQualifier);
-        const formattedPropertyId: string = MatchServiceHelper.isValidURI(propertyId as string)
-            ? this._resolvePropertyPath(propertyId as string)
-            : `${propertyId}`;
+            this._resolvePropertyValue(rawConditionValue, propertyIdSubstituted as string, matchQualifier);
+        const formattedPropertyId: string = MatchServiceHelper.isValidURI(propertyIdSubstituted as string)
+            ? this._resolvePropertyPath(propertyIdSubstituted as string)
+            : `${propertyIdSubstituted}`;
 
         let triple = this._resolveMatchQualifierAndQuantifier(matchQualifier as MatchQualifierEnum,
             formattedPropertyId, matchQuantifier as MatchQuantifierEnum, formattedConditionValue, index);
