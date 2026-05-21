@@ -96,8 +96,11 @@ export class MatchService {
 
         switch (property) {
             case ArtsdataProperties.START_DATE:
+                return `?startDate;
+                FILTER(?startDate = "${value}"^^xsd:date || ( ?startDate > "${value}T00:00:00"^^xsd:dateTime && ?startDate < "${value}T23:59:59"^^xsd:dateTime ))`;
             case ArtsdataProperties.END_DATE:
-                return `"${value}"^^xsd:dateTime`;
+                return `?endDate;
+                FILTER(?endDate = "${value}"^^xsd:date || ( ?endDate > "${value}T00:00:00"^^xsd:dateTime && ?endDate < "${value}T23:59:59"^^xsd:dateTime ))`;
             case ArtsdataProperties.SAME_AS:
             case ArtsdataProperties.LOCATION:
             case ArtsdataProperties.ORGANIZER:
