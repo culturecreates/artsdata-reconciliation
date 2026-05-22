@@ -37,6 +37,7 @@ export const Entities = {
 export const SCHEMA_ORG_PROPERTY_URI_MAP = {
     POSTAL_CODE: "<http://schema.org/postalCode>",
     ADDRESS_POSTAL_CODE: "<http://schema.org/address>/<http://schema.org/postalCode>",
+    LOCATION_ADDRESS_POSTAL_CODE: "<http://schema.org/location>/<http://schema.org/address>/<http://schema.org/postalCode>",
     ADDRESS_LOCALITY: "<http://schema.org/addressLocality>",
     ADDRESS_ADDRESS_LOCALITY: "<http://schema.org/address>/<http://schema.org/addressLocality>",
     ADDRESS_COUNTRY: "<http://schema.org/addressCountry>",

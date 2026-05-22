@@ -358,6 +358,7 @@ export class MatchServiceHelper {
                 switch (propertyId) {
                     case SCHEMA_ORG_PROPERTY_URI_MAP.POSTAL_CODE:
                     case SCHEMA_ORG_PROPERTY_URI_MAP.ADDRESS_POSTAL_CODE:
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.LOCATION_ADDRESS_POSTAL_CODE:
                         postalCode = condition.propertyValue as string;
                         break;
                     case SCHEMA_ORG_PROPERTY_URI_MAP.ADDRESS_LOCALITY:

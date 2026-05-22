@@ -189,6 +189,51 @@ describe('Test matching events using sparql query v1', () => {
 
     });
 
+    it('Reconcile an event with exact name, startDate and location name, postal code and endDate, should be exact match', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {matchType: MatchTypeEnum.NAME, propertyValue: "A Beacon during the Night"},
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-03-03T17:00:00-05:00",
+                    propertyId: "schema:startDate",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-03-03T18:00:00-05:00",
+                    propertyId: "schema:endDate",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "One Location",
+                    propertyId: "<http://schema.org/location>/<http://schema.org/name>",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "12345",
+                    propertyId: "<http://schema.org/location>/<http://schema.org/address>/<http://schema.org/postalCode>",
+                    required: true
+                }
+
+            ],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KE-4");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeTruthy();
+
+    });
+
 
     it(`Reconcile an event entity with uri 'http://kg.artsdata.ca/resource/KE-4, which is a true match`, async () => {
 
