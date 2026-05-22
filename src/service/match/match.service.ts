@@ -106,7 +106,7 @@ export class MatchService {
                 FILTER(${variable} = "${value}"^^xsd:date || ( ${variable} > "${value}T00:00:00"^^xsd:dateTime && ${variable} < "${value}T23:59:59"^^xsd:dateTime ))`;
                 } else {
                     return `${variable};
-                FILTER(${variable} = "${value}"^^xsd:dateTime );`;
+                FILTER(${variable} = "${value}"^^xsd:dateTime )`;
                 }
 
             case ArtsdataProperties.SAME_AS:
