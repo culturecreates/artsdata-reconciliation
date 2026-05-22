@@ -367,7 +367,7 @@ describe('Test reconciling events using sparql query version 1', () => {
 
     });
 
-    it('Reconcile Event with Name and startDate', async () => {
+    it('Reconcile Event with Name and startDate in xsd:dateTime format', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: "schema:Event",
