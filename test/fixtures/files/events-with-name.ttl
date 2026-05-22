@@ -17,28 +17,38 @@ adr:KE-2 rdf:type <http://schema.org/Event> ;
 
 adr:KE-4 rdf:type <http://schema.org/Event> ;
     rdfs:label "A Beacon during the Night";
-    schema:startDate "2025-03-03T17:00:00-05:00"^^xsd:dateTime.
+    schema:name "A Beacon during the Night";
+    schema:startDate "2025-03-03T17:00:00-05:00"^^xsd:dateTime;
+    schema:endDate "2025-03-03T18:00:00-05:00"^^xsd:dateTime;
+    schema:location adr:KP-1.
 
 adr:KE-5 rdf:type <http://schema.org/Event> ;
-    rdfs:label "A Beautiful Night" .
+    rdfs:label "A Beautiful Night" ;
+    schema:name "A Beautiful Night" .
 
 adr:KE-6 rdf:type <http://schema.org/Event> ;
     rdfs:label "At the Night" ;
+    schema:name "At the Night" ;
     schema:startDate "2025-12-28T13:00:00-04:00"^^xsd:date.
 
 adr:KE-7 rdf:type <http://schema.org/Event> ;
+    schema:name "Pierre-Yves Roy-Desmarais" ;
     rdfs:label "Pierre-Yves Roy-Desmarais" .
 
 adr:KE-8 rdf:type <http://schema.org/Event> ;
-    rdfs:label "Banx & Ranx || FMG 2023" .
+    rdfs:label "Banx & Ranx || FMG 2023" ;
+    schema:name "Banx & Ranx || FMG 2023" .
 
 adr:KE-9 rdf:type <http://schema.org/Event> ;
-    rdfs:label "Parcours citoyenne : Maï Nguyen (Vietnam)" .
+    rdfs:label "Parcours citoyenne : Maï Nguyen (Vietnam)" ;
+    schema:name "Parcours citoyenne : Maï Nguyen (Vietnam)" .
 
 adr:KE-10 rdf:type <http://schema.org/Event> ;
-    rdfs:label "Kev - M'en c*lisse, j'essaye [Trois-Rivières] 18+" .
+    rdfs:label "Kev - M'en c*lisse, j'essaye [Trois-Rivières] 18+" ;
+    schema:name "Kev - M'en c*lisse, j'essaye [Trois-Rivières] 18+" .
 
 adr:KE-11 rdf:type <http://schema.org/Event> ;
-    rdfs:label "Emily D’Angelo" .
+    rdfs:label "Emily D’Angelo" ;
+    schema:name "Emily D’Angelo" .
 
 
