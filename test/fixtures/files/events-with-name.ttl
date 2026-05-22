@@ -51,4 +51,11 @@ adr:KE-11 rdf:type <http://schema.org/Event> ;
     rdfs:label "Emily D’Angelo" ;
     schema:name "Emily D’Angelo" .
 
+adr:KP-1 rdf:type <http://schema.org/Place> ;
+    rdfs:label "One Location" ;
+    schema:name "One Location" ;
+    schema:address [
+    schema:postalCode "12345" ;
+    ].
+
 
