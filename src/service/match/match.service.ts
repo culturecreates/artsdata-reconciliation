@@ -94,13 +94,21 @@ export class MatchService {
             return `<${value}>`;
         }
 
+
         switch (property) {
             case ArtsdataProperties.START_DATE:
-                return `?startDate;
-                FILTER(?startDate = "${value}"^^xsd:date || ( ?startDate > "${value}T00:00:00"^^xsd:dateTime && ?startDate < "${value}T23:59:59"^^xsd:dateTime ))`;
             case ArtsdataProperties.END_DATE:
-                return `?endDate;
-                FILTER(?endDate = "${value}"^^xsd:date || ( ?endDate > "${value}T00:00:00"^^xsd:dateTime && ?endDate < "${value}T23:59:59"^^xsd:dateTime ))`;
+                const variable = property === ArtsdataProperties.START_DATE ? "?startDate" : "?endDate";
+                const xsdDateRegex = /^-?\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])(Z|[+-](0\d|1[0-4]):[0-5]\d)?$/;
+
+                if (xsdDateRegex.test(value)) {
+                    return `${variable};
+                FILTER(${variable} = "${value}"^^xsd:date || ( ${variable} > "${value}T00:00:00"^^xsd:dateTime && ${variable} < "${value}T23:59:59"^^xsd:dateTime ))`;
+                } else {
+                    return `${variable};
+                FILTER(${variable} = "${value}"^^xsd:dateTime );`;
+                }
+
             case ArtsdataProperties.SAME_AS:
             case ArtsdataProperties.LOCATION:
             case ArtsdataProperties.ORGANIZER:
@@ -360,7 +368,7 @@ export class MatchService {
 
             rawQuery = rawQuery.replace(
                 "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
-        `OPTIONAL { ?entity schema:startDate ?startDate }
+                `OPTIONAL { ?entity schema:startDate ?startDate }
         OPTIONAL { ?entity schema:alternateName ?alternateName}  
         OPTIONAL { ?entity schema:endDate ?endDate }
         OPTIONAL { ?entity schema:location ?location .
