@@ -367,7 +367,7 @@ describe('Test reconciling events using sparql query version 1', () => {
 
     });
 
-    it('Reconcile Event with Name and startDate', async () => {
+    it('Reconcile Event with Name and startDate in xsd:dateTime format', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: "schema:Event",
@@ -395,8 +395,8 @@ describe('Test reconciling events using sparql query version 1', () => {
         const allResults = response.results?.[0]?.candidates;
         const actualResult = allResults?.[0];
 
-        expect(actualResult?.id).toBe(undefined);
-        expect(allResults?.length).toBe(0);
+        expect(actualResult?.id).toBe("KE-6");
+        expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeFalsy();
 
     });

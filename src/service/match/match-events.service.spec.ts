@@ -35,7 +35,7 @@ describe('Test matching events using sparql query v1', () => {
         await dropIndexAndTheGraph(testGraphUri,testLuceneConnectorId);
     })
 
-    it('Reconcile an event with name `A Beacon in the Night`, which is exact match', async () => {
+    it('Reconcile an event with name `A Beacon in the Night`, which is not exact match', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -58,7 +58,184 @@ describe('Test matching events using sparql query v1', () => {
 
     });
 
-    it(`Reconcile an event entity with uri 'http://kg.artsdata.ca/resource/KE-4`, async () => {
+    it('Reconcile an event with name `Beacon Night` and start Date `2025-01-01`, which is not exact match', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {matchType: MatchTypeEnum.NAME, propertyValue: "Beacon Night"},
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-01-01",
+                    propertyId: "schema:startDate",
+                    required: true
+                }
+
+            ],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KE-1");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeFalsy();
+
+    });
+
+
+    it('Reconcile an event with name `Beacon Night` and start Date `2025-02-02`, which is not exact match', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {matchType: MatchTypeEnum.NAME, propertyValue: "Beacon Night"},
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-02-02",
+                    propertyId: "schema:startDate",
+                    required: true
+                }
+
+            ],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KE-2");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeFalsy();
+
+    });
+
+    it('Reconcile an event with name `Beacon Night` and start Date `2025-03-03`, which is should match an event startDate datatype is xsd:dateTime', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {matchType: MatchTypeEnum.NAME, propertyValue: "Beacon Night"},
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-03-03",
+                    propertyId: "schema:startDate",
+                    required: true
+                }
+
+            ],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KE-4");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeFalsy();
+
+    });
+
+    it('Reconcile an event with exact name, startDate and location URI and endDate, should be exact match', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {matchType: MatchTypeEnum.NAME, propertyValue: "A Beacon during the Night"},
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-03-03T17:00:00-05:00",
+                    propertyId: "schema:startDate",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-03-03T18:00:00-05:00",
+                    propertyId: "schema:endDate",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "http://kg.artsdata.ca/resource/KP-1",
+                    propertyId: "schema:location",
+                    required: true
+                }
+
+            ],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KE-4");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeTruthy();
+
+    });
+
+    it('Reconcile an event with exact name, startDate and location name, postal code and endDate, should be exact match', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {matchType: MatchTypeEnum.NAME, propertyValue: "A Beacon during the Night"},
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-03-03T17:00:00-05:00",
+                    propertyId: "schema:startDate",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-03-03T18:00:00-05:00",
+                    propertyId: "schema:endDate",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "One Location",
+                    propertyId: "<http://schema.org/location>/<http://schema.org/name>",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "12345",
+                    propertyId: "<http://schema.org/location>/<http://schema.org/address>/<http://schema.org/postalCode>",
+                    required: true
+                }
+
+            ],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KE-4");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeTruthy();
+
+    });
+
+
+    it(`Reconcile an event entity with uri 'http://kg.artsdata.ca/resource/KE-4, which is a true match`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -101,10 +278,10 @@ describe('Test reconciling events using sparql query version 2', () => {
         jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
     });
     afterAll(async () => {
-        await dropIndexAndTheGraph(testGraphUri,testLuceneConnectorId);
+        await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
     })
 
-    it('Reconcile an event with name `A Beacon in the Night`, which is exact match', async () => {
+    it('Reconcile an event with name `A Beacon in the Night`, which is not exact match', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -113,7 +290,7 @@ describe('Test reconciling events using sparql query version 2', () => {
         };
 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
-            {queries: [reconciliationQuery]},SparqlVersionEnum.V2);
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V2);
 
         expect(response.results).toHaveLength(1);
         const allResults = response.results?.[0]?.candidates;
@@ -127,7 +304,7 @@ describe('Test reconciling events using sparql query version 2', () => {
 
     });
 
-    it(`Reconcile an event entity with uri 'http://kg.artsdata.ca/resource/KE-4`, async () => {
+    it(`Reconcile an event entity with uri 'http://kg.artsdata.ca/resource/KE-4, which is a exact match`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -136,7 +313,7 @@ describe('Test reconciling events using sparql query version 2', () => {
         };
 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
-            {queries: [reconciliationQuery]},"V2");
+            {queries: [reconciliationQuery]}, "V2");
 
         expect(response.results).toHaveLength(1);
         const allResults = response.results?.[0]?.candidates;

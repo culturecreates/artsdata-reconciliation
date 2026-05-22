@@ -87,17 +87,28 @@ export class MatchService {
         }
 
         if (matchQualifier === MatchQualifierEnum.REGEX_MATCH) {
-            return `"${value.replace("\\","\\\\")}"`;
+            return `"${value.replace("\\", "\\\\")}"`;
         }
 
         if (MatchServiceHelper.isValidURI(value)) {
             return `<${value}>`;
         }
 
+
         switch (property) {
             case ArtsdataProperties.START_DATE:
             case ArtsdataProperties.END_DATE:
-                return `"${value}"^^xsd:dateTime`;
+                const variable = property === ArtsdataProperties.START_DATE ? "?startDate" : "?endDate";
+                const xsdDateRegex = /^-?\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])(Z|[+-](0\d|1[0-4]):[0-5]\d)?$/;
+
+                if (xsdDateRegex.test(value)) {
+                    return `${variable};
+                FILTER(${variable} = "${value}"^^xsd:date || ( ${variable} > "${value}T00:00:00"^^xsd:dateTime && ${variable} < "${value}T23:59:59"^^xsd:dateTime ))`;
+                } else {
+                    return `${variable};
+                FILTER(${variable} = "${value}"^^xsd:dateTime )`;
+                }
+
             case ArtsdataProperties.SAME_AS:
             case ArtsdataProperties.LOCATION:
             case ArtsdataProperties.ORGANIZER:
@@ -123,11 +134,14 @@ export class MatchService {
      */
     private _generateTripleFromCondition(condition: QueryCondition, index: number,): string {
         const {required, propertyId, propertyValue: rawConditionValue, matchQualifier, matchQuantifier} = condition;
+
+        const propertyIdSubstituted = propertyId ? MatchServiceHelper.substitutePrefix(propertyId as string) : propertyId;
+
         const formattedConditionValue =
-            this._resolvePropertyValue(rawConditionValue, propertyId as string, matchQualifier);
-        const formattedPropertyId: string = MatchServiceHelper.isValidURI(propertyId as string)
-            ? this._resolvePropertyPath(propertyId as string)
-            : `${propertyId}`;
+            this._resolvePropertyValue(rawConditionValue, propertyIdSubstituted as string, matchQualifier);
+        const formattedPropertyId: string = MatchServiceHelper.isValidURI(propertyIdSubstituted as string)
+            ? this._resolvePropertyPath(propertyIdSubstituted as string)
+            : `${propertyIdSubstituted}`;
 
         let triple = this._resolveMatchQualifierAndQuantifier(matchQualifier as MatchQualifierEnum,
             formattedPropertyId, matchQuantifier as MatchQuantifierEnum, formattedConditionValue, index);
@@ -354,7 +368,7 @@ export class MatchService {
 
             rawQuery = rawQuery.replace(
                 "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
-        `OPTIONAL { ?entity schema:startDate ?startDate }
+                `OPTIONAL { ?entity schema:startDate ?startDate }
         OPTIONAL { ?entity schema:alternateName ?alternateName}  
         OPTIONAL { ?entity schema:endDate ?endDate }
         OPTIONAL { ?entity schema:location ?location .

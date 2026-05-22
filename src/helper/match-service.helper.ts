@@ -2,7 +2,7 @@ import {LanguageEnum, MatchQualifierEnum} from "../enum";
 import {GRAPHDB_INDEX} from "../config";
 import {QueryCondition, ReconciliationQuery, ResultCandidates} from "../dto";
 import {isURL} from "validator";
-import {ArtsdataConstants, Entities, SCHEMA_ORG_PROPERTY_URI_MAP} from "../constant";
+import {ArtsdataConstants, Entities, PREFIXES, SCHEMA_ORG_PROPERTY_URI_MAP} from "../constant";
 import {JaroWinklerDistance} from "natural";
 import {QUERIES_V2} from "../constant/match/match-queries-v2.constants";
 import {SparqlVersionEnum} from "../enum/sparql-versions.enum";
@@ -358,6 +358,7 @@ export class MatchServiceHelper {
                 switch (propertyId) {
                     case SCHEMA_ORG_PROPERTY_URI_MAP.POSTAL_CODE:
                     case SCHEMA_ORG_PROPERTY_URI_MAP.ADDRESS_POSTAL_CODE:
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.LOCATION_ADDRESS_POSTAL_CODE:
                         postalCode = condition.propertyValue as string;
                         break;
                     case SCHEMA_ORG_PROPERTY_URI_MAP.ADDRESS_LOCALITY:
@@ -525,4 +526,19 @@ export class MatchServiceHelper {
         ].join('\n');
     }
 
+    static substitutePrefix(text: string) {
+        // 1. Count total colons in the string
+        const prefixCount = (text.match(/:/g) || []).length;
+
+        // 2. If exactly one colon exists and the string contains 'schema:', swap it
+        if (prefixCount === 1) {
+            return text.replace('schema:', PREFIXES.SCHEMA)
+                .replace('skos:', PREFIXES.SKOS)
+            .replace('ado:', PREFIXES.ADO)
+                ;
+        }
+
+        return text;
+
+    }
 }
