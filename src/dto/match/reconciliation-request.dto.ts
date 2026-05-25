@@ -9,14 +9,14 @@ import {
     IsNotEmpty,
     IsNumber,
     IsOptional,
-    IsString, IsUrl,
+    IsString,
     Matches,
     Min,
     ValidateIf,
     ValidateNested
 } from "class-validator";
 import {MatchQualifierEnum, MatchQuantifierEnum, MatchTypeEnum} from "../../enum";
-import {MANIFEST} from "../../constant";
+import {MANIFEST, PREFIXES} from "../../constant";
 
 
 export class QueryCondition {
@@ -60,7 +60,14 @@ export class ReconciliationQuery {
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    @IsIn(MANIFEST.defaultTypes.map(type => type.id))
+    @IsIn(MANIFEST.defaultTypes.flatMap(type => {
+        return [
+            type.id,
+            type.id.replace("schema:", PREFIXES.SCHEMA)
+                .replace("skos:", PREFIXES.SKOS)
+                .replace("ado:", PREFIXES.ADO)
+        ]
+    }))
     type: string;
 
     @IsOptional()
