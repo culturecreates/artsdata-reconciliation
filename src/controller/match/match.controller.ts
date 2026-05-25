@@ -60,7 +60,7 @@ Escape Regex operators like dot (.) and plus (+) when searching for the literal 
                 value: JSON.stringify({
                     queries: [
                         {
-                            type: "schema:Place",
+                            type: "http://schema.org/Place",
                             limit: 2,
                             conditions: [
                                 {
@@ -79,7 +79,7 @@ Escape Regex operators like dot (.) and plus (+) when searching for the literal 
                 value: JSON.stringify({
                     queries: [
                         {
-                            type: "schema:Organization",
+                            type: "http://schema.org/Organization",
                             conditions: [
                                 {
                                     matchType: "property",
@@ -100,7 +100,7 @@ Escape Regex operators like dot (.) and plus (+) when searching for the literal 
                 value: JSON.stringify({
                     queries: [
                         {
-                            type: "schema:Organization",
+                            type: "http://schema.org/Organization",
                             conditions: [
                                 {
                                     matchType: "property",
@@ -169,7 +169,7 @@ Escape Regex operators like dot (.) and plus (+) when searching for the literal 
                 value: {
                     queries: [
                         {
-                            type: "schema:Place",
+                            type: "http://schema.org/Place",
                             limit: 2,
                             conditions: [
                                 {
@@ -188,7 +188,7 @@ Escape Regex operators like dot (.) and plus (+) when searching for the literal 
                 value: {
                     queries: [
                         {
-                            type: "schema:Organization",
+                            type: "http://schema.org/Organization",
                             conditions: [
                                 {
                                     matchType: "property",
@@ -209,7 +209,7 @@ Escape Regex operators like dot (.) and plus (+) when searching for the literal 
                 value: {
                     queries: [
                         {
-                            type: "schema:Organization",
+                            type: "http://schema.org/Organization",
                             conditions: [
                                 {
                                     matchType: "property",
