@@ -1,5 +1,5 @@
 import {Body, Controller, Get, Headers, Post, Query, Res,} from "@nestjs/common";
-import {ApiHeader, ApiOperation, ApiQuery, ApiResponse, ApiTags,} from "@nestjs/swagger";
+import {ApiBody, ApiHeader, ApiOperation, ApiQuery, ApiResponse, ApiTags,} from "@nestjs/swagger";
 import {MatchService} from "../../service";
 import {ReconciliationRequest, ReconciliationResponse} from "../../dto";
 import {LanguageEnum} from "../../enum";
@@ -136,7 +136,96 @@ Escape Regex operators like dot (.) and plus (+) when searching for the literal 
     }
 
     @Post("/match")
-    @ApiOperation({summary: "Send reconciliation queries to the match service"})
+    @ApiOperation({
+        summary: "Send reconciliation queries to the match service",
+        description: `
+### Reconciliation Query Format
+A reconciliation query filters and ranks entity candidates based on the following fields:
+
+* **\`conditions\`** *(Array, Required)*: A list of one or more constraints to filter candidates.
+* **\`type\`** *(String, Optional)*: Restricts the search to a specific entity class (e.g., Event, Place, etc).
+* **\`limit\`** *(Integer, Optional)*: Maximum number of candidates to return (must be a positive integer, default: 25).
+
+#### Condition Object Structure
+Each object inside the \`conditions\` array consists of:
+* **\`matchType\`** *(String, Required)*: Must be \`name\`, \`id\`, or \`property\`.
+* **\`propertyId\`** *(String)*: Required if \`matchType\` is \`property\`.
+* **\`propertyValue\`** *(String or List of String, Required)*: The value(s) to match against.
+* **\`required\`** *(Boolean, Optional)*: \`true\` acts as a strict filter; \`false\` only affects ranking score. *(Default: false)*
+* **\`matchQuantifier\`** *(String, Optional)*: Logic for multi-values: \`any\` (OR), \`all\` (AND), or \`none\` (NOT). *(Default: any)*
+* **\`matchQualifier\`** *(String, Optional)*: Matching relationship flavor (e.g., \`RegexMatch\`, \`ExactMatch\`). 
+
+The service use REGEX function in SPARQL. The regular expression language is defined in XQuery 1.0 and XPath 2.0 Functions and Operators section. 
+You can read more about the syntax here. Artsdata always uses the “i” flag to make characters case insensitive. 
+Escape Regex operators like dot (.) and plus (+) when searching for the literal string by using 2 backslashes “\\”.`,
+    })
+    @ApiBody({
+        type: ReconciliationRequest,
+        description: 'Reconciliation query request payload',
+        examples: {
+            "Example1": {
+                summary: "Finds a specific place like Roy Thomson Hall",
+                description: "An example of a query that matches a place like Roy Thomson Hall",
+                value: {
+                    queries: [
+                        {
+                            type: "http://schema.org/Place",
+                            limit: 2,
+                            conditions: [
+                                {
+                                    matchType: "name",
+                                    propertyValue: "Roy Thomson hall",
+                                    required: true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            "Example2": {
+                summary: "Match organizations by domain",
+                description: "Matches all organizations with a website containing 'nac-cna' using RegexMatch.",
+                value: {
+                    queries: [
+                        {
+                            type: "http://schema.org/Organization",
+                            conditions: [
+                                {
+                                    matchType: "property",
+                                    propertyId: "http://schema.org/url",
+                                    propertyValue: "nac-cna.ca",
+                                    required: true,
+                                    matchQuantifier: "all",
+                                    matchQualifier: "RegexMatch"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            "Example3": {
+                summary: "Query that matches all organizations that have an ISNI",
+                description: "An example of a query that matches all organizations that have an ISNI using RegexMatch",
+                value: {
+                    queries: [
+                        {
+                            type: "http://schema.org/Organization",
+                            conditions: [
+                                {
+                                    matchType: "property",
+                                    propertyId: "http://schema.org/sameAs",
+                                    propertyValue: "ISNI.*",
+                                    required: true,
+                                    matchQuantifier: "all",
+                                    matchQualifier: "RegexMatch"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    })
     @ApiResponse({
         status: 200,
         type: ReconciliationResponse,
