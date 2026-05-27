@@ -146,6 +146,7 @@ export class MatchService {
 
         let triple = this._resolveMatchQualifierAndQuantifier(matchQualifier as MatchQualifierEnum,
             formattedPropertyId, matchQuantifier as MatchQuantifierEnum, formattedConditionValue, index);
+
         return required ? triple : `OPTIONAL { ${triple} }\n`;
     }
 
@@ -198,12 +199,9 @@ export class MatchService {
      */
     private _resolveMatchQualifierAndQuantifier(matchQualifier: MatchQualifierEnum, formattedPropertyId: string,
                                                 matchQuantifier: MatchQuantifierEnum, formattedConditionValue: string | string[], index: number) {
-        if (!matchQuantifier) {
-            matchQuantifier = MatchQuantifierEnum.ALL;
-        }
-        if (!matchQualifier) {
-            matchQualifier = MatchQualifierEnum.EXACT_MATCH;
-        }
+        //Setting default values for match qualifier and match quantifier
+        matchQuantifier = matchQuantifier || MatchQuantifierEnum.ALL;
+        matchQualifier = matchQualifier || MatchQualifierEnum.EXACT_MATCH;
 
         const isConditionValueArray = Array.isArray(formattedConditionValue);
         let triple: string = "";
