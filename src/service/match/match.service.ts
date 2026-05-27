@@ -336,7 +336,7 @@ export class MatchService {
                 QUERIES.SELECT_ENTITY_QUERY_BY_KEYWORD);
         }
 
-        rawQuery = this._modifyQueryToAddAdditionalPropertiesForAutoMatchCalculations(type, rawQuery)
+        rawQuery = this._addQueryToFetchAdditionalPropertiesForAutoMatchCalculations(type, rawQuery)
 
         rawQuery = rawQuery
             .replace("INDEX_PLACE_HOLDER", graphdbIndex)
@@ -426,7 +426,7 @@ export class MatchService {
      * @param rawQuery
      * @private
      */
-    private _modifyQueryToAddAdditionalPropertiesForAutoMatchCalculations(type: string, rawQuery: string): string {
+    private _addQueryToFetchAdditionalPropertiesForAutoMatchCalculations(type: string, rawQuery: string): string {
 
         switch (type) {
             case Entities.PLACE:
