@@ -211,19 +211,25 @@ export class MatchService {
             switch (matchQualifier) {
 
                 case MatchQualifierEnum.EXACT_MATCH:
-                    if (matchQuantifier === MatchQuantifierEnum.ANY) {
-                        triple = `?entity ${formattedPropertyId} ${objectId} 
+
+                    switch (matchQuantifier) {
+                        case MatchQuantifierEnum.ANY:
+                            triple = `?entity ${formattedPropertyId} ${objectId} 
                         FILTER (${objectId} IN (${(formattedConditionValue as string[]).join(" , ")})).`;
-                    } else if (matchQuantifier === MatchQuantifierEnum.ALL) {
-                        triple = `${(formattedConditionValue as string[])
-                            .map((v) => ` FILTER EXISTS {?entity ${formattedPropertyId} ${v}}`)
-                            .join("\n")}`;
-                    } else if (matchQuantifier === MatchQuantifierEnum.NONE) {
-                        triple = `${(formattedConditionValue as string[])
-                            .map((v) => ` FILTER NOT EXISTS {?entity ${formattedPropertyId} ${v}}`)
-                            .join("\n")}`;
-                    } else {
-                        Exception.badRequest("Unsupported match qualifier");
+                            break;
+                        case MatchQuantifierEnum.ALL:
+                            triple = `${(formattedConditionValue as string[])
+                                .map((v) => ` FILTER EXISTS {?entity ${formattedPropertyId} ${v}}`)
+                                .join("\n")}`;
+                            break;
+                        case MatchQuantifierEnum.NONE:
+                            triple = `${(formattedConditionValue as string[])
+                                .map((v) => ` FILTER NOT EXISTS {?entity ${formattedPropertyId} ${v}}`)
+                                .join("\n")}`;
+                            break;
+                        default:
+                            Exception.badRequest("Unsupported match qualifier");
+                            break;
                     }
                     break;
 
