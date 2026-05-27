@@ -336,6 +336,66 @@ export class MatchService {
                 QUERIES.SELECT_ENTITY_QUERY_BY_KEYWORD);
         }
 
+        rawQuery = this._modifyQueryToAddAdditionalPropertiesForAutoMatchCalculations(type, rawQuery)
+
+        rawQuery = rawQuery
+            .replace("INDEX_PLACE_HOLDER", graphdbIndex)
+            .replace("QUERY_FILTER_PLACE_HOLDER", name ? `luc:query ${name}` : "")
+            .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
+
+        return this._resolvePropertyConditions(rawQuery, propertyConditions);
+    }
+
+    private _resolvePropertyPath(propertyId: string) {
+        const parts = propertyId.trim().split("/http");
+        let propertyPath = "";
+
+        for (let i = 0; i < parts.length; i++) {
+            const part = i === 0 ? parts[i] : "http" + parts[i];
+            propertyPath += part.startsWith("http") ? `<${part}>` : part;
+            if (i < parts.length - 1) propertyPath += "/";
+        }
+
+        return propertyPath;
+    }
+
+    private _modifyNameForLuceneScore(name: string, propertyConditions: QueryCondition[]): string {
+        const propertyMap = {
+            "http://schema.org/url": "url",
+            "http://schema.org/sameAs": "sameAs",
+            "http://schema.org/postalCode": "postalCode",
+            "http://schema.org/startDate": "startDate",
+            "http://schema.org/endDate": "endDate",
+            "<https://schema.org/location>/<https://schema.org/name>": "locationName",
+            "<https://schema.org/location>/<https://schema.org/address>/<https://schema.org/postalCode>": "locationPostalCode",
+        };
+
+        const luceneQuery = propertyConditions
+            .filter((condition) => condition.matchType === MatchTypeEnum.PROPERTY)
+            .reduce((query, condition) => {
+                Object.entries(propertyMap).forEach(([key, value]) => {
+                    if (condition.propertyId?.includes(key)) {
+                        query = `${query} OR ${this.resolvePropertyValueForLucene(
+                            condition.propertyValue,
+                            value,
+                        )}`;
+                    }
+                });
+                return query;
+            }, `${name}`);
+
+        return `"${luceneQuery}" ;`;
+    }
+
+    private resolvePropertyValueForLucene(propertyValue: string | string[], propertyId: string): string {
+        const values = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
+        return values
+            .map((value) =>
+                `${MatchServiceHelper.transformSearchQuery(value, propertyId)}`)
+            .join(" ");
+    }
+
+    private _modifyQueryToAddAdditionalPropertiesForAutoMatchCalculations(type: string, rawQuery: string): string {
         if (type === Entities.PLACE) {
             rawQuery = rawQuery.replace(
                 "ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
@@ -400,74 +460,19 @@ export class MatchService {
                 "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
                 `   OPTIONAL { ?entity schema:alternateName ?alternateName}  
                 OPTIONAL { ?entity schema:sameAs ?sameAs 
-      OPTIONAL {BIND(?sameAs AS ?wikidata)
-        FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
-      }
-      OPTIONAL {BIND(?sameAs AS ?isni)
-        FILTER (STRSTARTS(str(?isni), "https://isni.org/isni/"))
-      }
-    }`,
+                  OPTIONAL {BIND(?sameAs AS ?wikidata)
+                    FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
+                  }
+                  OPTIONAL {BIND(?sameAs AS ?isni)
+                    FILTER (STRSTARTS(str(?isni), "https://isni.org/isni/"))
+                  }
+                }`,
             );
         } else {
-            rawQuery = rawQuery.replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER", "");
-            rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER", "");
+            rawQuery = rawQuery.replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER", "")
+                .replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER", "");
         }
 
-        rawQuery = rawQuery
-            .replace("INDEX_PLACE_HOLDER", graphdbIndex)
-            .replace("QUERY_FILTER_PLACE_HOLDER", name ? `luc:query ${name}` : "")
-            .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
-
-        return this._resolvePropertyConditions(rawQuery, propertyConditions);
+        return rawQuery;
     }
-
-    private _resolvePropertyPath(propertyId: string) {
-        const parts = propertyId.trim().split("/http");
-        let propertyPath = "";
-
-        for (let i = 0; i < parts.length; i++) {
-            const part = i === 0 ? parts[i] : "http" + parts[i];
-            propertyPath += part.startsWith("http") ? `<${part}>` : part;
-            if (i < parts.length - 1) propertyPath += "/";
-        }
-
-        return propertyPath;
-    }
-
-    private _modifyNameForLuceneScore(name: string, propertyConditions: QueryCondition[]): string {
-        const propertyMap = {
-            "http://schema.org/url": "url",
-            "http://schema.org/sameAs": "sameAs",
-            "http://schema.org/postalCode": "postalCode",
-            "http://schema.org/startDate": "startDate",
-            "http://schema.org/endDate": "endDate",
-            "<https://schema.org/location>/<https://schema.org/name>": "locationName",
-            "<https://schema.org/location>/<https://schema.org/address>/<https://schema.org/postalCode>": "locationPostalCode",
-        };
-
-        const luceneQuery = propertyConditions
-            .filter((condition) => condition.matchType === MatchTypeEnum.PROPERTY)
-            .reduce((query, condition) => {
-                Object.entries(propertyMap).forEach(([key, value]) => {
-                    if (condition.propertyId?.includes(key)) {
-                        query = `${query} OR ${this.resolvePropertyValueForLucene(
-                            condition.propertyValue,
-                            value,
-                        )}`;
-                    }
-                });
-                return query;
-            }, `${name}`);
-
-        return `"${luceneQuery}" ;`;
-    }
-
-    private resolvePropertyValueForLucene(propertyValue: string | string[], propertyId: string): string {
-        const values = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
-        return values
-            .map((value) =>
-                `${MatchServiceHelper.transformSearchQuery(value, propertyId)}`)
-            .join(" ");
-    }
-
 }
