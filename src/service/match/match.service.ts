@@ -44,10 +44,11 @@ export class MatchService {
      * @returns {string}
      */
     private _resolvePropertyConditions(rawSparqlQuery: string, propertyConditions: QueryCondition[]): string {
+
         const propertyTriples = propertyConditions
-            .map((condition, index) =>
-                this._generateTripleFromCondition(condition, index),
-            ).join("");
+            .map((condition, index) => this._generateTripleFromCondition(condition, index))
+            .join("");
+
         return rawSparqlQuery.replace("PROPERTY_PLACE_HOLDER", propertyTriples);
     }
 
