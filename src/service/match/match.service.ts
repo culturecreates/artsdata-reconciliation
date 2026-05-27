@@ -203,9 +203,9 @@ export class MatchService {
         matchQuantifier = matchQuantifier || MatchQuantifierEnum.ALL;
         matchQualifier = matchQualifier || MatchQualifierEnum.EXACT_MATCH;
 
-        const isConditionValueArray = Array.isArray(formattedConditionValue);
+        const isConditionValueAList = Array.isArray(formattedConditionValue);
         let triple: string = "";
-        if (isConditionValueArray) {
+        if (isConditionValueAList) {
             const objectId = `?obj_${index + 1}`;
             switch (matchQualifier) {
                 case MatchQualifierEnum.EXACT_MATCH:
