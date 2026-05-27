@@ -396,83 +396,77 @@ export class MatchService {
     }
 
     private _modifyQueryToAddAdditionalPropertiesForAutoMatchCalculations(type: string, rawQuery: string): string {
-        if (type === Entities.PLACE) {
-            rawQuery = rawQuery.replace(
-                "ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
-                `(SAMPLE(?postalCode) AS ?postalCode)
-                (SAMPLE(?addressLocality) AS ?addressLocality)
-                (SAMPLE(?wikidata) AS ?wikidata)
-                (SAMPLE(?alternateName) AS ?alternateName)`,
-            );
 
-            rawQuery = rawQuery.replace(
-                "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
-                `
-          OPTIONAL { ?entity schema:alternateName ?alternateName} 
-          OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode }
-          OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality }
-          OPTIONAL { ?entity schema:sameAs ?wikidata 
-        FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
-      }`);
-        } else if (type === Entities.EVENT) {
-            rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
-                `(SAMPLE(?startDate) AS ?startDate)
-        (SAMPLE(?endDate) AS ?endDate)
-        (SAMPLE(?locationName) AS ?locationName)
-        (SAMPLE(?postalCode) AS ?postalCode)
-        (SAMPLE(?artsdataUri) AS ?locationUri)
-        (SAMPLE(?alternateName) AS ?alternateName)
-        (SAMPLE(?locationContainedIn) AS ?locationContainedIn)
-        (SAMPLE(?locationContains) AS ?locationContains)`,
-            );
+        switch (type) {
+            case Entities.PLACE:
+                rawQuery = rawQuery.replace(
+                    "ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
+                    `(SAMPLE(?postalCode) AS ?postalCode)
+                                (SAMPLE(?addressLocality) AS ?addressLocality)
+                                (SAMPLE(?wikidata) AS ?wikidata)
+                                (SAMPLE(?alternateName) AS ?alternateName)`)
+                    .replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
+                        `OPTIONAL { ?entity schema:alternateName ?alternateName} 
+                                     OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode }
+                                     OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality }
+                                     OPTIONAL { ?entity schema:sameAs ?wikidata 
+                                    FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
+                                  }`);
+                break;
+            case Entities.EVENT:
+                rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
+                    `(SAMPLE(?startDate) AS ?startDate)
+                                (SAMPLE(?endDate) AS ?endDate)
+                                (SAMPLE(?locationName) AS ?locationName)
+                                (SAMPLE(?postalCode) AS ?postalCode)
+                                (SAMPLE(?artsdataUri) AS ?locationUri)
+                                (SAMPLE(?alternateName) AS ?alternateName)
+                                (SAMPLE(?locationContainedIn) AS ?locationContainedIn)
+                                (SAMPLE(?locationContains) AS ?locationContains)`)
+                    .replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
+                        `OPTIONAL { ?entity schema:startDate ?startDate }
+                                    OPTIONAL { ?entity schema:alternateName ?alternateName}  
+                                    OPTIONAL { ?entity schema:endDate ?endDate }
+                                    OPTIONAL { ?entity schema:location ?location .
+                                    OPTIONAL { ?location schema:name ?locationName }
+                                    OPTIONAL { ?location schema:address/schema:postalCode ?postalCode }
+                                    OPTIONAL { BIND(?location AS ?artsdataUri)
+                                        FILTER(STRSTARTS(STR(?artsdataUri), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
+                                    }
+                                    OPTIONAL {
+                                        ?location schema:containedInPlace ?parentPlace .
+                                        FILTER(STRSTARTS(STR(?parentPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
+                                        BIND(?parentPlace AS ?locationContainedIn)
+                                    }
+                                    OPTIONAL {
+                                        ?location ^schema:containedInPlace ?childPlace .
+                                        FILTER(STRSTARTS(STR(?childPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
+                                        BIND(?childPlace AS ?locationContains)
+                                    }}`);
+                break;
+            case Entities.PERSON:
+            case Entities.ORGANIZATION:
+            case Entities.AGENT:
+                rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
+                    `(SAMPLE(?wikidata) AS ?wikidata)
+                                (SAMPLE(?alternateName) AS ?alternateName)
+                                (SAMPLE(?isni) AS ?isni)`)
+                    .replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
+                        ` OPTIONAL { ?entity schema:alternateName ?alternateName}  
+                                      OPTIONAL { ?entity schema:sameAs ?sameAs 
+                                      OPTIONAL {BIND(?sameAs AS ?wikidata)
+                                        FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
+                                      }
+                                      OPTIONAL {BIND(?sameAs AS ?isni)
+                                        FILTER (STRSTARTS(str(?isni), "https://isni.org/isni/"))
+                                      }}`);
+                break;
+            default:
+                rawQuery = rawQuery.replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER", "")
+                    .replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER", "")
+                break;
 
-            rawQuery = rawQuery.replace(
-                "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
-                `OPTIONAL { ?entity schema:startDate ?startDate }
-        OPTIONAL { ?entity schema:alternateName ?alternateName}  
-        OPTIONAL { ?entity schema:endDate ?endDate }
-        OPTIONAL { ?entity schema:location ?location .
-        OPTIONAL { ?location schema:name ?locationName }
-        OPTIONAL { ?location schema:address/schema:postalCode ?postalCode }
-        OPTIONAL { BIND(?location AS ?artsdataUri)
-            FILTER(STRSTARTS(STR(?artsdataUri), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
         }
-        OPTIONAL {
-            ?location schema:containedInPlace ?parentPlace .
-            FILTER(STRSTARTS(STR(?parentPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
-            BIND(?parentPlace AS ?locationContainedIn)
-        }
-        OPTIONAL {
-            ?location ^schema:containedInPlace ?childPlace .
-            FILTER(STRSTARTS(STR(?childPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
-            BIND(?childPlace AS ?locationContains)
-        }
-        }`,
-            );
-        } else if (type === Entities.PERSON || type === Entities.ORGANIZATION || type === Entities.AGENT) {
-            rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
-                `(SAMPLE(?wikidata) AS ?wikidata)
-                            (SAMPLE(?alternateName) AS ?alternateName)
-                            (SAMPLE(?isni) AS ?isni)`,
-            );
-
-            rawQuery = rawQuery.replace(
-                "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
-                `   OPTIONAL { ?entity schema:alternateName ?alternateName}  
-                OPTIONAL { ?entity schema:sameAs ?sameAs 
-                  OPTIONAL {BIND(?sameAs AS ?wikidata)
-                    FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
-                  }
-                  OPTIONAL {BIND(?sameAs AS ?isni)
-                    FILTER (STRSTARTS(str(?isni), "https://isni.org/isni/"))
-                  }
-                }`,
-            );
-        } else {
-            rawQuery = rawQuery.replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER", "")
-                .replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER", "");
-        }
-
         return rawQuery;
     }
 }
