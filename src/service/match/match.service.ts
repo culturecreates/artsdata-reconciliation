@@ -6,6 +6,7 @@ import {ArtsdataConstants, ArtsdataProperties, Entities, QUERIES,} from "../../c
 import {QueryCondition, ReconciliationRequest, ReconciliationResponse, ReconciliationResults,} from "../../dto";
 import {LanguageEnum, MatchQualifierEnum, MatchQuantifierEnum, MatchTypeEnum,} from "../../enum";
 import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
+import {PropertyDataType} from "../../enum/match-service.enum";
 
 @Injectable()
 export class MatchService {
@@ -80,10 +81,10 @@ export class MatchService {
      * @return {string}
      */
     private _resolvePropertyValue(value: string | string[], property: string,
-                                  matchQualifier: MatchQualifierEnum | undefined): string | string[] {
+                                  matchQualifier: MatchQualifierEnum | undefined, index: number): string | string[] {
 
         if (Array.isArray(value)) {
-            return value.flatMap((val) => this._resolvePropertyValue(val, property, matchQualifier));
+            return value.flatMap((val) => this._resolvePropertyValue(val, property, matchQualifier, index));
         }
 
         if (matchQualifier === MatchQualifierEnum.REGEX_MATCH) {
@@ -137,14 +138,8 @@ export class MatchService {
 
         const propertyIdSubstituted = propertyId ? MatchServiceHelper.substitutePrefix(propertyId as string) : propertyId;
 
-        const formattedConditionValue =
-            this._resolvePropertyValue(rawConditionValue, propertyIdSubstituted as string, matchQualifier);
-        const formattedPropertyId: string = MatchServiceHelper.isValidURI(propertyIdSubstituted as string)
-            ? this._resolvePropertyPath(propertyIdSubstituted as string)
-            : `${propertyIdSubstituted}`;
-
         let triple = this._resolveMatchQualifierAndQuantifier(matchQualifier as MatchQualifierEnum,
-            formattedPropertyId, matchQuantifier as MatchQuantifierEnum, formattedConditionValue, index);
+            propertyIdSubstituted, matchQuantifier as MatchQuantifierEnum, rawConditionValue, index);
         return required ? triple : `OPTIONAL { ${triple} }\n`;
     }
 
@@ -195,8 +190,8 @@ export class MatchService {
      * @param formattedConditionValue
      * @param index
      */
-    private _resolveMatchQualifierAndQuantifier(matchQualifier: MatchQualifierEnum, formattedPropertyId: string,
-                                                matchQuantifier: MatchQuantifierEnum, formattedConditionValue: string | string[], index: number) {
+    private _resolveMatchQualifierAndQuantifier(matchQualifier: MatchQualifierEnum, propertyId: string | undefined,
+                                                matchQuantifier: MatchQuantifierEnum, rawConditionValue: string | string[], index: number) {
         if (!matchQuantifier) {
             matchQuantifier = MatchQuantifierEnum.ALL;
         }
@@ -204,14 +199,21 @@ export class MatchService {
             matchQualifier = MatchQualifierEnum.EXACT_MATCH;
         }
 
+        const formattedConditionValue =
+            this._resolvePropertyValue(rawConditionValue, propertyId as string, matchQualifier, index);
+        const formattedPropertyId: string = MatchServiceHelper.isValidURI(propertyId as string)
+            ? this._resolvePropertyPath(propertyId as string)
+            : `${propertyId}`;
+
         const isConditionValueArray = Array.isArray(formattedConditionValue);
         let triple: string = "";
+        const isPropertyComparedAsString = propertyId ? MatchServiceHelper.getDataType(propertyId) === PropertyDataType.STRING : false;
         if (isConditionValueArray) {
             const objectId = `?obj_${index + 1}`;
             switch (matchQualifier) {
                 case MatchQualifierEnum.EXACT_MATCH:
                     if (matchQuantifier === MatchQuantifierEnum.ANY) {
-                        triple = `?entity ${formattedPropertyId} ${objectId} FILTER (${objectId} IN (${(formattedConditionValue as string[]).join(" , ")})).`;
+                        triple = `?entity ${formattedPropertyId} ${objectId} FILTER (${isPropertyComparedAsString ? `str(${objectId})` : objectId} IN (${(formattedConditionValue as string[]).join(" , ")})).`;
                     } else if (matchQuantifier === MatchQuantifierEnum.ALL) {
                         triple = `${(formattedConditionValue as string[])
                             .map((v) => ` FILTER EXISTS {?entity ${formattedPropertyId} ${v}}`)
@@ -234,12 +236,17 @@ export class MatchService {
                     break;
             }
         } else {
+            const objectId = `?obj_${index + 1}`;
             switch (matchQualifier) {
+
                 case MatchQualifierEnum.EXACT_MATCH:
-                    triple = `?entity ${formattedPropertyId} ${formattedConditionValue} .`;
+                    triple = isPropertyComparedAsString ?
+                        `?entity ${formattedPropertyId} ${objectId}
+                        FILTER ( str(${objectId}) = ${formattedConditionValue} ).`
+                        : `?entity ${formattedPropertyId} ${formattedConditionValue} .`;
                     break;
                 case MatchQualifierEnum.REGEX_MATCH:
-                    const objectId = `?obj_${index + 1}`;
+
                     triple = `?entity ${formattedPropertyId} ${objectId}
           FILTER REGEX(str(${objectId}), ${formattedConditionValue}, "i").`;
                     break;
@@ -436,6 +443,7 @@ export class MatchService {
 
     private _modifyNameForLuceneScore(name: string, propertyConditions: QueryCondition[]): string {
         const propertyMap = {
+            "http://schema.org/name": "name",
             "http://schema.org/url": "url",
             "http://schema.org/sameAs": "sameAs",
             "http://schema.org/postalCode": "postalCode",

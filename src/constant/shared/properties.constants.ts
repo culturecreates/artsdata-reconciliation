@@ -10,6 +10,7 @@ export const ArtsdataProperties = {
     EVENT_STATUS: "http://schema.org/eventStatus",
     IN_LANGUAGE: "http://schema.org/inLanguage",
     SUB_EVENT: "http://schema.org/subEvent",
+    URL: "http://schema.org/url",
     SAME_AS: "http://schema.org/sameAs",
 };
 
