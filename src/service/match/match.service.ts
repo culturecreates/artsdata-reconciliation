@@ -208,9 +208,11 @@ export class MatchService {
         if (isConditionValueAList) {
             const objectId = `?obj_${index + 1}`;
             switch (matchQualifier) {
+
                 case MatchQualifierEnum.EXACT_MATCH:
                     if (matchQuantifier === MatchQuantifierEnum.ANY) {
-                        triple = `?entity ${formattedPropertyId} ${objectId} FILTER (${objectId} IN (${(formattedConditionValue as string[]).join(" , ")})).`;
+                        triple = `?entity ${formattedPropertyId} ${objectId} 
+                        FILTER (${objectId} IN (${(formattedConditionValue as string[]).join(" , ")})).`;
                     } else if (matchQuantifier === MatchQuantifierEnum.ALL) {
                         triple = `${(formattedConditionValue as string[])
                             .map((v) => ` FILTER EXISTS {?entity ${formattedPropertyId} ${v}}`)
@@ -223,11 +225,13 @@ export class MatchService {
                         Exception.badRequest("Unsupported match qualifier");
                     }
                     break;
+
                 case MatchQualifierEnum.REGEX_MATCH:
                     triple = `?entity ${formattedPropertyId} ${objectId}
-          FILTER ( ${(formattedConditionValue as string[])
+                              FILTER ( ${(formattedConditionValue as string[])
                         .map((v) => `REGEX (${objectId}, ${v}, "i")`).join(" || ")} ;`;
                     break;
+
                 default:
                     Exception.badRequest("Unsupported match qualifier");
                     break;
@@ -235,13 +239,16 @@ export class MatchService {
         } else {
             switch (matchQualifier) {
                 case MatchQualifierEnum.EXACT_MATCH:
+
                     triple = `?entity ${formattedPropertyId} ${formattedConditionValue} .`;
                     break;
+
                 case MatchQualifierEnum.REGEX_MATCH:
                     const objectId = `?obj_${index + 1}`;
                     triple = `?entity ${formattedPropertyId} ${objectId}
-          FILTER REGEX(str(${objectId}), ${formattedConditionValue}, "i").`;
+                               FILTER REGEX(str(${objectId}), ${formattedConditionValue}, "i").`;
                     break;
+
                 default:
                     Exception.badRequest("Unsupported match qualifier");
                     triple = "";
