@@ -187,6 +187,83 @@ export class MatchService {
         return {results};
     }
 
+
+    private _resolveConditionWithPropertyLocation(formattedConditionValue: string | string[], index: number, matchQualifier: MatchQualifierEnum, matchQuantifier: MatchQuantifierEnum): string {
+        const objectId = `?obj_${index + 1}`;
+        let triple = "";
+        const isConditionValueAList = Array.isArray(formattedConditionValue);
+
+        if (isConditionValueAList) {
+            switch (matchQualifier) {
+                case MatchQualifierEnum.EXACT_MATCH:
+                    switch (matchQuantifier) {
+                        case MatchQuantifierEnum.ANY:
+                            triple = `?entity schema:location ${objectId}.
+                            OPTIONAL{?location ^schema:containedInPlace ${objectId}_containsPlace}
+                            OPTIONAL {?location schema:containedInPlace ${objectId}_containedInPlace}
+                        FILTER (${objectId} IN (${(formattedConditionValue as string[]).join(" , ")}) ||
+                        ${objectId}_containsPlace IN (${(formattedConditionValue as string[]).join(" , ")}) ||
+                        ${objectId}_containedInPlace IN (${(formattedConditionValue as string[]).join(" , ")})).`;
+                            break;
+                            //TODO Complete the logic for ALL and NONE
+                        // case MatchQuantifierEnum.ALL:
+                        //     triple = `${(formattedConditionValue as string[])
+                        //         .map((v) => ` FILTER EXISTS {?entity schema:location ${v}}`)
+                        //         .join("\n")}`;
+                        //     break;
+                        // case MatchQuantifierEnum.NONE:
+                        //     triple = `${(formattedConditionValue as string[])
+                        //         .map((v) => ` FILTER NOT EXISTS {?entity schema:location ${v}}`)
+                        //         .join("\n")}`;
+                        //     break;
+                        default:
+                            Exception.badRequest("Unsupported match quantifier");
+                            break;
+                    }
+                    break;
+
+                    //TODO Complete the logic for REGEX_MATCH
+                // case MatchQualifierEnum.REGEX_MATCH:
+                //     triple = `?entity schema:location ${objectId}
+                //               FILTER ( ${(formattedConditionValue as string[])
+                //         .map((v) => `REGEX (${objectId}, ${v}, "i")`).join(" || ")} ;`;
+                //     break;
+
+                default:
+                    Exception.badRequest("Unsupported match qualifier");
+                    break;
+            }
+        } else {
+            triple = `?entity schema:location ${objectId} .
+                      OPTIONAL{ ?location ^schema:containedInPlace ${objectId}_containsPlace } . 
+                      OPTIONAL { ?location schema:containedInPlace ${objectId}_containedInPlace } .`
+            switch (matchQualifier) {
+                case MatchQualifierEnum.EXACT_MATCH:
+                    triple = triple.concat(`FILTER (${objectId} =  ${formattedConditionValue} ||
+                            ${objectId}_containsPlace =  ${formattedConditionValue} ||
+                            ${objectId}_containedInPlace =  ${formattedConditionValue}).`);
+                    break;
+
+                case MatchQualifierEnum.REGEX_MATCH:
+                    triple = triple.concat(`FILTER (REGEX(str(${objectId}), ${formattedConditionValue}, "i") ||
+                    REGEX(str(${objectId}_containsPlace), ${formattedConditionValue}, "i") ||
+                    REGEX(str(${objectId}_containedInPlace), ${formattedConditionValue}, "i")).`);
+                    break;
+
+                default:
+                    Exception.badRequest("Unsupported match qualifier");
+                    triple = "";
+                    break;
+            }
+            if (matchQuantifier === MatchQuantifierEnum.NONE) {
+                return `FILTER NOT EXISTS { ${triple} }.`;
+            }
+        }
+
+        return triple;
+
+    }
+
     /**
      * @private
      * @name _resolveMatchQualifierAndQuantifier
@@ -202,6 +279,9 @@ export class MatchService {
         //Setting default values for match qualifier and match quantifier
         matchQuantifier = matchQuantifier || MatchQuantifierEnum.ALL;
         matchQualifier = matchQualifier || MatchQualifierEnum.EXACT_MATCH;
+
+        if (formattedPropertyId === `<${ArtsdataProperties.LOCATION}>`)
+            return this._resolveConditionWithPropertyLocation(formattedConditionValue, index, matchQualifier, matchQuantifier)
 
         const isConditionValueAList = Array.isArray(formattedConditionValue);
         let triple: string = "";
