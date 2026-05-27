@@ -346,6 +346,13 @@ export class MatchService {
         return this._resolvePropertyConditions(rawQuery, propertyConditions);
     }
 
+    /**
+     * @private
+     * @name _resolvePropertyConditions
+     * @description Resolve property conditions
+     * @param propertyId
+     * @private
+     */
     private _resolvePropertyPath(propertyId: string) {
         const parts = propertyId.trim().split("/http");
         let propertyPath = "";
@@ -359,6 +366,14 @@ export class MatchService {
         return propertyPath;
     }
 
+    /**
+     * @private
+     * @name _resolveConditions
+     * @description Resolve conditions
+     * @param name
+     * @param propertyConditions
+     * @private
+     */
     private _modifyNameForLuceneScore(name: string, propertyConditions: QueryCondition[]): string {
         const propertyMap = {
             "http://schema.org/url": "url",
@@ -375,7 +390,7 @@ export class MatchService {
             .reduce((query, condition) => {
                 Object.entries(propertyMap).forEach(([key, value]) => {
                     if (condition.propertyId?.includes(key)) {
-                        query = `${query} OR ${this.resolvePropertyValueForLucene(
+                        query = `${query} OR ${this._resolvePropertyValueForLucene(
                             condition.propertyValue,
                             value,
                         )}`;
@@ -387,7 +402,15 @@ export class MatchService {
         return `"${luceneQuery}" ;`;
     }
 
-    private resolvePropertyValueForLucene(propertyValue: string | string[], propertyId: string): string {
+    /**
+     * @private
+     * @name _resolvePropertyConditions
+     * @description Resolve property conditions
+     * @param propertyValue
+     * @param propertyId
+     * @private
+     */
+    private _resolvePropertyValueForLucene(propertyValue: string | string[], propertyId: string): string {
         const values = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
         return values
             .map((value) =>
@@ -395,6 +418,14 @@ export class MatchService {
             .join(" ");
     }
 
+    /**
+     * @private
+     * @name _resolvePropertyConditions
+     * @description Resolve property conditions
+     * @param type
+     * @param rawQuery
+     * @private
+     */
     private _modifyQueryToAddAdditionalPropertiesForAutoMatchCalculations(type: string, rawQuery: string): string {
 
         switch (type) {
