@@ -205,8 +205,9 @@ export class MatchService {
 
         const isConditionValueAList = Array.isArray(formattedConditionValue);
         let triple: string = "";
+        const objectId = `?obj_${index + 1}`;
         if (isConditionValueAList) {
-            const objectId = `?obj_${index + 1}`;
+
             switch (matchQualifier) {
 
                 case MatchQualifierEnum.EXACT_MATCH:
@@ -244,7 +245,6 @@ export class MatchService {
                     break;
 
                 case MatchQualifierEnum.REGEX_MATCH:
-                    const objectId = `?obj_${index + 1}`;
                     triple = `?entity ${formattedPropertyId} ${objectId}
                                FILTER REGEX(str(${objectId}), ${formattedConditionValue}, "i").`;
                     break;
