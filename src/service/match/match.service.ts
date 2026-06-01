@@ -259,7 +259,7 @@ export class MatchService {
             }
         }
 
-        return triple;
+        return `${triple}\n`;
 
     }
 
