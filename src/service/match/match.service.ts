@@ -221,12 +221,14 @@ export class MatchService {
                     }
                     break;
 
-                //TODO Complete the logic for REGEX_MATCH
-                // case MatchQualifierEnum.REGEX_MATCH:
-                //     triple = `?entity schema:location ${objectId}
-                //               FILTER ( ${(formattedConditionValue as string[])
-                //         .map((v) => `REGEX (${objectId}, ${v}, "i")`).join(" || ")} ;`;
-                //     break;
+                // TODO Complete the logic for REGEX_MATCH
+                case MatchQualifierEnum.REGEX_MATCH:
+                    triple = `${triplesToFetch}.
+                            ${(formattedConditionValue as string[]).map((v) => {
+                        return `FILTER ( REGEX(str(${objectId}), ${v},"i") || REGEX(str(${objectId}_containsPlace), ${v}, "i") || REGEX(str(${objectId}_containedInPlace), ${v},"i")).`
+                    }).join("\n")}`;
+
+                    break;
 
                 default:
                     Exception.badRequest("Unsupported match qualifier");
