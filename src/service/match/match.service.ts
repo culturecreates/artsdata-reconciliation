@@ -195,11 +195,11 @@ export class MatchService {
 
         if (isConditionValueAList) {
             const triplesToFetch = `?entity schema:location ${objectId}.
-                            OPTIONAL{?location ^schema:containedInPlace ${objectId}_containsPlace}
-                            OPTIONAL {?location schema:containedInPlace ${objectId}_containedInPlace}`;
+                            OPTIONAL{${objectId} ^schema:containedInPlace ${objectId}_hall}
+                            OPTIONAL {${objectId} schema:containedInPlace ${objectId}_building}`;
             const filter = `FILTER (${objectId} IN (${(formattedConditionValue as string[]).join(" , ")}) ||
-                        ${objectId}_containsPlace IN (${(formattedConditionValue as string[]).join(" , ")}) ||
-                        ${objectId}_containedInPlace IN (${(formattedConditionValue as string[]).join(" , ")})).`;
+                        ${objectId}_hall IN (${(formattedConditionValue as string[]).join(" , ")}) ||
+                        ${objectId}_building IN (${(formattedConditionValue as string[]).join(" , ")})).`;
             switch (matchQualifier) {
                 case MatchQualifierEnum.EXACT_MATCH:
                     switch (matchQuantifier) {
@@ -209,7 +209,7 @@ export class MatchService {
                         case MatchQuantifierEnum.ALL:
                             triple = `${triplesToFetch}.
                             ${(formattedConditionValue as string[]).map((v) => {
-                                return `FILTER (${objectId} = ${v} || ${objectId}_containsPlace = ${v} || ${objectId}_containedInPlace = ${v}).`
+                                return `FILTER (${objectId} = ${v} || ${objectId}_hall = ${v} || ${objectId}_building = ${v}).`
                             }).join("\n")}`;
                             break;
                         case MatchQuantifierEnum.NONE:
@@ -225,7 +225,7 @@ export class MatchService {
                 case MatchQualifierEnum.REGEX_MATCH:
                     triple = `${triplesToFetch}.
                             ${(formattedConditionValue as string[]).map((v) => {
-                        return `FILTER ( REGEX(str(${objectId}), ${v},"i") || REGEX(str(${objectId}_containsPlace), ${v}, "i") || REGEX(str(${objectId}_containedInPlace), ${v},"i")).`
+                        return `FILTER ( REGEX(str(${objectId}), ${v},"i") || REGEX(str(${objectId}_hall), ${v}, "i") || REGEX(str(${objectId}_building), ${v},"i")).`
                     }).join("\n")}`;
 
                     break;
@@ -236,19 +236,19 @@ export class MatchService {
             }
         } else {
             triple = `?entity schema:location ${objectId} .
-                      OPTIONAL{ ?location ^schema:containedInPlace ${objectId}_containsPlace } . 
-                      OPTIONAL { ?location schema:containedInPlace ${objectId}_containedInPlace } .`
+                      OPTIONAL{ ${objectId} ^schema:containedInPlace ${objectId}_hall } . 
+                      OPTIONAL { ${objectId} schema:containedInPlace ${objectId}_building } .`
             switch (matchQualifier) {
                 case MatchQualifierEnum.EXACT_MATCH:
                     triple = triple.concat(`FILTER (${objectId} =  ${formattedConditionValue} ||
-                            ${objectId}_containsPlace =  ${formattedConditionValue} ||
-                            ${objectId}_containedInPlace =  ${formattedConditionValue}).`);
+                            ${objectId}_hall =  ${formattedConditionValue} ||
+                            ${objectId}_building =  ${formattedConditionValue}).`);
                     break;
 
                 case MatchQualifierEnum.REGEX_MATCH:
                     triple = triple.concat(`FILTER (REGEX(str(${objectId}), ${formattedConditionValue}, "i") ||
-                    REGEX(str(${objectId}_containsPlace), ${formattedConditionValue}, "i") ||
-                    REGEX(str(${objectId}_containedInPlace), ${formattedConditionValue}, "i")).`);
+                    REGEX(str(${objectId}_hall), ${formattedConditionValue}, "i") ||
+                    REGEX(str(${objectId}_building), ${formattedConditionValue}, "i")).`);
                     break;
 
                 default:
