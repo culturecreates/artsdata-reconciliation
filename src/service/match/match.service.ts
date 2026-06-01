@@ -194,35 +194,34 @@ export class MatchService {
         const isConditionValueAList = Array.isArray(formattedConditionValue);
 
         if (isConditionValueAList) {
+            const triplesToFetch = `?entity schema:location ${objectId}.
+                            OPTIONAL{?location ^schema:containedInPlace ${objectId}_containsPlace}
+                            OPTIONAL {?location schema:containedInPlace ${objectId}_containedInPlace}`;
+            const filter = `FILTER (${objectId} IN (${(formattedConditionValue as string[]).join(" , ")}) ||
+                        ${objectId}_containsPlace IN (${(formattedConditionValue as string[]).join(" , ")}) ||
+                        ${objectId}_containedInPlace IN (${(formattedConditionValue as string[]).join(" , ")})).`;
             switch (matchQualifier) {
                 case MatchQualifierEnum.EXACT_MATCH:
                     switch (matchQuantifier) {
                         case MatchQuantifierEnum.ANY:
-                            triple = `?entity schema:location ${objectId}.
-                            OPTIONAL{?location ^schema:containedInPlace ${objectId}_containsPlace}
-                            OPTIONAL {?location schema:containedInPlace ${objectId}_containedInPlace}
-                        FILTER (${objectId} IN (${(formattedConditionValue as string[]).join(" , ")}) ||
-                        ${objectId}_containsPlace IN (${(formattedConditionValue as string[]).join(" , ")}) ||
-                        ${objectId}_containedInPlace IN (${(formattedConditionValue as string[]).join(" , ")})).`;
+                            triple = `${triplesToFetch}\n${filter}`;
                             break;
-                            //TODO Complete the logic for ALL and NONE
-                        // case MatchQuantifierEnum.ALL:
-                        //     triple = `${(formattedConditionValue as string[])
-                        //         .map((v) => ` FILTER EXISTS {?entity schema:location ${v}}`)
-                        //         .join("\n")}`;
-                        //     break;
-                        // case MatchQuantifierEnum.NONE:
-                        //     triple = `${(formattedConditionValue as string[])
-                        //         .map((v) => ` FILTER NOT EXISTS {?entity schema:location ${v}}`)
-                        //         .join("\n")}`;
-                        //     break;
+                        case MatchQuantifierEnum.ALL:
+                            triple = `${triplesToFetch}.
+                            ${(formattedConditionValue as string[]).map((v) => {
+                                return `FILTER (${objectId} = ${v} || ${objectId}_containsPlace = ${v} || ${objectId}_containedInPlace = ${v}).`
+                            }).join("\n")}`;
+                            break;
+                        case MatchQuantifierEnum.NONE:
+                            triple = `${triplesToFetch}\n${filter.replaceAll("IN", "NOT IN")}`;
+                            break;
                         default:
                             Exception.badRequest("Unsupported match quantifier");
                             break;
                     }
                     break;
 
-                    //TODO Complete the logic for REGEX_MATCH
+                //TODO Complete the logic for REGEX_MATCH
                 // case MatchQualifierEnum.REGEX_MATCH:
                 //     triple = `?entity schema:location ${objectId}
                 //               FILTER ( ${(formattedConditionValue as string[])
