@@ -32,25 +32,18 @@ async function bootstrap() {
     const config = new DocumentBuilder()
         .setTitle('Artsdata Reconciliation API')
         .setDescription(
-            `<p>Web API letting clients match, extend, preview and get suggestions for reconciling data against the Artsdata knowledge graph.</p>
-        <p> This API conforms to the W3C Reconciliation API Specification v1.0.</p>
-        <p> Some useful links: 
-        <ul>
-        <li> [W3C Reconciliation API Spec v1.0](https://reconciliation-api.github.io/specs/1.0-draft/)</li>
-        <li> [W3C Reconciliation API Test bench](https://reconciliation-api.github.io/testbench/1.0/#/client/https%3A%2F%2Frecon.artsdata.ca)</li>
-        <li> [W3C Entity Reconciliation Community Group](https://www.w3.org/community/reconciliation/)</li>
-        </ul>`
+`This Web API provides match, extend, preview and suggest services for reconciling data against the Artsdata knowledge graph.
+    
+This API conforms to the W3C Reconciliation API Specification v1.0.
+
+Some useful links: 
+
+- [W3C Reconciliation API Spec v1.0](https://reconciliation-api.github.io/specs/1.0-draft/)
+- [W3C Reconciliation API Test Bench](https://reconciliation-api.github.io/testbench/1.0/#/client/https%3A%2F%2Frecon.artsdata.ca)
+- [W3C Entity Reconciliation Community Group](https://www.w3.org/community/reconciliation/)
+`
         )
         .setVersion('1.0.1')
-        .setContact(
-            'W3C Entity Reconciliation Community Group',
-            'https://www.w3.org/community/reconciliation/',
-            'public-reconciliation@w3.org'
-        )
-        .setLicense(
-            'W3C Community Final Specification Agreement (FSA)',
-            'https://www.w3.org/community/about/process/fsa-deed/'
-        )
         .build();
 
     const document = SwaggerModule.createDocument(app, config);
