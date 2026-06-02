@@ -153,7 +153,7 @@ Each object inside the \`conditions\` array consists of:
 * **\`propertyValue\`** *(String or List of String, Required)*: The value(s) to match against.
 * **\`required\`** *(Boolean, Optional)*: \`true\` acts as a strict filter; \`false\` only affects ranking score. *(Default: false)*
 * **\`matchQuantifier\`** *(String, Optional)*: Logic for multi-values: \`any\` (OR), \`all\` (AND), or \`none\` (NOT). *(Default: any)*
-* **\`matchQualifier\`** *(String, Optional)*: Matching relationship flavor (e.g., \`RegexMatch\`, \`ExactMatch\`). 
+* **\`matchQualifier\`** *(String, Optional)*: Matching relationship flavor (e.g., \`RegexMatch\`, \`ExactMatch\`)*(Default: ExactMatch)*. 
 
 The service use REGEX function in SPARQL. The regular expression language is defined in XQuery 1.0 and XPath 2.0 Functions and Operators section. 
 You can read more about the syntax here. Artsdata always uses the “i” flag to make characters case insensitive. 

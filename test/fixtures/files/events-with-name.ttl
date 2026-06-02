@@ -23,8 +23,10 @@ adr:KE-4 rdf:type <http://schema.org/Event> ;
     schema:location adr:KP-1.
 
 adr:KE-5 rdf:type <http://schema.org/Event> ;
-    rdfs:label "A Beautiful Night" ;
-    schema:name "A Beautiful Night" .
+    rdfs:label "Dance Night" ;
+    schema:name "Dance Night" ;
+    schema:startDate "2026-04-25T19:30:00-07:00"^^xsd:dateTime;
+    schema:location adr:K-PortTheatreAuditorium.
 
 adr:KE-6 rdf:type <http://schema.org/Event> ;
     rdfs:label "At the Night" ;
@@ -57,5 +59,14 @@ adr:KP-1 rdf:type <http://schema.org/Place> ;
     schema:address [
     schema:postalCode "12345" ;
     ].
+
+adr:K-PortTheatre rdf:type <http://schema.org/Place> ;
+    rdfs:label "Port Theatre" ;
+    schema:name "Port Theatre" .
+
+adr:K-PortTheatreAuditorium rdf:type <http://schema.org/Place> ;
+        rdfs:label "Port Theatre Auditorium" ;
+        schema:name "Port Theatre Auditorium" ;
+        schema:containedInPlace adr:K-PortTheatre.
 
 

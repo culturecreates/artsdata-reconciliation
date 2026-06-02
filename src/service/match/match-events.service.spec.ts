@@ -32,7 +32,7 @@ describe('Test matching events using sparql query v1', () => {
         jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
     });
     afterAll(async () => {
-        await dropIndexAndTheGraph(testGraphUri,testLuceneConnectorId);
+        await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
     })
 
     it('Reconcile an event with name `A Beacon in the Night`, which is not exact match', async () => {
@@ -255,6 +255,94 @@ describe('Test matching events using sparql query v1', () => {
         expect(actualResult?.match).toBeTruthy();
         expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
             .toBe("http://schema.org/Event");
+    });
+
+
+    it(`Reconcile an event entity with name and location uri of the place (event linked to auditorium)`, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {matchType: MatchTypeEnum.NAME, propertyValue: "Dance Night"},
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "http://kg.artsdata.ca/resource/K-PortTheatreAuditorium",
+                    propertyId: "schema:location",
+                    required: true
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KE-5");
+        expect(allResults?.length).toBe(1);
+    });
+
+    it(`Reconcile an event entity with name and location uri of the place (event linked to auditorium) and startDate. Should be true match`, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {matchType: MatchTypeEnum.NAME, propertyValue: "Dance Night"},
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "http://kg.artsdata.ca/resource/K-PortTheatre",
+                    propertyId: "schema:location",
+                    required: true
+                },
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2026-04-25T19:30:00-07:00",
+                    propertyId: "schema:startDate",
+                    required: true
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+        expect(actualResult?.match).toBeTruthy();
+        expect(actualResult?.id).toBe("KE-5");
+        expect(allResults?.length).toBe(1);
+    });
+
+    it(`Reconcile an event entity with name and location uri of the hall (event linked to hall)`, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {matchType: MatchTypeEnum.NAME, propertyValue: "Dance Night"},
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "http://kg.artsdata.ca/resource/K-PortTheatreAuditorium",
+                    propertyId: "schema:location",
+                    required: true
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KE-5");
+        expect(allResults?.length).toBe(1);
     });
 });
 

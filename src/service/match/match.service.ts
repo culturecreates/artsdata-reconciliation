@@ -44,10 +44,11 @@ export class MatchService {
      * @returns {string}
      */
     private _resolvePropertyConditions(rawSparqlQuery: string, propertyConditions: QueryCondition[]): string {
+
         const propertyTriples = propertyConditions
-            .map((condition, index) =>
-                this._generateTripleFromCondition(condition, index),
-            ).join("");
+            .map((condition, index) => this._generateTripleFromCondition(condition, index))
+            .join("");
+
         return rawSparqlQuery.replace("PROPERTY_PLACE_HOLDER", propertyTriples);
     }
 
@@ -145,6 +146,7 @@ export class MatchService {
 
         let triple = this._resolveMatchQualifierAndQuantifier(matchQualifier as MatchQualifierEnum,
             formattedPropertyId, matchQuantifier as MatchQuantifierEnum, formattedConditionValue, index);
+
         return required ? triple : `OPTIONAL { ${triple} }\n`;
     }
 
@@ -187,6 +189,68 @@ export class MatchService {
 
     /**
      * @private
+     * @name _resolveConditionWithPropertyLocation
+     * @description Resolve condition with property location
+     * @param formattedConditionValue
+     * @param index
+     * @param matchQualifier
+     * @param matchQuantifier
+     * @private
+     */
+    private _resolveConditionWithPropertyLocation(
+        formattedConditionValue: string | string[],
+        index: number,
+        matchQualifier: MatchQualifierEnum,
+        matchQuantifier: MatchQuantifierEnum
+    ): string {
+        const objectId = `?obj_${index + 1}`;
+        const hallId = `${objectId}_hall`;
+        const bldgId = `${objectId}_building`;
+
+        const values = Array.isArray(formattedConditionValue) ? formattedConditionValue : [formattedConditionValue];
+        const isList = Array.isArray(formattedConditionValue);
+
+        const triplesToFetch = `?entity schema:location ${objectId} .
+        OPTIONAL { ${objectId} ^schema:containedInPlace ${hallId} }
+        OPTIONAL { ${objectId} schema:containedInPlace ${bldgId} }`;
+
+        let filterClauses: string[] = [];
+
+        if (matchQualifier === MatchQualifierEnum.EXACT_MATCH) {
+            if (isList && matchQuantifier === MatchQuantifierEnum.ANY) {
+                const joinedValues = values.join(" , ");
+                filterClauses.push(`(${objectId} IN (${joinedValues}) || (${hallId} IN (${joinedValues}) && BOUND(${hallId})) || (${bldgId} IN (${joinedValues}) && BOUND(${bldgId})))`);
+            } else if (isList && matchQuantifier === MatchQuantifierEnum.NONE) {
+                const joinedValues = values.join(" , ");
+                filterClauses.push(`(${objectId} NOT IN (${joinedValues}) && (!BOUND(${hallId}) || ${hallId} NOT IN (${joinedValues})) && (!BOUND(${bldgId}) || ${bldgId} NOT IN (${joinedValues})))`);
+            } else {
+                filterClauses = values.map(v => `(${objectId} = ${v} || (${hallId} = ${v}  && BOUND(${hallId}))|| (${bldgId} = ${v}  && BOUND(${bldgId})))`);
+            }
+        } else if (matchQualifier === MatchQualifierEnum.REGEX_MATCH) {
+            if (matchQuantifier === MatchQuantifierEnum.NONE) {
+                filterClauses = values.map(v => `(!REGEX(str(${objectId}), ${v}, "i") && (!REGEX(str(${hallId}), ${v}, "i") || !BOUND(${hallId})) && (!REGEX(str(${bldgId}), ${v}, "i") || !BOUND(${bldgId})))`);
+            } else {
+                filterClauses = values.map(v => `(REGEX(str(${objectId}), ${v}, "i") || (REGEX(str(${hallId}), ${v}, "i") && BOUND(${hallId})) || (REGEX(str(${bldgId}), ${v}, "i") && BOUND(${bldgId})))`);
+            }
+        } else {
+            throw Exception.badRequest("Unsupported match qualifier");
+        }
+
+        // 4. Handle NONE logic for scalar inputs using FILTER NOT EXISTS
+        if (!isList && matchQuantifier === MatchQuantifierEnum.NONE) {
+            const filterStr = filterClauses.length ? `\nFILTER ${filterClauses.join(" && \n")}` : "";
+            return `FILTER NOT EXISTS {\n${triplesToFetch}${filterStr}\n}.\n`;
+        }
+
+        // 5. Build final output query
+        const joinOperator = [MatchQuantifierEnum.ALL, MatchQuantifierEnum.NONE].includes(matchQuantifier) ? " && \n" : " || \n";
+        const filterStr = filterClauses.length ? `\nFILTER (${filterClauses.join(joinOperator)}).` : "";
+
+        return `${triplesToFetch}${filterStr}\n`;
+    }
+
+    /**
+     * @private
      * @name _resolveMatchQualifierAndQuantifier
      * @description Resolve match qualifier, matchQualifier is defaulted to exact match
      * @param matchQualifier
@@ -197,38 +261,49 @@ export class MatchService {
      */
     private _resolveMatchQualifierAndQuantifier(matchQualifier: MatchQualifierEnum, formattedPropertyId: string,
                                                 matchQuantifier: MatchQuantifierEnum, formattedConditionValue: string | string[], index: number) {
-        if (!matchQuantifier) {
-            matchQuantifier = MatchQuantifierEnum.ALL;
-        }
-        if (!matchQualifier) {
-            matchQualifier = MatchQualifierEnum.EXACT_MATCH;
-        }
+        //Setting default values for match qualifier and match quantifier
+        matchQuantifier = matchQuantifier || MatchQuantifierEnum.ALL;
+        matchQualifier = matchQualifier || MatchQualifierEnum.EXACT_MATCH;
 
-        const isConditionValueArray = Array.isArray(formattedConditionValue);
+        if (formattedPropertyId === `<${ArtsdataProperties.LOCATION}>`)
+            return this._resolveConditionWithPropertyLocation(formattedConditionValue, index, matchQualifier, matchQuantifier)
+
+        const isConditionValueAList = Array.isArray(formattedConditionValue);
         let triple: string = "";
-        if (isConditionValueArray) {
-            const objectId = `?obj_${index + 1}`;
+        const objectId = `?obj_${index + 1}`;
+        if (isConditionValueAList) {
+
             switch (matchQualifier) {
+
                 case MatchQualifierEnum.EXACT_MATCH:
-                    if (matchQuantifier === MatchQuantifierEnum.ANY) {
-                        triple = `?entity ${formattedPropertyId} ${objectId} FILTER (${objectId} IN (${(formattedConditionValue as string[]).join(" , ")})).`;
-                    } else if (matchQuantifier === MatchQuantifierEnum.ALL) {
-                        triple = `${(formattedConditionValue as string[])
-                            .map((v) => ` FILTER EXISTS {?entity ${formattedPropertyId} ${v}}`)
-                            .join("\n")}`;
-                    } else if (matchQuantifier === MatchQuantifierEnum.NONE) {
-                        triple = `${(formattedConditionValue as string[])
-                            .map((v) => ` FILTER NOT EXISTS {?entity ${formattedPropertyId} ${v}}`)
-                            .join("\n")}`;
-                    } else {
-                        Exception.badRequest("Unsupported match qualifier");
+
+                    switch (matchQuantifier) {
+                        case MatchQuantifierEnum.ANY:
+                            triple = `?entity ${formattedPropertyId} ${objectId} 
+                        FILTER (${objectId} IN (${(formattedConditionValue as string[]).join(" , ")})).`;
+                            break;
+                        case MatchQuantifierEnum.ALL:
+                            triple = `${(formattedConditionValue as string[])
+                                .map((v) => ` FILTER EXISTS {?entity ${formattedPropertyId} ${v}}`)
+                                .join("\n")}`;
+                            break;
+                        case MatchQuantifierEnum.NONE:
+                            triple = `${(formattedConditionValue as string[])
+                                .map((v) => ` FILTER NOT EXISTS {?entity ${formattedPropertyId} ${v}}`)
+                                .join("\n")}`;
+                            break;
+                        default:
+                            Exception.badRequest("Unsupported match qualifier");
+                            break;
                     }
                     break;
+
                 case MatchQualifierEnum.REGEX_MATCH:
                     triple = `?entity ${formattedPropertyId} ${objectId}
-          FILTER ( ${(formattedConditionValue as string[])
+                              FILTER ( ${(formattedConditionValue as string[])
                         .map((v) => `REGEX (${objectId}, ${v}, "i")`).join(" || ")} ;`;
                     break;
+
                 default:
                     Exception.badRequest("Unsupported match qualifier");
                     break;
@@ -236,13 +311,15 @@ export class MatchService {
         } else {
             switch (matchQualifier) {
                 case MatchQualifierEnum.EXACT_MATCH:
+
                     triple = `?entity ${formattedPropertyId} ${formattedConditionValue} .`;
                     break;
+
                 case MatchQualifierEnum.REGEX_MATCH:
-                    const objectId = `?obj_${index + 1}`;
                     triple = `?entity ${formattedPropertyId} ${objectId}
-          FILTER REGEX(str(${objectId}), ${formattedConditionValue}, "i").`;
+                               FILTER REGEX(str(${objectId}), ${formattedConditionValue}, "i").`;
                     break;
+
                 default:
                     Exception.badRequest("Unsupported match qualifier");
                     triple = "";
@@ -336,82 +413,7 @@ export class MatchService {
                 QUERIES.SELECT_ENTITY_QUERY_BY_KEYWORD);
         }
 
-        if (type === Entities.PLACE) {
-            rawQuery = rawQuery.replace(
-                "ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
-                `(SAMPLE(?postalCode) AS ?postalCode)
-                (SAMPLE(?addressLocality) AS ?addressLocality)
-                (SAMPLE(?wikidata) AS ?wikidata)
-                (SAMPLE(?alternateName) AS ?alternateName)`,
-            );
-
-            rawQuery = rawQuery.replace(
-                "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
-                `
-          OPTIONAL { ?entity schema:alternateName ?alternateName} 
-          OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode }
-          OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality }
-          OPTIONAL { ?entity schema:sameAs ?wikidata 
-        FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
-      }`);
-        } else if (type === Entities.EVENT) {
-            rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
-                `(SAMPLE(?startDate) AS ?startDate)
-        (SAMPLE(?endDate) AS ?endDate)
-        (SAMPLE(?locationName) AS ?locationName)
-        (SAMPLE(?postalCode) AS ?postalCode)
-        (SAMPLE(?artsdataUri) AS ?locationUri)
-        (SAMPLE(?alternateName) AS ?alternateName)
-        (SAMPLE(?locationContainedIn) AS ?locationContainedIn)
-        (SAMPLE(?locationContains) AS ?locationContains)`,
-            );
-
-            rawQuery = rawQuery.replace(
-                "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
-                `OPTIONAL { ?entity schema:startDate ?startDate }
-        OPTIONAL { ?entity schema:alternateName ?alternateName}  
-        OPTIONAL { ?entity schema:endDate ?endDate }
-        OPTIONAL { ?entity schema:location ?location .
-        OPTIONAL { ?location schema:name ?locationName }
-        OPTIONAL { ?location schema:address/schema:postalCode ?postalCode }
-        OPTIONAL { BIND(?location AS ?artsdataUri)
-            FILTER(STRSTARTS(STR(?artsdataUri), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
-        }
-        OPTIONAL {
-            ?location schema:containedInPlace ?parentPlace .
-            FILTER(STRSTARTS(STR(?parentPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
-            BIND(?parentPlace AS ?locationContainedIn)
-        }
-        OPTIONAL {
-            ?location ^schema:containedInPlace ?childPlace .
-            FILTER(STRSTARTS(STR(?childPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
-            BIND(?childPlace AS ?locationContains)
-        }
-        }`,
-            );
-        } else if (type === Entities.PERSON || type === Entities.ORGANIZATION || type === Entities.AGENT) {
-            rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
-                `(SAMPLE(?wikidata) AS ?wikidata)
-                            (SAMPLE(?alternateName) AS ?alternateName)
-                            (SAMPLE(?isni) AS ?isni)`,
-            );
-
-            rawQuery = rawQuery.replace(
-                "ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
-                `   OPTIONAL { ?entity schema:alternateName ?alternateName}  
-                OPTIONAL { ?entity schema:sameAs ?sameAs 
-      OPTIONAL {BIND(?sameAs AS ?wikidata)
-        FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
-      }
-      OPTIONAL {BIND(?sameAs AS ?isni)
-        FILTER (STRSTARTS(str(?isni), "https://isni.org/isni/"))
-      }
-    }`,
-            );
-        } else {
-            rawQuery = rawQuery.replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER", "");
-            rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER", "");
-        }
+        rawQuery = this._addQueryToFetchAdditionalPropertiesForAutoMatchCalculations(type, rawQuery)
 
         rawQuery = rawQuery
             .replace("INDEX_PLACE_HOLDER", graphdbIndex)
@@ -421,6 +423,13 @@ export class MatchService {
         return this._resolvePropertyConditions(rawQuery, propertyConditions);
     }
 
+    /**
+     * @private
+     * @name _resolvePropertyConditions
+     * @description Resolve property conditions
+     * @param propertyId
+     * @private
+     */
     private _resolvePropertyPath(propertyId: string) {
         const parts = propertyId.trim().split("/http");
         let propertyPath = "";
@@ -434,6 +443,14 @@ export class MatchService {
         return propertyPath;
     }
 
+    /**
+     * @private
+     * @name _resolveConditions
+     * @description Resolve conditions
+     * @param name
+     * @param propertyConditions
+     * @private
+     */
     private _modifyNameForLuceneScore(name: string, propertyConditions: QueryCondition[]): string {
         const propertyMap = {
             "http://schema.org/url": "url",
@@ -450,7 +467,7 @@ export class MatchService {
             .reduce((query, condition) => {
                 Object.entries(propertyMap).forEach(([key, value]) => {
                     if (condition.propertyId?.includes(key)) {
-                        query = `${query} OR ${this.resolvePropertyValueForLucene(
+                        query = `${query} OR ${this._resolvePropertyValueForLucene(
                             condition.propertyValue,
                             value,
                         )}`;
@@ -462,7 +479,15 @@ export class MatchService {
         return `"${luceneQuery}" ;`;
     }
 
-    private resolvePropertyValueForLucene(propertyValue: string | string[], propertyId: string): string {
+    /**
+     * @private
+     * @name _resolvePropertyConditions
+     * @description Resolve property conditions
+     * @param propertyValue
+     * @param propertyId
+     * @private
+     */
+    private _resolvePropertyValueForLucene(propertyValue: string | string[], propertyId: string): string {
         const values = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
         return values
             .map((value) =>
@@ -470,4 +495,86 @@ export class MatchService {
             .join(" ");
     }
 
+    /**
+     * @private
+     * @name _resolvePropertyConditions
+     * @description Resolve property conditions
+     * @param type
+     * @param rawQuery
+     * @private
+     */
+    private _addQueryToFetchAdditionalPropertiesForAutoMatchCalculations(type: string, rawQuery: string): string {
+
+        switch (type) {
+            case Entities.PLACE:
+                rawQuery = rawQuery.replace(
+                    "ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
+                    `(SAMPLE(?postalCode) AS ?postalCode)
+                                (SAMPLE(?addressLocality) AS ?addressLocality)
+                                (SAMPLE(?wikidata) AS ?wikidata)
+                                (SAMPLE(?alternateName) AS ?alternateName)`)
+                    .replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
+                        `OPTIONAL { ?entity schema:alternateName ?alternateName} 
+                                     OPTIONAL { ?entity schema:address/schema:postalCode ?postalCode }
+                                     OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality }
+                                     OPTIONAL { ?entity schema:sameAs ?wikidata 
+                                    FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
+                                  }`);
+                break;
+            case Entities.EVENT:
+                rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
+                    `(SAMPLE(?startDate) AS ?startDate)
+                                (SAMPLE(?endDate) AS ?endDate)
+                                (SAMPLE(?locationName) AS ?locationName)
+                                (SAMPLE(?postalCode) AS ?postalCode)
+                                (SAMPLE(?artsdataUri) AS ?locationUri)
+                                (SAMPLE(?alternateName) AS ?alternateName)
+                                (SAMPLE(?locationContainedIn) AS ?locationContainedIn)
+                                (SAMPLE(?locationContains) AS ?locationContains)`)
+                    .replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
+                        `OPTIONAL { ?entity schema:startDate ?startDate }
+                                    OPTIONAL { ?entity schema:alternateName ?alternateName}  
+                                    OPTIONAL { ?entity schema:endDate ?endDate }
+                                    OPTIONAL { ?entity schema:location ?location .
+                                    OPTIONAL { ?location schema:name ?locationName }
+                                    OPTIONAL { ?location schema:address/schema:postalCode ?postalCode }
+                                    OPTIONAL { BIND(?location AS ?artsdataUri)
+                                        FILTER(STRSTARTS(STR(?artsdataUri), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
+                                    }
+                                    OPTIONAL {
+                                        ?location schema:containedInPlace ?parentPlace .
+                                        FILTER(STRSTARTS(STR(?parentPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
+                                        BIND(?parentPlace AS ?locationContainedIn)
+                                    }
+                                    OPTIONAL {
+                                        ?location ^schema:containedInPlace ?childPlace .
+                                        FILTER(STRSTARTS(STR(?childPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
+                                        BIND(?childPlace AS ?locationContains)
+                                    }}`);
+                break;
+            case Entities.PERSON:
+            case Entities.ORGANIZATION:
+            case Entities.AGENT:
+                rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
+                    `(SAMPLE(?wikidata) AS ?wikidata)
+                                (SAMPLE(?alternateName) AS ?alternateName)
+                                (SAMPLE(?isni) AS ?isni)`)
+                    .replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER",
+                        ` OPTIONAL { ?entity schema:alternateName ?alternateName}  
+                                      OPTIONAL { ?entity schema:sameAs ?sameAs 
+                                      OPTIONAL {BIND(?sameAs AS ?wikidata)
+                                        FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
+                                      }
+                                      OPTIONAL {BIND(?sameAs AS ?isni)
+                                        FILTER (STRSTARTS(str(?isni), "https://isni.org/isni/"))
+                                      }}`);
+                break;
+            default:
+                rawQuery = rawQuery.replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER", "")
+                    .replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER", "")
+                break;
+
+        }
+        return rawQuery;
+    }
 }
