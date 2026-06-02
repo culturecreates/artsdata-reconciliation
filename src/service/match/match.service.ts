@@ -198,22 +198,27 @@ export class MatchService {
                             OPTIONAL{${objectId} ^schema:containedInPlace ${objectId}_hall}
                             OPTIONAL {${objectId} schema:containedInPlace ${objectId}_building}`;
             const filter = `FILTER (${objectId} IN (${(formattedConditionValue as string[]).join(" , ")}) ||
-                        ${objectId}_hall IN (${(formattedConditionValue as string[]).join(" , ")}) ||
-                        ${objectId}_building IN (${(formattedConditionValue as string[]).join(" , ")})).`;
+                        (${objectId}_hall IN (${(formattedConditionValue as string[]).join(" , ")}) && BOUND(${objectId}_hall)) ||
+                        (${objectId}_building IN (${(formattedConditionValue as string[]).join(" , ")}) && BOUND(${objectId}_building))).`;
+
             switch (matchQualifier) {
                 case MatchQualifierEnum.EXACT_MATCH:
                     switch (matchQuantifier) {
                         case MatchQuantifierEnum.ANY:
                             triple = `${triplesToFetch}\n${filter}`;
                             break;
+
                         case MatchQuantifierEnum.ALL:
                             triple = `${triplesToFetch}.
                             ${(formattedConditionValue as string[]).map((v) => {
                                 return `FILTER (${objectId} = ${v} || ${objectId}_hall = ${v} || ${objectId}_building = ${v}).`
                             }).join("\n")}`;
                             break;
+
                         case MatchQuantifierEnum.NONE:
-                            triple = `${triplesToFetch}\n${filter.replaceAll("IN", "NOT IN")}`;
+                            triple = `${triplesToFetch}\n${filter.replaceAll("IN", "NOT IN")
+                                .replaceAll("||", "&&")
+                                .replaceAll("BOUND", "! BOUND")}`;
                             break;
                         default:
                             Exception.badRequest("Unsupported match quantifier");
@@ -221,11 +226,10 @@ export class MatchService {
                     }
                     break;
 
-                // TODO Complete the logic for REGEX_MATCH
                 case MatchQualifierEnum.REGEX_MATCH:
                     triple = `${triplesToFetch}.
                             ${(formattedConditionValue as string[]).map((v) => {
-                        return `FILTER ( REGEX(str(${objectId}), ${v},"i") || REGEX(str(${objectId}_hall), ${v}, "i") || REGEX(str(${objectId}_building), ${v},"i")).`
+                        return `FILTER ( REGEX(str(${objectId}), ${v},"i") || (REGEX(str(${objectId}_hall), ${v}, "i") && BOUND(${objectId}_hall) ) || (REGEX(str(${objectId}_building), ${v},"i") && BOUND(${objectId}_building)).`
                     }).join("\n")}`;
 
                     break;
@@ -235,20 +239,29 @@ export class MatchService {
                     break;
             }
         } else {
+
             triple = `?entity schema:location ${objectId} .
-                      OPTIONAL{ ${objectId} ^schema:containedInPlace ${objectId}_hall } . 
-                      OPTIONAL { ${objectId} schema:containedInPlace ${objectId}_building } .`
+                      OPTIONAL{ ${objectId} ^schema:containedInPlace ${objectId}_hall . } . 
+                      OPTIONAL { ${objectId} schema:containedInPlace ${objectId}_building . } .`
+
             switch (matchQualifier) {
                 case MatchQualifierEnum.EXACT_MATCH:
-                    triple = triple.concat(`FILTER (${objectId} =  ${formattedConditionValue} ||
-                            ${objectId}_hall =  ${formattedConditionValue} ||
-                            ${objectId}_building =  ${formattedConditionValue}).`);
+
+                    const filter = `\nFILTER (${objectId} =  ${formattedConditionValue} ||
+                    (${objectId}_hall =  ${formattedConditionValue} && BOUND(${objectId}_hall)) 
+                    || (${objectId}_building =  ${formattedConditionValue} && BOUND(${objectId}_building))).`;
+
+                    triple = triple.concat(`\n${filter}`);
+
                     break;
 
                 case MatchQualifierEnum.REGEX_MATCH:
-                    triple = triple.concat(`FILTER (REGEX(str(${objectId}), ${formattedConditionValue}, "i") ||
-                    REGEX(str(${objectId}_hall), ${formattedConditionValue}, "i") ||
-                    REGEX(str(${objectId}_building), ${formattedConditionValue}, "i")).`);
+                    const regexFilter = `\nFILTER (REGEX(str(${objectId}), ${formattedConditionValue}, "i") ||
+                    (REGEX(str(${objectId}_hall), ${formattedConditionValue}, "i") && BOUND(${objectId}_hall)) ||
+                    (REGEX(str(${objectId}_building), ${formattedConditionValue}, "i") && BOUND(${objectId}_building))).`;
+
+                    triple = triple.concat(`\n${regexFilter}`);
+
                     break;
 
                 default:
@@ -257,7 +270,7 @@ export class MatchService {
                     break;
             }
             if (matchQuantifier === MatchQuantifierEnum.NONE) {
-                return `FILTER NOT EXISTS { ${triple} }.`;
+                return `FILTER NOT EXISTS { \n${triple} }.`;
             }
         }
 
