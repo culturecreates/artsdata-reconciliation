@@ -23,8 +23,9 @@ adr:KE-4 rdf:type <http://schema.org/Event> ;
     schema:location adr:KP-1.
 
 adr:KE-5 rdf:type <http://schema.org/Event> ;
-    rdfs:label "A Beautiful Night" ;
-    schema:name "A Beautiful Night" .
+    rdfs:label "Dance Night" ;
+    schema:name "Dance Night" ;
+    schema:location adr:PortTheatreAuditorium.
 
 adr:KE-6 rdf:type <http://schema.org/Event> ;
     rdfs:label "At the Night" ;
