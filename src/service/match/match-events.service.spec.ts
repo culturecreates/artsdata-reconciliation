@@ -258,7 +258,7 @@ describe('Test matching events using sparql query v1', () => {
     });
 
 
-    it(`Reconcile an event entity with name and location uri of the place (event linked to hall)`, async () => {
+    it(`Reconcile an event entity with name and location uri of the place (event linked to auditorium)`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -266,7 +266,7 @@ describe('Test matching events using sparql query v1', () => {
                 {matchType: MatchTypeEnum.NAME, propertyValue: "Dance Night"},
                 {
                     matchType: MatchTypeEnum.PROPERTY,
-                    propertyValue: "http://kg.artsdata.ca/resource/PortTheatre",
+                    propertyValue: "http://kg.artsdata.ca/resource/K-PortTheatreAuditorium",
                     propertyId: "schema:location",
                     required: true
                 }
@@ -285,6 +285,39 @@ describe('Test matching events using sparql query v1', () => {
         expect(allResults?.length).toBe(1);
     });
 
+    it(`Reconcile an event entity with name and location uri of the place (event linked to auditorium) and startDate. Should be true match`, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {matchType: MatchTypeEnum.NAME, propertyValue: "Dance Night"},
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "http://kg.artsdata.ca/resource/K-PortTheatre",
+                    propertyId: "schema:location",
+                    required: true
+                },
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2026-04-25T19:30:00-07:00",
+                    propertyId: "schema:startDate",
+                    required: true
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+        expect(actualResult?.match).toBeTruthy();
+        expect(actualResult?.id).toBe("KE-5");
+        expect(allResults?.length).toBe(1);
+    });
+
     it(`Reconcile an event entity with name and location uri of the hall (event linked to hall)`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
@@ -293,7 +326,7 @@ describe('Test matching events using sparql query v1', () => {
                 {matchType: MatchTypeEnum.NAME, propertyValue: "Dance Night"},
                 {
                     matchType: MatchTypeEnum.PROPERTY,
-                    propertyValue: "http://kg.artsdata.ca/resource/PortTheatreAuditorium",
+                    propertyValue: "http://kg.artsdata.ca/resource/K-PortTheatreAuditorium",
                     propertyId: "schema:location",
                     required: true
                 }
