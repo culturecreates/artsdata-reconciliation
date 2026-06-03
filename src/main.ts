@@ -30,26 +30,20 @@ async function bootstrap() {
     console.log('GraphDB connection verified. Starting NestJS application...');
 
     const config = new DocumentBuilder()
-        .setTitle('Reconciliation API - OpenAPI 3.1')
+        .setTitle('Artsdata Reconciliation API')
         .setDescription(
-            `Web API letting clients match data against a database hosted by the service.<br>
-       Some useful links:<br>
-       - [W3C Entity Reconciliation Community Group](https://www.w3.org/community/reconciliation/)<br>
-       - [Source code for Reconciliation API](https://github.com/reconciliation-api/specs)<br>
-       - [List of known public endpoints](https://reconciliation-api.github.io/testbench/)<br>
-       - [OpenRefine wiki list of reconcilable data sources](https://github.com/OpenRefine/OpenRefine/wiki/Reconciliable-Data-Sources)`
+`This Web API provides match, extend, preview and suggest services for reconciling data against the Artsdata knowledge graph.
+    
+This API conforms to the W3C Reconciliation API Specification v1.0.
+
+Some useful links: 
+
+- [W3C Reconciliation API Spec v1.0](https://reconciliation-api.github.io/specs/1.0-draft/)
+- [W3C Reconciliation API Test Bench](https://reconciliation-api.github.io/testbench/1.0/#/client/https%3A%2F%2Frecon.artsdata.ca)
+- [W3C Entity Reconciliation Community Group](https://www.w3.org/community/reconciliation/)
+`
         )
-        .setVersion('0.0.1')
-        .setContact(
-            'W3C Entity Reconciliation Community Group',
-            'https://www.w3.org/community/reconciliation/',
-            'public-reconciliation@w3.org'
-        )
-        .setLicense(
-            'W3C Community Final Specification Agreement (FSA)',
-            'https://www.w3.org/community/about/process/fsa-deed/'
-        )
-        .setExternalDoc('Find out more about Reconciliation API', 'https://reconciliation-api.github.io')
+        .setVersion('1.0.1')
         .build();
 
     const document = SwaggerModule.createDocument(app, config);
