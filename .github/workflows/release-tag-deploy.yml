@@ -38,12 +38,8 @@ jobs:
           git push origin HEAD:main
 
   deploy-to-staging:
-    runs-on: ubuntu-latest
-    needs : update-swagger-version
-    steps:
-      - name: Deploy to staging
-        uses: ./.github/workflows/deploy-to-staging.yml
-
+    needs: update-swagger-version
+    uses: .github/workflows/deploy-to-staging.yml
 
   promote-staging-to-production:
     runs-on: ubuntu-latest
@@ -60,7 +56,7 @@ jobs:
           RESPONSE=$(curl -X POST https://api.heroku.com/pipeline-promotions \
             -H "Content-Type: application/json" \
             -H "Accept: application/vnd.heroku+json; version=3" \
-            -H "Authorization: Bearer ${{ vars.HEROKU_APP_NAME }}" \
+            -H "Authorization: Bearer ${{ secrets.HEROKU_API_KEY }}" \
             -d '{
               "pipeline": {
                 "id": "'"${{ vars.HEROKU_APP_NAME }}"'"
@@ -79,7 +75,6 @@ jobs:
               ]
             }')
           
-          # Check if the response contains an error
           if echo "$RESPONSE" | grep -q '"id":"error"'; then
             echo "Promotion failed!"
             echo "$RESPONSE"
@@ -87,4 +82,3 @@ jobs:
           else
             echo "Successfully initiated Heroku promotion."
           fi
-
