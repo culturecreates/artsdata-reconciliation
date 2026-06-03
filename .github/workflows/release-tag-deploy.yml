@@ -36,3 +36,55 @@ jobs:
           git add src/main.ts
           git commit -m "chore: update Swagger version to ${RELEASE_VERSION} [skip ci]"
           git push origin HEAD:main
+
+  deploy-to-staging:
+    runs-on: ubuntu-latest
+    needs : update-swagger-version
+    steps:
+      - name: Deploy to staging
+        uses: ./.github/workflows/deploy-to-staging.yml
+
+
+  promote-staging-to-production:
+    runs-on: ubuntu-latest
+    needs: deploy-to-staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Promote Heroku Slug
+        run: |
+          echo "Promoting staging app to production..."
+          
+          RESPONSE=$(curl -X POST https://api.heroku.com/pipeline-promotions \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/vnd.heroku+json; version=3" \
+            -H "Authorization: Bearer ${{ vars.HEROKU_APP_NAME }}" \
+            -d '{
+              "pipeline": {
+                "id": "'"${{ vars.HEROKU_APP_NAME }}"'"
+              },
+              "source": {
+                "app": {
+                  "id": "'"${{ vars.HEROKU_APP_NAME }}"'"
+                }
+              },
+              "targets": [
+                {
+                  "app": {
+                    "name": "${{ vars.HEROKU_APP_PROD_NAME }}"
+                  }
+                }
+              ]
+            }')
+          
+          # Check if the response contains an error
+          if echo "$RESPONSE" | grep -q '"id":"error"'; then
+            echo "Promotion failed!"
+            echo "$RESPONSE"
+            exit 1
+          else
+            echo "Successfully initiated Heroku promotion."
+          fi
+
