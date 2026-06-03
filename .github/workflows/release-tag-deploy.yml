@@ -39,7 +39,7 @@ jobs:
 
   deploy-to-staging:
     needs: update-swagger-version
-    uses: .github/workflows/deploy-to-staging.yml
+    uses: ./.github/workflows/deploy-to-staging.yml
 
   promote-staging-to-production:
     runs-on: ubuntu-latest
