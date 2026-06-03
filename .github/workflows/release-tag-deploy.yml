@@ -1,0 +1,38 @@
+name: Release Tag Deploy
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  update-swagger-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Extract version from release tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "RELEASE_VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Update Swagger version
+        run: |
+          sed -i -E "s/\\.setVersion\\('[^']+'\\)/.setVersion('${RELEASE_VERSION}')/" src/main.ts
+
+      - name: Commit updated Swagger version
+        run: |
+          if git diff --quiet -- src/main.ts; then
+            echo "No Swagger version changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/main.ts
+          git commit -m "chore: update Swagger version to ${RELEASE_VERSION} [skip ci]"
+          git push origin HEAD:main
