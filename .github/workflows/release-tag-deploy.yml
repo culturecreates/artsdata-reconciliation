@@ -36,8 +36,3 @@ jobs:
           git add src/main.ts
           git commit -m "chore: update Swagger version to ${RELEASE_VERSION} [skip ci]"
           git push origin HEAD:main
-
-  deploy:
-    needs: update-swagger-version
-    uses: ./.github/workflows/deploy-to-staging.yml
-    secrets: inherit
