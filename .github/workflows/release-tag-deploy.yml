@@ -40,6 +40,11 @@ jobs:
   deploy-to-staging:
     needs: update-swagger-version
     uses: ./.github/workflows/deploy-to-staging.yml
+    with:
+      heroku_app_name: ${{ vars.HEROKU_APP_NAME }}
+      heroku_email: ${{ vars.HEROKU_EMAIL }}
+    secrets:
+      HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
   promote-staging-to-production:
     runs-on: ubuntu-latest
