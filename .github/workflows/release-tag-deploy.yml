@@ -2,7 +2,7 @@ name: Release Tag Deploy
 
 on:
   release:
-    types: [created]
+    types: [ created ]
 
 permissions:
   contents: write
@@ -48,14 +48,21 @@ jobs:
 
   promote:
     runs-on: ubuntu-latest
+    needs: deploy-to-staging
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Install Heroku CLI
-        run: curl https://heroku.com | sh
+        uses: akhileshns/heroku-deploy@v3.14.15
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{  vars.HEROKU_APP_NAME  }}
+          heroku_email: ${{  vars.HEROKU_EMAIL }}
+          just_to_install: true
 
       - name: Promote Staging App to Production
-        run: heroku pipelines:promote -a ${{vars.HEROKU_APP_NAME}}
+        run: heroku pipelines:promote -a ${{  vars.HEROKU_APP_NAME  }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
