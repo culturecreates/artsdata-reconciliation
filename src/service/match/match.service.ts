@@ -453,6 +453,7 @@ export class MatchService {
      */
     private _modifyNameForLuceneScore(name: string, propertyConditions: QueryCondition[]): string {
         const propertyMap = {
+            "http://schema.org/name": "name",
             "http://schema.org/url": "url",
             "http://schema.org/sameAs": "sameAs",
             "http://schema.org/postalCode": "postalCode",
