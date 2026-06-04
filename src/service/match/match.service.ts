@@ -493,7 +493,7 @@ export class MatchService {
         return values
             .map((value) =>
                 `${MatchServiceHelper.transformSearchQuery(value, propertyId)}`)
-            .join(" ");
+            .join(" OR ");
     }
 
     /**
