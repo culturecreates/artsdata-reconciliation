@@ -10,6 +10,10 @@ permissions:
 jobs:
   update-swagger-version:
     runs-on: ubuntu-latest
+
+    outputs:
+      deploy_sha: ${{ steps.commit.outputs.sha }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,23 +30,33 @@ jobs:
           sed -i -E "s/\\.setVersion\\('[^']+'\\)/.setVersion('${RELEASE_VERSION}')/" src/main.ts
 
       - name: Commit updated Swagger version
+        id: commit
         run: |
-          if git diff --quiet -- src/main.ts; then
-            echo "No Swagger version changes to commit."
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet -- src/main.ts; then
+            echo "No Swagger version changes to commit."
+            echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           git add src/main.ts
           git commit -m "chore: update Swagger version to ${RELEASE_VERSION} [skip ci]"
           git push origin HEAD:main
 
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
   deploy-to-staging:
     needs: update-swagger-version
+
     uses: ./.github/workflows/deploy-to-staging.yml
+
     with:
+      deploy_sha: ${{ needs.update-swagger-version.outputs.deploy_sha }}
       heroku_app_name: ${{ vars.HEROKU_APP_NAME }}
       heroku_email: ${{ vars.HEROKU_EMAIL }}
+
     secrets:
       HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
@@ -51,13 +65,11 @@ jobs:
     needs: deploy-to-staging
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install.sh | sh
 
       - name: Promote Staging App to Production
-        run: heroku pipelines:promote -a ${{  vars.HEROKU_APP_NAME  }}
+        run: |
+          heroku pipelines:promote -a ${{ vars.HEROKU_APP_NAME }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}

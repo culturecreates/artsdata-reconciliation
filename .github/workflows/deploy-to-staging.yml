@@ -3,12 +3,16 @@ name: CI CD - Staging Server
 on:
   workflow_call:
     inputs:
+      deploy_sha:
+        required: false
+        type: string
+
       heroku_app_name:
-        required: true
+        required: false
         type: string
 
       heroku_email:
-        required: true
+        required: false
         type: string
 
     secrets:
@@ -16,8 +20,10 @@ on:
         required: true
 
   workflow_dispatch:
+
   push:
-    branches: [ 'main' ]
+    branches:
+      - main
     paths:
       - 'src/**'
 
@@ -28,14 +34,16 @@ jobs:
   deploy-to-heroku:
     needs: test
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout requested commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.deploy_sha || github.sha }}
 
-      - name: Install Heroku CLI
-        run: curl https://cli-assets.heroku.com/install.sh | sh
-
-      - uses: akhileshns/heroku-deploy@v3.14.15
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.14.15
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: ${{ inputs.heroku_app_name || vars.HEROKU_APP_NAME  }}
+          heroku_app_name: ${{ inputs.heroku_app_name || vars.HEROKU_APP_NAME }}
           heroku_email: ${{ inputs.heroku_email || vars.HEROKU_EMAIL }}
