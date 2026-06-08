@@ -99,17 +99,7 @@ export class MatchService {
         switch (property) {
             case ArtsdataProperties.START_DATE:
             case ArtsdataProperties.END_DATE:
-                const variable = property === ArtsdataProperties.START_DATE ? "?startDate" : "?endDate";
-                const xsdDateRegex = /^-?\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])(Z|[+-](0\d|1[0-4]):[0-5]\d)?$/;
-
-                if (xsdDateRegex.test(value)) {
-                    return `${variable};
-                FILTER(${variable} = "${value}"^^xsd:date || ( ${variable} > "${value}T00:00:00"^^xsd:dateTime && ${variable} < "${value}T23:59:59"^^xsd:dateTime ))`;
-                } else {
-                    return `${variable};
-                FILTER(${variable} = "${value}"^^xsd:dateTime )`;
-                }
-
+                return value;
             case ArtsdataProperties.SAME_AS:
             case ArtsdataProperties.LOCATION:
             case ArtsdataProperties.ORGANIZER:
@@ -251,6 +241,47 @@ export class MatchService {
 
     /**
      * @private
+     * @name _resolveConditionWithPropertyLocation
+     * @description Resolve condition with property location
+     * @param formattedConditionValue
+     * @param index
+     * @param matchQualifier
+     * @param matchQuantifier
+     * @private
+     */
+    private _resolveConditionWithPropertyDates(
+        formattedConditionValue: string | string[], index: number, matchQualifier: MatchQualifierEnum,
+        matchQuantifier: MatchQuantifierEnum, formattedPropertyId: string): string {
+
+        const objectId = `?obj_${index + 1}`;
+
+        const values = Array.isArray(formattedConditionValue) ? formattedConditionValue : [formattedConditionValue];
+        const value = values[0]
+
+        const triplesToFetch = `?entity ${formattedPropertyId} ${objectId} .`;
+
+        const xsdDateRegex = /^-?\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])(Z|[+-](0\d|1[0-4]):[0-5]\d)?$/;
+
+        if (matchQualifier === MatchQualifierEnum.EXACT_MATCH) {
+            if (xsdDateRegex.test(value)) {
+                return `${triplesToFetch}
+                FILTER(${objectId} = "${value}"^^xsd:date || ( ${objectId} > "${value}T00:00:00"^^xsd:dateTime && ${objectId} < "${value}T23:59:59"^^xsd:dateTime ))`;
+            } else {
+                return `${triplesToFetch}
+                FILTER(${objectId} = "${value}"^^xsd:dateTime )`;
+            }
+        } else if (matchQualifier === MatchQualifierEnum.REGEX_MATCH) {
+            if (matchQuantifier === MatchQuantifierEnum.NONE) {
+                return `FILTER NOT EXISTS { ${triplesToFetch} FILTER (REGEX(str(${objectId}), ${value}, "i") ) }.`;
+            } else {
+                return `${triplesToFetch} FILTER (REGEX(str(${objectId}), ${value}, "i") ).`;
+            }
+        }
+        throw Exception.badRequest("Unsupported match qualifier");
+    }
+
+    /**
+     * @private
      * @name _resolveMatchQualifierAndQuantifier
      * @description Resolve match qualifier, matchQualifier is defaulted to exact match
      * @param matchQualifier
@@ -265,8 +296,13 @@ export class MatchService {
         matchQuantifier = matchQuantifier || MatchQuantifierEnum.ALL;
         matchQualifier = matchQualifier || MatchQualifierEnum.EXACT_MATCH;
 
-        if (formattedPropertyId === `<${ArtsdataProperties.LOCATION}>`)
+        if (formattedPropertyId === `<${ArtsdataProperties.LOCATION}>`) {
             return this._resolveConditionWithPropertyLocation(formattedConditionValue, index, matchQualifier, matchQuantifier)
+        }
+
+        if ([`<${ArtsdataProperties.START_DATE}>`, `<${ArtsdataProperties.END_DATE}>`].includes(formattedPropertyId)) {
+            return this._resolveConditionWithPropertyDates(formattedConditionValue, index, matchQualifier, matchQuantifier, formattedPropertyId)
+        }
 
         const isConditionValueAList = Array.isArray(formattedConditionValue);
         let triple: string = "";
