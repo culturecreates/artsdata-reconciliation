@@ -279,17 +279,20 @@ export class MatchService {
 
                     switch (matchQuantifier) {
                         case MatchQuantifierEnum.ANY:
-                            triple = `?entity ${formattedPropertyId} ${objectId} 
-                        FILTER (${objectId} IN (${(formattedConditionValue as string[]).join(" , ")})).`;
+                            triple = `?entity ${formattedPropertyId} ${objectId}.
+                            FILTER( STR(${objectId}) IN (${(formattedConditionValue as string[]).join(" , ")}) ||
+                                ${objectId} IN (${(formattedConditionValue as string[]).join(" , ")})).`;
                             break;
                         case MatchQuantifierEnum.ALL:
                             triple = `${(formattedConditionValue as string[])
-                                .map((v) => ` FILTER EXISTS {?entity ${formattedPropertyId} ${v}}`)
+                                .map((v) => ` FILTER EXISTS {?entity ${formattedPropertyId} ${objectId}
+                                FILTER(STR(${objectId})  = ${v} || ${objectId} = ${v})}`)
                                 .join("\n")}`;
                             break;
                         case MatchQuantifierEnum.NONE:
                             triple = `${(formattedConditionValue as string[])
-                                .map((v) => ` FILTER NOT EXISTS {?entity ${formattedPropertyId} ${v}}`)
+                                .map((v) => ` FILTER NOT EXISTS {?entity ${formattedPropertyId} ${objectId}
+                                FILTER( STR(${objectId})  = ${v} || ${objectId} = ${v} )}`)
                                 .join("\n")}`;
                             break;
                         default:
@@ -312,7 +315,8 @@ export class MatchService {
             switch (matchQualifier) {
                 case MatchQualifierEnum.EXACT_MATCH:
 
-                    triple = `?entity ${formattedPropertyId} ${formattedConditionValue} .`;
+                    triple = `?entity ${formattedPropertyId} ${objectId}.
+                               FILTER( STR(${objectId})  = ${formattedConditionValue} || ${objectId} = ${formattedConditionValue}) .`;
                     break;
 
                 case MatchQualifierEnum.REGEX_MATCH:
