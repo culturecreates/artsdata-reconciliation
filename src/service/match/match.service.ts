@@ -440,7 +440,7 @@ export class MatchService {
 
         const graphdbIndex = MatchServiceHelper.getGraphdbIndex(type);
         let rawQuery = QUERIES.RECONCILIATION_QUERY;
-        let luceneQuery: string  = "";
+        let luceneQuery: string = "";
         if (name) {
             luceneQuery = this._generateLuceneQuery(name, propertyConditions);
         }
@@ -457,7 +457,7 @@ export class MatchService {
 
         rawQuery = rawQuery
             .replace("INDEX_PLACE_HOLDER", graphdbIndex)
-            .replace("QUERY_FILTER_PLACE_HOLDER", luceneQuery.length ? `luc:query ${luceneQuery}`: luceneQuery)
+            .replace("QUERY_FILTER_PLACE_HOLDER", luceneQuery.length ? `luc:query ${luceneQuery}` : luceneQuery)
             .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
 
         return this._resolvePropertyConditions(rawQuery, propertyConditions);
@@ -493,7 +493,7 @@ export class MatchService {
      */
     private _generateLuceneQuery(name: string, propertyConditions: QueryCondition[]): string {
 
-        const transformedName :string = MatchServiceHelper.transformSearchQuery(name, 'name');
+        const transformedName: string = MatchServiceHelper.transformSearchQuery(name, 'name');
 
         const propertyMap = {
             "http://schema.org/name": "name",
