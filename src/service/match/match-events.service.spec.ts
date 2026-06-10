@@ -67,7 +67,7 @@ describe('Test matching events using sparql query v1', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2025-01-01",
-                    propertyId: "schema:startDate",
+                    propertyId: "http://schema.org/startDate",
                     required: true
                 }
 
@@ -98,7 +98,7 @@ describe('Test matching events using sparql query v1', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2025-02-02",
-                    propertyId: "schema:startDate",
+                    propertyId: "http://schema.org/startDate",
                     required: true
                 }
 
@@ -128,7 +128,7 @@ describe('Test matching events using sparql query v1', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2025-03-03",
-                    propertyId: "schema:startDate",
+                    propertyId: "http://schema.org/startDate",
                     required: true
                 }
 
@@ -158,17 +158,17 @@ describe('Test matching events using sparql query v1', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2025-03-03T17:00:00-05:00",
-                    propertyId: "schema:startDate",
+                    propertyId: "http://schema.org/startDate",
                     required: true
                 }, {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2025-03-03T18:00:00-05:00",
-                    propertyId: "schema:endDate",
+                    propertyId: "http://schema.org/endDate",
                     required: true
                 }, {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "http://kg.artsdata.ca/resource/KP-1",
-                    propertyId: "schema:location",
+                    propertyId: "http://schema.org/location",
                     required: true
                 }
 
@@ -198,12 +198,12 @@ describe('Test matching events using sparql query v1', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2025-03-03T17:00:00-05:00",
-                    propertyId: "schema:startDate",
+                    propertyId: "http://schema.org/startDate",
                     required: true
                 }, {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2025-03-03T18:00:00-05:00",
-                    propertyId: "schema:endDate",
+                    propertyId: "http://schema.org/endDate",
                     required: true
                 }, {
                     matchType: MatchTypeEnum.PROPERTY,
@@ -292,7 +292,7 @@ describe('Reconcile events with contained in place', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "http://kg.artsdata.ca/resource/K-PortTheatreAuditorium",
-                    propertyId: "schema:location",
+                    propertyId: "http://schema.org/location",
                     required: true
                 }
             ],
@@ -319,7 +319,7 @@ describe('Reconcile events with contained in place', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "http://kg.artsdata.ca/resource/K-PortTheatre",
-                    propertyId: "schema:location",
+                    propertyId: "http://schema.org/location",
                     required: true
                 }
             ],
@@ -346,13 +346,13 @@ describe('Reconcile events with contained in place', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "http://kg.artsdata.ca/resource/K-PortTheatre",
-                    propertyId: "schema:location",
+                    propertyId: "http://schema.org/location",
                     required: true
                 },
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2026-04-25T19:30:00-07:00",
-                    propertyId: "schema:startDate",
+                    propertyId: "http://schema.org/startDate",
                     required: true
                 }
             ],
