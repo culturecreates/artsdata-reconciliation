@@ -376,7 +376,6 @@ describe('Test reconciling events using sparql query version 1', () => {
                 {
                     matchType: "name",
                     propertyValue: "At the Night",
-                    propertyId: "string",
                     required: true,
                 },
                 {
