@@ -45,6 +45,28 @@ export class MatchServiceHelper {
         }
     }
 
+    static generateDateQuery(value: string, propertyId: string) {
+        const xsdDateRegex = /^-?\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])(Z|[+-](0\d|1[0-4]):[0-5]\d)?$/;
+
+        function toLuceneDate(value :string) {
+            const iso = new Date(value).toISOString();
+
+            return iso
+                .slice(0, 19)
+                .replace(/[-:T]/g, '');
+        }
+
+        if(xsdDateRegex.test(value)) {
+            const startDateRange = toLuceneDate(value);
+            const endDateRange = toLuceneDate(`${value}T23:59:59Z`);
+
+            return `( ${propertyId}Date:${startDateRange.slice(0,8)} OR ${propertyId}Time:[${startDateRange} TO ${endDateRange}] )`;
+        } else {
+            return `${propertyId}Time:${toLuceneDate(value)}`;
+        }
+
+    }
+
     static formatReconciliationResponse(responseLanguage: LanguageEnum, sparqlResponse: any,
                                         reconciliationQuery: ReconciliationQuery, isQueryByURI: boolean): ResultCandidates[] {
         const bindings = sparqlResponse?.results?.bindings || [];
