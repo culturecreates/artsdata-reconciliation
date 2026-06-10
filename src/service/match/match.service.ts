@@ -449,7 +449,7 @@ export class MatchService {
         let rawQuery = QUERIES.RECONCILIATION_QUERY;
         let luceneQuery: string  = "";
         if (name) {
-            luceneQuery = this._generateLuceneQuery(MatchServiceHelper.transformSearchQuery(name, 'name'), propertyConditions);
+            luceneQuery = this._generateLuceneQuery(name, propertyConditions);
         }
         if (id) {
             id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX}${id}>`;
@@ -499,6 +499,9 @@ export class MatchService {
      * @private
      */
     private _generateLuceneQuery(name: string, propertyConditions: QueryCondition[]): string {
+
+        const transformedName :string = MatchServiceHelper.transformSearchQuery(name, 'name');
+
         const propertyMap = {
             "http://schema.org/name": "name",
             "http://schema.org/url": "url",
@@ -522,7 +525,7 @@ export class MatchService {
                     }
                 });
                 return query;
-            }, `${name}`);
+            }, `${transformedName}`);
 
         return `"${luceneQuery}" ;`;
     }
