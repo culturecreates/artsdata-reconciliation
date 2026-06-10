@@ -531,9 +531,13 @@ export class MatchService {
     private _resolvePropertyValueForLucene(propertyValue: string | string[], propertyId: string): string {
         const values = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
         return values
-            .map((value) =>
-                `${MatchServiceHelper.transformSearchQuery(value, propertyId)}`)
-            .join(" OR ");
+            .map((value) =>{
+                if(propertyId === "startDate" || propertyId === "endDate"){
+                    return `${MatchServiceHelper.generateDateQuery(value, propertyId)}`
+                } else {
+                    return `${MatchServiceHelper.transformSearchQuery(value, propertyId)}`
+                }
+            }).join(" OR ");
     }
 
     /**
