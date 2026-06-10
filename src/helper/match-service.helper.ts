@@ -39,7 +39,7 @@ export class MatchServiceHelper {
 
         if (isNameProperty) {
             const alternateNameQuery = fuzzyTerms.map(term => `alternateName:${term}`).join(' AND ');
-            return `(${nameQuery})^3 OR (${alternateNameQuery})`
+            return `( (${nameQuery})^3 OR (${alternateNameQuery}) )`
         } else {
             return `(${nameQuery})`
         }
