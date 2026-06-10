@@ -518,7 +518,8 @@ export class MatchService {
             .reduce((query, condition) => {
                 Object.entries(propertyMap).forEach(([key, value]) => {
                     if (condition.propertyId?.includes(key)) {
-                        query = `${query} OR ${this._resolvePropertyValueForLucene(condition.propertyValue, value)}`;
+                        const connector = condition.required ? "AND" : "OR";
+                        query = `${query} ${connector} ${this._resolvePropertyValueForLucene(condition.propertyValue, value)}`;
                     }
                 });
                 return query;
