@@ -440,9 +440,9 @@ export class MatchService {
 
         const graphdbIndex = MatchServiceHelper.getGraphdbIndex(type);
         let rawQuery = QUERIES.RECONCILIATION_QUERY;
-
+        let luceneQuery: string  = "";
         if (name) {
-            name = this._modifyNameForLuceneScore(MatchServiceHelper.transformSearchQuery(name, 'name'), propertyConditions);
+            luceneQuery = this._generateLuceneQuery(MatchServiceHelper.transformSearchQuery(name, 'name'), propertyConditions);
         }
         if (id) {
             id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX}${id}>`;
@@ -457,7 +457,7 @@ export class MatchService {
 
         rawQuery = rawQuery
             .replace("INDEX_PLACE_HOLDER", graphdbIndex)
-            .replace("QUERY_FILTER_PLACE_HOLDER", name ? `luc:query ${name}` : "")
+            .replace("QUERY_FILTER_PLACE_HOLDER", luceneQuery.length ? `luc:query ${luceneQuery}`: luceneQuery)
             .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
 
         return this._resolvePropertyConditions(rawQuery, propertyConditions);
@@ -491,7 +491,7 @@ export class MatchService {
      * @param propertyConditions
      * @private
      */
-    private _modifyNameForLuceneScore(name: string, propertyConditions: QueryCondition[]): string {
+    private _generateLuceneQuery(name: string, propertyConditions: QueryCondition[]): string {
         const propertyMap = {
             "http://schema.org/name": "name",
             "http://schema.org/url": "url",
