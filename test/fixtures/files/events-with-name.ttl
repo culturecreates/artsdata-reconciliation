@@ -31,7 +31,7 @@ adr:KE-5 rdf:type <http://schema.org/Event> ;
 adr:KE-6 rdf:type <http://schema.org/Event> ;
     rdfs:label "At the Night" ;
     schema:name "At the Night" ;
-    schema:startDate "2025-12-28T13:00:00-04:00"^^xsd:date.
+    schema:startDate "2025-12-28T13:00:00-04:00"^^xsd:dateTime.
 
 adr:KE-7 rdf:type <http://schema.org/Event> ;
     schema:name "Pierre-Yves Roy-Desmarais" ;
