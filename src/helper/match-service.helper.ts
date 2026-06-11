@@ -127,21 +127,21 @@ export class MatchServiceHelper {
         }
 
         switch (type) {
-            case "schema:Event":
+            case Entities.EVENT:
                 return GRAPHDB_INDEX.EVENT;
-            case "schema:Place":
+            case Entities.PLACE:
                 return GRAPHDB_INDEX.PLACE;
-            case "schema:Organization":
+            case Entities.ORGANIZATION:
                 return GRAPHDB_INDEX.ORGANIZATION;
-            case "schema:Person":
+            case Entities.PERSON:
                 return GRAPHDB_INDEX.PERSON;
-            case "dbo:Agent":
+            case Entities.AGENT:
                 return GRAPHDB_INDEX.AGENT;
-            case "skos:Concept":
+            case Entities.CONCEPT:
                 return GRAPHDB_INDEX.CONCEPT;
-            case "ado:EventType":
+            case Entities.EVENT_TYPE:
                 return GRAPHDB_INDEX.EVENT_TYPE;
-            case "ado:LivePerformanceWork":
+            case Entities.LIVE_PERFORMANCE_WORK:
                 return GRAPHDB_INDEX.LIVE_PERFORMANCE_WORK;
             default:
                 return GRAPHDB_INDEX.DEFAULT;
@@ -445,7 +445,7 @@ export class MatchServiceHelper {
     static generateSubQueryToURI(uri: string, type: string, scoreVariable: string, limit: number) {
         let query = QUERIES_V2.SELECT_ENTITY_BY_URI_TEMPLATE;
 
-        query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type);
+        query = query.replace("PROPERTY_TYPE_PLACEHOLDER",  type ? `<${type}>`: '?x');
         query = query.replace("URI_PLACEHOLDER", `<${uri}>`);
         query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
 
@@ -468,7 +468,7 @@ export class MatchServiceHelper {
 
         query = query.replace("INDEX_PLACEHOLDER", lucenceIndex);
         query = query.replace("LUCENE_QUERY_PLACEHOLDER", `${propertyName}: ${propertyValue}`);
-        query = query.replace("TYPE_PLACEHOLDER", type || "?x");
+        query = query.replace("TYPE_PLACEHOLDER",   type ? `<${type}>`: '?x' );
         query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
         query = query + ` LIMIT ${limit}`;
 

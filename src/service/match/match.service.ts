@@ -2,7 +2,7 @@ import {Injectable} from "@nestjs/common";
 import {ArtsdataService} from "../artsdata";
 import {ManifestService} from "../manifest";
 import {Exception, MatchServiceHelper} from "../../helper";
-import {ArtsdataConstants, ArtsdataProperties, Entities, QUERIES,} from "../../constant";
+import {ArtsdataConstants, ArtsdataProperties, Entities, PREFIXES, QUERIES,} from "../../constant";
 import {QueryCondition, ReconciliationRequest, ReconciliationResponse, ReconciliationResults,} from "../../dto";
 import {LanguageEnum, MatchQualifierEnum, MatchQuantifierEnum, MatchTypeEnum,} from "../../enum";
 import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
@@ -28,9 +28,16 @@ export class MatchService {
         }
 
         try {
-            const queries = JSON.parse(rawQueries);
-            return await this.reconcileByQueries(acceptLanguage, queries);
-        } catch {
+            let queries = JSON.parse(rawQueries);
+            queries = queries?.queries?.map((query: any) => {
+                const type = query.type;
+                query.type = type?.replace("schema:", PREFIXES.SCHEMA)
+                    .replace("skos:", PREFIXES.SKOS)
+                    .replace("ado:", PREFIXES.ADO);
+                return query;
+            })
+            return await this.reconcileByQueries(acceptLanguage, {queries:queries});
+        } catch (error) {
             return Exception.badRequest("The request is not a valid JSON object.");
         }
     }

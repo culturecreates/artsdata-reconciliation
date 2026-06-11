@@ -1,5 +1,5 @@
 import {ApiProperty, ApiPropertyOptional} from "@nestjs/swagger";
-import {Type} from "class-transformer";
+import {Type, Transform} from "class-transformer";
 import {
     ArrayMinSize,
     IsArray,
@@ -60,14 +60,17 @@ export class ReconciliationQuery {
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    @IsIn(MANIFEST.defaultTypes.flatMap(type => {
-        return [
-            type.id,
-            type.id.replace("schema:", PREFIXES.SCHEMA)
-                .replace("skos:", PREFIXES.SKOS)
-                .replace("ado:", PREFIXES.ADO)
-        ]
-    }))
+    @Transform(({ value }) => {
+        return value
+            .replace("schema:", PREFIXES.SCHEMA)
+            .replace("skos:", PREFIXES.SKOS)
+            .replace("ado:", PREFIXES.ADO);
+    })
+    @IsIn(MANIFEST.defaultTypes.map(type =>
+        type.id.replace("schema:", PREFIXES.SCHEMA)
+            .replace("skos:", PREFIXES.SKOS)
+            .replace("ado:", PREFIXES.ADO)
+    ))
     type: string;
 
     @IsOptional()
