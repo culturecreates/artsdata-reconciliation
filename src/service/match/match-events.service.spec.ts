@@ -273,7 +273,7 @@ describe('Reconcile events with contained in place', () => {
         const {
             graphUri,
             luceneConnector
-        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.ALL_LITERALS, testDatasetPath)
+        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.EVENT, testDatasetPath)
         testGraphUri = graphUri;
         testLuceneConnectorId = luceneConnector;
         jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
@@ -353,7 +353,7 @@ describe('Reconcile events with contained in place', () => {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2026-04-25T19:30:00-07:00",
                     propertyId: "http://schema.org/startDate",
-                    required: true
+                    required: false
                 }
             ],
             limit: 10
