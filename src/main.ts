@@ -14,7 +14,9 @@ async function bootstrap() {
     server.use(express.urlencoded({limit: '50mb', extended: true}));
 
     const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(new ValidationPipe(
+        {transform: true}
+    ));
     app.enableCors();
 
     const artsdataService = app.get(ArtsdataService);

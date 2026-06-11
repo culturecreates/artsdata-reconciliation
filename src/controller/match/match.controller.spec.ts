@@ -6,16 +6,12 @@ import {ReconciliationRequest} from "../../dto";
 import {INestApplication, ValidationPipe} from "@nestjs/common";
 import {plainToInstance} from "class-transformer";
 import {validate} from "class-validator";
+import {dropIndexAndTheGraph, uploadDataSetAndCreateLuceneConnector} from "../../../test/util/common-util";
+import {IndexFileNameEnum} from "../../enum/index-names.enum";
+import {MatchServiceHelper} from "../../helper";
 
 describe('MatchController', () => {
-    let matchController: MatchController;
     let app: INestApplication;
-    const mockResponse: any = {
-        setHeader: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn().mockReturnThis(),
-        send: jest.fn().mockReturnThis()
-    };
 
     beforeAll(async () => {
         const moduleRef: TestingModule = await Test.createTestingModule({
@@ -26,7 +22,6 @@ describe('MatchController', () => {
 
         app.useGlobalPipes(new ValidationPipe({whitelist: true, transform: true,}));
         await app.init();
-        matchController = app.get<MatchController>(MatchController);
     });
 
     describe("Test Match API", () => {
@@ -59,6 +54,95 @@ describe('MatchController', () => {
             const dto = plainToInstance(ReconciliationRequest, matchRequest);
             const errors = await validate(dto);
             expect(errors.length).toBe(0);
+        });
+
+    });
+});
+
+
+describe('MatchController - type as fully qualified URI and not', () => {
+    let matchController: MatchController;
+    let app: INestApplication;
+
+    const testDatasetPath = 'test/fixtures/files/places-people-and-organizations-with-name.ttl';
+    let testLuceneConnectorId: string;
+    let testGraphUri: string;
+
+    const mockResponse: any = {
+        setHeader: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+        send: jest.fn().mockReturnThis()
+    };
+
+    beforeAll(async () => {
+        const moduleRef: TestingModule = await Test.createTestingModule({
+            controllers: [MatchController],
+            providers: [HttpService, ArtsdataService, ManifestService, MatchService]
+        }).compile();
+        app = moduleRef.createNestApplication();
+
+        app.useGlobalPipes(new ValidationPipe({whitelist: true, transform: true,}));
+        await app.init();
+        matchController = app.get<MatchController>(MatchController);
+        const {
+            graphUri,
+            luceneConnector
+        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.PLACE, testDatasetPath)
+        testGraphUri = graphUri;
+        testLuceneConnectorId = luceneConnector;
+        jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
+
+    });
+
+    afterAll(async () => {
+        await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
+    })
+
+    describe("Test Match API", () => {
+
+        it("Match service should return Place - when type is 'http://schema.org/Place'", async () => {
+            const matchRequest: ReconciliationRequest = {
+                "queries": [
+                    {
+                        conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Place Bell"}],
+                        type: "http://schema.org/Place",
+                        limit: 5
+                    }
+                ]
+            }
+
+            const dto = plainToInstance(ReconciliationRequest, matchRequest);
+            const response = await matchController.reconcileByQueries(LanguageEnum.ENGLISH, dto, mockResponse);
+
+            const resultCandidates = response.results?.[0]?.candidates;
+            resultCandidates.forEach(actualResult => {
+                expect(actualResult?.type?.find(type => type.id === "http://schema.org/Place")?.id)
+                    .toBe("http://schema.org/Place");
+            })
+
+        });
+
+
+        it("Match service should return Place - when type is schema:Place", async () => {
+            const matchRequest: ReconciliationRequest = {
+                "queries": [
+                    {
+                        conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Place Bell"}],
+                        type: "schema:Place",
+                        limit: 5
+                    }
+                ]
+            }
+
+            const dto = plainToInstance(ReconciliationRequest, matchRequest);
+            const response = await matchController.reconcileByQueries(LanguageEnum.ENGLISH, dto, mockResponse);
+
+            const resultCandidates = response.results?.[0]?.candidates;
+            resultCandidates.forEach(actualResult => {
+                expect(actualResult?.type?.find(type => type.id === "http://schema.org/Place")?.id)
+                    .toBe("http://schema.org/Place");
+            })
         });
 
     });

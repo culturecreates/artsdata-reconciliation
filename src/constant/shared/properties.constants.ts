@@ -25,13 +25,14 @@ export const PREFIXES = {
 };
 
 export const Entities = {
-    EVENT: "schema:Event",
-    PLACE: "schema:Place",
-    PERSON: "schema:Person",
-    ORGANIZATION: "schema:Organization",
-    CONCEPT: "skos:Concept",
-    AGENT: "dbo:Agent",
-    LIVE_PERFORMANCE_WORK: "dbo:LivePerformanceWork",
+    EVENT: "http://schema.org/Event",
+    PLACE: "http://schema.org/Place",
+    PERSON: "http://schema.org/Person",
+    ORGANIZATION: "http://schema.org/Organization",
+    CONCEPT: "http://www.w3.org/2004/02/skos/core#Concept",
+    AGENT: "http://kg.artsdata.ca/ontology/Agent",
+    LIVE_PERFORMANCE_WORK: "http://kg.artsdata.ca/ontology/LivePerformanceWork",
+    EVENT_TYPE: "http://kg.artsdata.ca/ontology/EventType"
 };
 
 export const SCHEMA_ORG_PROPERTY_URI_MAP = {
