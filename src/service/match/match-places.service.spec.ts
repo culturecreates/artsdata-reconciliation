@@ -83,7 +83,7 @@ describe('Test matching Place using sparql query v1', () => {
     it('It should match a place whose French title is the search term', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Place",
+            type: Entities.PLACE,
             limit: 1,
             conditions: [
                 {
@@ -133,7 +133,7 @@ describe('Test matching Place using sparql query v1', () => {
     it('It should match a place whose French title is the search term', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Place",
+            type: Entities.PLACE,
             limit: 1,
             conditions: [
                 {
@@ -161,7 +161,7 @@ describe('Test matching Place using sparql query v1', () => {
     it('Reconcile Place with Name and Postal code', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Place",
+            type: Entities.PLACE,
             limit: 1,
             conditions: [
                 {
@@ -195,7 +195,7 @@ describe('Test matching Place using sparql query v1', () => {
     it('Reconcile Place with Name and Street Address', async () => {
 
         const reconciliationQuery: ReconciliationQuery ={
-            type: "schema:Place",
+            type: Entities.PLACE,
             limit: 1,
             conditions: [
                 {
@@ -229,7 +229,7 @@ describe('Test matching Place using sparql query v1', () => {
     it('It should find by name', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Place",
+            type: Entities.PLACE,
             limit: 1,
             conditions: [
                 {
@@ -257,7 +257,7 @@ describe('Test matching Place using sparql query v1', () => {
     it('Reconcile Place with name and postal code and match should be false since postal code is incorrect', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Place",
+            type: Entities.PLACE,
             limit: 1,
             conditions: [
                 {
@@ -285,7 +285,7 @@ describe('Test matching Place using sparql query v1', () => {
     it('Reconcile Place with name and locality, the match should be true since all are exactly matching', async () => {
 
         const reconciliationQuery: ReconciliationQuery =  {
-            type: "schema:Place",
+            type: Entities.PLACE,
             limit: 1,
             conditions: [
                 {
@@ -319,7 +319,7 @@ describe('Test matching Place using sparql query v1', () => {
     it('Match Place with alternate name', async () => {
 
         const reconciliationQuery: ReconciliationQuery =  {
-            type: "schema:Place",
+            type: Entities.PLACE,
             limit: 1,
             conditions: [
                 {

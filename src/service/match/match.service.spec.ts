@@ -9,6 +9,7 @@ import {IndexFileNameEnum} from "../../enum/index-names.enum";
 import {MatchServiceHelper} from "../../helper";
 import {ReconciliationQuery} from "../../dto";
 import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
+import {Entities} from "../../constant";
 
 describe('Test reconciling events using sparql query version 1', () => {
 
@@ -36,7 +37,7 @@ describe('Test reconciling events using sparql query version 1', () => {
     it('Reconcile event with partial name and that contains \'&\'.', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Event",
+            type: Entities.EVENT,
             limit: 1,
             conditions: [
                 {
@@ -64,7 +65,7 @@ describe('Test reconciling events using sparql query version 1', () => {
     it('Reconcile event with partial name and that contains \'-\'.', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Event",
+            type: Entities.EVENT,
             limit: 1,
             conditions: [
                 {
@@ -92,7 +93,7 @@ describe('Test reconciling events using sparql query version 1', () => {
     it('Reconcile event with partial name and that contains \'||\'.', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Event",
+            type: Entities.EVENT,
             limit: 1,
             conditions: [
                 {
@@ -120,7 +121,7 @@ describe('Test reconciling events using sparql query version 1', () => {
     it('Reconcile event with partial name and that contains \'(\' and \').', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Event",
+            type: Entities.EVENT,
             limit: 1,
             conditions: [
                 {
@@ -148,7 +149,7 @@ describe('Test reconciling events using sparql query version 1', () => {
     it('Reconcile event with partial name and that contains \'[\' and \']\'.', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Event",
+            type: Entities.EVENT,
             limit: 1,
             conditions: [
                 {
@@ -176,7 +177,7 @@ describe('Test reconciling events using sparql query version 1', () => {
     it('Reconcile event with partial name and that contains AND', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Event",
+            type: Entities.EVENT,
             limit: 1,
             conditions: [
                 {
@@ -204,7 +205,7 @@ describe('Test reconciling events using sparql query version 1', () => {
     it('It should match names with single neutral quote', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Event",
+            type: Entities.EVENT,
             limit: 1,
             conditions: [
                 {
@@ -232,7 +233,7 @@ describe('Test reconciling events using sparql query version 1', () => {
     it('It should match names with single curved quote', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Event",
+            type: Entities.EVENT,
             limit: 1,
             conditions: [
                 {
@@ -260,7 +261,7 @@ describe('Test reconciling events using sparql query version 1', () => {
     it('It should match names with single curved quote', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Event",
+            type: Entities.EVENT,
             limit: 1,
             conditions: [
                 {
@@ -288,7 +289,7 @@ describe('Test reconciling events using sparql query version 1', () => {
     it('It should match names with &', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Event",
+            type: Entities.EVENT,
             limit: 1,
             conditions: [
                 {
@@ -316,7 +317,7 @@ describe('Test reconciling events using sparql query version 1', () => {
     it('It should match names with &', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Event",
+            type: Entities.EVENT,
             limit: 1,
             conditions: [
                 {
@@ -344,7 +345,7 @@ describe('Test reconciling events using sparql query version 1', () => {
     it('Reconcile a Event with Invalid Artsdata ID - XXX', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Event",
+            type: Entities.EVENT,
             limit: 1,
             conditions: [
                 {
@@ -370,7 +371,7 @@ describe('Test reconciling events using sparql query version 1', () => {
     it('Reconcile Event with Name and startDate in xsd:dateTime format', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "schema:Event",
+            type: Entities.EVENT,
             limit: 1,
             conditions: [
                 {
