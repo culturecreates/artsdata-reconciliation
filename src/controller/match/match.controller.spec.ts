@@ -6,16 +6,12 @@ import {ReconciliationRequest} from "../../dto";
 import {INestApplication, ValidationPipe} from "@nestjs/common";
 import {plainToInstance} from "class-transformer";
 import {validate} from "class-validator";
+import {dropIndexAndTheGraph, uploadDataSetAndCreateLuceneConnector} from "../../../test/util/common-util";
+import {IndexFileNameEnum} from "../../enum/index-names.enum";
+import {MatchServiceHelper} from "../../helper";
 
 describe('MatchController', () => {
-    let matchController: MatchController;
     let app: INestApplication;
-    const mockResponse: any = {
-        setHeader: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn().mockReturnThis(),
-        send: jest.fn().mockReturnThis()
-    };
 
     beforeAll(async () => {
         const moduleRef: TestingModule = await Test.createTestingModule({
@@ -26,7 +22,6 @@ describe('MatchController', () => {
 
         app.useGlobalPipes(new ValidationPipe({whitelist: true, transform: true,}));
         await app.init();
-        matchController = app.get<MatchController>(MatchController);
     });
 
     describe("Test Match API", () => {
