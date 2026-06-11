@@ -127,7 +127,7 @@ describe('Test matching events using sparql query v1', () => {
                 {matchType: MatchTypeEnum.NAME, propertyValue: "Beacon Night"},
                 {
                     matchType: MatchTypeEnum.PROPERTY,
-                    propertyValue: "2025-03-03T17:00:00-05:00",
+                    propertyValue: "2025-03-03",
                     propertyId: "http://schema.org/startDate",
                     required: true
                 }
