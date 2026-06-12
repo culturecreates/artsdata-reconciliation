@@ -49,6 +49,7 @@ export const SCHEMA_ORG_PROPERTY_URI_MAP = {
     URL: "<http://schema.org/url>",
     SAME_AS: "<http://schema.org/sameAs>",
     START_DATE: "<http://schema.org/startDate>",
+    SUB_EVENT: "<http://schema.org/subEvent>",
     END_DATE: "<http://schema.org/endDate>",
     LOCATION: "<http://schema.org/location>",
     LOCATION_NAME:"<http://schema.org/location>/<http://schema.org/name>",

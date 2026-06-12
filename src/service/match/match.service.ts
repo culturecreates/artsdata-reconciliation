@@ -572,12 +572,14 @@ export class MatchService {
                                      OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality }
                                      OPTIONAL { ?entity schema:sameAs ?wikidata 
                                     FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
-                                  }`);
+                                  }`)
+                    .replace("GROUP_BY_PLACEHOLDER", QUERIES.GROUP_BY_STATEMENT);
                 break;
             case Entities.EVENT:
                 rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
                     `(SAMPLE(?startDate) AS ?startDate)
                                 (SAMPLE(?endDate) AS ?endDate)
+                                ?subEvent
                                 (SAMPLE(?locationName) AS ?locationName)
                                 (SAMPLE(?postalCode) AS ?postalCode)
                                 (SAMPLE(?artsdataUri) AS ?locationUri)
@@ -588,6 +590,7 @@ export class MatchService {
                         `OPTIONAL { ?entity schema:startDate ?startDate }
                                     OPTIONAL { ?entity schema:alternateName ?alternateName}  
                                     OPTIONAL { ?entity schema:endDate ?endDate }
+                                    OPTIONAL {?entity schema:subEvent ?subEvent }
                                     OPTIONAL { ?entity schema:location ?location .
                                     OPTIONAL { ?location schema:name ?locationName }
                                     OPTIONAL { ?location schema:address/schema:postalCode ?postalCode }
@@ -603,7 +606,8 @@ export class MatchService {
                                         ?location ^schema:containedInPlace ?childPlace .
                                         FILTER(STRSTARTS(STR(?childPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
                                         BIND(?childPlace AS ?locationContains)
-                                    }}`);
+                                    }}`)
+                    .replace("GROUP_BY_PLACEHOLDER", `${QUERIES.GROUP_BY_STATEMENT} ?subEvent`);
                 break;
             case Entities.PERSON:
             case Entities.ORGANIZATION:
@@ -620,11 +624,13 @@ export class MatchService {
                                       }
                                       OPTIONAL {BIND(?sameAs AS ?isni)
                                         FILTER (STRSTARTS(str(?isni), "https://isni.org/isni/"))
-                                      }}`);
+                                      }}`)
+                    .replace("GROUP_BY_PLACEHOLDER", QUERIES.GROUP_BY_STATEMENT);
                 break;
             default:
                 rawQuery = rawQuery.replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER", "")
                     .replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER", "")
+                    .replace("GROUP_BY_PLACEHOLDER", QUERIES.GROUP_BY_STATEMENT);
                 break;
 
         }

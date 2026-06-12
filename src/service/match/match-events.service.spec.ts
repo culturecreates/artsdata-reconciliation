@@ -609,6 +609,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
             locationName: undefined,
             wikidata: undefined,
             isni: undefined,
+            subEvents: undefined,
         };
 
         const differentNameRecord = {name: "Hamlet"};

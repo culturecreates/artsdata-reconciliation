@@ -46,7 +46,7 @@ export const QUERIES = {
    ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER
    
  }
- GROUP BY ?entity ?total_score ?type_label ?type`,
+ GROUP_BY_PLACEHOLDER`,
 
   SELECT_ENTITY_QUERY_BY_KEYWORD: `
  SELECT ?entity ?total_score WHERE {
@@ -59,5 +59,7 @@ export const QUERIES = {
    FILTER(?total_score > 0)
  } GROUP BY ?entity ?total_score
   LIMIT_PLACE_HOLDER`,
+
+  GROUP_BY_STATEMENT: `GROUP BY ?entity ?total_score ?type_label ?type`,
 
 };
