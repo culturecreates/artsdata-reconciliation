@@ -62,7 +62,7 @@ export class MatchServiceHelper {
 
             return `( ${propertyId}Date:${startDateRange.slice(0,8)} OR ${propertyId}Time:[${startDateRange} TO ${endDateRange}] )`;
         } else {
-            return `${propertyId}Time:${toLuceneDate(value)}`;
+            return `( ${propertyId}Time:${toLuceneDate(value)}^3 )`;
         }
 
     }
