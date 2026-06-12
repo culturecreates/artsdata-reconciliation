@@ -60,7 +60,7 @@ export class MatchServiceHelper {
             const startDateRange = toLuceneDate(value);
             const endDateRange = toLuceneDate(`${value}T23:59:59Z`);
 
-            return `( ${propertyId}Date:${startDateRange.slice(0,8)} OR ${propertyId}Time:[${startDateRange} TO ${endDateRange}] )`;
+            return `( ${propertyId}:${startDateRange.slice(0,8)} OR ${propertyId}Time:[${startDateRange} TO ${endDateRange}] )`;
         } else {
             return `( ${propertyId}Time:${toLuceneDate(value)}^3 )`;
         }

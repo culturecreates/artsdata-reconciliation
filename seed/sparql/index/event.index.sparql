@@ -59,7 +59,7 @@ INSERT DATA {
       "facet": true
     },
     {
-      "fieldName": "startDateDate",
+      "fieldName": "startDate",
       "propertyChain": [
         "http://schema.org/startDate"
       ],
@@ -72,7 +72,7 @@ INSERT DATA {
       "facet": true
     },
     {
-      "fieldName": "endDateDate",
+      "fieldName": "endDate",
       "propertyChain": [
         "http://schema.org/endDate"
       ],
