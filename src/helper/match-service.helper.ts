@@ -107,7 +107,7 @@ export class MatchServiceHelper {
                 wikidata: currentBinding["wikidata"]?.value,
                 isni: currentBinding["isni"]?.value,
                 alternateName: currentBinding["alternateName"]?.value,
-                subEvents: subEventSet.size > 0 ? subEventSet : undefined,
+                subEvents: subEventSet.size > 0 ? [...subEventSet] : undefined,
             };
 
 
@@ -237,7 +237,7 @@ export class MatchServiceHelper {
             },
             listNotDifferentIfBothExists: (a: string[] | undefined, b: string[] | undefined) => {
                 if (!a || !b) return true;
-                return a.every(item => b.includes(item));
+                return b.every(item => a.includes(item));
             },
             exactUrl: (a: string, b: string) => {
                 if (a && b) {
