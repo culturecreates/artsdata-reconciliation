@@ -36,7 +36,7 @@ export class MatchService {
                     .replace("ado:", PREFIXES.ADO);
                 return query;
             })
-            return await this.reconcileByQueries(acceptLanguage, {queries:queries});
+            return await this.reconcileByQueries(acceptLanguage, {queries: queries});
         } catch (error) {
             return Exception.badRequest("The request is not a valid JSON object.");
         }
@@ -447,10 +447,8 @@ export class MatchService {
 
         const graphdbIndex = MatchServiceHelper.getGraphdbIndex(type);
         let rawQuery = QUERIES.RECONCILIATION_QUERY;
-        let luceneQuery: string = "";
-        if (name) {
-            luceneQuery = this._generateLuceneQuery(name, propertyConditions);
-        }
+        let luceneQuery: string = this._generateLuceneQuery(name, propertyConditions);
+
         if (id) {
             id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX}${id}>`;
             rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER",
@@ -498,9 +496,9 @@ export class MatchService {
      * @param propertyConditions
      * @private
      */
-    private _generateLuceneQuery(name: string, propertyConditions: QueryCondition[]): string {
+    private _generateLuceneQuery(name: string | undefined, propertyConditions: QueryCondition[]): string {
 
-        const transformedName: string = MatchServiceHelper.transformSearchQuery(name, 'name');
+        const transformedName: string = name ? MatchServiceHelper.transformSearchQuery(name, 'name') : '';
 
         const propertyMap = {
             "http://schema.org/name": "name",
@@ -518,7 +516,7 @@ export class MatchService {
             .reduce((query, condition) => {
                 Object.entries(propertyMap).forEach(([key, value]) => {
                     if (condition.propertyId === key) {
-                        const connector = condition.required ? "AND" : "OR";
+                        const connector = !query?.length ? '' : condition.required ? "AND" : "OR";
                         query = `${query} ${connector} ${this._resolvePropertyValueForLucene(condition.propertyValue, value)}`;
                     }
                 });
@@ -539,8 +537,8 @@ export class MatchService {
     private _resolvePropertyValueForLucene(propertyValue: string | string[], propertyId: string): string {
         const values = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
         return values
-            .map((value) =>{
-                if(propertyId === "startDate" || propertyId === "endDate"){
+            .map((value) => {
+                if (propertyId === "startDate" || propertyId === "endDate") {
                     return `${MatchServiceHelper.generateDateQuery(value, propertyId)}`
                 } else {
                     return `${MatchServiceHelper.transformSearchQuery(value, propertyId)}`
