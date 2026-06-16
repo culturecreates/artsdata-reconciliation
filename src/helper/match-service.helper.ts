@@ -237,7 +237,7 @@ export class MatchServiceHelper {
             },
             listNotDifferentIfBothExists: (a: string[] | undefined, b: string[] | undefined) => {
                 if (!a || !b) return true;
-                return b.every(item => a.includes(item));
+                return a.every(item => b.includes(item));
             },
             exactUrl: (a: string, b: string) => {
                 if (a && b) {

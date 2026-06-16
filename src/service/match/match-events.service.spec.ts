@@ -308,7 +308,7 @@ describe('Reconcile events with subEvents', () => {
                     required: true
                 }, {
                     matchType: MatchTypeEnum.PROPERTY,
-                    propertyValue: "http://kg.artsdata.ca/resource/SubEvent1",
+                    propertyValue: ["http://kg.artsdata.ca/resource/SubEvent1","http://kg.artsdata.ca/resource/SubEvent2"],
                     propertyId: "http://schema.org/subEvent",
                     required: false
                 }
@@ -328,7 +328,7 @@ describe('Reconcile events with subEvents', () => {
         expect(allResults?.length).toBe(1);
     });
 
-    it(`Event with subEvents not matching - Auto match should be false `, async () => {
+    it(`Event with subEvents not matching (One subevent missing in query) - Auto match should be false `, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -353,7 +353,7 @@ describe('Reconcile events with subEvents', () => {
                     required: true
                 }, {
                     matchType: MatchTypeEnum.PROPERTY,
-                    propertyValue: "http://kg.artsdata.ca/resource/NotMatchingSubEvent",
+                    propertyValue: "http://kg.artsdata.ca/resource/SubEvent1",
                     propertyId: "http://schema.org/subEvent",
                     required: false
                 }
