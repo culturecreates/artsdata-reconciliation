@@ -46,10 +46,24 @@ INSERT DATA {
       "facet": true
     },
     {
+      "fieldName": "startDateTime",
+      "propertyChain": [
+        "http://schema.org/startDate"
+      ],
+      "datatype": "http://www.w3.org/2001/XMLSchema#dateTime",
+      "indexed": true,
+      "stored": true,
+      "analyzed": true,
+      "multivalued": true,
+      "ignoreInvalidValues": true,
+      "facet": true
+    },
+    {
       "fieldName": "startDate",
       "propertyChain": [
         "http://schema.org/startDate"
       ],
+      "datatype": "http://www.w3.org/2001/XMLSchema#date",
       "indexed": true,
       "stored": true,
       "analyzed": true,
@@ -62,6 +76,20 @@ INSERT DATA {
       "propertyChain": [
         "http://schema.org/endDate"
       ],
+      "datatype": "http://www.w3.org/2001/XMLSchema#date",
+      "indexed": true,
+      "stored": true,
+      "analyzed": true,
+      "multivalued": true,
+      "ignoreInvalidValues": true,
+      "facet": true
+    },
+    {
+      "fieldName": "endDateTime",
+      "propertyChain": [
+        "http://schema.org/endDate"
+      ],
+      "datatype": "http://www.w3.org/2001/XMLSchema#dateTime",
       "indexed": true,
       "stored": true,
       "analyzed": true,

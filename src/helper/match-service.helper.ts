@@ -39,10 +39,32 @@ export class MatchServiceHelper {
 
         if (isNameProperty) {
             const alternateNameQuery = fuzzyTerms.map(term => `alternateName:${term}`).join(' AND ');
-            return `(${nameQuery})^3 OR (${alternateNameQuery})`
+            return `( (${nameQuery})^3 OR (${alternateNameQuery}) )`
         } else {
             return `(${nameQuery})`
         }
+    }
+
+    static generateDateQuery(value: string, propertyId: string) {
+        const xsdDateRegex = /^-?\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])(Z|[+-](0\d|1[0-4]):[0-5]\d)?$/;
+
+        function toLuceneDate(value: string) {
+            const iso = new Date(value).toISOString();
+
+            return iso
+                .slice(0, 19)
+                .replace(/[-:T]/g, '');
+        }
+
+        if (xsdDateRegex.test(value)) {
+            const startDateRange = toLuceneDate(value);
+            const endDateRange = toLuceneDate(`${value}T23:59:59Z`);
+
+            return `( ${propertyId}:${startDateRange.slice(0, 8)} OR ${propertyId}Time:[${startDateRange} TO ${endDateRange}] )`;
+        } else {
+            return `( ${propertyId}Time:${toLuceneDate(value)}^3 )`;
+        }
+
     }
 
     static formatReconciliationResponse(responseLanguage: LanguageEnum, sparqlResponse: any,
@@ -65,6 +87,12 @@ export class MatchServiceHelper {
             const description = currentBinding["description"]?.value;
             const descriptionEn = currentBinding["descriptionEn"]?.value;
             const descriptionFr = currentBinding["descriptionFr"]?.value;
+            const subEventSet = new Set();
+            currentBindings.forEach((binding: any) => {
+                if (binding.subEvent && binding.subEvent.value) {
+                    subEventSet.add(binding.subEvent.value);
+                }
+            });
 
             const additionalPropertiesForAutoMatch = {
                 url: currentBinding["url"]?.value,
@@ -79,7 +107,9 @@ export class MatchServiceHelper {
                 wikidata: currentBinding["wikidata"]?.value,
                 isni: currentBinding["isni"]?.value,
                 alternateName: currentBinding["alternateName"]?.value,
+                subEvents: subEventSet.size > 0 ? [...subEventSet] : undefined,
             };
+
 
             if (responseLanguage === LanguageEnum.FRENCH) {
                 resultCandidate.name = nameFr || name || nameEn;
@@ -205,6 +235,10 @@ export class MatchServiceHelper {
                 if (!a || !b) return true;
                 return a === b;
             },
+            listNotDifferentIfBothExists: (a: string[] | undefined, b: string[] | undefined) => {
+                if (!a || !b) return true;
+                return a.every(item => b.includes(item));
+            },
             exactUrl: (a: string, b: string) => {
                 if (a && b) {
                     try {
@@ -285,7 +319,7 @@ export class MatchServiceHelper {
             matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
         ];
 
-        const checksNameStartDateEndDatePlaceUriMatchForEvents = [
+        const checksNameStartDateEndDatePlaceUriAndSubEventsMatchForEvents = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate),
             matchers.exactLocationOrRelated(
@@ -299,9 +333,10 @@ export class MatchServiceHelper {
             matchers.closeDates(additionalProperties.startDate, recordFromQuery.startDate as string,
                 additionalProperties.endDate, recordFromQuery.endDate,
             ),
+            matchers.listNotDifferentIfBothExists(additionalProperties.subEvents, recordFromQuery.subEvents)
         ];
 
-        const checksNameStartDateEndDatePlaceNamePostalCodeMatchForEvents = [
+        const checksNameStartDateEndDatePlaceNamePostalCodeAndSubEventsMatchForEvents = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate),
             matchers.exact(additionalProperties.postalCode, recordFromQuery.postalCode, true),
@@ -309,6 +344,8 @@ export class MatchServiceHelper {
             matchers.closeDates(
                 additionalProperties.startDate, recordFromQuery.startDate as string, additionalProperties.endDate,
                 recordFromQuery.endDate),
+            matchers.listNotDifferentIfBothExists(additionalProperties.subEvents, recordFromQuery.subEvents)
+
         ];
 
         if (reconciliationQuery.type === Entities.PLACE) {
@@ -320,8 +357,8 @@ export class MatchServiceHelper {
             );
         } else if (reconciliationQuery.type === Entities.EVENT) {
             return (
-                checksNameStartDateEndDatePlaceUriMatchForEvents.every(Boolean) ||
-                checksNameStartDateEndDatePlaceNamePostalCodeMatchForEvents.every(Boolean)
+                checksNameStartDateEndDatePlaceUriAndSubEventsMatchForEvents.every(Boolean) ||
+                checksNameStartDateEndDatePlaceNamePostalCodeAndSubEventsMatchForEvents.every(Boolean)
             );
         } else {
             return (
@@ -339,7 +376,8 @@ export class MatchServiceHelper {
 
         let postalCode: string | undefined = undefined, addressLocality: string | undefined = undefined,
             addressRegion: string | undefined = undefined, url: string | undefined = undefined,
-            startDate: string | undefined = undefined, endDate: string | undefined = undefined,
+            startDate: string | undefined = undefined, subEvents: string[] | undefined,
+            endDate: string | undefined = undefined,
             locationName: string | undefined = undefined, locationUri: string | undefined = undefined,
             wikidata: string | undefined = undefined, isni: string | undefined = undefined;
         let sameAs: string[] = [];
@@ -378,6 +416,16 @@ export class MatchServiceHelper {
                     case SCHEMA_ORG_PROPERTY_URI_MAP.START_DATE:
                         startDate = condition.propertyValue as string;
                         break;
+                    case SCHEMA_ORG_PROPERTY_URI_MAP.SUB_EVENT:
+                        const subEventValue = condition.propertyValue;
+                        if (Array.isArray(subEventValue)) {
+                            subEvents = subEventValue as string[];
+                        } else if (subEventValue) {
+                            subEvents = [subEventValue];
+                        } else {
+                            subEvents = undefined;
+                        }
+                        break;
                     case SCHEMA_ORG_PROPERTY_URI_MAP.END_DATE:
                         endDate = condition.propertyValue as string;
                         break;
@@ -409,6 +457,7 @@ export class MatchServiceHelper {
             url,
             startDate,
             endDate,
+            subEvents,
             locationName,
             locationUri,
             locationContainedIn: undefined,
@@ -445,7 +494,7 @@ export class MatchServiceHelper {
     static generateSubQueryToURI(uri: string, type: string, scoreVariable: string, limit: number) {
         let query = QUERIES_V2.SELECT_ENTITY_BY_URI_TEMPLATE;
 
-        query = query.replace("PROPERTY_TYPE_PLACEHOLDER",  type ? `<${type}>`: '?x');
+        query = query.replace("PROPERTY_TYPE_PLACEHOLDER", type ? `<${type}>` : '?x');
         query = query.replace("URI_PLACEHOLDER", `<${uri}>`);
         query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
 
@@ -468,7 +517,7 @@ export class MatchServiceHelper {
 
         query = query.replace("INDEX_PLACEHOLDER", lucenceIndex);
         query = query.replace("LUCENE_QUERY_PLACEHOLDER", `${propertyName}: ${propertyValue}`);
-        query = query.replace("TYPE_PLACEHOLDER",   type ? `<${type}>`: '?x' );
+        query = query.replace("TYPE_PLACEHOLDER", type ? `<${type}>` : '?x');
         query = query.replace("PROPERTY_SCORE_VARIABLE_PLACEHOLDER", scoreVariable);
         query = query + ` LIMIT ${limit}`;
 
@@ -534,7 +583,7 @@ export class MatchServiceHelper {
         if (prefixCount === 1) {
             return text.replace('schema:', PREFIXES.SCHEMA)
                 .replace('skos:', PREFIXES.SKOS)
-            .replace('ado:', PREFIXES.ADO)
+                .replace('ado:', PREFIXES.ADO)
                 ;
         }
 

@@ -67,7 +67,7 @@ describe('Test matching events using sparql query v1', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2025-01-01",
-                    propertyId: "schema:startDate",
+                    propertyId: "http://schema.org/startDate",
                     required: true
                 }
 
@@ -98,7 +98,7 @@ describe('Test matching events using sparql query v1', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2025-02-02",
-                    propertyId: "schema:startDate",
+                    propertyId: "http://schema.org/startDate",
                     required: true
                 }
 
@@ -128,7 +128,7 @@ describe('Test matching events using sparql query v1', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2025-03-03",
-                    propertyId: "schema:startDate",
+                    propertyId: "http://schema.org/startDate",
                     required: true
                 }
 
@@ -158,17 +158,17 @@ describe('Test matching events using sparql query v1', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2025-03-03T17:00:00-05:00",
-                    propertyId: "schema:startDate",
+                    propertyId: "http://schema.org/startDate",
                     required: true
                 }, {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2025-03-03T18:00:00-05:00",
-                    propertyId: "schema:endDate",
+                    propertyId: "http://schema.org/endDate",
                     required: true
                 }, {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "http://kg.artsdata.ca/resource/KP-1",
-                    propertyId: "schema:location",
+                    propertyId: "http://schema.org/location",
                     required: true
                 }
 
@@ -198,12 +198,12 @@ describe('Test matching events using sparql query v1', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2025-03-03T17:00:00-05:00",
-                    propertyId: "schema:startDate",
+                    propertyId: "http://schema.org/startDate",
                     required: true
                 }, {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2025-03-03T18:00:00-05:00",
-                    propertyId: "schema:endDate",
+                    propertyId: "http://schema.org/endDate",
                     required: true
                 }, {
                     matchType: MatchTypeEnum.PROPERTY,
@@ -259,6 +259,123 @@ describe('Test matching events using sparql query v1', () => {
 
 });
 
+describe('Reconcile events with subEvents', () => {
+
+    let matchService: MatchService;
+    const testDatasetPath = 'test/fixtures/files/events-with-name.ttl';
+    let testLuceneConnectorId: string;
+    let testGraphUri: string;
+
+    beforeAll(async () => {
+        const setup = await setupMatchService();
+        matchService = setup.matchService;
+
+        const {
+            graphUri,
+            luceneConnector
+        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.EVENT, testDatasetPath)
+        testGraphUri = graphUri;
+        testLuceneConnectorId = luceneConnector;
+        jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
+    });
+    afterAll(async () => {
+        await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
+    })
+
+
+    it(`Event with subEvents not matching - Auto match should be false `, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {
+                    matchType: MatchTypeEnum.NAME,
+                    propertyValue: "Event Series One"
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-01-01T13:00:00-04:00",
+                    propertyId: "http://schema.org/startDate",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-01-28T13:00:00-04:00",
+                    propertyId: "http://schema.org/endDate",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "http://kg.artsdata.ca/resource/KP-1",
+                    propertyId: "http://schema.org/location",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: ["http://kg.artsdata.ca/resource/SubEvent1","http://kg.artsdata.ca/resource/SubEvent2"],
+                    propertyId: "http://schema.org/subEvent",
+                    required: false
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("EventSeries1");
+        expect(actualResult?.match).toBeTruthy();
+        expect(allResults?.length).toBe(1);
+    });
+
+    it(`Event with subEvents not matching (One subevent missing in query) - Auto match should be false `, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {
+                    matchType: MatchTypeEnum.NAME,
+                    propertyValue: "Event Series One"
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-01-01T13:00:00-04:00",
+                    propertyId: "http://schema.org/startDate",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-01-28T13:00:00-04:00",
+                    propertyId: "http://schema.org/endDate",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "http://kg.artsdata.ca/resource/KP-1",
+                    propertyId: "http://schema.org/location",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "http://kg.artsdata.ca/resource/SubEvent1",
+                    propertyId: "http://schema.org/subEvent",
+                    required: false
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("EventSeries1");
+        expect(actualResult?.match).toBeFalsy();
+        expect(allResults?.length).toBe(1);
+    });
+
+
+});
+
 describe('Reconcile events with contained in place', () => {
 
     let matchService: MatchService;
@@ -273,7 +390,7 @@ describe('Reconcile events with contained in place', () => {
         const {
             graphUri,
             luceneConnector
-        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.ALL_LITERALS, testDatasetPath)
+        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.EVENT, testDatasetPath)
         testGraphUri = graphUri;
         testLuceneConnectorId = luceneConnector;
         jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
@@ -292,7 +409,7 @@ describe('Reconcile events with contained in place', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "http://kg.artsdata.ca/resource/K-PortTheatreAuditorium",
-                    propertyId: "schema:location",
+                    propertyId: "http://schema.org/location",
                     required: true
                 }
             ],
@@ -319,7 +436,7 @@ describe('Reconcile events with contained in place', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "http://kg.artsdata.ca/resource/K-PortTheatre",
-                    propertyId: "schema:location",
+                    propertyId: "http://schema.org/location",
                     required: true
                 }
             ],
@@ -346,14 +463,14 @@ describe('Reconcile events with contained in place', () => {
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "http://kg.artsdata.ca/resource/K-PortTheatre",
-                    propertyId: "schema:location",
+                    propertyId: "http://schema.org/location",
                     required: true
                 },
                 {
                     matchType: MatchTypeEnum.PROPERTY,
                     propertyValue: "2026-04-25T19:30:00-07:00",
-                    propertyId: "schema:startDate",
-                    required: true
+                    propertyId: "http://schema.org/startDate",
+                    required: false
                 }
             ],
             limit: 10
@@ -609,6 +726,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
             locationName: undefined,
             wikidata: undefined,
             isni: undefined,
+            subEvents: undefined,
         };
 
         const differentNameRecord = {name: "Hamlet"};

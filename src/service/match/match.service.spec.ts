@@ -377,13 +377,12 @@ describe('Test reconciling events using sparql query version 1', () => {
                 {
                     matchType: "name",
                     propertyValue: "At the Night",
-                    propertyId: "string",
                     required: true,
                 },
                 {
                     matchType: "property",
                     propertyValue: "2025-12-28T13:00:00-04:00",
-                    propertyId: "schema:startDate",
+                    propertyId: "http://schema.org/startDate",
                     required: true,
                 },
             ],

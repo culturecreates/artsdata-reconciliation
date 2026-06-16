@@ -447,9 +447,9 @@ export class MatchService {
 
         const graphdbIndex = MatchServiceHelper.getGraphdbIndex(type);
         let rawQuery = QUERIES.RECONCILIATION_QUERY;
-
+        let luceneQuery: string = "";
         if (name) {
-            name = this._modifyNameForLuceneScore(MatchServiceHelper.transformSearchQuery(name, 'name'), propertyConditions);
+            luceneQuery = this._generateLuceneQuery(name, propertyConditions);
         }
         if (id) {
             id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX}${id}>`;
@@ -464,7 +464,7 @@ export class MatchService {
 
         rawQuery = rawQuery
             .replace("INDEX_PLACE_HOLDER", graphdbIndex)
-            .replace("QUERY_FILTER_PLACE_HOLDER", name ? `luc:query ${name}` : "")
+            .replace("QUERY_FILTER_PLACE_HOLDER", luceneQuery.length ? `luc:query ${luceneQuery}` : luceneQuery)
             .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
 
         return this._resolvePropertyConditions(rawQuery, propertyConditions);
@@ -498,7 +498,10 @@ export class MatchService {
      * @param propertyConditions
      * @private
      */
-    private _modifyNameForLuceneScore(name: string, propertyConditions: QueryCondition[]): string {
+    private _generateLuceneQuery(name: string, propertyConditions: QueryCondition[]): string {
+
+        const transformedName: string = MatchServiceHelper.transformSearchQuery(name, 'name');
+
         const propertyMap = {
             "http://schema.org/name": "name",
             "http://schema.org/url": "url",
@@ -514,15 +517,13 @@ export class MatchService {
             .filter((condition) => condition.matchType === MatchTypeEnum.PROPERTY)
             .reduce((query, condition) => {
                 Object.entries(propertyMap).forEach(([key, value]) => {
-                    if (condition.propertyId?.includes(key)) {
-                        query = `${query} OR ${this._resolvePropertyValueForLucene(
-                            condition.propertyValue,
-                            value,
-                        )}`;
+                    if (condition.propertyId === key) {
+                        const connector = condition.required ? "AND" : "OR";
+                        query = `${query} ${connector} ${this._resolvePropertyValueForLucene(condition.propertyValue, value)}`;
                     }
                 });
                 return query;
-            }, `${name}`);
+            }, `${transformedName}`);
 
         return `"${luceneQuery}" ;`;
     }
@@ -538,9 +539,13 @@ export class MatchService {
     private _resolvePropertyValueForLucene(propertyValue: string | string[], propertyId: string): string {
         const values = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
         return values
-            .map((value) =>
-                `${MatchServiceHelper.transformSearchQuery(value, propertyId)}`)
-            .join(" OR ");
+            .map((value) =>{
+                if(propertyId === "startDate" || propertyId === "endDate"){
+                    return `${MatchServiceHelper.generateDateQuery(value, propertyId)}`
+                } else {
+                    return `${MatchServiceHelper.transformSearchQuery(value, propertyId)}`
+                }
+            }).join(" OR ");
     }
 
     /**
@@ -567,12 +572,14 @@ export class MatchService {
                                      OPTIONAL { ?entity schema:address/schema:addressLocality ?addressLocality }
                                      OPTIONAL { ?entity schema:sameAs ?wikidata 
                                     FILTER (STRSTARTS(str(?wikidata), "http://www.wikidata.org/entity/"))
-                                  }`);
+                                  }`)
+                    .replace("GROUP_BY_PLACEHOLDER", QUERIES.GROUP_BY_STATEMENT);
                 break;
             case Entities.EVENT:
                 rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
                     `(SAMPLE(?startDate) AS ?startDate)
                                 (SAMPLE(?endDate) AS ?endDate)
+                                ?subEvent
                                 (SAMPLE(?locationName) AS ?locationName)
                                 (SAMPLE(?postalCode) AS ?postalCode)
                                 (SAMPLE(?artsdataUri) AS ?locationUri)
@@ -583,6 +590,7 @@ export class MatchService {
                         `OPTIONAL { ?entity schema:startDate ?startDate }
                                     OPTIONAL { ?entity schema:alternateName ?alternateName}  
                                     OPTIONAL { ?entity schema:endDate ?endDate }
+                                    OPTIONAL {?entity schema:subEvent ?subEvent }
                                     OPTIONAL { ?entity schema:location ?location .
                                     OPTIONAL { ?location schema:name ?locationName }
                                     OPTIONAL { ?location schema:address/schema:postalCode ?postalCode }
@@ -598,7 +606,8 @@ export class MatchService {
                                         ?location ^schema:containedInPlace ?childPlace .
                                         FILTER(STRSTARTS(STR(?childPlace), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
                                         BIND(?childPlace AS ?locationContains)
-                                    }}`);
+                                    }}`)
+                    .replace("GROUP_BY_PLACEHOLDER", `${QUERIES.GROUP_BY_STATEMENT} ?subEvent`);
                 break;
             case Entities.PERSON:
             case Entities.ORGANIZATION:
@@ -615,11 +624,13 @@ export class MatchService {
                                       }
                                       OPTIONAL {BIND(?sameAs AS ?isni)
                                         FILTER (STRSTARTS(str(?isni), "https://isni.org/isni/"))
-                                      }}`);
+                                      }}`)
+                    .replace("GROUP_BY_PLACEHOLDER", QUERIES.GROUP_BY_STATEMENT);
                 break;
             default:
                 rawQuery = rawQuery.replace("ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER", "")
                     .replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER", "")
+                    .replace("GROUP_BY_PLACEHOLDER", QUERIES.GROUP_BY_STATEMENT);
                 break;
 
         }

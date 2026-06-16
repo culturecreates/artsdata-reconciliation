@@ -31,7 +31,7 @@ adr:KE-5 rdf:type <http://schema.org/Event> ;
 adr:KE-6 rdf:type <http://schema.org/Event> ;
     rdfs:label "At the Night" ;
     schema:name "At the Night" ;
-    schema:startDate "2025-12-28T13:00:00-04:00"^^xsd:date.
+    schema:startDate "2025-12-28T13:00:00-04:00"^^xsd:dateTime.
 
 adr:KE-7 rdf:type <http://schema.org/Event> ;
     schema:name "Pierre-Yves Roy-Desmarais" ;
@@ -52,6 +52,23 @@ adr:KE-10 rdf:type <http://schema.org/Event> ;
 adr:KE-11 rdf:type <http://schema.org/Event> ;
     rdfs:label "Emily D’Angelo" ;
     schema:name "Emily D’Angelo" .
+
+adr:EventSeries1 rdf:type <http://schema.org/Event> ;
+        rdfs:label "Event Series One" ;
+        schema:name "Event Series One" ;
+        schema:startDate "2025-01-01T13:00:00-04:00"^^xsd:dateTime;
+        schema:endDate "2025-01-28T13:00:00-04:00"^^xsd:dateTime;
+        schema:subEvent adr:SubEvent1;
+        schema:subEvent adr:SubEvent2;
+        schema:location adr:KP-1.
+
+adr:SubEvent1 rdf:type <http://schema.org/Event>;
+                schema:name "Sub Event One" ;
+                rdfs:label "Sub Event One" .
+
+adr:SubEvent2 rdf:type <http://schema.org/Event>;
+                schema:name "Sub Event Two" ;
+                rdfs:label "Sub Event Two" .
 
 adr:KP-1 rdf:type <http://schema.org/Place> ;
     rdfs:label "One Location" ;
