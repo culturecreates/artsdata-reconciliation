@@ -39,7 +39,7 @@ INSERT DATA {
       ],
       "indexed": true,
       "stored": true,
-      "analyzed": true,
+      "analyzed": false,
       "multivalued": true,
       "ignoreInvalidValues": true,
       "facet": true
