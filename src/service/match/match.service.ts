@@ -515,7 +515,7 @@ export class MatchService {
             .filter((condition) => condition.matchType === MatchTypeEnum.PROPERTY)
             .reduce((query, condition) => {
                 Object.entries(propertyMap).forEach(([key, value]) => {
-                    if (condition.propertyId === key) {
+                    if (condition.propertyId === key && (!condition.matchQualifier || condition.matchQualifier === MatchQualifierEnum.EXACT_MATCH)) {
                         const connector = !query?.length ? '' : condition.required ? "AND" : "OR";
                         query = `${query} ${connector} ${this._resolvePropertyValueForLucene(condition.propertyValue, value)}`;
                     }
