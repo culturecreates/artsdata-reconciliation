@@ -578,6 +578,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
             isni: undefined,
             alternateName: undefined,
             addressLocality: undefined,
+            types: ["http://schema.org/Event"]
         };
 
         const query: ReconciliationQuery = {
@@ -600,6 +601,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
             locationName: undefined,
             wikidata: undefined,
             isni: undefined,
+            type: "http://schema.org/Event"
         };
 
         const result = MatchServiceHelper.isAutoMatch(baseRecord, query, additionalProperties, recordFromQuery);
@@ -620,6 +622,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
             isni: undefined,
             alternateName: undefined,
             addressLocality: undefined,
+            types: ["http://schema.org/Event"]
         };
 
         const query: ReconciliationQuery = {
@@ -642,6 +645,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
             locationName: undefined,
             wikidata: undefined,
             isni: undefined,
+            type: "http://schema.org/Event"
         };
 
         const result = MatchServiceHelper.isAutoMatch(baseRecord, query, additionalProperties, recordFromQuery);
