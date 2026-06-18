@@ -129,10 +129,15 @@ export class MatchServiceHelper {
                 MatchServiceHelper.isAutoMatch(resultCandidate, reconciliationQuery, additionalPropertiesForAutoMatch,
                     recordFromQuery);
 
-            resultCandidate.type = currentBindings.map((binding: any) => ({
-                id: binding["type"]?.value,
-                name: binding["type_label"]?.value,
-            }));
+            resultCandidate.type = currentBindings.map((binding: any) => {
+                const id = binding["type"]?.value;
+                const label = binding["type_label"]?.value;
+                if (id)
+                    return {
+                        id: id,
+                        name: label?.length ? label : id.substring(id.lastIndexOf('/') + 1),
+                    }
+            });
 
             resultCandidate.features = Object.entries(currentBinding)
                 .filter(([key]) => key.endsWith("_score") && key !== "total_score")
