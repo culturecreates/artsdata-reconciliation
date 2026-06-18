@@ -16,7 +16,8 @@ describe('isAutoMatch', () => {
                 },
             ],
         };
-        const additionalProperties = {postalCode: 'H7N 0E4'};
+        const additionalProperties = {postalCode: 'H7N 0E4',
+            types: ['http://schema.org/Place']};
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
             recordFromQuery);
@@ -37,7 +38,8 @@ describe('isAutoMatch', () => {
                 },
             ],
         };
-        const additionalProperties = {postalCode: 'H7N 055'};
+        const additionalProperties = {postalCode: 'H7N 055',
+            types: ['http://schema.org/Place']};
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
             recordFromQuery);
@@ -62,7 +64,8 @@ describe('isAutoMatch', () => {
                 },
             ],
         };
-        const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval'};
+        const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval',
+            types: ['http://schema.org/Place']};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -88,7 +91,8 @@ describe('isAutoMatch', () => {
                 }
             ],
         };
-        const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval'};
+        const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval',
+            types: ['http://schema.org/Place']};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -113,7 +117,8 @@ describe('isAutoMatch', () => {
                 }
             ],
         };
-        const additionalProperties = {addressLocality: 'Laval'};
+        const additionalProperties = {addressLocality: 'Laval',
+            types: ['http://schema.org/Place']};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -134,7 +139,8 @@ describe('isAutoMatch', () => {
                 }
             ],
         };
-        const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval'};
+        const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval',
+            types: ['http://schema.org/Place']};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -156,7 +162,8 @@ describe('isAutoMatch', () => {
                 }
             ],
         };
-        const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval'};
+        const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval',
+            types: ['http://schema.org/Place']};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -177,7 +184,8 @@ describe('isAutoMatch', () => {
                 }
             ],
         };
-        const additionalProperties = {addressLocality: 'Laval'};
+        const additionalProperties = {addressLocality: 'Laval',
+            types: ['http://schema.org/Place']};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -199,7 +207,8 @@ describe('isAutoMatch', () => {
                 },
             ],
         };
-        const additionalProperties = {url: "http://www.placebell.ca/fr"};
+        const additionalProperties = {url: "http://www.placebell.ca/fr",
+            types: ['http://schema.org/Place']};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -221,7 +230,8 @@ describe('isAutoMatch', () => {
                 },
             ],
         };
-        const additionalProperties = {url: 'http://www.placebell.ca/fr'};
+        const additionalProperties = {url: 'http://www.placebell.ca/fr',
+            types: ['http://schema.org/Place']};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -243,7 +253,8 @@ describe('isAutoMatch', () => {
                 },
             ],
         };
-        const additionalProperties = {url: 'http://www.placebell.ca/wrong-url'};
+        const additionalProperties = {url: 'http://www.placebell.ca/wrong-url',
+            types: ['http://schema.org/Place']};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -271,7 +282,8 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {
             isni: 'https://isni.org/isni/0000000123456789',
-            wikidata: 'http://www.wikidata.org/entity/Q12345'
+            wikidata: 'http://www.wikidata.org/entity/Q12345',
+            types: ['http://schema.org/Place']
         };
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
@@ -295,7 +307,8 @@ describe('isAutoMatch', () => {
                 },
             ],
         };
-        const additionalProperties = {startDate: '2023-01-01'};
+        const additionalProperties = {startDate: '2023-01-01',
+            types: ['http://schema.org/Event']};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -317,7 +330,8 @@ describe('isAutoMatch', () => {
                 },
             ],
         };
-        const additionalProperties = {startDate: '2023-02-01'};
+        const additionalProperties = {startDate: '2023-02-01',
+            types: ['http://schema.org/Event']};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -345,6 +359,7 @@ describe('isAutoMatch', () => {
             startDate: '2023-01-01',
             endDate: '2023-01-02',
             locationUri: 'http://kg.artsdata.ca/resource/K11-240',
+            types: ['http://schema.org/Event']
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -365,7 +380,8 @@ describe('isAutoMatch', () => {
                 },
             ],
         };
-        const additionalProperties = {locationUri: 'http://kg.artsdata.ca/resource/K22-240'};
+        const additionalProperties = {locationUri: 'http://kg.artsdata.ca/resource/K22-240',
+            types: ['http://schema.org/Event']};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -394,6 +410,7 @@ describe('isAutoMatch', () => {
             endDate: '2023-01-02',
             locationName: 'Place Bell',
             postalCode: 'H7N 0E4',
+            types: ['http://schema.org/Event']
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -416,6 +433,7 @@ describe('isAutoMatch', () => {
             startDate: '2023-01-01',
             endDate: '2023-01-02',
             postalCode: '77N 0E4',
+            types: ['http://schema.org/Event']
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -439,7 +457,8 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {
             startDate: '2023-01-01',
-            locationUri: 'http://kg.artsdata.ca/resource/K11-240'
+            locationUri: 'http://kg.artsdata.ca/resource/K11-240',
+            types: ['http://schema.org/Event']
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -473,7 +492,8 @@ describe('isAutoMatch', () => {
         const additionalProperties = {
             startDate: '2023-01-01T10:00:00Z',
             endDate: '2023-01-02T18:00:00Z',
-            locationUri: 'http://kg.artsdata.ca/resource/K11-240'
+            locationUri: 'http://kg.artsdata.ca/resource/K11-240',
+            types: ['http://schema.org/Event']
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -493,6 +513,7 @@ describe('isAutoMatch', () => {
         const additionalProperties = {
             startDate: '2023-01-01',
             endDate: '2023-01-02',
+            types: ['http://schema.org/Event']
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -520,7 +541,8 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {
             startDate: '2023-01-01T10:00:00Z',
-            locationUri: 'http://kg.artsdata.ca/resource/K11-240'
+            locationUri: 'http://kg.artsdata.ca/resource/K11-240',
+            types: ['http://schema.org/Event']
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -548,7 +570,8 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {
             startDate: '2023-01-01T10:00:00Z',
-            locationUri: 'http://kg.artsdata.ca/resource/K11-240'
+            locationUri: 'http://kg.artsdata.ca/resource/K11-240',
+            types: ['http://schema.org/Event']
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
