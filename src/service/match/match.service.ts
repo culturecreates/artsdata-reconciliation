@@ -33,6 +33,7 @@ export class MatchService {
                 const type = query.type;
                 query.type = type?.replace("schema:", PREFIXES.SCHEMA)
                     .replace("skos:", PREFIXES.SKOS)
+                    .replace("dbo:", PREFIXES.DBO)
                     .replace("ado:", PREFIXES.ADO);
                 return query;
             })
@@ -172,7 +173,7 @@ export class MatchService {
                     sparqlQuery = this._generateSparqlQuery(id, name as string, type, limit || 25, propertyConditions);
                 }
 
-                const response = await this._artsdataService.executeSparqlQuery(sparqlQuery);
+                const response = await this._artsdataService.executeSparqlQuery(sparqlQuery, true);
                 const candidates = MatchServiceHelper.formatReconciliationResponse(requestLanguage,
                     response, reconciliationQuery, isQueryByURI);
                 results.push({candidates});

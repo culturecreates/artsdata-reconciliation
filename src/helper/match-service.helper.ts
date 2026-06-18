@@ -88,9 +88,13 @@ export class MatchServiceHelper {
             const descriptionEn = currentBinding["descriptionEn"]?.value;
             const descriptionFr = currentBinding["descriptionFr"]?.value;
             const subEventSet = new Set();
+            const typeSet = new Set();
             currentBindings.forEach((binding: any) => {
                 if (binding.subEvent && binding.subEvent.value) {
                     subEventSet.add(binding.subEvent.value);
+                }
+                if (binding.type && binding.type.value) {
+                    typeSet.add(binding.type.value);
                 }
             });
 
@@ -108,6 +112,7 @@ export class MatchServiceHelper {
                 isni: currentBinding["isni"]?.value,
                 alternateName: currentBinding["alternateName"]?.value,
                 subEvents: subEventSet.size > 0 ? [...subEventSet] : undefined,
+                types: typeSet.size > 0 ? [...typeSet] : undefined,
             };
 
 
@@ -124,10 +129,15 @@ export class MatchServiceHelper {
                 MatchServiceHelper.isAutoMatch(resultCandidate, reconciliationQuery, additionalPropertiesForAutoMatch,
                     recordFromQuery);
 
-            resultCandidate.type = currentBindings.map((binding: any) => ({
-                id: binding["type"]?.value,
-                name: binding["type_label"]?.value,
-            }));
+            resultCandidate.type = currentBindings.map((binding: any) => {
+                const id = binding["type"]?.value;
+                const label = binding["type_label"]?.value;
+                if (id)
+                    return {
+                        id: id,
+                        name: label?.length ? label : id.substring(id.lastIndexOf('/') + 1),
+                    }
+            });
 
             resultCandidate.features = Object.entries(currentBinding)
                 .filter(([key]) => key.endsWith("_score") && key !== "total_score")
@@ -239,6 +249,10 @@ export class MatchServiceHelper {
                 if (!a || !b) return true;
                 return a.every(item => b.includes(item));
             },
+            any: (resultValue: string[] | undefined, queryValue: string | undefined) => {
+                if (!resultValue || !queryValue) return false;
+                return resultValue.some(item => queryValue === item);
+            },
             exactUrl: (a: string, b: string) => {
                 if (a && b) {
                     try {
@@ -286,6 +300,8 @@ export class MatchServiceHelper {
         const checkIfWikidataIdIsExactMatch = [
             matchers.exact(additionalProperties.wikidata, recordFromQuery.wikidata),
         ];
+
+        const checkIfTypeIsMatching = matchers.any(additionalProperties.types, recordFromQuery.type);
 
         const checkIfNameIsCloseAndWikidataIdIsNotDifferentIfBothPresent = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
@@ -347,8 +363,9 @@ export class MatchServiceHelper {
             matchers.listNotDifferentIfBothExists(additionalProperties.subEvents, recordFromQuery.subEvents)
 
         ];
-
-        if (reconciliationQuery.type === Entities.PLACE) {
+        if (!checkIfTypeIsMatching) {
+            return false;
+        } else if (reconciliationQuery.type === Entities.PLACE) {
             return (
                 checkIfWikidataIdIsExactMatch.every(Boolean) ||
                 checkIfNameIsClosePostalCodeIsExactAndWikidataIsNotDifferent.every(Boolean) ||
@@ -370,7 +387,7 @@ export class MatchServiceHelper {
     }
 
     private static extractRecordFromQuery(reconciliationQuery: ReconciliationQuery) {
-        const {conditions} = reconciliationQuery;
+        const {conditions, type} = reconciliationQuery;
         const name = conditions.find((condition) => condition.matchType === "name")
             ?.propertyValue as string | undefined;
 
@@ -458,6 +475,7 @@ export class MatchServiceHelper {
             startDate,
             endDate,
             subEvents,
+            type,
             locationName,
             locationUri,
             locationContainedIn: undefined,
@@ -583,8 +601,8 @@ export class MatchServiceHelper {
         if (prefixCount === 1) {
             return text.replace('schema:', PREFIXES.SCHEMA)
                 .replace('skos:', PREFIXES.SKOS)
-                .replace('ado:', PREFIXES.ADO)
-                ;
+                .replace('dbo:', PREFIXES.DBO)
+                .replace('ado:', PREFIXES.ADO);
         }
 
         return text;
