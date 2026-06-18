@@ -2,6 +2,7 @@
 @prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix schema: <http://schema.org/> .
+@prefix dbo: <http://dbpedia.org/ontology/> .
 
 # Places 
 
@@ -31,26 +32,26 @@ adr:Place1 a schema:Place ;
 
 # Persons
 
-adr:KPR-1 a schema:Person ;
+adr:KPR-1 a schema:Person , dbo:Agent ;
     rdfs:label "Persona bell" ;
      schema:name "Persona bell" .
 
-adr:WarrenSonoda a schema:Person ;
+adr:WarrenSonoda a schema:Person , dbo:Agent ;
     rdfs:label "Warren P. Sonoda" ;
      schema:name "Warren P. Sonoda" .
 
-adr:GarretWillie a schema:Person ;
+adr:GarretWillie a schema:Person , dbo:Agent ;
     rdfs:label "Garret T. Willie" ;
      schema:name "Garret T. Willie" .
 
-adr:WarrenHoyano a schema:Person ;
+adr:WarrenHoyano a schema:Person , dbo:Agent ;
     rdfs:label "Warren Hoyano" ;
      schema:name "Warren Hoyano" .
 
 
 # Organizations
 
-adr:KO-1 a schema:Organization ;
+adr:KO-1 a schema:Organization , dbo:Agent ;
     rdfs:label "Place Bell" ;
     schema:name "Place Bell" .
 
