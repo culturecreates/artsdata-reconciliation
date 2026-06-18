@@ -33,6 +33,7 @@ export class MatchService {
                 const type = query.type;
                 query.type = type?.replace("schema:", PREFIXES.SCHEMA)
                     .replace("skos:", PREFIXES.SKOS)
+                    .replace("dbo:", PREFIXES.DBO)
                     .replace("ado:", PREFIXES.ADO);
                 return query;
             })

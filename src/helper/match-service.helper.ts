@@ -596,8 +596,8 @@ export class MatchServiceHelper {
         if (prefixCount === 1) {
             return text.replace('schema:', PREFIXES.SCHEMA)
                 .replace('skos:', PREFIXES.SKOS)
-                .replace('ado:', PREFIXES.ADO)
-                ;
+                .replace('dbo:', PREFIXES.DBO)
+                .replace('ado:', PREFIXES.ADO);
         }
 
         return text;

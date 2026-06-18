@@ -21,6 +21,7 @@ export const ArtsdataConstants = {
 export const PREFIXES = {
     SCHEMA: "http://schema.org/",
     SKOS: "http://www.w3.org/2004/02/skos/core#",
+    DBO: "http://dbpedia.org/ontology/",
     ADO: "http://kg.artsdata.ca/ontology/"
 };
 
@@ -30,7 +31,7 @@ export const Entities = {
     PERSON: "http://schema.org/Person",
     ORGANIZATION: "http://schema.org/Organization",
     CONCEPT: "http://www.w3.org/2004/02/skos/core#Concept",
-    AGENT: "http://kg.artsdata.ca/ontology/Agent",
+    AGENT: "http://dbpedia.org/ontology/Agent",
     LIVE_PERFORMANCE_WORK: "http://kg.artsdata.ca/ontology/LivePerformanceWork",
     EVENT_TYPE: "http://kg.artsdata.ca/ontology/EventType"
 };
