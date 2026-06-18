@@ -7,6 +7,7 @@ export interface RecordFromQuery {
     startDate: string | undefined;
     endDate: string | undefined;
     subEvents?:string[]|undefined;
+    type?:string|undefined;
     locationName: string | undefined;
     locationUri: string | undefined;
     isni: string | undefined;
