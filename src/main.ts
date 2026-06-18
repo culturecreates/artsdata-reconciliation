@@ -45,7 +45,7 @@ Some useful links:
 - [W3C Entity Reconciliation Community Group](https://www.w3.org/community/reconciliation/)
 `
         )
-        .setVersion('1.0.3')
+        .setVersion('1.0.4')
         .build();
 
     const document = SwaggerModule.createDocument(app, config);
