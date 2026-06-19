@@ -2,10 +2,6 @@ PREFIX :<http://www.ontotext.com/connectors/lucene#>
 PREFIX inst:<http://www.ontotext.com/connectors/lucene/instance#>
 
 INSERT DATA {
-  inst:live-performance-work-index luc:dropConnector "true" .
-};
-
-INSERT DATA {
 	inst:live-performance-work-index :createConnector '''
 {
   "fields": [

@@ -2,10 +2,6 @@ PREFIX :<http://www.ontotext.com/connectors/lucene#>
 PREFIX inst:<http://www.ontotext.com/connectors/lucene/instance#>
 
 INSERT DATA {
-  inst:agent-index luc:dropConnector "true" .
-};
-
-INSERT DATA {
 	inst:agent-index :createConnector '''
 {
   "fields": [
@@ -40,7 +36,7 @@ INSERT DATA {
       ],
       "indexed": true,
       "stored": true,
-      "analyzed": true,
+      "analyzed": false,
       "multivalued": true,
       "ignoreInvalidValues": true,
       "facet": true
