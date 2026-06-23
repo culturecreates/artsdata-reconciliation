@@ -12,7 +12,7 @@ export const ARTSDATA: {
     USER: string | undefined,
     PASSWORD: string | undefined
 } = {
-    ENDPOINT: env.ARTSDATA_ENDPOINT || "https://staging.db.artsdata.ca/",
+    ENDPOINT: env.ARTSDATA_ENDPOINT || "https://staging-db.artsdata.ca/",
     REPOSITORY: env.REPOSITORY || "artsdata",
     USER: env.ARTSDATA_USER,
     PASSWORD: env.ARTSDATA_PASSWORD

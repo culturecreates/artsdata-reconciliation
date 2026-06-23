@@ -25,31 +25,31 @@ Built with [NestJS](https://nestjs.com), this service provides a robust and scal
 
 The application uses the following environment variables. Create a `.env` file in the root directory based on `.env.sample`:
 
-| Variable | Description | Default Value |
-|----------|-------------|---------------|
-| `ENVIRONMENT` | Deployment environment (staging/production) | `staging` |
-| `PORT` | HTTP port for the server | `3000` |
-| `ARTSDATA_ENDPOINT` | GraphDB endpoint URL | `https://staging.db.artsdata.ca/` |
-| `REPOSITORY` | GraphDB repository name | `artsdata` |
-| `ARTSDATA_USER` | GraphDB username (optional) | - |
-| `ARTSDATA_PASSWORD` | GraphDB password (optional) | - |
-| **Index Configuration** | | |
-| `EVENT` | Event entity index name | `event-index` |
-| `ENTITY` | General entity index name | `entity-index` |
-| `PLACE` | Place entity index name | `place-index` |
-| `ORGANIZATION` | Organization entity index name | `organization-index` |
-| `PERSON` | Person entity index name | `person-index` |
-| `AGENT` | Agent entity index name | `agent-index` |
-| `CONCEPT` | Concept entity index name | `concept-index` |
-| `EVENT_TYPE` | Event type index name | `event-type-index` |
-| `LIVE_PERFORMANCE_WORK` | Live performance work index name | `live-performance-work-index` |
-| `DEFAULT` | Default resource index name | `resource-index` |
-| `PROPERTY` | Property index name | `property-index` |
-| `TYPE` | Type index name | `type-index` |
-| `LABELLED_ENTITIES` | Labeled entities index name | `all-literals` |
-| **Feature Flags** | | |
-| `ENABLE_EVENT_BATCH_RECONCILIATION` | Enable batch reconciliation for events | `true` |
-| `LOG_QUERIES` | Enable query logging for debugging | `true` |
+| Variable | Description | Default Value                     |
+|----------|-------------|-----------------------------------|
+| `ENVIRONMENT` | Deployment environment (staging/production) | `staging`                         |
+| `PORT` | HTTP port for the server | `3000`                            |
+| `ARTSDATA_ENDPOINT` | GraphDB endpoint URL | `https://staging-db.artsdata.ca/` |
+| `REPOSITORY` | GraphDB repository name | `artsdata`                        |
+| `ARTSDATA_USER` | GraphDB username (optional) | -                                 |
+| `ARTSDATA_PASSWORD` | GraphDB password (optional) | -                                 |
+| **Index Configuration** | |                                   |
+| `EVENT` | Event entity index name | `event-index`                     |
+| `ENTITY` | General entity index name | `entity-index`                    |
+| `PLACE` | Place entity index name | `place-index`                     |
+| `ORGANIZATION` | Organization entity index name | `organization-index`              |
+| `PERSON` | Person entity index name | `person-index`                    |
+| `AGENT` | Agent entity index name | `agent-index`                     |
+| `CONCEPT` | Concept entity index name | `concept-index`                   |
+| `EVENT_TYPE` | Event type index name | `event-type-index`                |
+| `LIVE_PERFORMANCE_WORK` | Live performance work index name | `live-performance-work-index`     |
+| `DEFAULT` | Default resource index name | `resource-index`                  |
+| `PROPERTY` | Property index name | `property-index`                  |
+| `TYPE` | Type index name | `type-index`                      |
+| `LABELLED_ENTITIES` | Labeled entities index name | `all-literals`                    |
+| **Feature Flags** | |                                   |
+| `ENABLE_EVENT_BATCH_RECONCILIATION` | Enable batch reconciliation for events | `true`                            |
+| `LOG_QUERIES` | Enable query logging for debugging | `true`                            |
 
 ### Setting Up Environment Variables
 
@@ -134,7 +134,7 @@ docker run -p 3000:3000 --env-file .env artsdata-reconciliation
 
 # Or with environment variables directly
 docker run -p 3000:3000 \
-  -e ARTSDATA_ENDPOINT=https://staging.db.artsdata.ca/ \
+  -e ARTSDATA_ENDPOINT=https://staging-db.artsdata.ca/ \
   -e REPOSITORY=artsdata \
   artsdata-reconciliation
 ```
