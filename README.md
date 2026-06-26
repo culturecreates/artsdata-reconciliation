@@ -302,6 +302,101 @@ docker-compose up --build
 docker-compose logs -f
 ```
 
+# Deployment
+
+This project uses **GitHub Actions** to implement a Continuous Integration and Continuous Deployment (CI/CD) pipeline. Deployments are automated using **Heroku Pipelines**, providing separate **staging** and **production** environments.
+
+## Continuous Deployment
+
+Changes pushed to the `main` branch automatically trigger the deployment workflow when application source files (`src/**`) are modified.
+
+The workflow performs the following steps:
+
+1. Check out the latest source code.
+2. Run the unit test workflow.
+3. If all tests pass, deploy the application to the **Heroku staging** application.
+
+This ensures that every successful change merged into `main` is automatically available for validation in the staging environment.
+
+## Production Releases
+
+Production deployments are initiated by creating a **GitHub Release**.
+
+When a release is created, the pipeline:
+
+1. Extracts the application version from the release tag (e.g., `v1.2.0` → `1.2.0`).
+2. Updates the Swagger/OpenAPI version in `src/main.ts`.
+3. Commits the version update back to the `main` branch (if required).
+4. Deploys the updated commit to the Heroku staging application.
+5. Promotes the validated staging slug to the production application using **Heroku Pipelines**.
+
+This promotion strategy ensures that the exact build validated in staging is deployed to production without rebuilding the application.
+
+## Deployment Workflow
+
+```text
+                     Push to main
+                           │
+                           ▼
+                 GitHub Actions CI
+                           │
+                           ▼
+                    Run Unit Tests
+                           │
+                    Tests Successful
+                           │
+                           ▼
+             Deploy to Heroku Staging
+                           │
+                           ▼
+             Validate Staging Deployment
+
+────────────────────────────────────────────────────
+
+                Create GitHub Release
+                           │
+                           ▼
+          Update Swagger/OpenAPI Version
+                           │
+                           ▼
+                 Commit Version Update 
+                           │
+                           ▼
+             Deploy Updated Commit to Staging
+                           │
+                           ▼
+       Promote Staging Slug via Heroku Pipeline
+                           │
+                           ▼
+                Deploy to Production
+```
+
+## GitHub Actions Workflows
+
+| Workflow               | Trigger                                                    | Purpose                                                                                                              |
+| ---------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Deploy to Staging**  | Push to `main` (changes under `src/**`) or manual dispatch | Runs unit tests and deploys the application to the Heroku staging environment.                                       |
+| **Release Tag Deploy** | GitHub Release created                                     | Updates the Swagger/OpenAPI version, deploys the release to staging, and promotes the validated build to production. |
+
+## Required Repository Configuration
+
+### GitHub Secrets
+
+| Secret           | Description                                                 |
+| ---------------- | ----------------------------------------------------------- |
+| `HEROKU_API_KEY` | API key used by GitHub Actions to authenticate with Heroku. |
+
+### GitHub Repository Variables
+
+| Variable          | Description                                       |
+| ----------------- | ------------------------------------------------- |
+| `HEROKU_APP_NAME` | Name of the Heroku staging application.           |
+| `HEROKU_EMAIL`    | Email address associated with the Heroku account. |
+
+> [!NOTE]
+> Production deployments rely on a configured **Heroku Pipeline** that links the staging and production applications. The release workflow promotes the validated staging slug directly to production, ensuring that the exact artifact tested in staging is the one deployed to production.
+
+
 ## Support
 
 For questions and support:
