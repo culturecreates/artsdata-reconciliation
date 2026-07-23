@@ -1,7 +1,7 @@
 import {MatchService,} from "../../service";
 import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
-import {LanguageEnum, MatchTypeEnum} from "../../enum";
+import {LanguageEnum, MatchQuantifierEnum, MatchTypeEnum} from "../../enum";
 import {
     dropIndexAndTheGraph,
     setupMatchService,
@@ -282,6 +282,38 @@ describe('Reconcile events with subEvents', () => {
         await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
     })
 
+    it(`Event with sameAs`, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [
+                {
+                    matchType: MatchTypeEnum.NAME,
+                    propertyValue: "Event Series One"
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: [
+                        "https://isni.org/isni/0000000123456789",
+                        "https://musicbrainz.org/artist/6b52e1be-f27a-433c-b51a-3f2d63abc2ba"
+                    ],
+                    propertyId: "http://schema.org/sameAs",
+                    matchQuantifier: MatchQuantifierEnum.ANY,
+                    required: true
+                }
+            ],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("EventSeries1");
+        expect(allResults?.length).toBe(1);
+    });
 
     it(`Event with subEvents not matching - Auto match should be false `, async () => {
 
@@ -308,7 +340,7 @@ describe('Reconcile events with subEvents', () => {
                     required: true
                 }, {
                     matchType: MatchTypeEnum.PROPERTY,
-                    propertyValue: ["http://kg.artsdata.ca/resource/SubEvent1","http://kg.artsdata.ca/resource/SubEvent2"],
+                    propertyValue: ["http://kg.artsdata.ca/resource/SubEvent1", "http://kg.artsdata.ca/resource/SubEvent2"],
                     propertyId: "http://schema.org/subEvent",
                     required: false
                 }
