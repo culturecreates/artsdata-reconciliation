@@ -428,7 +428,14 @@ export class MatchServiceHelper {
                         url = condition.propertyValue as string;
                         break;
                     case SCHEMA_ORG_PROPERTY_URI_MAP.SAME_AS:
-                        sameAs.push(condition.propertyValue as string);
+                        const sameAsValue = condition.propertyValue;
+                        if (sameAsValue) {
+                            if (!Array.isArray(sameAsValue)) {
+                                sameAs = [sameAsValue] as string[];
+                            } else {
+                                sameAs = sameAsValue as string[];
+                            }
+                        }
                         break;
                     case SCHEMA_ORG_PROPERTY_URI_MAP.START_DATE:
                         startDate = condition.propertyValue as string;
