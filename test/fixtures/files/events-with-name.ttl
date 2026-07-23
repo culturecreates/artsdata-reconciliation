@@ -60,7 +60,8 @@ adr:EventSeries1 rdf:type <http://schema.org/Event> ;
         schema:endDate "2025-01-28T13:00:00-04:00"^^xsd:dateTime;
         schema:subEvent adr:SubEvent1;
         schema:subEvent adr:SubEvent2;
-        schema:location adr:KP-1.
+        schema:location adr:KP-1;
+        schema:sameAs <https://isni.org/isni/0000000123456789>.
 
 adr:SubEvent1 rdf:type <http://schema.org/Event>;
                 schema:name "Sub Event One" ;
