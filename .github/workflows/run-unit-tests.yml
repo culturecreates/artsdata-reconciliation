@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run GraphDB
         run: docker compose -f "test/graph-db/docker-compose.yml" up -d --build
@@ -34,7 +34,7 @@ jobs:
           echo 'REPOSITORY="recon-test"' >> .env.test
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
 
