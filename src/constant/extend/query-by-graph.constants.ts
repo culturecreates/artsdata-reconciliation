@@ -13,6 +13,7 @@ SELECT ?uri
   (SAMPLE(?wikidata_ids) AS ?wikidata_uri)
   (GROUP_CONCAT(DISTINCT ?types; SEPARATOR = ", ") AS ?type)
   (MAX(?flaggedForReview) AS ?is_flagged_for_review)
+  (SAMPLE(?disambiguating_description_val) AS ?disambiguating_description)
   <EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>
 WHERE {
   GRAPH <GRAPH_URI_PLACEHOLDER> {
@@ -21,6 +22,10 @@ WHERE {
     OPTIONAL { ?uri schema:name ?name_no. FILTER(LANG(?name_no) = "") }
     BIND(COALESCE(?name_en, ?name_fr, ?name_no) AS ?name)
     FILTER(!ISBLANK(STR(?name)))
+    OPTIONAL { ?uri schema:disambiguatingDescription ?desc_en. FILTER(LANG(?desc_en) = "en") }
+    OPTIONAL { ?uri schema:disambiguatingDescription ?desc_fr. FILTER(LANG(?desc_fr) = "fr") }
+    OPTIONAL { ?uri schema:disambiguatingDescription ?desc_no. FILTER(LANG(?desc_no) = "") }
+    BIND(COALESCE(?desc_en, ?desc_fr, ?desc_no) AS ?disambiguating_description_val)
     ?uri a ?types.
     <FILTER_BY_REGION_PLACEHOLDER>
   }
