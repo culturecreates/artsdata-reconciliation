@@ -10,6 +10,7 @@ SELECT ?uri
   (SAMPLE(?name) AS ?name)
   (SAMPLE(?isni_uris) AS ?isni_uri)
   (COALESCE(SAMPLE(?adids), SAMPLE(?adid_obj)) AS ?artsdata_uri)
+  (IF(COUNT(DISTINCT ?adids) > 0, TRUE, FALSE) AS ?reconciled)
   (SAMPLE(?wikidata_ids) AS ?wikidata_uri)
   (GROUP_CONCAT(DISTINCT ?types; SEPARATOR = ", ") AS ?type)
   (MAX(?flaggedForReview) AS ?is_flagged_for_review)
