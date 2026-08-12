@@ -13,12 +13,8 @@ export const QUERIES = {
  SELECT DISTINCT
    ?entity
    ?total_score
-   (SAMPLE(?name_en) AS ?nameEn)
-   (SAMPLE(?name_fr) AS ?nameFr)
-   (SAMPLE(?name_no) AS ?name)
-   (SAMPLE(?description_no) AS ?description)
-   (SAMPLE(?description_en) AS ?descriptionEn)
-   (SAMPLE(?description_fr) AS ?descriptionFr)
+   (SAMPLE(?name) AS ?name)
+   (SAMPLE(?description) AS ?description)
    (SAMPLE(?url) AS ?url)
    ?type_label
    ?type
@@ -27,10 +23,20 @@ export const QUERIES = {
    {
    SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER
    }
+    
+   VALUES ?requestLanguage { "REQUEST_LANG_PLACEHOLDER" } 
  
    OPTIONAL { ?entity schema:name | skos:prefLabel ?name_en. FILTER(LANG(?name_en) = "en") }
    OPTIONAL { ?entity schema:name | skos:prefLabel ?name_fr. FILTER(LANG(?name_fr) = "fr") }
-   OPTIONAL { ?entity schema:name | skos:prefLabel ?name_no. FILTER(LANG(?name_no) = "") }
+   OPTIONAL { ?entity schema:name | skos:prefLabel ?name_default. FILTER(LANG(?name_default) = "") }
+   OPTIONAL { ?entity schema:name | skos:prefLabel ?name_mul. FILTER(LANG(?name_mul) = "mul") }
+   
+    BIND(
+    IF(?requestLanguage = "fr",
+       COALESCE(?name_fr, ?name_default, ?name_mul, ?name_en),
+       COALESCE(?name_en, ?name_default,  ?name_mul, ?name_fr))
+    AS ?name
+  )
  
    ?entity a ?type.
    OPTIONAL { ?type rdfs:label ?type_label_raw FILTER(LANG(?type_label_raw) = "") }
@@ -39,8 +45,16 @@ export const QUERIES = {
  
    OPTIONAL { ?entity schema:disambiguatingDescription ?description_en. FILTER(LANG(?description_en) = "en") }
    OPTIONAL { ?entity schema:disambiguatingDescription ?description_fr. FILTER(LANG(?description_fr) = "fr") }
-   OPTIONAL { ?entity schema:disambiguatingDescription ?description_no. FILTER(LANG(?description_no) = "") }
+   OPTIONAL { ?entity schema:disambiguatingDescription ?description_default. FILTER(LANG(?description_default) = "") }
+   OPTIONAL { ?entity schema:disambiguatingDescription ?description_mul. FILTER(LANG(?description_mul) = "mul") }
  
+    BIND(
+    IF(?requestLanguage = "fr",
+       COALESCE(?description_fr, ?description_default, ?description_mul, ?description_en),
+       COALESCE(?description_en, ?description_default,  ?description_mul, ?description_fr))
+    AS ?description
+  )
+  
    OPTIONAL { ?entity schema:url ?url }
    
    ADDITIONAL_TRIPLES_FOR_MATCH_PLACEHOLDER

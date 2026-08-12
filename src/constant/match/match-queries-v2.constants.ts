@@ -40,10 +40,22 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
     ?total_score`,
 
     COMMON_PROPERTIES_TO_FETCH_QUERY: `
+    # Request language
+    VALUES ?requestLanguage { "REQUEST_LANG_PLACEHOLDER" } 
+    
   # Name label
     OPTIONAL { ?entity schema:name | skos:prefLabel ?name_en FILTER(LANG(?name_en) = "en") }
     OPTIONAL { ?entity schema:name | skos:prefLabel ?name_fr FILTER(LANG(?name_fr) = "fr") }
     OPTIONAL { ?entity schema:name | skos:prefLabel ?name_default FILTER(LANG(?name_default) = "") }
+    OPTIONAL { ?entity schema:name | skos:prefLabel ?name_mul FILTER(LANG(?name_mul) = "mul") }
+    
+    BIND(
+        IF(?requestLanguage = "fr",
+            COALESCE(?name_fr, ?name, ?name_mul, ?name_en),
+            COALESCE(?name_en, ?name,  ?name_mul, ?name_fr))
+        AS ?name
+    )
+  
   # Additional type labels
     OPTIONAL { 
         ?entity a ?type .
@@ -56,6 +68,14 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>`,
     OPTIONAL { ?entity schema:disambiguatingDescription ?description_en FILTER(LANG(?description_en) = "en") }
     OPTIONAL { ?entity schema:disambiguatingDescription ?description_fr FILTER(LANG(?description_fr) = "fr") }
     OPTIONAL { ?entity schema:disambiguatingDescription ?description_default FILTER(LANG(?description_default) = "") }
+    OPTIONAL { ?entity schema:disambiguatingDescription ?description_mul FILTER(LANG(?description_mul) = "mul") }
+    BIND(
+        IF(?requestLanguage = "fr",
+            COALESCE(?description_fr, ?description_default, ?description_mul, ?description_en),
+            COALESCE(?description_en, ?description_default,  ?description_mul, ?description_fr))
+        AS ?description
+    )
+    
     #url
     OPTIONAL { ?entity schema:url ?url }`,
 

@@ -168,9 +168,9 @@ export class MatchService {
 
                 //TODO Remove this condition once the new version is fully released
                 if (version === SparqlVersionEnum.V2) {
-                    sparqlQuery = this._generateSparqlQueryV2(id, name as string, type, limit || 25, propertyConditions);
+                    sparqlQuery = this._generateSparqlQueryV2(id, name as string, type, limit || 25, propertyConditions, requestLanguage);
                 } else {
-                    sparqlQuery = this._generateSparqlQuery(id, name as string, type, limit || 25, propertyConditions);
+                    sparqlQuery = this._generateSparqlQuery(id, name as string, type, limit || 25, propertyConditions, requestLanguage);
                 }
 
                 const response = await this._artsdataService.executeSparqlQuery(sparqlQuery, false);
@@ -392,7 +392,7 @@ export class MatchService {
      * @param propertyConditions
      */
     private _generateSparqlQueryV2(id: string | undefined, name: string | undefined, type: string,
-                                   limit: number, propertyConditions: QueryCondition[]) {
+                                   limit: number, propertyConditions: QueryCondition[], requestLanguage: string) {
         const luceneIndex = MatchServiceHelper.getGraphdbIndex(type, SparqlVersionEnum.V2);
         const selectVariables = ['?entity'];
         const subQueries = [];
@@ -417,7 +417,7 @@ export class MatchService {
         const {
             selectQueryFragment,
             propertiesSubQuery
-        } = MatchServiceHelper.generateSubQueryToFetchAdditionalProperties();
+        } = MatchServiceHelper.generateSubQueryToFetchAdditionalProperties(requestLanguage);
 
         const {
             scoreVariables: scoreVarsFromProps,
@@ -441,10 +441,11 @@ export class MatchService {
      * @param type
      * @param limit
      * @param propertyConditions
+     * @param requestLanguage
      */
     private _generateSparqlQuery(
         id: string | undefined, name: string | undefined, type: string, limit: number,
-        propertyConditions: QueryCondition[]): string {
+        propertyConditions: QueryCondition[], requestLanguage: string): string {
 
         const graphdbIndex = MatchServiceHelper.getGraphdbIndex(type);
         let rawQuery = QUERIES.RECONCILIATION_QUERY;
@@ -463,6 +464,7 @@ export class MatchService {
 
         rawQuery = rawQuery
             .replace("INDEX_PLACE_HOLDER", graphdbIndex)
+            .replace("REQUEST_LANG_PLACEHOLDER", requestLanguage)
             .replace("QUERY_FILTER_PLACE_HOLDER", luceneQuery.length ? `luc:query ${luceneQuery}` : luceneQuery)
             .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
 
