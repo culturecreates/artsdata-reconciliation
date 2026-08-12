@@ -55,3 +55,7 @@ adr:KO-1 a schema:Organization , dbo:Agent ;
     rdfs:label "Place Bell" ;
     schema:name "Place Bell" .
 
+
+adr:KO-2 a schema:Organization , dbo:Agent ;
+    rdfs:label "ORGANIZATION NAME WITH MUL TAG"@mul ;
+    schema:name "ORGANIZATION NAME WITH MUL TAG"@mul .
