@@ -170,7 +170,7 @@ export class MatchService {
                 if (version === SparqlVersionEnum.V2) {
                     sparqlQuery = this._generateSparqlQueryV2(id, name as string, type, limit || 25, propertyConditions);
                 } else {
-                    sparqlQuery = this._generateSparqlQuery(id, name as string, type, limit || 25, propertyConditions);
+                    sparqlQuery = this._generateSparqlQuery(id, name as string, type, limit || 25, propertyConditions, requestLanguage);
                 }
 
                 const response = await this._artsdataService.executeSparqlQuery(sparqlQuery, false);
@@ -441,10 +441,11 @@ export class MatchService {
      * @param type
      * @param limit
      * @param propertyConditions
+     * @param requestLanguage
      */
     private _generateSparqlQuery(
         id: string | undefined, name: string | undefined, type: string, limit: number,
-        propertyConditions: QueryCondition[]): string {
+        propertyConditions: QueryCondition[], requestLanguage: string): string {
 
         const graphdbIndex = MatchServiceHelper.getGraphdbIndex(type);
         let rawQuery = QUERIES.RECONCILIATION_QUERY;
@@ -463,6 +464,7 @@ export class MatchService {
 
         rawQuery = rawQuery
             .replace("INDEX_PLACE_HOLDER", graphdbIndex)
+            .replace("REQUEST_LANG_PLACEHOLDER", requestLanguage)
             .replace("QUERY_FILTER_PLACE_HOLDER", luceneQuery.length ? `luc:query ${luceneQuery}` : luceneQuery)
             .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
 
