@@ -82,11 +82,7 @@ export class MatchServiceHelper {
 
             resultCandidate.id = currentBinding["entity"].value?.split(ArtsdataConstants.PREFIX).pop();
             const name = currentBinding["name"]?.value;
-            const nameEn = currentBinding["nameEn"]?.value;
-            const nameFr = currentBinding["nameFr"]?.value;
             const description = currentBinding["description"]?.value;
-            const descriptionEn = currentBinding["descriptionEn"]?.value;
-            const descriptionFr = currentBinding["descriptionFr"]?.value;
             const subEventSet = new Set();
             const typeSet = new Set();
             currentBindings.forEach((binding: any) => {
@@ -115,14 +111,9 @@ export class MatchServiceHelper {
                 types: typeSet.size > 0 ? [...typeSet] : undefined,
             };
 
+            resultCandidate.name = name;
+            resultCandidate.description = description;
 
-            if (responseLanguage === LanguageEnum.FRENCH) {
-                resultCandidate.name = nameFr || name || nameEn;
-                resultCandidate.description = descriptionFr || description || descriptionEn;
-            } else {
-                resultCandidate.name = nameEn || name || nameFr;
-                resultCandidate.description = descriptionEn || description || descriptionFr;
-            }
             resultCandidate.score = Math.round(Number(currentBinding["total_score"]?.value) * 100) / 100;
             resultCandidate.match =
                 isQueryByURI ||
@@ -502,7 +493,7 @@ export class MatchServiceHelper {
         }]
     }
 
-    static generateSubQueryToFetchAdditionalProperties(requestLanguage:string) {
+    static generateSubQueryToFetchAdditionalProperties(requestLanguage: string) {
 
         let propertiesSubQuery: string = QUERIES_V2.COMMON_PROPERTIES_TO_FETCH_QUERY;
         propertiesSubQuery = propertiesSubQuery.replace("REQUEST_LANG_PLACEHOLDER", requestLanguage);
