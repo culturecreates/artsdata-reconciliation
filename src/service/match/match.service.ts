@@ -168,7 +168,7 @@ export class MatchService {
 
                 //TODO Remove this condition once the new version is fully released
                 if (version === SparqlVersionEnum.V2) {
-                    sparqlQuery = this._generateSparqlQueryV2(id, name as string, type, limit || 25, propertyConditions);
+                    sparqlQuery = this._generateSparqlQueryV2(id, name as string, type, limit || 25, propertyConditions, requestLanguage);
                 } else {
                     sparqlQuery = this._generateSparqlQuery(id, name as string, type, limit || 25, propertyConditions, requestLanguage);
                 }
@@ -392,7 +392,7 @@ export class MatchService {
      * @param propertyConditions
      */
     private _generateSparqlQueryV2(id: string | undefined, name: string | undefined, type: string,
-                                   limit: number, propertyConditions: QueryCondition[]) {
+                                   limit: number, propertyConditions: QueryCondition[], requestLanguage: string) {
         const luceneIndex = MatchServiceHelper.getGraphdbIndex(type, SparqlVersionEnum.V2);
         const selectVariables = ['?entity'];
         const subQueries = [];
@@ -417,7 +417,7 @@ export class MatchService {
         const {
             selectQueryFragment,
             propertiesSubQuery
-        } = MatchServiceHelper.generateSubQueryToFetchAdditionalProperties();
+        } = MatchServiceHelper.generateSubQueryToFetchAdditionalProperties(requestLanguage);
 
         const {
             scoreVariables: scoreVarsFromProps,

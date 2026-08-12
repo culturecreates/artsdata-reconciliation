@@ -502,9 +502,11 @@ export class MatchServiceHelper {
         }]
     }
 
-    static generateSubQueryToFetchAdditionalProperties() {
+    static generateSubQueryToFetchAdditionalProperties(requestLanguage:string) {
 
         let propertiesSubQuery: string = QUERIES_V2.COMMON_PROPERTIES_TO_FETCH_QUERY;
+        propertiesSubQuery = propertiesSubQuery.replace("REQUEST_LANG_PLACEHOLDER", requestLanguage);
+
         let selectQueryFragment: string = QUERIES_V2.COMMON_SELECT_QUERY_FOR_ALL_ENTITY_PROPERTIES_SUB_QUERY;
 
         return {selectQueryFragment, propertiesSubQuery}
