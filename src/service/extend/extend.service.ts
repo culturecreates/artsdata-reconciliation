@@ -238,8 +238,9 @@ export class ExtendService {
                    ?uri schema:performer ?performer .
                    OPTIONAL { ?performer schema:name   ?performer_name_en. FILTER( LANG(?performer_name_en) = "en")}
                    OPTIONAL { ?performer schema:name  ?performer_name_fr. FILTER( LANG(?performer_name_fr) = "fr")}
-                   OPTIONAL { ?performer schema:name  ?performer_name_no. FILTER ( LANG(?performer_name_no) = "")}
-                  BIND(COALESCE(?performer_name_en, ?performer_name_fr, ?performer_name_no) as ?performerName)
+                   OPTIONAL { ?performer schema:name  ?performer_name_default. FILTER ( LANG(?performer_name_default) = "")}
+                   OPTIONAL { ?performer schema:name  ?performer_name_mul. FILTER ( LANG(?performer_name_mul) = "mul")}
+                  BIND(COALESCE(?performer_name_en, ?performer_name_fr, ?performer_name_mul, ?performer_name_default) as ?performerName)
               }
             #Offer buy uri
             OPTIONAL { ?uri schema:offers/schema:url ?offer_url }
