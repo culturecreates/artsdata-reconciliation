@@ -57,4 +57,23 @@ describe('Test matching Agents using sparql query v1', () => {
 
     });
 
+    it('Name with mul tag should return', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.AGENT,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "ORGANIZATION NAME WITH MUL TAG"}],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KO-2");
+        expect(actualResult?.name).toBe("ORGANIZATION NAME WITH MUL TAG");
+
+    });
 });
