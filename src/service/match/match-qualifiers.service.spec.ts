@@ -79,7 +79,6 @@ describe('Test matching Organization using qualifier RegexMatch using sparql que
         expect(response.results).toHaveLength(1);
         const allResults = response.results?.[0]?.candidates;
         const actualResult = allResults?.[0];
-        console.log("Actual result: ", actualResult);
 
         expect(actualResult?.id).toBe("Organization1");
 
