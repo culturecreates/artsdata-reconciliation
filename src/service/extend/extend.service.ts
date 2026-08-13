@@ -10,7 +10,7 @@ import {
     ProposedExtendProperty
 } from "../../dto/extend";
 import {QUERY_BY_GRAPH} from "../../constant/extend/query-by-graph.constants";
-import {ExpandablePropertyEnum} from "../../enum/extend-service.enum";
+import {ExpandablePropertyEnum, ExtendableResponseEnum, ExtendableSparqlEnum} from "../../enum";
 import {EXPANDABLE_PROPERTIES} from "../../constant/extend/expandable-properties.constants";
 import {FEATURE_FLAG} from "../../config";
 
@@ -118,7 +118,7 @@ export class ExtendService {
 
         }
         let propertyId = id;
-        if(MatchServiceHelper.isValidURI(id)){
+        if (MatchServiceHelper.isValidURI(id)) {
             propertyId = id.split('http://schema.org/')[1];
         }
         return `OPTIONAL {?uri schema:${propertyId} ?${propertyId}. ${expandedTriples ? `\n${expandedTriples}\n` : ""}}\n`;
@@ -194,11 +194,11 @@ export class ExtendService {
     }
 
 
-    async getDataFromGraph(graphURI: string, entityClass: EntityClassEnum, region: string, page: number = 1,
-                           limit: number = 10) {
+    async getExtendDataFromGraph(graphURI: string, entityClass: EntityClassEnum, region: string, page: number = 1,
+                                 limit: number = 10) {
         const sparqlQuery = this._getSparqlQueryByTypeAndGraph(graphURI, entityClass, region, page, limit);
         const result = await this._artsdataService.executeSparqlQuery(sparqlQuery, true);
-        return this._formatResults(result);
+        return this._formatExtendDataFromGraphResults(result);
     }
 
     private _getSparqlQueryByTypeAndGraph(graphURI: string, entityClass: EntityClassEnum, region: string, page: number,
@@ -324,7 +324,10 @@ export class ExtendService {
                     formattedRow[key] = `_:${row[key].value}`;
                 }
             }
+            formattedRow[ExtendableResponseEnum.RECONCILED] = !!formattedRow[ExtendableSparqlEnum.ARTSDATA_ID_INTERNAL];
+            delete formattedRow[ExtendableSparqlEnum.ARTSDATA_ID_INTERNAL];
             return formattedRow;
+
         });
     }
 
