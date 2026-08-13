@@ -109,6 +109,46 @@ describe('ExtendService', () => {
                 },
             ]);
         });
+
+        it('return wikidata id is the entity URI itself is wikidata URI', async () => {
+            artsdataService.executeSparqlQuery.mockResolvedValueOnce({
+                "results": {
+                    "bindings": [
+                        {
+                            "uri": {
+                                "type": "uri",
+                                "value": "http://www.wikidata.org/entity/123"
+                            },
+                            "name": {
+                                "xml:lang": "en",
+                                "type": "literal",
+                                "value": "Entity Name"
+                            },
+                            "wikidata_uri": {
+                                "type": "uri",
+                                "value": "http://www.wikidata.org/entity/123"
+                            },
+                            "type": {
+                                "type": "literal",
+                                "value": "http://schema.org/Person"
+                            }
+                        }]
+                }
+            });
+
+            const result = await extendService.getExtendDataFromGraph(
+                'https://kg.artsdata.ca/culture-creates/graph', EntityClassEnum.PERSON, "");
+
+            expect(result).toEqual([
+                {
+                    name: 'Entity Name',
+                    uri: 'http://www.wikidata.org/entity/123',
+                    wikidata_uri: 'http://www.wikidata.org/entity/123',
+                    reconciled: false,
+                    type: 'http://schema.org/Person',
+                },
+            ]);
+        });
     });
 });
 
