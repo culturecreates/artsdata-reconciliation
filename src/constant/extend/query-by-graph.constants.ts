@@ -9,7 +9,8 @@ SELECT ?uri
   (SAMPLE(?urls) AS ?url)
   (SAMPLE(?name) AS ?name)
   (SAMPLE(?isni_uris) AS ?isni_uri)
-  (COALESCE(SAMPLE(?adids), SAMPLE(?adid_obj)) AS ?artsdata_uri)
+  (COALESCE(SAMPLE(?adid_int), SAMPLE(?adid_ext)) AS ?artsdata_uri)
+  (SAMPLE (?adid_int) AS ?adid_int)
   (SAMPLE(?wikidata_ids) AS ?wikidata_uri)
   (GROUP_CONCAT(DISTINCT ?types; SEPARATOR = ", ") AS ?type)
   (MAX(?flaggedForReview) AS ?is_flagged_for_review)
@@ -33,19 +34,19 @@ WHERE {
   }
   ?uri a TYPE_PLACEHOLDER.
   FILTER(!ISBLANK(?uri))
-  OPTIONAL {
-    ?adids schema:sameAs ?uri.
-    FILTER(STRSTARTS(STR(?adids), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))
-  }
+      OPTIONAL {
+        ?uri schema:sameAs ?adid_ext.
+        FILTER(STRSTARTS(STR(?adid_ext), "http://kg.artsdata.ca/resource/K")) 
+    }
+    OPTIONAL {
+        ?adid_int schema:sameAs ?uri.
+        FILTER(STRSTARTS(STR(?adid_int), "http://kg.artsdata.ca/resource/K"))
+    }
   OPTIONAL { 
     ?uri schema:additionalType <http://kg.artsdata.ca/ontology/FlaggedForReview>. 
     BIND(TRUE AS ?flaggedForReview) 
   }
   <EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>
-  OPTIONAL { 
-    ?uri schema:sameAs ?adid_obj. 
-    FILTER(STRSTARTS(STR(?adid_obj), "${ArtsdataConstants.PREFIX_INCLUDING_K}")) 
-  }
   OPTIONAL { ?uri schema:url ?urls. FILTER(!ISBLANK(?urls)) }
   OPTIONAL { 
     ?uri schema:sameAs ?wikidata_ids. 

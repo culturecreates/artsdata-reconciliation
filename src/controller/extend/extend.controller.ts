@@ -90,13 +90,13 @@ export class ExtendController {
     description: "Select region",
     required: false,
   })
-  async getDataFromGraph(
+  async getExtendDataFromGraph(
     @Param("graph_uri") graphURI: string,
     @Param("entity_class") entityClass: EntityClassEnum,
     @Query("region") region: string,
     @Query("page", ParseIntPipe) page: number,
     @Query("limit", ParseIntPipe) limit: number,
   ) {
-    return await this._extendService.getDataFromGraph(graphURI, entityClass, region, page, limit);
+    return await this._extendService.getExtendDataFromGraph(graphURI, entityClass, region, page, limit);
   }
 }
