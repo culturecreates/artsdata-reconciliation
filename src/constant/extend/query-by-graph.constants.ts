@@ -11,7 +11,7 @@ SELECT ?uri
   (SAMPLE(?isni_uris) AS ?isni_uri)
   (COALESCE(SAMPLE(?adid_int), SAMPLE(?adid_ext)) AS ?artsdata_uri)
   (SAMPLE (?adid_int) AS ?adid_int)
-  (SAMPLE(?wikidata_ids) AS ?wikidata_uri)
+  (COALESCE(SAMPLE(?wikidata_ids), SAMPLE(?wikidata_self)) AS ?wikidata_uri)
   (GROUP_CONCAT(DISTINCT ?types; SEPARATOR = ", ") AS ?type)
   (MAX(?flaggedForReview) AS ?is_flagged_for_review)
   (SAMPLE(?disambiguating_descriptions) AS ?disambiguating_description)
@@ -51,6 +51,10 @@ WHERE {
   OPTIONAL { 
     ?uri schema:sameAs ?wikidata_ids. 
     FILTER(STRSTARTS(STR(?wikidata_ids), "http://www.wikidata.org/entity/")) 
+  }
+  OPTIONAL { 
+    FILTER(STRSTARTS(STR(?uri), "http://www.wikidata.org/entity/")) 
+    BIND(?uri AS ?wikidata_self) 
   }
   OPTIONAL { 
     ?uri schema:sameAs ?isni_uris. 
