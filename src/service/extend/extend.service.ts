@@ -303,12 +303,12 @@ export class ExtendService {
     }
 
     /**
-     * @name _formatResults
+     * @name _formatExtendDataFromGraphResults
      * @description Format the results from the SPARQL query for query by graph id
      * @param result
      * @private
      */
-    private _formatResults(result: any) {
+    private _formatExtendDataFromGraphResults(result: any) {
         return result.results.bindings.map((row: any) => {
             const formattedRow: { [key: string]: any } = {};
             for (const key in row) {
