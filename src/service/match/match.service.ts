@@ -453,8 +453,14 @@ export class MatchService {
 
         if (id) {
             id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX}${id}>`;
+            let query = `BIND(${id} as ?entity)`
+
+            if (type) {
+                query = query.concat(`?entity a <${type}>;`)
+            }
+
             rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER",
-                `BIND(${id} as ?entity)`);
+                query);
         } else {
             rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER",
                 QUERIES.SELECT_ENTITY_QUERY_BY_KEYWORD);
