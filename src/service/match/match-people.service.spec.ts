@@ -1,8 +1,7 @@
-import { MatchService } from "../../service";
-import { ReconciliationQuery } from "../../dto";
-import { Entities } from "../../constant";
-import { MatchTypeEnum } from "../../enum";
-import { LanguageEnum } from "../../enum";
+import {MatchService} from "../../service";
+import {ReconciliationQuery} from "../../dto";
+import {Entities} from "../../constant";
+import {LanguageEnum, MatchTypeEnum} from "../../enum";
 import {
     dropIndexAndTheGraph,
     setupMatchService,
@@ -101,7 +100,7 @@ describe('Test matching person using sparql query v1', () => {
         expect(allResults?.some(result => result.id === "GarretWillie")).toBeFalsy();
     });
 
-     it('Match person with full name including initial ', async () => {
+    it('Match person with full name including initial ', async () => {
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PERSON,
             conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Warren P. Sonoda"}],
@@ -118,6 +117,31 @@ describe('Test matching person using sparql query v1', () => {
         expect(actualResult?.match).toBeTruthy();
     });
 
+    it('Matching URI but not the type, should not return a match', async () => {
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE, /* KPR-1 a Person */
+            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KPR-1"}],
+            limit: 10
+        };
+
+        let response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        let allResults = response.results?.[0]?.candidates;
+        allResults?.length.toFixed(0)
+
+        // Ser the query type to Person
+        reconciliationQuery.type = Entities.PERSON;
+        response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+
+        allResults = response.results?.[0]?.candidates;
+        allResults?.length.toFixed(1)
+        const actualResult = allResults?.[0];
+        expect(actualResult?.id).toBe("KPR-1");
+        expect(actualResult?.match).toBeTruthy();
+    });
 
 });
 
