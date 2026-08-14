@@ -292,6 +292,11 @@ export class MatchServiceHelper {
             matchers.exact(additionalProperties.wikidata, recordFromQuery.wikidata),
         ];
 
+        if ((additionalProperties.types.includes(Entities.PERSON) || additionalProperties.types.includes(Entities.PERSON)) &&
+            (!additionalProperties.types.includes(Entities.AGENT))) {
+            additionalProperties.types.push(Entities.AGENT)
+        }
+
         const checkIfTypeIsMatching = matchers.any(additionalProperties.types, recordFromQuery.type);
 
         const checkIfNameIsCloseAndWikidataIdIsNotDifferentIfBothPresent = [
