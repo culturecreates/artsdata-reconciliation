@@ -453,7 +453,7 @@ export class MatchService {
 
         if (id) {
             id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX}${id}>`;
-            let query = `BIND(${id} as ?entity)`
+            let query = `BIND(${id} as ?entity)\n`
 
             if (type) {
                 query = query.concat(`?entity a <${type}>;`)
