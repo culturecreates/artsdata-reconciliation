@@ -341,6 +341,32 @@ describe('Test matching Place using sparql query v1', () => {
 
     });
 
+    it('Match Place with url', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PLACE,
+            limit: 1,
+            conditions: [
+                {
+                    matchType: "url",
+                    propertyValue: "http://www.placebell.ca",
+                    required: true
+                }
+            ],
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KP-1");
+        expect(actualResult?.match).toBeFalsy();
+
+    });
+
 });
 
 describe('Test reconciling place using sparql query version 2', () => {
