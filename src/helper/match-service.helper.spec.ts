@@ -1,6 +1,7 @@
 import {MatchServiceHelper} from './match-service.helper';
 import {ReconciliationQuery} from '../dto';
 import {Entities} from '../constant';
+import {ArtsdataConstants} from '../constant';
 
 describe('isAutoMatch', () => {
     it('returns true when names are very close and postal codes match exactly', () => {
@@ -577,6 +578,24 @@ describe('isAutoMatch', () => {
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
             recordFromQuery);
         expect(result).toBe(true);
+    });
+});
+
+describe('isValidURI', () => {
+    it('returns true for a valid absolute URI with HTTPS protocol', () => {
+        expect(MatchServiceHelper.isValidURI('https://kg.artsdata.ca/resource/K11-240')).toBe(true);
+    });
+
+    it('returns true for a valid absolute URI with HTTP protocol', () => {
+        expect(MatchServiceHelper.isValidURI('http://kg.artsdata.ca/resource/K11-240')).toBe(true);
+    });
+
+    it('returns false for a URI missing protocol', () => {
+        expect(MatchServiceHelper.isValidURI('kg.artsdata.ca/resource/K11-240')).toBe(false);
+    });
+
+    it('returns false for an empty string', () => {
+        expect(MatchServiceHelper.isValidURI('')).toBe(false);
     });
 });
 
