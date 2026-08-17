@@ -180,7 +180,7 @@ export class MatchServiceHelper {
     }
 
     static isValidURI(text: string) {
-        return isURL(text);
+        return isURL(text, {require_protocol: true});
     }
 
     static isQueryByURIOrArtsdataId(query: string) {
