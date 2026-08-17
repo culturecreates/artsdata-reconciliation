@@ -1,16 +1,16 @@
 import {MatchService,} from "../../service";
-import {ReconciliationQuery, ReconciliationResults} from "../../dto";
+import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
 import {LanguageEnum, MatchTypeEnum} from "../../enum";
 import {
     dropIndexAndTheGraph,
-    executeAndCompareResults,
     setupMatchService,
     uploadDataSetAndCreateLuceneConnector
 } from "../../../test/util/common-util";
 import {IndexFileNameEnum} from "../../enum/index-names.enum";
 import {MatchServiceHelper} from "../../helper";
 import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
+
 describe('Test matching Place using sparql query v1', () => {
 
     let matchService: MatchService;
@@ -194,7 +194,7 @@ describe('Test matching Place using sparql query v1', () => {
 
     it('Reconcile Place with Name and Street Address', async () => {
 
-        const reconciliationQuery: ReconciliationQuery ={
+        const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
             limit: 1,
             conditions: [
@@ -284,7 +284,7 @@ describe('Test matching Place using sparql query v1', () => {
 
     it('Reconcile Place with name and locality, the match should be true since all are exactly matching', async () => {
 
-        const reconciliationQuery: ReconciliationQuery =  {
+        const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
             limit: 1,
             conditions: [
@@ -318,7 +318,7 @@ describe('Test matching Place using sparql query v1', () => {
 
     it('Match Place with alternate name', async () => {
 
-        const reconciliationQuery: ReconciliationQuery =  {
+        const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
             limit: 1,
             conditions: [
@@ -388,8 +388,6 @@ describe('Test reconciling place using sparql query version 2', () => {
             .toBe("http://schema.org/Place");
 
     });
-
-
 
 
     it(`Reconcile an Place entity with uri 'http://kg.artsdata.ca/resource/KP-1`, async () => {
