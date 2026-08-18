@@ -151,6 +151,158 @@ describe('Test matching person using sparql query v1', () => {
         expect(actualResult?.match).toBeTruthy();
     });
 
+    it('Exact URI and mismatching name, finds match but set auto match to true', async () => {
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PERSON,
+            conditions: [
+                {
+                    matchType: MatchTypeEnum.ID,
+                    propertyValue: "http://kg.artsdata.ca/resource/KPR-1",
+                    required: false
+                }, {
+                    matchType: MatchTypeEnum.NAME,
+                    propertyValue: "wrong name",
+                    required: false
+                }
+            ],
+            limit: 10
+        };
+
+        let response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        allResults?.length.toFixed(1)
+        const actualResult = allResults?.[0];
+        expect(actualResult?.id).toBe("KPR-1");
+        expect(actualResult?.match).toBeTruthy();
+    });
+
+    it('URI is exact, name and wikidata id are mismatching, finds match but set auto match to false', async () => {
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PERSON,
+            conditions: [
+                {
+                    matchType: MatchTypeEnum.ID,
+                    propertyValue: "http://kg.artsdata.ca/resource/KPR-1",
+                    required: false
+                }, {
+                    matchType: MatchTypeEnum.NAME,
+                    propertyValue: "wrong name",
+                    required: false
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyId: "http://schema.org/sameAs",
+                    propertyValue: "http://www.wikidata.org/entity/Q-NON-MATCHING-ID",
+                    required: false
+                }
+            ],
+            limit: 10
+        };
+
+        let response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        allResults?.length.toFixed(1)
+        const actualResult = allResults?.[0];
+        expect(actualResult?.id).toBe("KPR-1");
+        expect(actualResult?.match).toBeFalsy();
+    });
+
+    it('URI and wikidata id is Exact, finds auto match true', async () => {
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PERSON,
+            conditions: [
+                {
+                    matchType: MatchTypeEnum.ID,
+                    propertyValue: "http://kg.artsdata.ca/resource/KPR-1",
+                    required: false
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyId: "http://schema.org/sameAs",
+                    propertyValue: "http://www.wikidata.org/entity/Q123",
+                    required: false
+                }
+            ],
+            limit: 10
+        };
+
+        let response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        allResults?.length.toFixed(1)
+        const actualResult = allResults?.[0];
+        expect(actualResult?.id).toBe("KPR-1");
+        expect(actualResult?.match).toBeTruthy();
+    });
+
+    it('URI and wikidata id is Exact but different isni, finds auto match false', async () => {
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PERSON,
+            conditions: [
+                {
+                    matchType: MatchTypeEnum.ID,
+                    propertyValue: "http://kg.artsdata.ca/resource/KPR-1",
+                    required: false
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyId: "http://schema.org/sameAs",
+                    propertyValue: "http://www.wikidata.org/entity/Q123",
+                    required: false
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyId: "http://schema.org/sameAs",
+                    propertyValue: "https://isni.org/isni/wrong-isni",
+                    required: false
+                }
+            ],
+            limit: 10
+        };
+
+        let response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        allResults?.length.toFixed(1)
+        const actualResult = allResults?.[0];
+        expect(actualResult?.id).toBe("KPR-1");
+        expect(actualResult?.match).toBeFalsy();
+    });
+
+    it('URI and wikidata id and ISNI is Exact, finds auto match true', async () => {
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PERSON,
+            conditions: [
+                {
+                    matchType: MatchTypeEnum.ID,
+                    propertyValue: "http://kg.artsdata.ca/resource/KPR-1",
+                    required: false
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyId: "http://schema.org/sameAs",
+                    propertyValue: "http://www.wikidata.org/entity/Q123",
+                    required: false
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyId: "http://schema.org/sameAs",
+                    propertyValue: "https://isni.org/isni/123",
+                    required: false
+                }
+            ],
+            limit: 10
+        };
+
+        let response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        allResults?.length.toFixed(1)
+        const actualResult = allResults?.[0];
+        expect(actualResult?.id).toBe("KPR-1");
+        expect(actualResult?.match).toBeTruthy();
+    });
 });
 
 describe('Test reconciling person using sparql query version 2', () => {
