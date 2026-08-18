@@ -43,13 +43,13 @@ describe('ExtendService', () => {
                                 "type": "uri",
                                 "value": "http://kg.artsdata.ca/resource/KX-XXX"
                             },
-                            "adid_int": {
-                                "type": "uri",
-                                "value": "http://kg.artsdata.ca/resource/KX-XXX"
-                            },
                             "type": {
                                 "type": "literal",
                                 "value": "http://schema.org/Person"
+                            },
+                            "reconciled": {
+                                "type": "literal",
+                                "value": true
                             }
                         }]
                 }
@@ -91,6 +91,10 @@ describe('ExtendService', () => {
                             "type": {
                                 "type": "literal",
                                 "value": "http://schema.org/Person"
+                            },
+                            "reconciled": {
+                                "type": "literal",
+                                "value": false
                             }
                         }]
                 }
@@ -144,8 +148,7 @@ describe('ExtendService', () => {
                     name: 'Entity Name',
                     uri: 'http://www.wikidata.org/entity/123',
                     wikidata_uri: 'http://www.wikidata.org/entity/123',
-                    reconciled: false,
-                    type: 'http://schema.org/Person',
+                    type: 'http://schema.org/Person'
                 },
             ]);
         });
