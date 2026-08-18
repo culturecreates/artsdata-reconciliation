@@ -35,7 +35,9 @@ adr:Place1 a schema:Place ;
 
 adr:KPR-1 a schema:Person , dbo:Agent ;
     rdfs:label "Persona bell" ;
-     schema:name "Persona bell" .
+     schema:name "Persona bell" ;
+     schema:sameAs <http://www.wikidata.org/entity/Q123> ;
+     schema:sameAs <https://isni.org/isni/123> .
 
 adr:WarrenSonoda a schema:Person , dbo:Agent ;
     rdfs:label "Warren P. Sonoda" ;
