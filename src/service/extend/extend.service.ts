@@ -324,8 +324,6 @@ export class ExtendService {
                     formattedRow[key] = `_:${row[key].value}`;
                 }
             }
-            formattedRow[ExtendableResponseEnum.RECONCILED] = !!formattedRow[ExtendableSparqlEnum.ARTSDATA_ID_INTERNAL];
-            delete formattedRow[ExtendableSparqlEnum.ARTSDATA_ID_INTERNAL];
             return formattedRow;
 
         });

@@ -10,10 +10,10 @@ SELECT ?uri
   (SAMPLE(?name) AS ?name)
   (SAMPLE(?isni_uris) AS ?isni_uri)
   (COALESCE(SAMPLE(?adid_int), SAMPLE(?adid_ext)) AS ?artsdata_uri)
-  (SAMPLE (?adid_int) AS ?adid_int)
   (COALESCE(SAMPLE(?wikidata_ids), SAMPLE(?wikidata_self)) AS ?wikidata_uri)
   (GROUP_CONCAT(DISTINCT ?types; SEPARATOR = ", ") AS ?type)
   (MAX(?flaggedForReview) AS ?is_flagged_for_review)
+  ?reconciled
   (SAMPLE(?disambiguating_descriptions) AS ?disambiguating_description)
   <EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>
 WHERE {
@@ -60,8 +60,15 @@ WHERE {
     ?uri schema:sameAs ?isni_uris. 
     FILTER(STRSTARTS(STR(?isni_uris), "https://isni.org/isni/")) 
   }
+  GRAPH <http://kg.artsdata.ca/core>{
+      OPTIONAL {
+          ?uri schema:sameAs ?adid.
+          FILTER(STRSTARTS(STR(?adid_ext), "http://kg.artsdata.ca/resource/K")) 
+          BIND(TRUE AS ?reconciled) 
+      }
+  }
 } 
-GROUP BY ?uri
+GROUP BY ?uri ?reconciled
 ORDER BY ?name
 LIMIT LIMIT_PLACEHOLDER
 OFFSET OFFSET_PLACEHOLDER`,
