@@ -341,7 +341,6 @@ export class MatchServiceHelper {
             ];
 
         //Name is very close and URL is exact match, postal code and wikidata should be exact match if present
-        const checkIfNameIsCloseUrlIsExactAndPostalCodeAndWikidataIsNotDifferentForPlace = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.exactUrl(
                 additionalProperties.url,
@@ -407,7 +406,8 @@ export class MatchServiceHelper {
         const name = conditions.find((condition) => condition.matchType === "name")
             ?.propertyValue as string | undefined;
 
-        let postalCode: string | undefined = undefined, addressLocality: string | undefined = undefined,
+        let id: string | undefined, postalCode: string | undefined = undefined,
+            addressLocality: string | undefined = undefined,
             addressRegion: string | undefined = undefined, url: string | undefined = undefined,
             startDate: string | undefined = undefined, subEvents: string[] | undefined,
             endDate: string | undefined = undefined,
@@ -416,6 +416,9 @@ export class MatchServiceHelper {
         let sameAs: string[] = [];
 
         for (const condition of conditions) {
+            if (condition.matchType === MatchTypeEnum.ID) {
+                id = condition.propertyValue as string;
+            }
             if (condition.propertyId) {
                 let propertyId = condition.propertyId as string;
                 if (propertyId.startsWith('schema:')) {
@@ -490,6 +493,7 @@ export class MatchServiceHelper {
         }
 
         return {
+            id,
             name,
             postalCode,
             addressLocality,
