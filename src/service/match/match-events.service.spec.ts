@@ -239,7 +239,7 @@ describe('Test matching events using sparql query v1', () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
-            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KE-4"}],
+            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KE-4", required:true}],
             limit: 1
         };
 
@@ -572,7 +572,7 @@ describe('Test reconciling events using sparql query version 2', () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
-            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KE-4"}],
+            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KE-4", required:true}],
             limit: 1
         };
 

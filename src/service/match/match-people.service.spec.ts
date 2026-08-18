@@ -62,7 +62,11 @@ describe('Test matching person using sparql query v1', () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PERSON,
-            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KPR-1"}],
+            conditions: [{
+                matchType: MatchTypeEnum.ID,
+                propertyValue: "http://kg.artsdata.ca/resource/KPR-1",
+                required: true
+            }],
             limit: 1
         };
 
@@ -120,7 +124,11 @@ describe('Test matching person using sparql query v1', () => {
     it('Matching URI but not the type, should not return a match', async () => {
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE, /* KPR-1 a Person */
-            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KPR-1"}],
+            conditions: [{
+                matchType: MatchTypeEnum.ID,
+                propertyValue: "http://kg.artsdata.ca/resource/KPR-1",
+                required: true
+            }],
             limit: 10
         };
 
@@ -195,7 +203,11 @@ describe('Test reconciling person using sparql query version 2', () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PERSON,
-            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KPR-1"}],
+            conditions: [{
+                matchType: MatchTypeEnum.ID,
+                propertyValue: "http://kg.artsdata.ca/resource/KPR-1",
+                required: true
+            }],
             limit: 1
         };
 

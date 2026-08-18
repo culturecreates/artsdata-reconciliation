@@ -112,7 +112,11 @@ describe('Test matching Place using sparql query v1', () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
-            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KP-1"}],
+            conditions: [{
+                matchType: MatchTypeEnum.ID,
+                propertyValue: "http://kg.artsdata.ca/resource/KP-1",
+                required: true
+            }],
             limit: 1
         };
 
@@ -420,7 +424,11 @@ describe('Test reconciling place using sparql query version 2', () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
-            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KP-1"}],
+            conditions: [{
+                matchType: MatchTypeEnum.ID,
+                propertyValue: "http://kg.artsdata.ca/resource/KP-1",
+                required: true
+            }],
             limit: 1
         };
 
