@@ -1,4 +1,4 @@
-import {LanguageEnum, MatchQualifierEnum} from "../enum";
+import {LanguageEnum, MatchQualifierEnum, MatchTypeEnum} from "../enum";
 import {GRAPHDB_INDEX} from "../config";
 import {QueryCondition, ReconciliationQuery, ResultCandidates} from "../dto";
 import {isURL} from "validator";
@@ -80,7 +80,8 @@ export class MatchServiceHelper {
             const currentBinding = currentBindings[0];
             const resultCandidate = new ResultCandidates();
 
-            resultCandidate.id = currentBinding["entity"].value?.split(ArtsdataConstants.PREFIX).pop();
+            const resultCandidateUri = currentBinding["entity"].value
+            resultCandidate.id = resultCandidateUri?.split(ArtsdataConstants.PREFIX).pop();
             const name = currentBinding["name"]?.value;
             const description = currentBinding["description"]?.value;
             const subEventSet = new Set();
@@ -95,6 +96,7 @@ export class MatchServiceHelper {
             });
 
             const additionalPropertiesForAutoMatch = {
+                uri: resultCandidateUri,
                 url: currentBinding["url"]?.value,
                 postalCode: currentBinding["postalCode"]?.value,
                 addressLocality: currentBinding["addressLocality"]?.value,
