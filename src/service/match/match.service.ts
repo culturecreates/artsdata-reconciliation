@@ -542,7 +542,10 @@ export class MatchService {
             .find(({matchType, required}) => matchType === MatchTypeEnum.ID && !required);
 
         if (nonRequiredIdCondition) {
-            luceneQuery =  `${this._resolvePropertyValueForLucene(nonRequiredIdCondition.propertyValue, 'uri')} OR ${luceneQuery} `;
+            const uriLuceneQuery
+                = this._resolvePropertyValueForLucene(nonRequiredIdCondition.propertyValue, "uri");
+
+            luceneQuery = luceneQuery?.length ? `${uriLuceneQuery} OR ${luceneQuery} ` : uriLuceneQuery;
         }
 
         return `"${luceneQuery}" ;`;
