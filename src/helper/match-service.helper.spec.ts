@@ -1,7 +1,6 @@
 import {MatchServiceHelper} from './match-service.helper';
 import {ReconciliationQuery} from '../dto';
 import {Entities} from '../constant';
-import {ArtsdataConstants} from '../constant';
 
 describe('isAutoMatch', () => {
     it('returns true when names are very close and postal codes match exactly', () => {
@@ -241,7 +240,7 @@ describe('isAutoMatch', () => {
         expect(result).toBe(true);
     });
 
-    it('returns false when URLs do not match for a PLACE entity', () => {
+    it('returns false when URL domains do not match for a PLACE entity', () => {
         const recordFetched = {name: 'Place Bell'};
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PLACE,
@@ -254,8 +253,10 @@ describe('isAutoMatch', () => {
                 },
             ],
         };
-        const additionalProperties = {url: 'http://www.placebell.ca/wrong-url',
-            types: ['http://schema.org/Place']};
+        const additionalProperties = {
+            url: 'http://www.wrong-domain.com/',
+            types: ['http://schema.org/Place']
+        };
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
