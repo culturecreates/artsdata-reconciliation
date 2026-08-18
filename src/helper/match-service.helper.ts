@@ -303,13 +303,23 @@ export class MatchServiceHelper {
             },
         };
 
-        const checkIfIsniIsExactMatch = [
+        const checkIfISNIIsExactMatchAndWikidataAndIdAreNotDifferent = [
             matchers.exact(additionalProperties.isni, recordFromQuery.isni),
+            matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata),
+            matchers.notDifferentIfBothExists(additionalProperties.uri, recordFromQuery.id)
         ];
 
-        // Wikidata should be exact match
-        const checkIfWikidataIdIsExactMatch = [
+        const checkIfIdIsExactMatchAndWikidataAndISNIAreNotDifferent = [
+            matchers.exact(additionalProperties.uri, recordFromQuery.id),
+            matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata),
+            matchers.notDifferentIfBothExists(additionalProperties.isni, recordFromQuery.isni)
+        ];
+
+        // Wikidata should be exact match and ISNI and Id is not different
+        const checkIfWikidataIdIsExactMatchAndISNIAndIdAreNotDifferent = [
             matchers.exact(additionalProperties.wikidata, recordFromQuery.wikidata),
+            matchers.notDifferentIfBothExists(additionalProperties.isni, recordFromQuery.isni),
+            matchers.notDifferentIfBothExists(additionalProperties.uri, recordFromQuery.id)
         ];
 
         // Wikidata should be exact match and ID - URI is not different
@@ -331,10 +341,12 @@ export class MatchServiceHelper {
 
         const checkIfTypeIsMatching = matchers.any(additionalProperties.types, recordFromQuery.type);
 
-        const checkIfNameIsCloseAndWikidataIdIsNotDifferentIfBothPresent = [
+        const checkIfNameIsCloseAndWikidataIdISNIAndIdAreNotDifferentIfBothPresent = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata),
-        ];
+            matchers.notDifferentIfBothExists(additionalProperties.isni, recordFromQuery.isni),
+            matchers.notDifferentIfBothExists(additionalProperties.uri, recordFromQuery.id)
+        ]
 
         // Name should be close match and postal code should be exact match, wikidata should be exact match if present and ID_URI should not be different
         const checkIfNameIsClosePostalCodeIsExactWikidataIsNotDifferentAndIDisNotDifferent = [
@@ -408,10 +420,12 @@ export class MatchServiceHelper {
                 checksNameStartDateEndDatePlaceNamePostalCodeAndSubEventsMatchForEvents.every(Boolean)
             );
         } else {
+            // All other types (person, organization, agent, concept, event type, live performance work)
             return (
-                checkIfWikidataIdIsExactMatch.every(Boolean) ||
-                checkIfIsniIsExactMatch.every(Boolean) ||
-                checkIfNameIsCloseAndWikidataIdIsNotDifferentIfBothPresent.every(Boolean)
+                checkIfWikidataIdIsExactMatchAndISNIAndIdAreNotDifferent.every(Boolean) ||
+                checkIfISNIIsExactMatchAndWikidataAndIdAreNotDifferent.every(Boolean) ||
+                checkIfIdIsExactMatchAndWikidataAndISNIAreNotDifferent.every(Boolean) ||
+                checkIfNameIsCloseAndWikidataIdISNIAndIdAreNotDifferentIfBothPresent.every(Boolean)
             );
         }
     }
