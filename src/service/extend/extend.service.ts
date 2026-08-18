@@ -10,7 +10,7 @@ import {
     ProposedExtendProperty
 } from "../../dto/extend";
 import {QUERY_BY_GRAPH} from "../../constant/extend/query-by-graph.constants";
-import {ExpandablePropertyEnum, ExtendableResponseEnum, ExtendableSparqlEnum} from "../../enum";
+import {ExpandablePropertyEnum} from "../../enum";
 import {EXPANDABLE_PROPERTIES} from "../../constant/extend/expandable-properties.constants";
 import {FEATURE_FLAG} from "../../config";
 
