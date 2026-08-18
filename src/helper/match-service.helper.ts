@@ -180,6 +180,8 @@ export class MatchServiceHelper {
     }
 
     static isValidURI(text: string) {
+        if (!text)
+            return false
         return isURL(text, {require_protocol: true});
     }
 
