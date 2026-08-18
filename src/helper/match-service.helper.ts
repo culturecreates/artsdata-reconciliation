@@ -267,6 +267,22 @@ export class MatchServiceHelper {
                     return false;
                 }
             },
+            exactDomain: (a: string | undefined, b: string | undefined) => {
+                if (a && b) {
+                    try {
+                        const urlA = new URL(a.toLowerCase());
+                        const urlB = new URL(b.toLowerCase());
+
+                        let hostA = urlA.hostname;
+                        let hostB = urlB.hostname;
+                        return hostA === hostB;
+                    } catch (e) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            },
             exactLocationOrRelated: (
                 locationUri: string | undefined, locationUriFromQuery: string | undefined,
                 locationContainedIn: string | undefined, locationContains: string | undefined,
