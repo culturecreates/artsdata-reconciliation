@@ -250,7 +250,7 @@ describe('isAutoMatch', () => {
                     propertyId: "<http://schema.org/url>",
                     propertyValue: "http://www.placebell.ca/fr",
                     matchType: "property",
-                },
+                }
             ],
         };
         const additionalProperties = {
@@ -309,8 +309,10 @@ describe('isAutoMatch', () => {
                 },
             ],
         };
-        const additionalProperties = {startDate: '2023-01-01',
-            types: ['http://schema.org/Event']};
+        const additionalProperties = {
+            startDate: '2023-01-01',
+            types: ['http://schema.org/Event']
+        };
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -332,8 +334,10 @@ describe('isAutoMatch', () => {
                 },
             ],
         };
-        const additionalProperties = {startDate: '2023-02-01',
-            types: ['http://schema.org/Event']};
+        const additionalProperties = {
+            startDate: '2023-02-01',
+            types: ['http://schema.org/Event']
+        };
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -382,8 +386,10 @@ describe('isAutoMatch', () => {
                 },
             ],
         };
-        const additionalProperties = {locationUri: 'http://kg.artsdata.ca/resource/K22-240',
-            types: ['http://schema.org/Event']};
+        const additionalProperties = {
+            locationUri: 'http://kg.artsdata.ca/resource/K22-240',
+            types: ['http://schema.org/Event']
+        };
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
