@@ -1,4 +1,4 @@
-import {LanguageEnum, MatchQualifierEnum} from "../enum";
+import {LanguageEnum, MatchQualifierEnum, MatchTypeEnum} from "../enum";
 import {GRAPHDB_INDEX} from "../config";
 import {QueryCondition, ReconciliationQuery, ResultCandidates} from "../dto";
 import {isURL} from "validator";
@@ -80,7 +80,8 @@ export class MatchServiceHelper {
             const currentBinding = currentBindings[0];
             const resultCandidate = new ResultCandidates();
 
-            resultCandidate.id = currentBinding["entity"].value?.split(ArtsdataConstants.PREFIX).pop();
+            const resultCandidateUri = currentBinding["entity"].value
+            resultCandidate.id = resultCandidateUri?.split(ArtsdataConstants.PREFIX).pop();
             const name = currentBinding["name"]?.value;
             const description = currentBinding["description"]?.value;
             const subEventSet = new Set();
@@ -95,6 +96,7 @@ export class MatchServiceHelper {
             });
 
             const additionalPropertiesForAutoMatch = {
+                uri: resultCandidateUri,
                 url: currentBinding["url"]?.value,
                 postalCode: currentBinding["postalCode"]?.value,
                 addressLocality: currentBinding["addressLocality"]?.value,
@@ -180,6 +182,8 @@ export class MatchServiceHelper {
     }
 
     static isValidURI(text: string) {
+        if (!text)
+            return false
         return isURL(text, {require_protocol: true});
     }
 
@@ -263,6 +267,22 @@ export class MatchServiceHelper {
                     return false;
                 }
             },
+            exactDomain: (a: string | undefined, b: string | undefined) => {
+                if (a && b) {
+                    try {
+                        const urlA = new URL(a.toLowerCase());
+                        const urlB = new URL(b.toLowerCase());
+
+                        let hostA = urlA.hostname;
+                        let hostB = urlB.hostname;
+                        return hostA === hostB;
+                    } catch (e) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            },
             exactLocationOrRelated: (
                 locationUri: string | undefined, locationUriFromQuery: string | undefined,
                 locationContainedIn: string | undefined, locationContains: string | undefined,
@@ -283,13 +303,35 @@ export class MatchServiceHelper {
             },
         };
 
-        const checkIfIsniIsExactMatch = [
+        const checkIfISNIIsExactMatchAndWikidataAndIdAreNotDifferent = [
             matchers.exact(additionalProperties.isni, recordFromQuery.isni),
+            matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata),
+            matchers.notDifferentIfBothExists(additionalProperties.uri, recordFromQuery.id)
         ];
 
-        // Wikidata should be exact match
-        const checkIfWikidataIdIsExactMatch = [
+        const checkIfIdIsExactMatchAndWikidataAndISNIAreNotDifferent = [
+            matchers.exact(additionalProperties.uri, recordFromQuery.id),
+            matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata),
+            matchers.notDifferentIfBothExists(additionalProperties.isni, recordFromQuery.isni)
+        ];
+
+        // Wikidata should be exact match and ISNI and Id is not different
+        const checkIfWikidataIdIsExactMatchAndISNIAndIdAreNotDifferent = [
             matchers.exact(additionalProperties.wikidata, recordFromQuery.wikidata),
+            matchers.notDifferentIfBothExists(additionalProperties.isni, recordFromQuery.isni),
+            matchers.notDifferentIfBothExists(additionalProperties.uri, recordFromQuery.id)
+        ];
+
+        // Wikidata should be exact match and ID - URI is not different
+        const checkIfWikidataIdIsExactMatchAndIDisNotDifferent = [
+            matchers.exact(additionalProperties.wikidata, recordFromQuery.wikidata),
+            matchers.notDifferentIfBothExists(additionalProperties.uri, recordFromQuery.id)
+        ];
+
+        // ID - URI should be exact match and wikidata is not different
+        const checkIfIdIsExactMatchAndWikidataisNotDifferent = [
+            matchers.exact(additionalProperties.uri, recordFromQuery.id),
+            matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
         ];
 
         if ((additionalProperties.types?.includes(Entities.PERSON) || additionalProperties.types?.includes(Entities.ORGANIZATION)) &&
@@ -299,36 +341,39 @@ export class MatchServiceHelper {
 
         const checkIfTypeIsMatching = matchers.any(additionalProperties.types, recordFromQuery.type);
 
-        const checkIfNameIsCloseAndWikidataIdIsNotDifferentIfBothPresent = [
+        const checkIfNameIsCloseAndWikidataIdISNIAndIdAreNotDifferentIfBothPresent = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata),
-        ];
+            matchers.notDifferentIfBothExists(additionalProperties.isni, recordFromQuery.isni),
+            matchers.notDifferentIfBothExists(additionalProperties.uri, recordFromQuery.id)
+        ]
 
-        // Name should be close match and postal code should be exact match, wikidata should be exact match if present
-        const checkIfNameIsClosePostalCodeIsExactAndWikidataIsNotDifferent = [
+        // Name should be close match and postal code should be exact match, wikidata should be exact match if present and ID_URI should not be different
+        const checkIfNameIsClosePostalCodeIsExactWikidataIsNotDifferentAndIDisNotDifferent = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.exact(additionalProperties.postalCode, recordFromQuery.postalCode, true),
-            matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
+            matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata),
+            matchers.notDifferentIfBothExists(additionalProperties.uri, recordFromQuery.id)
         ];
 
         //Name and address locality should be close match, postal code and wikidata should be exact match if present
-        const checkIfNameAddressLocalityAreCloseAndPostalCodeAndWikidataIsNotDifferentForPlace =
+        const checkIfNameAddressLocalityAreCloseAndPostalCodeWikidataAndIDIsNotDifferentForPlace =
             [
                 matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
                 matchers.notDifferentIfBothExists(additionalProperties.postalCode, recordFromQuery.postalCode),
                 matchers.veryClose(additionalProperties.addressLocality, recordFromQuery.addressLocality),
-                matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
+                matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata),
+                matchers.notDifferentIfBothExists(additionalProperties.uri, recordFromQuery.id)
             ];
 
         //Name is very close and URL is exact match, postal code and wikidata should be exact match if present
-        const checkIfNameIsCloseUrlIsExactAndPostalCodeAndWikidataIsNotDifferentForPlace = [
+        //Exact domain (ignoring protocol https/http and path)
+        const checkIfNameIsCloseUrlIsExactAndPostalCodeWikidataAndIdIsNotDifferentForPlace = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
-            matchers.exactUrl(
-                additionalProperties.url,
-                recordFromQuery.url as string,
-            ),
+            matchers.exactDomain(additionalProperties.url, recordFromQuery.url),
             matchers.notDifferentIfBothExists(additionalProperties.postalCode, recordFromQuery.postalCode),
-            matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
+            matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata),
+            matchers.notDifferentIfBothExists(additionalProperties.uri, recordFromQuery.id)
         ];
 
         const checksNameStartDateEndDatePlaceUriAndSubEventsMatchForEvents = [
@@ -363,10 +408,11 @@ export class MatchServiceHelper {
             return false;
         } else if (reconciliationQuery.type === Entities.PLACE) {
             return (
-                checkIfWikidataIdIsExactMatch.every(Boolean) ||
-                checkIfNameIsClosePostalCodeIsExactAndWikidataIsNotDifferent.every(Boolean) ||
-                checkIfNameAddressLocalityAreCloseAndPostalCodeAndWikidataIsNotDifferentForPlace.every(Boolean) ||
-                checkIfNameIsCloseUrlIsExactAndPostalCodeAndWikidataIsNotDifferentForPlace.every(Boolean)
+                checkIfWikidataIdIsExactMatchAndIDisNotDifferent.every(Boolean) ||
+                checkIfIdIsExactMatchAndWikidataisNotDifferent.every(Boolean) ||
+                checkIfNameIsClosePostalCodeIsExactWikidataIsNotDifferentAndIDisNotDifferent.every(Boolean) ||
+                checkIfNameAddressLocalityAreCloseAndPostalCodeWikidataAndIDIsNotDifferentForPlace.every(Boolean) ||
+                checkIfNameIsCloseUrlIsExactAndPostalCodeWikidataAndIdIsNotDifferentForPlace.every(Boolean)
             );
         } else if (reconciliationQuery.type === Entities.EVENT) {
             return (
@@ -374,10 +420,12 @@ export class MatchServiceHelper {
                 checksNameStartDateEndDatePlaceNamePostalCodeAndSubEventsMatchForEvents.every(Boolean)
             );
         } else {
+            // All other types (person, organization, agent, concept, event type, live performance work)
             return (
-                checkIfWikidataIdIsExactMatch.every(Boolean) ||
-                checkIfIsniIsExactMatch.every(Boolean) ||
-                checkIfNameIsCloseAndWikidataIdIsNotDifferentIfBothPresent.every(Boolean)
+                checkIfWikidataIdIsExactMatchAndISNIAndIdAreNotDifferent.every(Boolean) ||
+                checkIfISNIIsExactMatchAndWikidataAndIdAreNotDifferent.every(Boolean) ||
+                checkIfIdIsExactMatchAndWikidataAndISNIAreNotDifferent.every(Boolean) ||
+                checkIfNameIsCloseAndWikidataIdISNIAndIdAreNotDifferentIfBothPresent.every(Boolean)
             );
         }
     }
@@ -387,7 +435,8 @@ export class MatchServiceHelper {
         const name = conditions.find((condition) => condition.matchType === "name")
             ?.propertyValue as string | undefined;
 
-        let postalCode: string | undefined = undefined, addressLocality: string | undefined = undefined,
+        let id: string | undefined, postalCode: string | undefined = undefined,
+            addressLocality: string | undefined = undefined,
             addressRegion: string | undefined = undefined, url: string | undefined = undefined,
             startDate: string | undefined = undefined, subEvents: string[] | undefined,
             endDate: string | undefined = undefined,
@@ -396,6 +445,9 @@ export class MatchServiceHelper {
         let sameAs: string[] = [];
 
         for (const condition of conditions) {
+            if (condition.matchType === MatchTypeEnum.ID) {
+                id = condition.propertyValue as string;
+            }
             if (condition.propertyId) {
                 let propertyId = condition.propertyId as string;
                 if (propertyId.startsWith('schema:')) {
@@ -470,6 +522,7 @@ export class MatchServiceHelper {
         }
 
         return {
+            id,
             name,
             postalCode,
             addressLocality,

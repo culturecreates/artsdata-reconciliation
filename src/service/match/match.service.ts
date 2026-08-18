@@ -70,12 +70,14 @@ export class MatchService {
     private _resolveConditions(conditions: QueryCondition[]):
         { id: string | undefined, name: string | string[] | undefined; propertyConditions: QueryCondition[]; } {
         return {
-            id: conditions.find(({matchType}) => matchType === MatchTypeEnum.ID)
+            id: conditions.find(({matchType, required}) => matchType === MatchTypeEnum.ID && required)
                 ?.propertyValue as string,
             name: conditions.find(({matchType}) => matchType === MatchTypeEnum.NAME)
                 ?.propertyValue,
             propertyConditions: conditions
-                .filter(({matchType}) => matchType === MatchTypeEnum.PROPERTY)
+                .filter(({matchType, required}) => matchType === MatchTypeEnum.PROPERTY ||
+                    (matchType === MatchTypeEnum.ID && !required)
+                )
         };
     }
 
@@ -133,6 +135,10 @@ export class MatchService {
      */
     private _generateTripleFromCondition(condition: QueryCondition, index: number,): string {
         const {required, propertyId, propertyValue: rawConditionValue, matchQualifier, matchQuantifier} = condition;
+
+        if (!required) {
+            return '';
+        }
 
         const propertyIdSubstituted = propertyId ? MatchServiceHelper.substitutePrefix(propertyId as string) : propertyId;
 
@@ -520,7 +526,7 @@ export class MatchService {
             "<https://schema.org/location>/<https://schema.org/address>/<https://schema.org/postalCode>": "locationPostalCode",
         };
 
-        const luceneQuery = propertyConditions
+        let luceneQuery = propertyConditions
             .filter((condition) => condition.matchType === MatchTypeEnum.PROPERTY)
             .reduce((query, condition) => {
                 Object.entries(propertyMap).forEach(([key, value]) => {
@@ -531,6 +537,16 @@ export class MatchService {
                 });
                 return query;
             }, `${transformedName}`);
+
+        const nonRequiredIdCondition = propertyConditions
+            .find(({matchType, required}) => matchType === MatchTypeEnum.ID && !required);
+
+        if (nonRequiredIdCondition) {
+            const uriLuceneQuery
+                = this._resolvePropertyValueForLucene(nonRequiredIdCondition.propertyValue, "uri");
+
+            luceneQuery = luceneQuery?.length ? `${uriLuceneQuery} OR ${luceneQuery} ` : uriLuceneQuery;
+        }
 
         return `"${luceneQuery}" ;`;
     }

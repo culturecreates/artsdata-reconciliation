@@ -340,7 +340,7 @@ describe('Test auto-matching Places using sparql query v1', () => {
 
         const reconciliationQueryWithPostalCodeWithOutSpace: ReconciliationQuery = {
             type: Entities.PLACE,
-            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Arts Court"},
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Arts Court", required: true},
                 {
                     "matchType": MatchTypeEnum.PROPERTY,
                     "propertyId": "<http://schema.org/address>/<http://schema.org/postalCode>",

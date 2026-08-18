@@ -61,7 +61,11 @@ describe('Test matching organizations using sparql query v1', () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.ORGANIZATION,
-            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KO-1"}],
+            conditions: [{
+                matchType: MatchTypeEnum.ID,
+                propertyValue: "http://kg.artsdata.ca/resource/KO-1",
+                required: true
+            }],
             limit: 1
         };
 
@@ -130,7 +134,11 @@ describe('Test reconciling Organizations using sparql query version 2', () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.ORGANIZATION,
-            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KO-1"}],
+            conditions: [{
+                matchType: MatchTypeEnum.ID,
+                propertyValue: "http://kg.artsdata.ca/resource/KO-1",
+                required: true
+            }],
             limit: 1
         };
 

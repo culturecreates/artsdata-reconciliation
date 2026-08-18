@@ -239,7 +239,7 @@ describe('Test matching events using sparql query v1', () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
-            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KE-4"}],
+            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KE-4", required:true}],
             limit: 1
         };
 
@@ -572,7 +572,7 @@ describe('Test reconciling events using sparql query version 2', () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
-            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KE-4"}],
+            conditions: [{matchType: MatchTypeEnum.ID, propertyValue: "http://kg.artsdata.ca/resource/KE-4", required:true}],
             limit: 1
         };
 
@@ -598,6 +598,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
 
     it('auto-matches when query location is the room and graph location is the building (containedInPlace)', () => {
         const additionalProperties = {
+            uri: "http://kg.artsdata.ca/resource/KE-1",
             startDate: "2026-04-25T19:30:00-07:00",
             endDate: undefined,
             locationUri: "http://kg.artsdata.ca/resource/K2-5487",
@@ -620,6 +621,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
         };
 
         const recordFromQuery = {
+            id: undefined,
             name: "Romeo & Juliet",
             startDate: "2026-04-25T19:30:00-07:00",
             endDate: undefined,
@@ -642,6 +644,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
 
     it('auto-matches when query location is the building and graph location is the room (containsPlace)', () => {
         const additionalProperties = {
+            uri: "http://kg.artsdata.ca/resource/KE-1",
             startDate: "2026-04-25T19:30:00-07:00",
             endDate: undefined,
             locationUri: "http://kg.artsdata.ca/resource/K2-6080",
@@ -664,6 +667,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
         };
 
         const recordFromQuery = {
+            id: undefined,
             name: "Romeo & Juliet",
             startDate: "2026-04-25T19:30:00-07:00",
             endDate: undefined,
@@ -686,6 +690,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
 
     it('does not auto-match when location is unrelated to the graph location', () => {
         const additionalProperties = {
+            uri: "http://kg.artsdata.ca/resource/KE-1",
             startDate: "2026-04-25T19:30:00-07:00",
             endDate: undefined,
             locationUri: "http://kg.artsdata.ca/resource/K2-6080",
@@ -707,6 +712,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
         };
 
         const recordFromQuery = {
+            id: undefined,
             name: "Romeo & Juliet",
             startDate: "2026-04-25T19:30:00-07:00",
             endDate: undefined,
@@ -728,6 +734,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
 
     it('does not auto-match when name does not match even if location containment matches', () => {
         const additionalProperties = {
+            id: "http://kg.artsdata.ca/resource/KE-1",
             startDate: "2026-04-25T19:30:00-07:00",
             endDate: undefined,
             locationUri: "http://kg.artsdata.ca/resource/K2-5487",
@@ -749,6 +756,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
         };
 
         const recordFromQuery = {
+            id: undefined,
             name: "Romeo & Juliet",
             startDate: "2026-04-25T19:30:00-07:00",
             endDate: undefined,

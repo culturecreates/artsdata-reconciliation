@@ -5,6 +5,15 @@ INSERT DATA {
 	inst:event-index :createConnector '''
 {
   "fields": [
+     {
+      "fieldName": "uri",
+      "propertyChain": ["$self"],
+      "indexed": true,
+      "stored": true,
+      "analyzed": false,
+      "multivalued": false,
+      "facet": false
+    },
     {
       "fieldName": "name",
       "propertyChain": [

@@ -6,7 +6,16 @@ INSERT DATA {
     inst:organization-index :createConnector '''
 {
   "fields": [
-    {
+     {
+      "fieldName": "uri",
+      "propertyChain": ["$self"],
+      "indexed": true,
+      "stored": true,
+      "analyzed": false,
+      "multivalued": false,
+      "facet": false
+      },
+      {
       "fieldName": "name",
       "propertyChain": [
         "http://www.w3.org/2000/01/rdf-schema#label"

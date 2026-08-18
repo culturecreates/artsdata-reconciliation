@@ -1,4 +1,5 @@
 export interface RecordFromQuery {
+    id :string | undefined;
     name: string | undefined;
     postalCode: string | undefined;
     addressLocality: string | undefined;
