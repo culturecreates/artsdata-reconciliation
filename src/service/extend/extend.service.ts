@@ -10,7 +10,7 @@ import {
     ProposedExtendProperty
 } from "../../dto/extend";
 import {QUERY_BY_GRAPH} from "../../constant/extend/query-by-graph.constants";
-import {ExpandablePropertyEnum, ExtendableResponseEnum, ExtendableSparqlEnum} from "../../enum";
+import {ExpandablePropertyEnum} from "../../enum";
 import {EXPANDABLE_PROPERTIES} from "../../constant/extend/expandable-properties.constants";
 import {FEATURE_FLAG} from "../../config";
 
@@ -324,8 +324,6 @@ export class ExtendService {
                     formattedRow[key] = `_:${row[key].value}`;
                 }
             }
-            formattedRow[ExtendableResponseEnum.RECONCILED] = !!formattedRow[ExtendableSparqlEnum.ARTSDATA_ID_INTERNAL];
-            delete formattedRow[ExtendableSparqlEnum.ARTSDATA_ID_INTERNAL];
             return formattedRow;
 
         });
