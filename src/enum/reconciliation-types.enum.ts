@@ -18,6 +18,7 @@ export enum MatchQuantifierEnum {
 
 export enum MatchQualifierEnum {
     REGEX_MATCH = "RegexMatch",
-    EXACT_MATCH = "ExactMatch"
+    EXACT_MATCH = "ExactMatch",
+    DATE_RANGE = "http://kg.artsdata.ca/resource/reconciliation-qualifier-date-range"
 
 }
