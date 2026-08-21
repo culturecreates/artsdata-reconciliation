@@ -3,7 +3,7 @@ import {ArtsdataService} from "../artsdata";
 import {ArtsdataConstants, SUGGEST_QUERY} from "../../constant";
 import {GRAPHDB_INDEX} from "../../config";
 import {Exception, MatchServiceHelper} from "../../helper";
-import {SuggestPropertyResponse, SuggestPropertyResult, SuggestResponse} from "../../interface/suggest.interface";
+import {SuggestPropertyResponse, SuggestResponse} from "../../interface/suggest.interface";
 
 @Injectable()
 export class SuggestService {
@@ -17,9 +17,8 @@ export class SuggestService {
 
     async getSuggestedProperties(prefix: string, cursor: number): Promise<SuggestPropertyResponse> {
         const suggestedProperties = await this._getSuggestions(prefix, cursor, this._generateSparqlQueryForPropertySuggestion.bind(this));
-        const supportedQualifiers = MatchServiceHelper.getAllQualifiers()
         const result = suggestedProperties.result.map(result => {
-            return {...result, matchQualifiers: supportedQualifiers}
+            return {...result, matchQualifiers: MatchServiceHelper.getAllQualifiers(result.id)}
         })
         return {result};
     }
