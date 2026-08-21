@@ -2,7 +2,7 @@ import {LanguageEnum, MatchQualifierEnum, MatchTypeEnum} from "../enum";
 import {GRAPHDB_INDEX} from "../config";
 import {QueryCondition, ReconciliationQuery, ResultCandidates} from "../dto";
 import {isURL} from "validator";
-import {ArtsdataConstants, Entities, PREFIXES, SCHEMA_ORG_PROPERTY_URI_MAP} from "../constant";
+import {ArtsdataConstants, ArtsdataProperties, Entities, PREFIXES, SCHEMA_ORG_PROPERTY_URI_MAP} from "../constant";
 import {JaroWinklerDistance} from "natural";
 import {QUERIES_V2} from "../constant/match/match-queries-v2.constants";
 import {SparqlVersionEnum} from "../enum/sparql-versions.enum";
@@ -541,14 +541,21 @@ export class MatchServiceHelper {
         } as RecordFromQuery;
     }
 
-    static getAllQualifiers() {
-        return [{
+    static getAllQualifiers(id: string) {
+        const qualifiers = [{
             id: MatchQualifierEnum.EXACT_MATCH,
             name: "Exact match of the property value",
         }, {
             id: MatchQualifierEnum.REGEX_MATCH,
             name: "Match the property value using regular expression",
         }]
+        if([ArtsdataProperties.START_DATE, ArtsdataProperties.END_DATE].includes(id)){
+            qualifiers.push({
+                id: MatchQualifierEnum.DATE_RANGE,
+                name: "Date range"
+            })
+        }
+        return qualifiers;
     }
 
     static generateSubQueryToFetchAdditionalProperties(requestLanguage: string) {
