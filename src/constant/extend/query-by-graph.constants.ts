@@ -16,8 +16,13 @@ SELECT ?uri
 (SAMPLE(?disambiguating_descriptions) AS ?disambiguating_description)
 <EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>
 WHERE {
+    
+   ?allSubClasses rdfs:subClassOf* TYPE_PLACEHOLDER .
+
     GRAPH <GRAPH_URI_PLACEHOLDER> {
-            ?uri a TYPE_PLACEHOLDER.
+        
+        ?uri a ?allSubClasses.
+        
         OPTIONAL {
             ?uri schema:name ?name_en.
             FILTER(LANG(?name_en) = "en") 
@@ -89,7 +94,7 @@ WHERE {
     GRAPH <http://kg.artsdata.ca/core>{
         OPTIONAL {
             ?uri schema:sameAs ?adid.
-            FILTER(STRSTARTS(STR(?adid_ext), "http://kg.artsdata.ca/resource/K")) 
+            FILTER(STRSTARTS(STR(?adid), "http://kg.artsdata.ca/resource/K")) 
             BIND(TRUE AS ?reconciled) 
         }
     }
