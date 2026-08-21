@@ -18,6 +18,8 @@ SELECT ?uri
   <EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>
 WHERE {
   GRAPH <GRAPH_URI_PLACEHOLDER> {
+    ?uri a TYPE_PLACEHOLDER.
+    
     OPTIONAL { ?uri schema:name ?name_en. FILTER(LANG(?name_en) = "en") }
     OPTIONAL { ?uri schema:name ?name_fr. FILTER(LANG(?name_fr) = "fr") }
     OPTIONAL { ?uri schema:name ?name_default. FILTER(LANG(?name_default) = "") }
@@ -31,8 +33,8 @@ WHERE {
     BIND(COALESCE(?desc_en, ?desc_fr,?desc_mul, ?desc_default) AS ?disambiguating_descriptions)
     ?uri a ?types.
     <FILTER_BY_REGION_PLACEHOLDER>
-  }
-  ?uri a TYPE_PLACEHOLDER.
+  
+ 
   FILTER(!ISBLANK(?uri))
       OPTIONAL {
         ?uri schema:sameAs ?adid_ext.
@@ -59,6 +61,7 @@ WHERE {
   OPTIONAL { 
     ?uri schema:sameAs ?isni_uris. 
     FILTER(STRSTARTS(STR(?isni_uris), "https://isni.org/isni/")) 
+  }
   }
   GRAPH <http://kg.artsdata.ca/core>{
       OPTIONAL {
