@@ -1,0 +1,32 @@
+@prefix ext:<http://external-source.com/resource/>.
+@prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#>.
+@prefix schema:<http://schema.org/>.
+@prefix xsd:<http://www.w3.org/2001/XMLSchema#>.
+
+# Organizations
+ext:Organization1 a schema:Organization ;
+    schema:name "Organization one - reconciled" ;
+    rdfs:label "Organization one - reconciled" ;
+    schema:sameAs <http://www.wikidata.org/entity/Q11>;
+    schema:sameAs <https://isni.org/isni/00000000000000000011>;
+    schema:sameAs <http://kg.artsdata.ca/resource/K11>;
+    schema:url "http://orgnaization-one.com" .
+
+ext:Organization2 a schema:Organization ;
+    schema:name "Organization two - non-reconciled" ;
+    rdfs:label "Organization two - non-reconciled" ;
+    schema:url "http://orgnaization-two.com" .
+
+# People
+ext:Person1 a schema:Person ;
+    schema:name "Person one - reconciled" ;
+    rdfs:label "Person one - reconciled" ;
+    schema:sameAs <http://www.wikidata.org/entity/Q21>;
+    schema:sameAs <https://isni.org/isni/00000000000000000021>;
+    schema:url "http://person-one.com" .
+
+ext:Person2 a schema:Person ;
+    schema:name "Person two - reconciled" ;
+    rdfs:label "Person two - reconciled" ;
+    schema:sameAs <http://www.wikidata.org/entity/Q22>;
+    schema:sameAs <http://kg.artsdata.ca/resource/K22>.

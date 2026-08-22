@@ -1,0 +1,9 @@
+@prefix adr:<http://kg.artsdata.ca/resource/>.
+@prefix schema:<http://schema.org/>.
+@prefix ext:<http://external-source.com/resource/>.
+
+ext:Organization1 schema:sameAs <http://kg.artsdata.ca/resource/K11>.
+
+ext:Person1 schema:sameAs <http://kg.artsdata.ca/resource/K21>.
+
+ext:Person2 schema:sameAs <http://kg.artsdata.ca/resource/K22>.
