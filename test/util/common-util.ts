@@ -9,46 +9,6 @@ import N3 from 'n3';
 import {randomUUID} from 'node:crypto';
 import {ExtendService} from "../../src/service/extend";
 
-export async function executeAndCompareResults(
-    matchService: MatchService,
-    expectedResult: {
-        id: string;
-        name?: string;
-        type: string;
-        match: boolean;
-        count: number
-    },
-    reconciliationQuery: ReconciliationQuery,
-    version?: string
-) {
-    const result = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
-        {queries: [reconciliationQuery]}, version);
-
-    const allResults = result.results?.[0]?.candidates;
-    const actualResult = allResults?.[0];
-
-    if (expectedResult.id) {
-        expect(actualResult?.id).toBe(expectedResult.id);
-    }
-
-    if (expectedResult.name) {
-        expect(actualResult?.name).toBe(expectedResult.name);
-    }
-
-    if (expectedResult.count) {
-        expect(allResults?.length).toBe(expectedResult.count);
-    }
-
-    if (expectedResult.type) {
-        const expectedTypeUri = expectedResult.type.replace('schema:', 'http://schema.org/')
-        expect(actualResult?.type?.some(type => type.id === expectedTypeUri)).toBeTruthy();
-    }
-
-    if (expectedResult.match) {
-        expect(actualResult?.match).toBeTruthy();
-    }
-}
-
 export async function setupMatchService() {
     const app: TestingModule = await Test.createTestingModule({
         controllers: [ManifestController, MatchController],
