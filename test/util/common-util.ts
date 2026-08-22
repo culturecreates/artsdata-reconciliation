@@ -7,6 +7,7 @@ import {readFile} from 'node:fs/promises';
 import {executeSparql} from "./graphdb.util";
 import N3 from 'n3';
 import {randomUUID} from 'node:crypto';
+import {ExtendService} from "../../src/service/extend";
 
 export async function executeAndCompareResults(
     matchService: MatchService,
@@ -59,6 +60,19 @@ export async function setupMatchService() {
     await artsdataService.checkConnectionWithRetry();
 
     return {matchService, app};
+}
+
+export async function setupExtendService() {
+    const app: TestingModule = await Test.createTestingModule({
+        controllers: [ExtendService],
+        providers: [ExtendService, ArtsdataService, HttpService],
+    }).compile();
+
+    const extendService = app.get<ExtendService>(ExtendService);
+    const artsdataService = app.get<ArtsdataService>(ArtsdataService);
+    await artsdataService.checkConnectionWithRetry();
+
+    return {extendService, app};
 }
 
 /**
@@ -193,6 +207,26 @@ export async function uploadDataSetAndCreateLuceneConnector(index: string, testD
     }
 }
 
+/**
+ * Generates a SPARQL INSERT query to insert data into a graphName.
+ * @param graphURI - The URI of the graph to insert data into.
+ * @param testDataFilePath - The path to the JSON-LD file containing the test data.
+ * @returns A string representing the graph Uri.
+ */
+export async function uploadDataSet(graphURI: string, testDataFilePath: string) {
+
+    try {
+        //Update dataset
+        const indexQuery = await generateInsertQueryToLoadData(testDataFilePath, graphURI);
+        await executeSparql(indexQuery as string);
+
+        return {graphUri: graphURI};
+    } catch (error) {
+        await dropGraph(graphURI)
+        console.log(`Error uploading dataset: ${error.message}`);
+    }
+}
+
 export async function dropIndexAndTheGraph(graphUri: string, LuceneConnectorId: string) {
     const dropIndexQuery = `
         PREFIX luc-index: <http://www.ontotext.com/connectors/lucene/instance#>
@@ -203,4 +237,11 @@ export async function dropIndexAndTheGraph(graphUri: string, LuceneConnectorId: 
         DROP GRAPH <${graphUri}> 
         `
     await executeSparql(dropIndexQuery);
+}
+
+export async function dropGraph(graphUri: string) {
+    const dropGraphQuery = `
+        DROP GRAPH <${graphUri}> 
+        `
+    await executeSparql(dropGraphQuery);
 }
