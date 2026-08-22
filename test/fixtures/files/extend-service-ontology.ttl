@@ -1,0 +1,10 @@
+@prefix schema:<http://schema.org/>.
+@prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#>.
+@prefix dbo:<http://dbpedia.org/ontology/>.
+
+schema:Organization rdfs:subClassOf dbo:Agent.
+schema:Person rdfs:subClassOf dbo:Agent.
+
+schema:Person rdfs:subClassOf schema:Person.
+
+schema:Organization rdfs:subClassOf schema:Organization.

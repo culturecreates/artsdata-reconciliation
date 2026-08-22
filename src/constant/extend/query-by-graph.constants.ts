@@ -7,7 +7,7 @@ SELECT ?uri
 (SAMPLE(?urls) AS ?url)
 (SAMPLE(?name) AS ?name)
 (SAMPLE(?isni_uris) AS ?isni_uri)
-(COALESCE(SAMPLE(?adid_int), SAMPLE(?adid_ext)) AS ?artsdata_uri)
+(COALESCE(SAMPLE(?adid), SAMPLE(?adid_int), SAMPLE(?adid_ext)) AS ?artsdata_uri)
 (COALESCE(SAMPLE(?wikidata_ids), SAMPLE(?wikidata_self)) AS ?wikidata_uri)
 (GROUP_CONCAT(DISTINCT ?types;
         SEPARATOR = ", ") AS ?type)
