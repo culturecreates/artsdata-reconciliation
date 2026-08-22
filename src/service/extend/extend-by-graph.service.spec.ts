@@ -39,6 +39,7 @@ describe('Test Extend by graph URI', () => {
         const expectedResult = [
             {
                 "uri": "http://external-source.com/resource/Person1",
+                "artsdata_uri": "http://kg.artsdata.ca/resource/K21",
                 "url": "http://person-one.com",
                 "name": "Person one - reconciled",
                 "isni_uri": "https://isni.org/isni/00000000000000000021",
@@ -114,6 +115,7 @@ describe('Test Extend by graph URI', () => {
             },
             {
                 "uri": "http://external-source.com/resource/Person1",
+                "artsdata_uri": "http://kg.artsdata.ca/resource/K21",
                 "url": "http://person-one.com",
                 "name": "Person one - reconciled",
                 "isni_uri": "https://isni.org/isni/00000000000000000021",
