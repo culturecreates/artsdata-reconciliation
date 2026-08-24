@@ -11,7 +11,7 @@ SELECT ?uri
 (COALESCE(SAMPLE(?wikidata_ids), SAMPLE(?wikidata_self)) AS ?wikidata_uri)
 (GROUP_CONCAT(DISTINCT ?types;
         SEPARATOR = ", ") AS ?type)
-(MAX(?flaggedForReview) AS ?is_flagged_for_review)
+?flaggedForReview
 ?reconciled
 (SAMPLE(?disambiguating_descriptions) AS ?disambiguating_description)
 <EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>
@@ -103,7 +103,7 @@ WHERE {
         }
     }
 } 
-GROUP BY ?uri ?reconciled
+GROUP BY ?uri ?reconciled ?flaggedForReview
 ORDER BY ?name
 LIMIT LIMIT_PLACEHOLDER
 OFFSET OFFSET_PLACEHOLDER`,
