@@ -194,16 +194,26 @@ export class ExtendService {
     }
 
 
-    async getExtendDataFromGraph(graphURI: string, entityClass: EntityClassEnum, region: string, page: number = 1,
-                                 limit: number = 10) {
-        const sparqlQuery = this._getSparqlQueryByTypeAndGraph(graphURI, entityClass, region, page, limit);
+    async getExtendDataFromGraph(graphURI: string, entityClass: EntityClassEnum, entityUris: string[], region: string,
+                                 page: number = 1, limit: number = 10) {
+        if (entityUris?.length) {
+            this._validateUris(entityUris);
+        }
+
+        const sparqlQuery = this._getSparqlQueryByTypeAndGraph(graphURI, entityClass, entityUris, region, page,
+            limit);
         const result = await this._artsdataService.executeSparqlQuery(sparqlQuery, true);
         return this._formatExtendDataFromGraphResults(result);
     }
 
-    private _getSparqlQueryByTypeAndGraph(graphURI: string, entityClass: EntityClassEnum, region: string, page: number,
-                                          limit: number): string {
+    private _getSparqlQueryByTypeAndGraph(graphURI: string, entityClass: EntityClassEnum, entityUris: string[],
+                                          region: string, page: number, limit: number): string {
         let query: string = QUERY_BY_GRAPH.GENERIC;
+        let uriQueryReplacement: string = ''
+        if (entityUris?.length) {
+            uriQueryReplacement = `VALUES ?uri { ${entityUris.map(uri => `<${uri}>`).join(" ")} }`;
+        }
+        query = query.replace("<FILTER_BY_ENTITY_URIS_PLACEHOLDER>", uriQueryReplacement);
 
         switch (entityClass) {
             case EntityClassEnum.EVENT:
@@ -336,5 +346,13 @@ export class ExtendService {
 
     private _getExpandedPropertiesForPerformer() {
         return ["name"];
+    }
+
+    private _validateUris(entityUris: string[]) {
+        entityUris.forEach(uri => {
+            if (!MatchServiceHelper.isValidURI(uri)) {
+                throw Exception.badRequest(`Invalid URI: ${uri}`);
+            }
+        })
     }
 }

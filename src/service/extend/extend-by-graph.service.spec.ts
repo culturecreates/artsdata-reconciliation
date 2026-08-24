@@ -1,6 +1,7 @@
 import {EntityClassEnum} from "../../enum";
 import {dropGraph, setupExtendService, uploadDataSet} from "../../../test/util/common-util";
 import {ExtendService} from "./extend.service";
+import {BadRequestException} from "@nestjs/common";
 
 describe('Test Extend by graph URI', () => {
 
@@ -34,7 +35,7 @@ describe('Test Extend by graph URI', () => {
     it('Should return all people from the external graph ', async () => {
 
         const results = await extendService
-            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.PERSON, "", 1, 100);
+            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.PERSON, [], "", 1, 100);
 
         const expectedResult = [
             {
@@ -58,15 +59,56 @@ describe('Test Extend by graph URI', () => {
         ]
         expect(results).toHaveLength(2);
 
-        const sortByUri = (a:any, b:any) => a.uri.localeCompare(b.uri);
+        const sortByUri = (a: any, b: any) => a.uri.localeCompare(b.uri);
         expect(results.sort(sortByUri)).toEqual(expectedResult.sort(sortByUri));
+    });
+
+    it('Should return people from the external graph with filter by a URI', async () => {
+
+        const results = await extendService
+            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.PERSON,
+                ["http://external-source.com/resource/Person1"], "", 1, 100);
+
+        const expectedResult = [
+            {
+                "uri": "http://external-source.com/resource/Person1",
+                "artsdata_uri": "http://kg.artsdata.ca/resource/K21",
+                "url": "http://person-one.com",
+                "name": "Person one - reconciled",
+                "isni_uri": "https://isni.org/isni/00000000000000000021",
+                "wikidata_uri": "http://www.wikidata.org/entity/Q21",
+                "type": "http://schema.org/Person",
+                "reconciled": true
+            }
+        ]
+        expect(results).toHaveLength(1);
+
+        const sortByUri = (a: any, b: any) => a.uri.localeCompare(b.uri);
+        expect(results.sort(sortByUri)).toEqual(expectedResult.sort(sortByUri));
+    });
+
+    it('Should return people from the external graph with filter by URI that do not exist', async () => {
+
+        const results = await extendService
+            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.PERSON,
+                ["http://external-source.com/resource/entity-not-exist"], "", 1, 100);
+
+        expect(results).toHaveLength(0);
+    });
+
+    it('Should return people from the external graph with filter by URI that is invalid', async () => {
+
+        await expect(extendService
+            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.PERSON,
+                ["Invalid URI"], "", 1, 100))
+            .rejects.toThrow(BadRequestException);
     });
 
     it('Should return all organizations from the external graph ', async () => {
 
 
         const results = await extendService
-            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.ORGANIZATION, "", 1, 100);
+            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.ORGANIZATION, [], "", 1, 100);
 
         const expectedResult = [
             {
@@ -86,7 +128,7 @@ describe('Test Extend by graph URI', () => {
                 "type": "http://schema.org/Organization"
             }
         ]
-        const sortByUri = (a:any, b:any) => a.uri.localeCompare(b.uri);
+        const sortByUri = (a: any, b: any) => a.uri.localeCompare(b.uri);
         expect(results.sort(sortByUri)).toEqual(expectedResult.sort(sortByUri));
     });
 
@@ -94,9 +136,9 @@ describe('Test Extend by graph URI', () => {
 
 
         const results = await extendService
-            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.AGENT, "", 1, 100);
+            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.AGENT, [], "", 1, 100);
 
-        const expectedResult =[
+        const expectedResult = [
             {
                 "uri": "http://external-source.com/resource/Organization1",
                 "url": "http://orgnaization-one.com",
@@ -133,7 +175,7 @@ describe('Test Extend by graph URI', () => {
             }
         ]
 
-        const sortByUri = (a:any, b:any) => a.uri.localeCompare(b.uri);
+        const sortByUri = (a: any, b: any) => a.uri.localeCompare(b.uri);
         expect(results.sort(sortByUri)).toEqual(expectedResult.sort(sortByUri));
 
     });

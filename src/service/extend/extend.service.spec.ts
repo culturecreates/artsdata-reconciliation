@@ -56,7 +56,7 @@ describe('ExtendService', () => {
             });
 
             const result = await extendService.getExtendDataFromGraph(
-                'https://kg.artsdata.ca/culture-creates/graph', EntityClassEnum.PERSON, "");
+                'https://kg.artsdata.ca/culture-creates/graph', EntityClassEnum.PERSON, [], "");
 
             expect(result).toEqual([
                 {
@@ -101,7 +101,7 @@ describe('ExtendService', () => {
             });
 
             const result = await extendService.getExtendDataFromGraph(
-                'https://kg.artsdata.ca/culture-creates/graph', EntityClassEnum.PERSON, "");
+                'https://kg.artsdata.ca/culture-creates/graph', EntityClassEnum.PERSON, [], "");
 
             expect(result).toEqual([
                 {
@@ -141,7 +141,7 @@ describe('ExtendService', () => {
             });
 
             const result = await extendService.getExtendDataFromGraph(
-                'https://kg.artsdata.ca/culture-creates/graph', EntityClassEnum.PERSON, "");
+                'https://kg.artsdata.ca/culture-creates/graph', EntityClassEnum.PERSON, [], "");
 
             expect(result).toEqual([
                 {
