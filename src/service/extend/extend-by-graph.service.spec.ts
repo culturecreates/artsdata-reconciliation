@@ -10,10 +10,12 @@ describe('Test Extend by graph URI', () => {
     const externalGraphData = 'test/fixtures/files/extend-service-external-source-graph.ttl';
     const coreGraphData = 'test/fixtures/files/extend-service-core-graph.ttl';
     const ontologyGraphData = 'test/fixtures/files/extend-service-ontology.ttl';
+    const maintenanceGraphData = 'test/fixtures/files/extend-service-maintenance-graph.ttl';
 
     const externalGraphURI: string = 'http://test.fixtures/external-graph';
     const coreGraphURI: string = 'http://kg.artsdata.ca/core';
     const ontologyGraphURI: string = 'http://test.fixtures/ontology-graph';
+    const maintenanceGraphURI: string = 'http://kg.artsdata.ca/maintenance';
 
     beforeAll(async () => {
         const setup = await setupExtendService();
@@ -23,6 +25,7 @@ describe('Test Extend by graph URI', () => {
         await uploadDataSet(externalGraphURI, externalGraphData)
         await uploadDataSet(coreGraphURI, coreGraphData)
         await uploadDataSet(ontologyGraphURI, ontologyGraphData)
+        await uploadDataSet(maintenanceGraphURI, maintenanceGraphData)
 
     });
 
@@ -30,6 +33,7 @@ describe('Test Extend by graph URI', () => {
         await dropGraph(externalGraphURI);
         await dropGraph(coreGraphURI);
         await dropGraph(ontologyGraphURI);
+        await dropGraph(maintenanceGraphURI);
     })
 
     it('Should return all people from the external graph ', async () => {
@@ -46,7 +50,8 @@ describe('Test Extend by graph URI', () => {
                 "isni_uri": "https://isni.org/isni/00000000000000000021",
                 "wikidata_uri": "http://www.wikidata.org/entity/Q21",
                 "type": "http://schema.org/Person",
-                "reconciled": true
+                "reconciled": true,
+                "is_flagged_for_review": true
             },
             {
                 "uri": "http://external-source.com/resource/Person2",
@@ -78,7 +83,8 @@ describe('Test Extend by graph URI', () => {
                 "isni_uri": "https://isni.org/isni/00000000000000000021",
                 "wikidata_uri": "http://www.wikidata.org/entity/Q21",
                 "type": "http://schema.org/Person",
-                "reconciled": true
+                "reconciled": true,
+                "is_flagged_for_review": true
             }
         ]
         expect(results).toHaveLength(1);
@@ -119,7 +125,8 @@ describe('Test Extend by graph URI', () => {
                 "artsdata_uri": "http://kg.artsdata.ca/resource/K11",
                 "wikidata_uri": "http://www.wikidata.org/entity/Q11",
                 "type": "http://schema.org/Organization",
-                "reconciled": true
+                "reconciled": true,
+                "is_flagged_for_review": true,
             },
             {
                 "uri": "http://external-source.com/resource/Organization2",
@@ -147,7 +154,8 @@ describe('Test Extend by graph URI', () => {
                 "artsdata_uri": "http://kg.artsdata.ca/resource/K11",
                 "wikidata_uri": "http://www.wikidata.org/entity/Q11",
                 "type": "http://schema.org/Organization",
-                "reconciled": true
+                "reconciled": true,
+                "is_flagged_for_review": true
             },
             {
                 "uri": "http://external-source.com/resource/Organization2",
@@ -163,7 +171,8 @@ describe('Test Extend by graph URI', () => {
                 "isni_uri": "https://isni.org/isni/00000000000000000021",
                 "wikidata_uri": "http://www.wikidata.org/entity/Q21",
                 "type": "http://schema.org/Person",
-                "reconciled": true
+                "reconciled": true,
+                "is_flagged_for_review": true
             },
             {
                 "uri": "http://external-source.com/resource/Person2",

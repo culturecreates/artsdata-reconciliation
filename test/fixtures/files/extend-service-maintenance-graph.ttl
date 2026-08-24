@@ -1,0 +1,8 @@
+@prefix adr:<http://kg.artsdata.ca/resource/>.
+@prefix schema:<http://schema.org/>.
+@prefix ext:<http://external-source.com/resource/>.
+
+ext:Person1 schema:additionalType <http://kg.artsdata.ca/ontology/FlaggedForReview>.
+
+ext:Organization1 schema:additionalType <http://kg.artsdata.ca/ontology/FlaggedForReview>.
+
