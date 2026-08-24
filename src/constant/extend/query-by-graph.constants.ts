@@ -92,7 +92,7 @@ WHERE {
     
     OPTIONAL {
             ?uri schema:additionalType <http://kg.artsdata.ca/ontology/FlaggedForReview>.
-            BIND(TRUE AS ?flaggedForReview) 
+            BIND(TRUE AS ?is_flagged_for_review) 
         }
         
     GRAPH <http://kg.artsdata.ca/core>{
