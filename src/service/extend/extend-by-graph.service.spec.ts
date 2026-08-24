@@ -15,7 +15,7 @@ describe('Test Extend by graph URI', () => {
     const externalGraphURI: string = 'http://test.fixtures/external-graph';
     const coreGraphURI: string = 'http://kg.artsdata.ca/core';
     const ontologyGraphURI: string = 'http://test.fixtures/ontology-graph';
-    const maintenanceGraphURI: string = 'http://test.fixtures/maintenance';
+    const maintenanceGraphURI: string = 'http://kg.artsdata.ca/maintenance';
 
     beforeAll(async () => {
         const setup = await setupExtendService();
@@ -51,7 +51,7 @@ describe('Test Extend by graph URI', () => {
                 "wikidata_uri": "http://www.wikidata.org/entity/Q21",
                 "type": "http://schema.org/Person",
                 "reconciled": true,
-                "?is_flagged_for_review": true
+                "is_flagged_for_review": true
             },
             {
                 "uri": "http://external-source.com/resource/Person2",
@@ -84,7 +84,7 @@ describe('Test Extend by graph URI', () => {
                 "wikidata_uri": "http://www.wikidata.org/entity/Q21",
                 "type": "http://schema.org/Person",
                 "reconciled": true,
-                "?is_flagged_for_review": true
+                "is_flagged_for_review": true
             }
         ]
         expect(results).toHaveLength(1);
@@ -126,7 +126,7 @@ describe('Test Extend by graph URI', () => {
                 "wikidata_uri": "http://www.wikidata.org/entity/Q11",
                 "type": "http://schema.org/Organization",
                 "reconciled": true,
-                "?is_flagged_for_review": true,
+                "is_flagged_for_review": true,
             },
             {
                 "uri": "http://external-source.com/resource/Organization2",
@@ -155,7 +155,7 @@ describe('Test Extend by graph URI', () => {
                 "wikidata_uri": "http://www.wikidata.org/entity/Q11",
                 "type": "http://schema.org/Organization",
                 "reconciled": true,
-                "?is_flagged_for_review": true
+                "is_flagged_for_review": true
             },
             {
                 "uri": "http://external-source.com/resource/Organization2",
@@ -172,7 +172,7 @@ describe('Test Extend by graph URI', () => {
                 "wikidata_uri": "http://www.wikidata.org/entity/Q21",
                 "type": "http://schema.org/Person",
                 "reconciled": true,
-                "?is_flagged_for_review": true
+                "is_flagged_for_review": true
             },
             {
                 "uri": "http://external-source.com/resource/Person2",
