@@ -71,10 +71,6 @@ WHERE {
             ?adid_int schema:sameAs ?uri.
             FILTER(STRSTARTS(STR(?adid_int), "http://kg.artsdata.ca/resource/K"))
         }
-        OPTIONAL {
-            ?uri schema:additionalType <http://kg.artsdata.ca/ontology/FlaggedForReview>.
-            BIND(TRUE AS ?flaggedForReview) 
-        }
           <EXTRA_FIELD_WHERE_CLAUSE_QUERY_PLACEHOLDER>
         OPTIONAL {
             ?uri schema:url ?urls.
@@ -93,6 +89,12 @@ WHERE {
             FILTER(STRSTARTS(STR(?isni_uris), "https://isni.org/isni/")) 
         }
     }
+    
+    OPTIONAL {
+            ?uri schema:additionalType <http://kg.artsdata.ca/ontology/FlaggedForReview>.
+            BIND(TRUE AS ?flaggedForReview) 
+        }
+        
     GRAPH <http://kg.artsdata.ca/core>{
         OPTIONAL {
             ?uri schema:sameAs ?adid.
