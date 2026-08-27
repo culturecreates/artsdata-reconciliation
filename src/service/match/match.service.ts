@@ -290,6 +290,20 @@ export class MatchService {
             } else {
                 return `${triplesToFetch} FILTER (REGEX(str(${objectId}), ${value}, "i") ).`;
             }
+        }else if (matchQualifier === MatchQualifierEnum.DATE_RANGE) {
+            if (matchQuantifier === MatchQuantifierEnum.NONE) {
+                throw Exception.badRequest("Unsupported match qualifier");
+                // return `FILTER NOT EXISTS { ${triplesToFetch} FILTER (REGEX(str(${objectId}), ${value}, "i") ) }.`;
+            } else {
+                const {startRange, endRange} = MatchServiceHelper.extractDates(value);
+                if(startRange && endRange){
+                    return `${triplesToFetch} FILTER ( ${objectId} >= ${startRange} && ${objectId} <= ${endRange} ).`;
+                } else if(startRange || endRange){
+                    return `${triplesToFetch} FILTER ( ${objectId} = ${startRange||endRange} ).`;
+                }
+
+                return `${triplesToFetch} FILTER (REGEX(str(${objectId}), ${value}, "i") ).`;
+            }
         }
         throw Exception.badRequest("Unsupported match qualifier");
     }

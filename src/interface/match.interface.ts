@@ -17,3 +17,7 @@ export interface RecordFromQuery {
     locationContainedIn: string | undefined;
 }
 
+export interface DateRange{
+    startRange?: string;
+    endRange?: string;
+}
