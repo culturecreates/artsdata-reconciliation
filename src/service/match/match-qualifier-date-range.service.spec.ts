@@ -14,7 +14,7 @@ import {SparqlVersionEnum} from "../../enum/sparql-versions.enum";
 describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => {
 
     let matchService: MatchService;
-    const testDatasetPath = 'test/fixtures/files/qualifier-match.ttl';
+    const testDatasetPath = 'test/fixtures/files/date-range-qualifier-match.ttl';
     let testLuceneConnectorId: string;
     let testGraphUri: string;
 
@@ -25,7 +25,7 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
         const {
             graphUri,
             luceneConnector
-        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.ORGANIZATION, testDatasetPath)
+        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.EVENT, testDatasetPath)
         testGraphUri = graphUri;
         testLuceneConnectorId = luceneConnector;
         jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
@@ -65,7 +65,7 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
             conditions: [{
                 matchType: "property",
                 propertyId: "http://schema.org/startDate",
-                propertyValue: "2025-01-01",
+                propertyValue: "2025-01-01/",
                 required: true,
                 matchQualifier: MatchQualifierEnum.DATE_RANGE
             }],
@@ -112,7 +112,7 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
             conditions: [{
                 matchType: "property",
                 propertyId: "http://schema.org/startDate",
-                propertyValue: "2025-01-01",
+                propertyValue: "2025-01-01/2025-02-03",
                 required: true,
                 matchQualifier: MatchQualifierEnum.DATE_RANGE
             }],
@@ -122,10 +122,11 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
             {queries: [reconciliationQuery]}, SparqlVersionEnum.V1);
 
-        expect(response.results).toHaveLength(2);
         const allResults = response.results?.[0]?.candidates;
+        expect(allResults).toHaveLength(2);
+
         expect( allResults?.[0]?.id).toBe("Event1");
-        expect( allResults?.[0]?.id).toBe("Event2");
+        expect( allResults?.[1]?.id).toBe("Event2");
 
     });
 
