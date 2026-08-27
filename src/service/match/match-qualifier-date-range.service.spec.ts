@@ -130,4 +130,51 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
 
     });
 
+    it(`Should find a event with start Date '2025-03-03T12:00:00-05:00/2025-03-03T20:00:00-05:00' `, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [{
+                matchType: "property",
+                propertyId: "http://schema.org/startDate",
+                propertyValue: "2025-03-03T12:00:00-05:00/2025-03-03T20:00:00-05:00",
+                required: true,
+                matchQualifier: MatchQualifierEnum.DATE_RANGE
+            }],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V1);
+
+        const allResults = response.results?.[0]?.candidates;
+        expect(allResults).toHaveLength(1);
+
+        expect( allResults?.[0]?.id).toBe("Event3");
+
+    });
+
+    it(`Should find a event with start Date '2024-12-31T23:59:00-05:00/2025-02-01T00:00:00-05:00'. Compare date and datetime`, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [{
+                matchType: "property",
+                propertyId: "http://schema.org/startDate",
+                propertyValue: "2024-12-31T23:59:00-05:00/2025-02-01T00:00:00-05:00",
+                required: true,
+                matchQualifier: MatchQualifierEnum.DATE_RANGE
+            }],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V1);
+
+        const allResults = response.results?.[0]?.candidates;
+        expect(allResults).toHaveLength(1);
+
+        expect( allResults?.[0]?.id).toBe("Event1");
+
+    });
 });
