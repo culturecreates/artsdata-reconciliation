@@ -1,0 +1,32 @@
+@prefix adr:<http://kg.artsdata.ca/resource/>.
+@prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#>.
+@prefix schema:<http://schema.org/>.
+@prefix xsd:<http://www.w3.org/2001/XMLSchema#>.
+
+adr:Event1 rdf:type <http://schema.org/Event> ;
+    rdfs:label "Event on January 1st" ;
+    schema:name "Event on January 1st";
+    schema:startDate "2025-01-01"^^xsd:date.
+
+adr:Event2 rdf:type <http://schema.org/Event> ;
+    rdfs:label "Event on February 2nd" ;
+    schema:name "Event on February 2nd"";
+    schema:startDate "2025-02-02"^^xsd:date;
+    schema:endDate "2025-02-28"^^xsd:date.
+
+adr:Event3 rdf:type <http://schema.org/Event> ;
+    rdfs:label "Event on March 3rd"";
+    schema:name "Event on March 3rd";
+    schema:startDate "2025-03-03T15:00:00-05:00"^^xsd:dateTime.
+
+adr:Event4 rdf:type <http://schema.org/Event> ;
+    rdfs:label "Event on April 4th";
+    schema:name "Event on April 4th";
+    schema:startDate "2025-04-04T16:00:00-05:00"^^xsd:dateTime;
+    schema:endDate "2025-04-30"^^xsd:date.
+
+adr:Event5 rdf:type <http://schema.org/Event> ;
+    rdfs:label "Event on May 5th";
+    schema:name "Event on May 5th";
+    schema:startDate "2025-05-05T17:00:00-05:00"^^xsd:dateTime;
+    schema:endDate "2025-05-31T17:00:00-05:00"^^xsd:dateTime;
