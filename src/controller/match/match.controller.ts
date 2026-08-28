@@ -29,7 +29,7 @@ Each object inside the \`conditions\` array consists of:
 * **\`propertyValue\`** *(String or List of String, Required)*: The value(s) to match against.
 * **\`required\`** *(Boolean, Optional)*: \`true\` acts as a strict filter; \`false\` only affects ranking score. *(Default: false)*
 * **\`matchQuantifier\`** *(String, Optional)*: Logic for multi-values: \`any\` (OR), \`all\` (AND), or \`none\` (NOT). *(Default: any)*
-* **\`matchQualifier\`** *(String, Optional)*: Matching relationship flavor (e.g., \`RegexMatch\`, \`ExactMatch\`). 
+* **\`matchQualifier\`** *(String, Optional)*: Matching relationship flavor (e.g., \`RegexMatch\`, \`ExactMatch\`,\`http://kg.artsdata.ca/resource/reconciliation-qualifier-date-range\` ). 
 
 The service use REGEX function in SPARQL. The regular expression language is defined in XQuery 1.0 and XPath 2.0 Functions and Operators section. 
 You can read more about the syntax here. Artsdata always uses the “i” flag to make characters case insensitive. 
@@ -153,11 +153,23 @@ Each object inside the \`conditions\` array consists of:
 * **\`propertyValue\`** *(String or List of String, Required)*: The value(s) to match against.
 * **\`required\`** *(Boolean, Optional)*: \`true\` acts as a strict filter; \`false\` only affects ranking score. *(Default: false)*
 * **\`matchQuantifier\`** *(String, Optional)*: Logic for multi-values: \`any\` (OR), \`all\` (AND), or \`none\` (NOT). *(Default: any)*
-* **\`matchQualifier\`** *(String, Optional)*: Matching relationship flavor (e.g., \`RegexMatch\`, \`ExactMatch\`)*(Default: ExactMatch)*. 
+* **\`matchQualifier\`** *(String, Optional)*: Matching relationship flavor (e.g., \`RegexMatch\`, \`ExactMatch\`,\`http://kg.artsdata.ca/resource/reconciliation-qualifier-date-range\` )*(Default: ExactMatch)*. 
 
 The service use REGEX function in SPARQL. The regular expression language is defined in XQuery 1.0 and XPath 2.0 Functions and Operators section. 
 You can read more about the syntax here. Artsdata always uses the “i” flag to make characters case insensitive. 
-Escape Regex operators like dot (.) and plus (+) when searching for the literal string by using 2 backslashes “\\”.`,
+Escape Regex operators like dot (.) and plus (+) when searching for the literal string by using 2 backslashes “\\”.
+
+The [http://kg.artsdata.ca/resource/reconciliation-qualifier-date-range](http://kg.artsdata.ca/resource/reconciliation-qualifier-date-range) match qualifier filters query results based on a specified date or date-time range.
+Syntax & Format: A date range is defined using two values separated by a slash (/): \`date or dateTime\`/\`date or dateTime\`
+Example:
+2026-01-01/2026-12-31\tClosed Range (date)\tMatches dates from 2026-01-01 to 2026-12-31, inclusive.
+2026-01-01T00:00:00Z/2026-12-31T23:59:59Z\tClosed Range (dateTime)\tMatches timestamps from 2026-01-01T00:00:00Z to 2026-12-31T23:59:59Z, inclusive.
+2026-01-01T00:00:00Z/\tOpen-Ended Start Range(dateTime)\tMatches timestamps on or after 2026-01-01T00:00:00Z.
+/2026-12-31T23:59:59Z\tOpen-Ended End Range(dateTime)\tMatches timestamps on or before 2026-12-31T23:59:59Z.
+2026-12-31/\tOpen-Ended Start Range (date)\tMatches dates on or after 2026-12-31.
+/2026-12-31\tOpen-Ended End Range (date)\tMatches dates on or before 2026-12-31.`,
+
+
     })
     @ApiBody({
         type: ReconciliationRequest,
