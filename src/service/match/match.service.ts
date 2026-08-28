@@ -294,14 +294,15 @@ export class MatchService {
 
             const extractDates = MatchServiceHelper.extractDates(value);
             let subQuery = `?entity ${formattedPropertyId} ${objectId} .`;
-            subQuery = subQuery.concat(matchQuantifier === MatchQuantifierEnum.NONE ? "FILTER NOT EXISTS" : "FILTER")
+
             if (extractDates.startDateRange && extractDates.endDateRange) {
-                subQuery = subQuery.concat(`( (${objectId} >= ${extractDates.startDateRange} || ${objectId} >= ${extractDates.startDateTimeRange}) && (${objectId} <= ${extractDates.endDateRange} || ${objectId} <= ${extractDates.endDateTimeRange} ) ).`);
+                subQuery = subQuery.concat(`FILTER ( (${objectId} >= ${extractDates.startDateRange} || ${objectId} >= ${extractDates.startDateTimeRange}) && (${objectId} <= ${extractDates.endDateRange} || ${objectId} <= ${extractDates.endDateTimeRange} ) ).`);
             } else if (extractDates.startDateRange) {
-                subQuery = subQuery.concat(` (${objectId} >= ${extractDates.startDateRange} || ${objectId} >= ${extractDates.startDateTimeRange})`);
+                subQuery = subQuery.concat(`FILTER  (${objectId} >= ${extractDates.startDateRange} || ${objectId} >= ${extractDates.startDateTimeRange})`);
             } else {
-                subQuery = subQuery.concat(` (${objectId} <= ${extractDates.endDateRange} || ${objectId} <= ${extractDates.endDateTimeRange}).`);
+                subQuery = subQuery.concat(`FILTER (${objectId} <= ${extractDates.endDateRange} || ${objectId} <= ${extractDates.endDateTimeRange}).`);
             }
+            subQuery = matchQuantifier === MatchQuantifierEnum.NONE ? `FILTER NOT EXISTS { ${subQuery} }`: subQuery;
             return subQuery
         }
 

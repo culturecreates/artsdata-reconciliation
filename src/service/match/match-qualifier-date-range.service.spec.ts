@@ -1,7 +1,7 @@
 import {MatchService,} from "../../service";
 import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
-import {LanguageEnum, MatchQualifierEnum} from "../../enum";
+import {LanguageEnum, MatchQualifierEnum, MatchQuantifierEnum} from "../../enum";
 import {
     dropIndexAndTheGraph,
     setupMatchService,
@@ -139,7 +139,7 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
 
     });
 
-    it(`Should find a event with start Date '2025-03-03T12:00:00-05:00/2025-03-03T20:00:00-05:00' `, async () => {
+    it(`'2025-03-03T12:00:00-05:00/2025-03-03T20:00:00-05:00' => Event between given dates (including) `, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -163,7 +163,7 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
 
     });
 
-    it(`Should find a event with start Date '2024-12-31T23:59:00-05:00/2025-02-01T00:00:00-05:00'. Compare date and datetime`, async () => {
+    it(`'2024-12-31T23:59:00-05:00/2025-02-01' => Combination of date and date times`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -184,6 +184,35 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
         expect(allResults).toHaveLength(1);
 
         expect(allResults?.[0]?.id).toBe("Event1");
+
+    });
+
+    it(`NOT 2025-01-01/2025-03-03 => All events out of this range`, async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.EVENT,
+            conditions: [{
+                matchType: "property",
+                propertyId: "http://schema.org/startDate",
+                propertyValue: "2025-01-01/2025-03-03",
+                required: true,
+                matchQualifier: MatchQualifierEnum.DATE_RANGE,
+                matchQuantifier: MatchQuantifierEnum.NONE
+            }],
+            limit: 10
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V1);
+
+        const allResults = response.results?.[0]?.candidates;
+        expect(allResults).toHaveLength(2);
+
+        const expectedIds = [ "Event4", "Event5"];
+
+        expectedIds.forEach((expectedId, index) => {
+            expect(allResults?.[index]?.id).toBe(expectedId);
+        });
 
     });
 });
