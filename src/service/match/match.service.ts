@@ -290,19 +290,18 @@ export class MatchService {
             } else {
                 return `${triplesToFetch} FILTER (REGEX(str(${objectId}), ${value}, "i") ).`;
             }
-        }else if (matchQualifier === MatchQualifierEnum.DATE_RANGE) {
+        } else if (matchQualifier === MatchQualifierEnum.DATE_RANGE) {
             if (matchQuantifier === MatchQuantifierEnum.NONE) {
                 throw Exception.badRequest("Unsupported match qualifier");
                 // return `FILTER NOT EXISTS { ${triplesToFetch} FILTER (REGEX(str(${objectId}), ${value}, "i") ) }.`;
             } else {
-                const {startRange, endRange} = MatchServiceHelper.extractDates(value);
-                if(startRange && endRange){
-                    return `${triplesToFetch} FILTER ( ${objectId} >= ${startRange} && ${objectId} <= ${endRange} ).`;
-                } else if(startRange || endRange){
-                    return `${triplesToFetch} FILTER ( ${objectId} = ${startRange||endRange} ).`;
-                }
+                const extractDates = MatchServiceHelper.extractDates(value);
 
-                return `${triplesToFetch} FILTER (REGEX(str(${objectId}), ${value}, "i") ).`;
+                if (extractDates.endDateRange) {
+                    return `${triplesToFetch} FILTER ( (${objectId} >= ${extractDates.startDateRange} || ${objectId} >= ${extractDates.startDateTimeRange}) && (${objectId} <= ${extractDates.endDateRange} || ${objectId} <= ${extractDates.endDateTimeRange} ) ).`;
+                } else {
+                    return `${triplesToFetch} FILTER(${objectId} = ${extractDates.startDateTimeRange} || ( ${objectId} > "${value}T00:00:00"^^xsd:dateTime && ${objectId} < "${value}T23:59:59"^^xsd:dateTime )).`;
+                }
             }
         }
         throw Exception.badRequest("Unsupported match qualifier");

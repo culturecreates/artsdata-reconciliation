@@ -687,7 +687,8 @@ export class MatchServiceHelper {
 
         // No "/" at all -> single date, treated as start-only.
         if (!trimmed.includes('/')) {
-            return {startRange: this.parseDateSegment(trimmed)};
+            const extractedDates = this.parseDateSegment(trimmed, true)
+            return {startDateRange: extractedDates.date, startDateTimeRange: extractedDates.dateTime};
         }
 
         const firstSlash = trimmed.indexOf('/');
@@ -699,20 +700,26 @@ export class MatchServiceHelper {
         const startPart = trimmed.slice(0, firstSlash).trim();
         const endPart = trimmed.slice(firstSlash + 1).trim();
 
-        const startRange = startPart.length > 0 ? this.parseDateSegment(startPart) : undefined;
-        const endRange = endPart.length > 0 ? this.parseDateSegment(endPart) : undefined;
+        const extractedStartDates = startPart.length > 0 ? this.parseDateSegment(startPart, true) : undefined;
+        const extractedEndDates = endPart.length > 0 ? this.parseDateSegment(endPart, false) : undefined;
 
-        if (startRange === null && endRange === null) {
+        if (!extractedStartDates && !extractedEndDates) {
             throw new Error(`Invalid date value: "${value}" has no date on either side of "/"`);
         }
 
-        return {startRange, endRange};
+        return {
+            startDateRange: extractedStartDates?.date,
+            startDateTimeRange: extractedStartDates?.dateTime,
+            endDateRange: extractedEndDates?.date,
+            endDateTimeRange: extractedEndDates?.dateTime
+        };
     }
 
-    private static parseDateSegment(segment: string): string {
+    private static parseDateSegment(segment: string, isStartSegment: boolean): { date: string, dateTime: string } {
         const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
         const DATE_TIME_REGEX =
             /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?$/;
+        const appendTime = isStartSegment ? 'T00:00:00' : 'T23:59:59';
 
         if (DATE_ONLY_REGEX.test(segment)) {
             const [year, month, day] = segment.split('-').map(Number);
@@ -726,8 +733,7 @@ export class MatchServiceHelper {
             ) {
                 throw new Error(`Invalid date value: "${segment}" is not a real calendar date`);
             }
-
-            return `"${segment}"^^xsd:date`;
+            return {date: `"${segment}"^^xsd:date`, dateTime: `"${segment}${appendTime}"^^xsd:dateTime`};
         }
 
         if (DATE_TIME_REGEX.test(segment)) {
@@ -735,7 +741,8 @@ export class MatchServiceHelper {
             if (Number.isNaN(date.getTime())) {
                 throw new Error(`Invalid date value: "${segment}" could not be parsed`);
             }
-            return `"${segment}"^^xsd:dateTime`;
+            const dateString = date.toLocaleDateString('en-CA');
+            return {dateTime: `"${segment}"^^xsd:dateTime`, date: `"${dateString}"^^xsd:date`};
         }
 
         throw new Error(`Invalid date value: "${segment}" is not a recognized date or date-time`);
