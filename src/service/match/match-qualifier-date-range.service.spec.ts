@@ -83,7 +83,7 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
 
     });
 
-    it(`'/2025-05-06' =>  Should find events held on or before /2025-05-06' `, async () => {
+    it(`'/2025-05-06' => Should find events held on or before /2025-05-06' `, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -187,7 +187,7 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
 
     });
 
-    it(`NOT 2025-01-01/2025-03-03 => All events out of this range`, async () => {
+    it(`NOT in range 2025-01-01/2025-03-03 => All events out of this range`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
