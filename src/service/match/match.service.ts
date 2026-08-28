@@ -292,18 +292,24 @@ export class MatchService {
             }
         } else if (matchQualifier === MatchQualifierEnum.DATE_RANGE) {
 
-            const extractDates = MatchServiceHelper.extractDates(value);
-            let subQuery = `?entity ${formattedPropertyId} ${objectId} .`;
+            const {
+                startDateRange,
+                endDateRange,
+                startDateTimeRange,
+                endDateTimeRange
+            } = MatchServiceHelper.extractDates(value);
 
-            if (extractDates.startDateRange && extractDates.endDateRange) {
-                subQuery = subQuery.concat(`FILTER ( (${objectId} >= ${extractDates.startDateRange} || ${objectId} >= ${extractDates.startDateTimeRange}) && (${objectId} <= ${extractDates.endDateRange} || ${objectId} <= ${extractDates.endDateTimeRange} ) ).`);
-            } else if (extractDates.startDateRange) {
-                subQuery = subQuery.concat(`FILTER  (${objectId} >= ${extractDates.startDateRange} || ${objectId} >= ${extractDates.startDateTimeRange})`);
-            } else {
-                subQuery = subQuery.concat(`FILTER (${objectId} <= ${extractDates.endDateRange} || ${objectId} <= ${extractDates.endDateTimeRange}).`);
-            }
-            subQuery = matchQuantifier === MatchQuantifierEnum.NONE ? `FILTER NOT EXISTS { ${subQuery} }`: subQuery;
-            return subQuery
+            const baseQuery = `?entity ${formattedPropertyId} ${objectId} .`;
+
+            const filterClause = (startDateRange && endDateRange)
+                ? `FILTER ( (${objectId} >= ${startDateRange} || ${objectId} >= ${startDateTimeRange}) && (${objectId} <= ${endDateRange} || ${objectId} <= ${endDateTimeRange} ) ).`
+                : startDateRange
+                    ? `FILTER  (${objectId} >= ${startDateRange} || ${objectId} >= ${startDateTimeRange})`
+                    : `FILTER (${objectId} <= ${endDateRange} || ${objectId} <= ${endDateTimeRange}).`;
+
+            const subQuery = `${baseQuery}${filterClause}`;
+
+            return matchQuantifier === MatchQuantifierEnum.NONE ? `FILTER NOT EXISTS { ${subQuery} }` : subQuery;
         }
 
         throw Exception.badRequest("Unsupported match qualifier");
