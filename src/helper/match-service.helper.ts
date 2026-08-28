@@ -2,11 +2,11 @@ import {LanguageEnum, MatchQualifierEnum, MatchTypeEnum} from "../enum";
 import {GRAPHDB_INDEX} from "../config";
 import {QueryCondition, ReconciliationQuery, ResultCandidates} from "../dto";
 import {isURL} from "validator";
-import {ArtsdataConstants, Entities, PREFIXES, SCHEMA_ORG_PROPERTY_URI_MAP} from "../constant";
+import {ArtsdataConstants, ArtsdataProperties, Entities, PREFIXES, SCHEMA_ORG_PROPERTY_URI_MAP} from "../constant";
 import {JaroWinklerDistance} from "natural";
 import {QUERIES_V2} from "../constant/match/match-queries-v2.constants";
 import {SparqlVersionEnum} from "../enum/sparql-versions.enum";
-import {RecordFromQuery} from "../interface/match.interface";
+import {DateRange, RecordFromQuery} from "../interface/match.interface";
 
 export class MatchServiceHelper {
 
@@ -541,14 +541,21 @@ export class MatchServiceHelper {
         } as RecordFromQuery;
     }
 
-    static getAllQualifiers() {
-        return [{
+    static getAllQualifiers(id: string) {
+        const qualifiers = [{
             id: MatchQualifierEnum.EXACT_MATCH,
             name: "Exact match of the property value",
         }, {
             id: MatchQualifierEnum.REGEX_MATCH,
             name: "Match the property value using regular expression",
         }]
+        if ([ArtsdataProperties.START_DATE, ArtsdataProperties.END_DATE].includes(id)) {
+            qualifiers.push({
+                id: MatchQualifierEnum.DATE_RANGE,
+                name: "Date range"
+            })
+        }
+        return qualifiers;
     }
 
     static generateSubQueryToFetchAdditionalProperties(requestLanguage: string) {
@@ -665,5 +672,78 @@ export class MatchServiceHelper {
 
         return text;
 
+    }
+
+
+    static extractDates(value: string): DateRange {
+        if (value == null) {
+            throw new Error(`Invalid date value: ${value}`);
+        }
+
+        const trimmed = value.trim();
+        if (trimmed.length === 0) {
+            throw new Error('Invalid date value: value is empty');
+        }
+
+        // No "/" at all -> single date, treated as invalid date range.
+        if (!trimmed.includes('/')) {
+            throw new Error('Invalid date value: value is empty');
+        }
+
+        const firstSlash = trimmed.indexOf('/');
+        const lastSlash = trimmed.lastIndexOf('/');
+        if (firstSlash !== lastSlash) {
+            throw new Error(`Invalid date value: "${value}" contains more than one "/"`);
+        }
+
+        const startPart = trimmed.slice(0, firstSlash).trim();
+        const endPart = trimmed.slice(firstSlash + 1).trim();
+
+        const extractedStartDates = startPart.length > 0 ? this.parseDateSegment(startPart, true) : undefined;
+        const extractedEndDates = endPart.length > 0 ? this.parseDateSegment(endPart, false) : undefined;
+
+        if (!extractedStartDates && !extractedEndDates) {
+            throw new Error(`Invalid date value: "${value}" has no date on either side of "/"`);
+        }
+
+        return {
+            startDateRange: extractedStartDates?.date,
+            startDateTimeRange: extractedStartDates?.dateTime,
+            endDateRange: extractedEndDates?.date,
+            endDateTimeRange: extractedEndDates?.dateTime
+        };
+    }
+
+    private static parseDateSegment(segment: string, isStartSegment: boolean): { date: string, dateTime: string } {
+        const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+        const DATE_TIME_REGEX =
+            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?$/;
+        const appendTime = isStartSegment ? 'T00:00:00' : 'T23:59:59';
+
+        if (DATE_ONLY_REGEX.test(segment)) {
+            const [year, month, day] = segment.split('-').map(Number);
+            const date = new Date(year, month - 1, day);
+
+            // Guard against JS silently rolling invalid dates over (e.g. 2025-02-30 -> 2025-03-02).
+            if (
+                date.getFullYear() !== year ||
+                date.getMonth() !== month - 1 ||
+                date.getDate() !== day
+            ) {
+                throw new Error(`Invalid date value: "${segment}" is not a real calendar date`);
+            }
+            return {date: `"${segment}"^^xsd:date`, dateTime: `"${segment}${appendTime}"^^xsd:dateTime`};
+        }
+
+        if (DATE_TIME_REGEX.test(segment)) {
+            const date = new Date(segment);
+            if (Number.isNaN(date.getTime())) {
+                throw new Error(`Invalid date value: "${segment}" could not be parsed`);
+            }
+            const dateString = date.toLocaleDateString('en-CA');
+            return {dateTime: `"${segment}"^^xsd:dateTime`, date: `"${dateString}"^^xsd:date`};
+        }
+
+        throw new Error(`Invalid date value: "${segment}" is not a recognized date or date-time`);
     }
 }

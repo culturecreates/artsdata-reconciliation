@@ -290,7 +290,28 @@ export class MatchService {
             } else {
                 return `${triplesToFetch} FILTER (REGEX(str(${objectId}), ${value}, "i") ).`;
             }
+        } else if (matchQualifier === MatchQualifierEnum.DATE_RANGE) {
+
+            const {
+                startDateRange,
+                endDateRange,
+                startDateTimeRange,
+                endDateTimeRange
+            } = MatchServiceHelper.extractDates(value);
+
+            const baseQuery = `?entity ${formattedPropertyId} ${objectId} .`;
+
+            const filterClause = (startDateRange && endDateRange)
+                ? `FILTER ( (${objectId} >= ${startDateRange} || ${objectId} >= ${startDateTimeRange}) && (${objectId} <= ${endDateRange} || ${objectId} <= ${endDateTimeRange} ) ).`
+                : startDateRange
+                    ? `FILTER  (${objectId} >= ${startDateRange} || ${objectId} >= ${startDateTimeRange})`
+                    : `FILTER (${objectId} <= ${endDateRange} || ${objectId} <= ${endDateTimeRange}).`;
+
+            const subQuery = `${baseQuery}${filterClause}`;
+
+            return matchQuantifier === MatchQuantifierEnum.NONE ? `FILTER NOT EXISTS { ${subQuery} }` : subQuery;
         }
+
         throw Exception.badRequest("Unsupported match qualifier");
     }
 

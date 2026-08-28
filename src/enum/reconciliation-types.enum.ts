@@ -1,10 +1,3 @@
-export enum ReconciliationTypesEnum {
-    EVENT = "schema:Event",
-    PLACE = "schema:Place",
-    PERSON = "schema:Person",
-    ORGANIZATION = "schema:Organization"
-}
-
 export enum LanguageEnum {
     ENGLISH = "en",
     FRENCH = "fr"
@@ -25,6 +18,7 @@ export enum MatchQuantifierEnum {
 
 export enum MatchQualifierEnum {
     REGEX_MATCH = "RegexMatch",
-    EXACT_MATCH = "ExactMatch"
+    EXACT_MATCH = "ExactMatch",
+    DATE_RANGE = "http://kg.artsdata.ca/resource/reconciliation-qualifier-date-range"
 
 }

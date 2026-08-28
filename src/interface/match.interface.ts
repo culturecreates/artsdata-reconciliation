@@ -1,5 +1,5 @@
 export interface RecordFromQuery {
-    id :string | undefined;
+    id: string | undefined;
     name: string | undefined;
     postalCode: string | undefined;
     addressLocality: string | undefined;
@@ -7,8 +7,8 @@ export interface RecordFromQuery {
     url: string | undefined;
     startDate: string | undefined;
     endDate: string | undefined;
-    subEvents?:string[]|undefined;
-    type?:string|undefined;
+    subEvents?: string[] | undefined;
+    type?: string | undefined;
     locationName: string | undefined;
     locationUri: string | undefined;
     isni: string | undefined;
@@ -17,3 +17,9 @@ export interface RecordFromQuery {
     locationContainedIn: string | undefined;
 }
 
+export interface DateRange {
+    startDateRange?: string;
+    endDateRange?: string;
+    startDateTimeRange?: string;
+    endDateTimeRange?: string;
+}
