@@ -34,7 +34,7 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
         await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
     })
 
-    it(`Should find a event with start Date '2025-01-01' `, async () => {
+    it(`'2025-01-01' is an invalid date range`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -51,21 +51,19 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
             {queries: [reconciliationQuery]}, SparqlVersionEnum.V1);
 
-        expect(response.results).toHaveLength(1);
         const allResults = response.results?.[0]?.candidates;
-        const actualResult = allResults?.[0];
-        expect(actualResult?.id).toBe("Event1");
+        expect(allResults).toHaveLength(0);
 
     });
 
-    it(`Should find a event with start Date '2025-01-01/' `, async () => {
+    it(`'2025-03-04/' => Should find events held on or after 2025-03-04`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
             conditions: [{
                 matchType: "property",
                 propertyId: "http://schema.org/startDate",
-                propertyValue: "2025-01-01/",
+                propertyValue: "2025-03-04/",
                 required: true,
                 matchQualifier: MatchQualifierEnum.DATE_RANGE
             }],
@@ -75,21 +73,24 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
             {queries: [reconciliationQuery]}, SparqlVersionEnum.V1);
 
-        expect(response.results).toHaveLength(1);
         const allResults = response.results?.[0]?.candidates;
-        const actualResult = allResults?.[0];
-        expect(actualResult?.id).toBe("Event1");
+        expect(allResults).toHaveLength(2);
+
+        const expectedIds = ["Event4", "Event5"];
+        expectedIds.forEach((expectedId, index) => {
+            expect(allResults?.[index]?.id).toBe(expectedId);
+        });
 
     });
 
-    it(`Should find a event with start Date '/2025-02-02' `, async () => {
+    it(`'/2025-05-06' =>  Should find events held on or before /2025-05-06' `, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
             conditions: [{
                 matchType: "property",
                 propertyId: "http://schema.org/startDate",
-                propertyValue: "/2025-02-02",
+                propertyValue: "/2025-05-06",
                 required: true,
                 matchQualifier: MatchQualifierEnum.DATE_RANGE
             }],
@@ -99,13 +100,18 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
         const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
             {queries: [reconciliationQuery]}, SparqlVersionEnum.V1);
 
-        expect(response.results).toHaveLength(1);
         const allResults = response.results?.[0]?.candidates;
-        expect( allResults?.[0]?.id).toBe("Event2");
+        expect(allResults).toHaveLength(5);
+
+        const expectedIds = ["Event1", "Event2", "Event3", "Event4", "Event5"];
+
+        expectedIds.forEach((expectedId, index) => {
+            expect(allResults?.[index]?.id).toBe(expectedId);
+        });
 
     });
 
-    it(`Should find a event with start Date '2025-01-01/2025-02-03' `, async () => {
+    it(`'2025-01-01/2025-02-03' => Should find events happening between 2025-01-01 and 2025-02-03 (including dates)`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.EVENT,
@@ -125,8 +131,11 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
         const allResults = response.results?.[0]?.candidates;
         expect(allResults).toHaveLength(2);
 
-        expect( allResults?.[0]?.id).toBe("Event1");
-        expect( allResults?.[1]?.id).toBe("Event2");
+        const expectedIds = ["Event1", "Event2"];
+
+        expectedIds.forEach((expectedId, index) => {
+            expect(allResults?.[index]?.id).toBe(expectedId);
+        });
 
     });
 
@@ -150,7 +159,7 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
         const allResults = response.results?.[0]?.candidates;
         expect(allResults).toHaveLength(1);
 
-        expect( allResults?.[0]?.id).toBe("Event3");
+        expect(allResults?.[0]?.id).toBe("Event3");
 
     });
 
@@ -174,7 +183,7 @@ describe('Test match qualifier - reconciliation-qualifier-date-range v1', () => 
         const allResults = response.results?.[0]?.candidates;
         expect(allResults).toHaveLength(1);
 
-        expect( allResults?.[0]?.id).toBe("Event1");
+        expect(allResults?.[0]?.id).toBe("Event1");
 
     });
 });

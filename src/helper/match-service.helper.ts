@@ -685,10 +685,9 @@ export class MatchServiceHelper {
             throw new Error('Invalid date value: value is empty');
         }
 
-        // No "/" at all -> single date, treated as start-only.
+        // No "/" at all -> single date, treated as invalid date range.
         if (!trimmed.includes('/')) {
-            const extractedDates = this.parseDateSegment(trimmed, true)
-            return {startDateRange: extractedDates.date, startDateTimeRange: extractedDates.dateTime};
+            throw new Error('Invalid date value: value is empty');
         }
 
         const firstSlash = trimmed.indexOf('/');
