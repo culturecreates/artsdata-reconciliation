@@ -1,7 +1,7 @@
 import {Injectable} from "@nestjs/common";
 import {ArtsdataService} from "../artsdata";
 import {EntityClassEnum} from "../../enum/entity-class.enum";
-import {ArtsdataConstants, EXTEND_QUERY, PROPOSED_EXTEND_PROPERTIES_METADATA} from "../../constant";
+import {ArtsdataConstants, EXTEND_QUERY, PREFIXES, PROPOSED_EXTEND_PROPERTIES_METADATA} from "../../constant";
 import {Exception, MatchServiceHelper} from "../../helper";
 import {
     DataExtensionQueryDTO,
@@ -23,7 +23,8 @@ export class ExtendService {
 
     async getDataExtension(dataExtensionQuery: DataExtensionQueryDTO) {
         const sparqlQuery: string = this._generateQuery(dataExtensionQuery);
-        const expandProperties = dataExtensionQuery.properties.filter(property => property.expand);
+        const expandProperties = dataExtensionQuery.properties
+            .filter(property => property.expand);
         const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
         const formattedResult = this._formatResult(dataExtensionQuery.ids, result);
 
@@ -117,11 +118,23 @@ export class ExtendService {
                 .map(prop => `\t\tOPTIONAL {?${id} schema:${prop} ?${id}_${prop}.}`).join("\n");
 
         }
-        let propertyId = id;
+        let objectId = id;
+
         if (MatchServiceHelper.isValidURI(id)) {
-            propertyId = id.split('http://schema.org/')[1];
+
+            const supportedPrefixes = [PREFIXES.SCHEMA, PREFIXES.RDF,];
+            const matchedPrefix = supportedPrefixes.find(prefix => id.startsWith(prefix));
+
+            if (!matchedPrefix) {
+                Exception.badRequest("This URI is not supported.");
+            } else {
+                objectId = id.slice(matchedPrefix.length);
+            }
         }
-        return `OPTIONAL {?uri schema:${propertyId} ?${propertyId}. ${expandedTriples ? `\n${expandedTriples}\n` : ""}}\n`;
+        const predicate = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `schema:${objectId}`;
+
+        return `OPTIONAL { ?uri ${predicate} ?${objectId}. 
+                ${expandedTriples ? `\n${expandedTriples}\n` : ""}}\n`;
     }
 
     private _formatResult(ids: string[], result: any): DataExtensionResponseDTO {

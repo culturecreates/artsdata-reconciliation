@@ -20,9 +20,14 @@ export const ArtsdataConstants = {
 
 export const PREFIXES = {
     SCHEMA: "http://schema.org/",
+    RDF: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     SKOS: "http://www.w3.org/2004/02/skos/core#",
     DBO: "http://dbpedia.org/ontology/",
     ADO: "http://kg.artsdata.ca/ontology/"
+};
+
+export const RDF = {
+    TYPE: `${PREFIXES.RDF}type`,
 };
 
 export const Entities = {
@@ -53,7 +58,7 @@ export const SCHEMA_ORG_PROPERTY_URI_MAP = {
     SUB_EVENT: "<http://schema.org/subEvent>",
     END_DATE: "<http://schema.org/endDate>",
     LOCATION: "<http://schema.org/location>",
-    LOCATION_NAME:"<http://schema.org/location>/<http://schema.org/name>",
+    LOCATION_NAME: "<http://schema.org/location>/<http://schema.org/name>",
     LOCATIONS_URI: "<http://schema.org/location>/<http://schema.org/sameAs>",
 
 };
