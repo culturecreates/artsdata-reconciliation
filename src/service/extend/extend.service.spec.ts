@@ -1,157 +1,169 @@
-import {Test, TestingModule} from '@nestjs/testing';
 import {ExtendService} from './extend.service';
-import {ArtsdataService} from '../artsdata';
-import {EntityClassEnum} from '../../enum/entity-class.enum';
+import {DataExtensionQueryDTO} from "../../dto/extend";
+import {dropGraph, setupExtendService, uploadDataSet} from "../../../test/util/common-util";
 
 describe('ExtendService', () => {
     let extendService: ExtendService;
-    let artsdataService: { executeSparqlQuery: jest.Mock };
 
-    beforeEach(async () => {
-        jest.clearAllMocks();
+    const maintenanceGraphData = 'test/fixtures/files/extend-service.ttl';
+    const externalGraphURI: string = 'http://test.fixtures/extend-test-graph';
 
-        artsdataService = {
-            executeSparqlQuery: jest.fn(),
-        };
-
-        const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                ExtendService,
-                {provide: ArtsdataService, useValue: artsdataService},
-            ],
-        }).compile();
-
-        extendService = module.get<ExtendService>(ExtendService);
+    beforeAll(async () => {
+        const setup = await setupExtendService();
+        extendService = setup.extendService;
+        await uploadDataSet(externalGraphURI, maintenanceGraphData)
     });
 
-    describe('getExtendDataFromGraph', () => {
-        it(`reconciled is set to 'true' if the entity is linked to internal entity(core graph)`, async () => {
-            artsdataService.executeSparqlQuery.mockResolvedValueOnce({
-                "results": {
-                    "bindings": [
-                        {
-                            "uri": {
-                                "type": "uri",
-                                "value": "http://www.wikidata.org/entity/123"
+    afterAll(async () => {
+        await dropGraph(externalGraphURI);
+    })
+
+    describe('Test Extend data Service', () => {
+
+        it(`Extend data for an Event `, async () => {
+
+            const extendRequest: DataExtensionQueryDTO = {
+                ids: ["Event1"],
+                properties: [
+                    {id: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"},
+                    {id: "name"},
+                    {id: "startDate"}
+                ]
+            }
+            const result = await extendService.getDataExtension(extendRequest);
+
+            const expectedResult ={
+                "meta": [
+                    {
+                        "id": "type",
+                        "name": "type"
+                    },
+                    {
+                        "id": "name",
+                        "name": "name"
+                    },
+                    {
+                        "id": "startDate",
+                        "name": "startDate"
+                    }
+                ],
+                "rows": [
+                    {
+                        "id": "Event1",
+                        "properties": [
+                            {
+                                "id": "type",
+                                "values": [
+                                    {
+                                        "id": "http://schema.org/Event"
+                                    }
+                                ]
                             },
-                            "name": {
-                                "xml:lang": "en",
-                                "type": "literal",
-                                "value": "Entity Name"
+                            {
+                                "id": "name",
+                                "values": [
+                                    {
+                                        "str": "Event One"}
+                                ]
                             },
-                            "artsdata_uri": {
-                                "type": "uri",
-                                "value": "http://kg.artsdata.ca/resource/KX-XXX"
-                            },
-                            "type": {
-                                "type": "literal",
-                                "value": "http://schema.org/Person"
-                            },
-                            "reconciled": {
-                                "type": "literal",
-                                "value": true
+                            {
+                                "id": "startDate",
+                                "values": [
+                                    {
+                                        "str": "2020-01-01"
+                                    }
+                                ]
                             }
-                        }]
-                }
-            });
-
-            const result = await extendService.getExtendDataFromGraph(
-                'https://kg.artsdata.ca/culture-creates/graph', EntityClassEnum.PERSON, [], "");
-
-            expect(result).toEqual([
-                {
-                    name: 'Entity Name',
-                    uri: 'http://www.wikidata.org/entity/123',
-                    artsdata_uri: 'http://kg.artsdata.ca/resource/KX-XXX',
-                    reconciled: true,
-                    type: 'http://schema.org/Person',
-                }
-            ]);
-            expect(artsdataService.executeSparqlQuery).toHaveBeenCalledWith(expect.any(String), true);
+                        ]
+                    }
+                ]
+            }
+            expect(result).toEqual(expectedResult);
         });
 
-        it('reconciled is set to \'false\' if the entity is not linked to internal entity(core graph)', async () => {
-            artsdataService.executeSparqlQuery.mockResolvedValueOnce({
-                "results": {
-                    "bindings": [
-                        {
-                            "uri": {
-                                "type": "uri",
-                                "value": "http://www.wikidata.org/entity/123"
-                            },
-                            "name": {
-                                "xml:lang": "en",
-                                "type": "literal",
-                                "value": "Entity Name"
-                            },
-                            "artsdata_uri": {
-                                "type": "uri",
-                                "value": "http://kg.artsdata.ca/resource/KX-XXX"
-                            },
-                            "type": {
-                                "type": "literal",
-                                "value": "http://schema.org/Person"
-                            },
-                            "reconciled": {
-                                "type": "literal",
-                                "value": false
-                            }
-                        }]
-                }
-            });
+        it(`Should return extend data for an Place request`, async () => {
 
-            const result = await extendService.getExtendDataFromGraph(
-                'https://kg.artsdata.ca/culture-creates/graph', EntityClassEnum.PERSON, [], "");
+            const extendRequest: DataExtensionQueryDTO = {
+                ids: ["Place1"],
+                properties: [
+                    {id: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"},
+                    {id: "sameAs"}
+                ]
+            }
+            const result = await extendService.getDataExtension(extendRequest);
 
-            expect(result).toEqual([
+            const expectedResult = [
                 {
-                    name: 'Entity Name',
-                    uri: 'http://www.wikidata.org/entity/123',
-                    artsdata_uri: "http://kg.artsdata.ca/resource/KX-XXX",
-                    reconciled: false,
-                    type: 'http://schema.org/Person',
-                },
-            ]);
+                    "id": "Place1",
+                    "properties": [
+                        {
+                            "id": "type",
+                            "values": [
+                                {
+                                    "id": "http://schema.org/Place"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "sameAs",
+                            "values": [
+                                {
+                                    "str": "http://www.place-one.com"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+            expect(result.rows).toEqual(expectedResult);
         });
 
-        it('return wikidata id is the entity URI itself is wikidata URI', async () => {
-            artsdataService.executeSparqlQuery.mockResolvedValueOnce({
-                "results": {
-                    "bindings": [
-                        {
-                            "uri": {
-                                "type": "uri",
-                                "value": "http://www.wikidata.org/entity/123"
-                            },
-                            "name": {
-                                "xml:lang": "en",
-                                "type": "literal",
-                                "value": "Entity Name"
-                            },
-                            "wikidata_uri": {
-                                "type": "uri",
-                                "value": "http://www.wikidata.org/entity/123"
-                            },
-                            "type": {
-                                "type": "literal",
-                                "value": "http://schema.org/Person"
-                            }
-                        }]
-                }
-            });
+        it(`Extend data for an Organization`, async () => {
 
-            const result = await extendService.getExtendDataFromGraph(
-                'https://kg.artsdata.ca/culture-creates/graph', EntityClassEnum.PERSON, [], "");
+            const extendRequest: DataExtensionQueryDTO = {
+                ids: ["Organization1"],
+                properties: [
+                    {id: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"},
+                    {id: "name"},
+                    {id: "url"}
+                ]
+            }
+            const result = await extendService.getDataExtension(extendRequest);
 
-            expect(result).toEqual([
+            const expectedResult = [
                 {
-                    name: 'Entity Name',
-                    uri: 'http://www.wikidata.org/entity/123',
-                    wikidata_uri: 'http://www.wikidata.org/entity/123',
-                    type: 'http://schema.org/Person'
-                },
-            ]);
+                    "id": "Organization1",
+                    "properties": [
+                        {
+                            "id": "type",
+                            "values": [
+                                {
+                                    "id": "http://schema.org/Organization"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "name",
+                            "values": [
+                                {
+                                    "str": "Organization One"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "url",
+                            "values": [
+                                {
+                                    "str": "http://www.organization-one.com"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+            expect(result.rows).toEqual(expectedResult);
         });
-    });
-});
+
+    })
+})
 
