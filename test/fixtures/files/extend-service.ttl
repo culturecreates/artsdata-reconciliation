@@ -1,0 +1,16 @@
+@prefix adr:<http://kg.artsdata.ca/resource/>.
+@prefix schema:<http://schema.org/>.
+@prefix ext:<http://external-source.com/resource/>.
+@prefix xsd:<http://www.w3.org/2001/XMLSchema#>.
+
+adr:Place1 a schema:Place ;
+    schema:name "Place One" ;
+    schema:sameAs "http://www.place-one.com" .
+
+adr:Organization1 a schema:Organization ;
+    schema:name "Organization One" ;
+    schema:url "http://www.organization-one.com" .
+
+adr:Event1 a schema:Event ;
+    schema:name "Event One" ;
+    schema:startDate "2020-01-01"^^xsd:date .
