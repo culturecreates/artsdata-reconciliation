@@ -78,7 +78,7 @@ export class ExtendService {
         const {ids, properties} = dataExtensionQuery;
 
         // Generate URIs with prefix if necessary
-        const uris = ids.map(id => MatchServiceHelper.isValidURI(id) ? id : `${ArtsdataConstants.PREFIX}${id}`);
+        const uris = ids.map(id => MatchServiceHelper.isValidURI(id) ? id.trim() : `${ArtsdataConstants.PREFIX}${id.trim()}`);
         const uriPlaceholder = uris.map(uri => `(<${uri}>)`).join(" ");
 
         // Replace URI placeholder in the query
