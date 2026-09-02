@@ -1,6 +1,6 @@
 import { ApiProperty , ApiPropertyOptional } from "@nestjs/swagger";
 import { ArrayMinSize , IsBoolean , IsOptional , IsString , ValidateNested } from "class-validator";
-import { Type } from "class-transformer";
+import {Transform, Type} from "class-transformer";
 
 export class ExtendQueryProperty {
   @ApiProperty({ type: String })
@@ -17,6 +17,9 @@ export class DataExtensionQueryDTO {
   @ApiProperty({ type: [String] })
   @IsString({ each: true })
   @ArrayMinSize(1)
+  @Transform(({ value }) =>
+      Array.isArray(value) ? value.map((id) => (typeof id === 'string' ? id.trim() : id)) : value
+  )
   ids: string[];
 
   @ApiProperty({ type: [ExtendQueryProperty] })
