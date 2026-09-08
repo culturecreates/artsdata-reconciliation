@@ -98,6 +98,9 @@ export class ExtendService {
         if (expand) {
             const expandedProperties = [];
             switch (id as ExpandablePropertyEnum) {
+                case ExpandablePropertyEnum.LOCATION:
+                    expandedProperties.push(...EXPANDABLE_PROPERTIES.LOCATION);
+                    break;
                 case ExpandablePropertyEnum.ADDRESS:
                     expandedProperties.push(...EXPANDABLE_PROPERTIES.ADDRESS);
                     break;
