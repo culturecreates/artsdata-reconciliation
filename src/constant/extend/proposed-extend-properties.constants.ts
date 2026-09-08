@@ -14,7 +14,7 @@ export const PROPOSED_EXTEND_PROPERTIES_METADATA = {
             {id: "sameAs", name: "sameAs"},
             {id: "eventStatus", name: "eventStatus"},
             {id: "eventAttendanceMode", name: "eventAttendanceMode"},
-            {id: "location", name: "location"},
+            {id: "location", name: "location", expandable: true},
             {id: "offers", name: "offers", expandable: true},
             {id: "performer", name: "performer", expandable: true},
             {id: "organizer", name: "organizer", expandable: true}
