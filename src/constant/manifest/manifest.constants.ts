@@ -71,11 +71,7 @@ export const MANIFEST =
                         }
                     ]
                 }
-            ],
-            "propose_properties": {
-                "service_url": `${APPLICATION.RECON_URL}`,
-                "service_path": "/extend/propose"
-            }
+            ]
         },
         "view": {
             "url": `${APPLICATION.KG_URL}/{{id}}`,
