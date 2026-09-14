@@ -55,7 +55,7 @@ export const MANIFEST =
                     "name": "Content",
                     "type": "select",
                     "default": "literal",
-                    "helpText": "Content type: ID or literal",
+                    "helpText": "Content type: id or literal or expand",
                     "choices": [
                         {
                             "value": "id",
