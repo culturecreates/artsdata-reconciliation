@@ -35,7 +35,8 @@ adr:KP-1-performer a schema:Person ;
 #Organization
 adr:KP-1-organizer a schema:Organization ;
     schema:name "Organizer Bell";
-    rdfs:label "Organizer Bell" .
+    rdfs:label "Organizer Bell" ;
+    schema:disambiguatingDescription "Org description".
 
 #Event used for the language, missing label and offer cases
 adr:KP-2-event a schema:Event ;
