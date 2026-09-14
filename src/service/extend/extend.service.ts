@@ -10,7 +10,7 @@ import {
     ProposedExtendProperty
 } from "../../dto/extend";
 import {QUERY_BY_GRAPH} from "../../constant/extend/query-by-graph.constants";
-import {ExpandablePropertyEnum} from "../../enum";
+import {ExpandablePropertyEnum, ExtendPropertySettingsEnum} from "../../enum";
 import {EXPANDABLE_PROPERTIES} from "../../constant/extend/expandable-properties.constants";
 import {FEATURE_FLAG} from "../../config";
 
@@ -24,7 +24,7 @@ export class ExtendService {
     async getDataExtension(dataExtensionQuery: DataExtensionQueryDTO) {
         const sparqlQuery: string = this._generateQuery(dataExtensionQuery);
         const expandProperties = dataExtensionQuery.properties
-            .filter(property => property.expand);
+            .filter(property => property.settings?.content === ExtendPropertySettingsEnum.EXPAND);
         const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
         const formattedResult = this._formatResult(dataExtensionQuery.ids, result);
 
@@ -93,9 +93,9 @@ export class ExtendService {
     }
 
     private _generateTripleFromCondition(property: ExtendQueryProperty) {
-        const {id, expand} = property;
+        const {id, settings} = property;
         let expandedTriples;
-        if (expand) {
+        if (settings?.content === ExtendPropertySettingsEnum.EXPAND) {
             const expandedProperties = [];
             switch (id as ExpandablePropertyEnum) {
                 case ExpandablePropertyEnum.LOCATION:

@@ -1,0 +1,38 @@
+@prefix adr:    <http://kg.artsdata.ca/resource/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+
+# Places
+adr:KP-1 a schema:Place ;
+    rdfs:label "Place Bell" ;
+    schema:name "Place Bell" ;
+    schema:url "http://www.placebell.ca";
+    schema:address adr:KP-1-address.
+
+#address
+adr:KP-1-address a schema:PostalAddress ;
+    schema:postalCode "123 123" ;
+    schema:streetAddress "street 123" ;
+    schema:addressLocality "Toronto";
+    schema:addressRegion "ON";
+    schema:addressCountry "CA".
+
+#Events
+adr:KP-1-event a schema:Event ;
+    schema:name "Event Bell" ;
+    rdfs:label "Place Bell" ;
+    schema:startDate "2018-01-01" ;
+    schema:endDate "2018-01-02" ;
+    schema:location adr:KP-1;
+    schema:performer adr:KP-1-performer;
+    schema:organizer adr:KP-1-organizer.
+
+#Person
+adr:KP-1-performer a schema:Person ;
+    schema:name "Performer Bell";
+    rdfs:label "Performer Bell" .
+
+#Organization
+adr:KP-1-organizer a schema:Organization ;
+    schema:name "Organizer Bell";
+    rdfs:label "Organizer Bell" .
