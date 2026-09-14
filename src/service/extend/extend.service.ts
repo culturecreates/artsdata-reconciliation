@@ -121,7 +121,10 @@ export class ExtendService {
                 console.log("No expanded properties found for id: ", id);
             }
             expandedTriples = expandedProperties
-                .map(prop => `\t\tOPTIONAL {?${objectId} schema:${prop} ?${objectId}_${prop}.}`).join("\n");
+                .map(prop => {
+                    const predicate = prop === "type" ? `rdf:type` : `schema:${prop}`;
+                    return `\t\tOPTIONAL {?${objectId} ${predicate} ?${objectId}_${prop}.}`
+                }).join("\n");
         }
 
         return `OPTIONAL { ?uri ${predicate} ?${objectId}. 
@@ -139,8 +142,8 @@ export class ExtendService {
      * @private
      */
     private _generateLiteralTriple(id: string, objectId: string, predicate: string) {
-        const literalPath = this._getExpandableProperties(id, DEFAULT_LITERAL_PROPERTIES)
-            .map(prop => `schema:${prop}`).join("|");
+        const literalPath = DEFAULT_LITERAL_PROPERTIES.map(prop => `schema:${prop}`)
+            .join("|");
 
         return `OPTIONAL { ?uri ${predicate}/(${literalPath})? ?${objectId}.
                 FILTER(isLiteral(?${objectId}))\n}\n`;
