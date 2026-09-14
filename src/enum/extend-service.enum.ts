@@ -5,3 +5,9 @@ export enum ExpandablePropertyEnum {
   OFFERS = "offers",
   LOCATION = "location"
 }
+
+export enum ExtendPropertySettingsEnum {
+  ID = "id" ,
+  LITERAL = "literal" ,
+  EXPAND = "expand"
+}
