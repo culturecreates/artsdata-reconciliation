@@ -10,8 +10,8 @@ import {
     ProposedExtendProperty
 } from "../../dto/extend";
 import {QUERY_BY_GRAPH} from "../../constant/extend/query-by-graph.constants";
-import {ExpandablePropertyEnum} from "../../enum";
-import {EXPANDABLE_PROPERTIES} from "../../constant/extend/expandable-properties.constants";
+import {ExpandablePropertyEnum, ExtendPropertySettingsEnum} from "../../enum";
+import {DEFAULT_LITERAL_PROPERTIES, EXPANDABLE_PROPERTIES} from "../../constant/extend/expandable-properties.constants";
 import {FEATURE_FLAG} from "../../config";
 
 @Injectable()
@@ -24,7 +24,7 @@ export class ExtendService {
     async getDataExtension(dataExtensionQuery: DataExtensionQueryDTO) {
         const sparqlQuery: string = this._generateQuery(dataExtensionQuery);
         const expandProperties = dataExtensionQuery.properties
-            .filter(property => property.expand);
+            .filter(property => property.settings?.content === ExtendPropertySettingsEnum.EXPAND);
         const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
         const formattedResult = this._formatResult(dataExtensionQuery.ids, result);
 
@@ -86,41 +86,15 @@ export class ExtendService {
         let query = EXTEND_QUERY.replace("<URI_PLACE_HOLDER>", uriPlaceholder);
 
         // Generate property triples and replace the placeholder
-        const propertyTriples = properties.map(this._generateTripleFromCondition).join("");
+        const propertyTriples = properties.map(property => this._generateTripleFromCondition(property)).join("");
         query = query.replace("<TRIPLES_PLACE_HOLDER>", propertyTriples);
 
         return query;
     }
 
     private _generateTripleFromCondition(property: ExtendQueryProperty) {
-        const {id, expand} = property;
-        let expandedTriples;
-        if (expand) {
-            const expandedProperties = [];
-            switch (id as ExpandablePropertyEnum) {
-                case ExpandablePropertyEnum.LOCATION:
-                    expandedProperties.push(...EXPANDABLE_PROPERTIES.LOCATION);
-                    break;
-                case ExpandablePropertyEnum.ADDRESS:
-                    expandedProperties.push(...EXPANDABLE_PROPERTIES.ADDRESS);
-                    break;
-                case ExpandablePropertyEnum.PERFORMER:
-                    expandedProperties.push(...EXPANDABLE_PROPERTIES.PERFORMER);
-                    break;
-                case ExpandablePropertyEnum.ORGANIZER:
-                    expandedProperties.push(...EXPANDABLE_PROPERTIES.ORGANIZER);
-                    break;
-                case ExpandablePropertyEnum.OFFERS:
-                    expandedProperties.push(...EXPANDABLE_PROPERTIES.OFFERS);
-                    break;
-                default:
-                    console.log("No expanded properties found for id: ", id);
-                    break;
-            }
-            expandedTriples = expandedProperties
-                .map(prop => `\t\tOPTIONAL {?${id} schema:${prop} ?${id}_${prop}.}`).join("\n");
+        const {id, settings} = property;
 
-        }
         let objectId = id;
 
         if (MatchServiceHelper.isValidURI(id)) {
@@ -136,8 +110,66 @@ export class ExtendService {
         }
         const predicate = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `schema:${objectId}`;
 
+        if (settings?.content === ExtendPropertySettingsEnum.LITERAL) {
+            return this._generateLiteralTriple(id, objectId, predicate);
+        }
+
+        let expandedTriples;
+        if (settings?.content === ExtendPropertySettingsEnum.EXPAND) {
+            const expandedProperties = this._getExpandableProperties(id);
+            if (!expandedProperties.length) {
+                console.log("No expanded properties found for id: ", id);
+            }
+            expandedTriples = expandedProperties
+                .map(prop => {
+                    const predicate = prop === "type" ? `rdf:type` : `schema:${prop}`;
+                    return `\t\tOPTIONAL {?${objectId} ${predicate} ?${objectId}_${prop}.}`
+                }).join("\n");
+        }
+
         return `OPTIONAL { ?uri ${predicate} ?${objectId}. 
                 ${expandedTriples ? `\n${expandedTriples}\n` : ""}}\n`;
+    }
+
+    /**
+     * @name _generateLiteralTriple
+     * @description Builds the triple for a property requested with `settings.content = literal`.
+     * The property is followed one hop further to the literal that labels the linked entity
+     * (for example `schema:organizer/schema:name`). The hop is made optional with `?` so that
+     * literal-only properties fall back to their own value, and the filter drops the entity URI
+     * that the zero-length match keeps. Both cases therefore bind the same variable, so the
+     * response keeps a single `literal` value per property and needs no post-processing.
+     * @private
+     */
+    private _generateLiteralTriple(id: string, objectId: string, predicate: string) {
+        const literalPath = DEFAULT_LITERAL_PROPERTIES.map(prop => `schema:${prop}`)
+            .join("|");
+
+        return `OPTIONAL { ?uri ${predicate}/(${literalPath})? ?${objectId}.
+                FILTER(isLiteral(?${objectId}))\n}\n`;
+    }
+
+    /**
+     * @name _getExpandableProperties
+     * @description Returns the properties used to describe the entity linked by an expandable
+     * property, or the given fallback when the property is not expandable.
+     * @private
+     */
+    private _getExpandableProperties(id: string, fallback: string[] = []): string[] {
+        switch (id as ExpandablePropertyEnum) {
+            case ExpandablePropertyEnum.LOCATION:
+                return EXPANDABLE_PROPERTIES.LOCATION;
+            case ExpandablePropertyEnum.ADDRESS:
+                return EXPANDABLE_PROPERTIES.ADDRESS;
+            case ExpandablePropertyEnum.PERFORMER:
+                return EXPANDABLE_PROPERTIES.PERFORMER;
+            case ExpandablePropertyEnum.ORGANIZER:
+                return EXPANDABLE_PROPERTIES.ORGANIZER;
+            case ExpandablePropertyEnum.OFFERS:
+                return EXPANDABLE_PROPERTIES.OFFERS;
+            default:
+                return fallback;
+        }
     }
 
     private _formatResult(ids: string[], result: any): DataExtensionResponseDTO {
@@ -355,14 +387,6 @@ export class ExtendService {
         });
     }
 
-
-    private _getExpandedPropertiesForAddress() {
-        return ["postalCode", "addressLocality", "addressCountry", "addressRegion"];
-    }
-
-    private _getExpandedPropertiesForPerformer() {
-        return ["name"];
-    }
 
     private _validateUris(entityUris: string[]) {
         entityUris.forEach(uri => {

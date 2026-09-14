@@ -14,10 +14,10 @@ export const PROPOSED_EXTEND_PROPERTIES_METADATA = {
             {id: "sameAs", name: "sameAs"},
             {id: "eventStatus", name: "eventStatus"},
             {id: "eventAttendanceMode", name: "eventAttendanceMode"},
-            {id: "location", name: "location", expandable: true},
-            {id: "offers", name: "offers", expandable: true},
-            {id: "performer", name: "performer", expandable: true},
-            {id: "organizer", name: "organizer", expandable: true}
+            {id: "location", name: "location"},
+            {id: "offers", name: "offers"},
+            {id: "performer", name: "performer"},
+            {id: "organizer", name: "organizer"}
         ]
     },
     PLACE: {
@@ -28,7 +28,7 @@ export const PROPOSED_EXTEND_PROPERTIES_METADATA = {
             {id: "url", name: "url"},
             {id: "sameAs", name: "sameAs"},
             {id: "disambiguatingDescription", name: "disambiguatingDescription"},
-            {id: "address", name: "address", expandable: true}
+            {id: "address", name: "address"}
         ]
     },
     PERSON: {

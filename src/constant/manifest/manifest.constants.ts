@@ -55,7 +55,7 @@ export const MANIFEST =
                     "name": "Content",
                     "type": "select",
                     "default": "literal",
-                    "helpText": "Content type: ID or literal",
+                    "helpText": "Content type: id, literal, or expand. For literal-only properties, id and expand fall back to literal.",
                     "choices": [
                         {
                             "value": "id",
@@ -71,11 +71,7 @@ export const MANIFEST =
                         }
                     ]
                 }
-            ],
-            "propose_properties": {
-                "service_url": `${APPLICATION.RECON_URL}`,
-                "service_path": "/extend/propose"
-            }
+            ]
         },
         "view": {
             "url": `${APPLICATION.KG_URL}/{{id}}`,

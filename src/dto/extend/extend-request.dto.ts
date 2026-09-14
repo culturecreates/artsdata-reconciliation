@@ -1,15 +1,25 @@
 import {ApiProperty, ApiPropertyOptional} from "@nestjs/swagger";
-import {ArrayMinSize, IsBoolean, IsOptional, IsString, ValidateNested} from "class-validator";
+import {ArrayMinSize, IsEnum, IsOptional, IsString, ValidateNested} from "class-validator";
 import {Transform, Type} from "class-transformer";
+import {ExtendPropertySettingsEnum} from "../../enum";
+
+export class ExtendQueryPropertySettings {
+    @ApiPropertyOptional({enum: ExtendPropertySettingsEnum})
+    @IsOptional()
+    @IsEnum(ExtendPropertySettingsEnum)
+    content?: ExtendPropertySettingsEnum
+}
 
 export class ExtendQueryProperty {
     @ApiProperty({type: String})
     @IsString()
     id: string;
-    @ApiPropertyOptional({type: Boolean, default: false})
+
+    @ApiPropertyOptional({type: ExtendQueryPropertySettings})
     @IsOptional()
-    @IsBoolean()
-    expand?: boolean;
+    @ValidateNested()
+    @Type(() => ExtendQueryPropertySettings)
+    settings?: ExtendQueryPropertySettings;
 }
 
 export class DataExtensionQueryDTO {
