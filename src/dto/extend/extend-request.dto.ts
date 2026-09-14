@@ -14,7 +14,7 @@ export class ExtendQueryProperty {
     @IsString()
     id: string;
 
-    @ApiPropertyOptional({type: ExtendQueryPropertySettings, default: false})
+    @ApiPropertyOptional({type: ExtendQueryPropertySettings})
     @IsOptional()
     settings?: ExtendQueryPropertySettings;
 }
