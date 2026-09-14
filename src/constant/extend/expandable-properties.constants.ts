@@ -1,8 +1,8 @@
 export const EXPANDABLE_PROPERTIES = {
     ADDRESS: ["postalCode", "addressLocality", "addressCountry", "addressRegion"],
-    LOCATION: ["name"],
-    PERFORMER: ["name"],
-    ORGANIZER: ["name"],
+    LOCATION: ["name", "type", "description"],
+    PERFORMER: ["name", "type", "disambiguatingDescription"],
+    ORGANIZER: ["name", "type", "disambiguatingDescription"],
     OFFERS: ["url"]
 };
 
