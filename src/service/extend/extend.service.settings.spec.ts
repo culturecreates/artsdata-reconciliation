@@ -178,6 +178,22 @@ describe('ExtendService', () => {
                                                         "str": "Organizer Bell"
                                                     }
                                                 ]
+                                            },
+                                            {
+                                                "id": "type",
+                                                "values": [
+                                                    {
+                                                        "id": "http://schema.org/Organization"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "id": "disambiguatingDescription",
+                                                "values": [
+                                                    {
+                                                        "str": "Org description"
+                                                    }
+                                                ]
                                             }
                                         ]
                                     }
