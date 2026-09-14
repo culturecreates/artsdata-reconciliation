@@ -4,9 +4,10 @@ import {Transform, Type} from "class-transformer";
 import {ExtendPropertySettingsEnum} from "../../enum";
 
 export class ExtendQueryPropertySettings {
-    @ApiProperty({required: false})
-    @IsEnum({ExtendPropertySettingsEnum})
-    content: ExtendPropertySettingsEnum
+    @ApiPropertyOptional({enum: ExtendPropertySettingsEnum})
+    @IsOptional()
+    @IsEnum(ExtendPropertySettingsEnum)
+    content?: ExtendPropertySettingsEnum
 }
 
 export class ExtendQueryProperty {
@@ -16,6 +17,8 @@ export class ExtendQueryProperty {
 
     @ApiPropertyOptional({type: ExtendQueryPropertySettings})
     @IsOptional()
+    @ValidateNested()
+    @Type(() => ExtendQueryPropertySettings)
     settings?: ExtendQueryPropertySettings;
 }
 
