@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { MANIFEST } from "../../constant";
 
 class DefaultType {
   @ApiProperty()
@@ -38,38 +39,7 @@ export class ServiceManifestResponse {
   versions: string[];
   @ApiProperty({ example: "Artsdata.ca Reconciliation Service" })
   name: String;
-  @ApiProperty({
-    type: [DefaultType], example: [
-      {
-        "id": "schema:Event",
-        "name": "Event"
-      },
-      {
-        "id": "schema:Person",
-        "name": "Person"
-      },
-      {
-        "id": "dbo:Agent",
-        "name": "Agent"
-      },
-      {
-        "id": "schema:Place",
-        "name": "Place"
-      },
-      {
-        "id": "schema:Organization",
-        "name": "Organization"
-      },
-      {
-        "id": "skos:Concept",
-        "name": "Concept"
-      },
-      {
-        "id": "ado:EventType",
-        "name": "Artsdata Event Type"
-      }
-    ]
-  })
+  @ApiProperty({ type: [DefaultType], example: MANIFEST.defaultTypes })
   defaultTypes: DefaultType[];
   @ApiProperty({ type: View })
   view: View;
