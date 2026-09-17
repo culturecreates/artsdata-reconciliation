@@ -99,7 +99,7 @@ export class ExtendService {
 
         if (MatchServiceHelper.isValidURI(id)) {
 
-            const supportedPrefixes = [PREFIXES.SCHEMA, PREFIXES.RDF,];
+            const supportedPrefixes = [PREFIXES.SCHEMA, PREFIXES.RDF, PREFIXES.ADO];
             const matchedPrefix = supportedPrefixes.find(prefix => id.startsWith(prefix));
 
             if (!matchedPrefix) {
