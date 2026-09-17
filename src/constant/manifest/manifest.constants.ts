@@ -32,10 +32,6 @@ export const MANIFEST =
                 "name": "Concept"
             },
             {
-                "id": "ado:EventType",
-                "name": "Artsdata Event Type"
-            },
-            {
                 "id": "ado:LivePerformanceWork",
                 "name": "Artsdata Live Performance Work"
             }
