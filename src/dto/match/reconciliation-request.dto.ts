@@ -67,12 +67,6 @@ export class ReconciliationQuery {
             .replace("ado:", PREFIXES.ADO)
             .replace("dbo:", PREFIXES.DBO);
     })
-    @IsIn(MANIFEST.defaultTypes.map(type =>
-        type.id.replace("schema:", PREFIXES.SCHEMA)
-            .replace("skos:", PREFIXES.SKOS)
-            .replace("dbo:", PREFIXES.DBO)
-            .replace("ado:", PREFIXES.ADO)
-    ))
     type: string;
 
     @IsOptional()
