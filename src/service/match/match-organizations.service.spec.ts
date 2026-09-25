@@ -130,6 +130,29 @@ describe('Test reconciling Organizations using sparql query version 2', () => {
 
     });
 
+    it('Reconcile an agent with name `Place Bell`, which is exact match', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.AGENT,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Place Bell"}],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V2);
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KO-1");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeTruthy();
+        expect(actualResult?.type?.find(type => type.id === Entities.ADO_ORGANIZATION)?.id)
+            .toBe(Entities.ADO_ORGANIZATION);
+
+    });
+
     it(`Reconcile an organization entity with uri 'http://kg.artsdata.ca/resource/KO-1`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
