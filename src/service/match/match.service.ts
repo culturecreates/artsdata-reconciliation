@@ -492,6 +492,13 @@ export class MatchService {
             rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER",
                 QUERIES.SELECT_ENTITY_QUERY_BY_KEYWORD);
         }
+        if (type) {
+            const filterType = type === Entities.AGENT ? "ado:Organization ado:Person" : `<${type}>`;
+            rawQuery = rawQuery.replace("FILTER_BY_TYPE_PLACE_HOLDER",
+                `VALUES ?exp_types {${filterType}} \n ?entity a ?exp_types .`);
+        } else {
+            rawQuery = rawQuery.replace("FILTER_BY_TYPE_PLACE_HOLDER", ``);
+        }
 
         rawQuery = this._addQueryToFetchAdditionalPropertiesForAutoMatchCalculations(type, rawQuery)
 
