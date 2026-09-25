@@ -35,6 +35,7 @@ export const Entities = {
     PLACE: "http://schema.org/Place",
     PERSON: "http://schema.org/Person",
     ORGANIZATION: "http://schema.org/Organization",
+    ADO_ORGANIZATION: "http://kg.artsdata.ca/ontology/Organization",
     CONCEPT: "http://www.w3.org/2004/02/skos/core#Concept",
     AGENT: "http://dbpedia.org/ontology/Agent",
     LIVE_PERFORMANCE_WORK: "http://kg.artsdata.ca/ontology/LivePerformanceWork",

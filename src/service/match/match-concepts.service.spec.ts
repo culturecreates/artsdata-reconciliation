@@ -36,7 +36,7 @@ describe('Test matching Concepts using sparql query v1', () => {
     it('Reconcile skos:Concept by name: \'Festival\'', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: "skos:Concept",
+            type: "http://www.w3.org/2004/02/skos/core#Concept",
             limit: 1,
             conditions: [{matchType: "name", propertyValue: "festival"}],
         }
