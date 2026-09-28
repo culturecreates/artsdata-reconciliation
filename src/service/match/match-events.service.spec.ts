@@ -35,6 +35,45 @@ describe('Test matching events using sparql query v1', () => {
         await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
     })
 
+
+    it('Reconcile an ado:Event with exact name, startDate and location URI and endDate, should be exact match', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ADO_EVENT,
+            conditions: [
+                {matchType: MatchTypeEnum.NAME, propertyValue: "A Beacon during the Night"},
+                {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-03-03T17:00:00-05:00",
+                    propertyId: "http://schema.org/startDate",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "2025-03-03T18:00:00-05:00",
+                    propertyId: "http://schema.org/endDate",
+                    required: true
+                }, {
+                    matchType: MatchTypeEnum.PROPERTY,
+                    propertyValue: "http://kg.artsdata.ca/resource/KP-1",
+                    propertyId: "http://schema.org/location",
+                    required: true
+                }
+
+            ],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const actualResult = response.results?.[0]?.candidates?.[0];
+
+        expect(actualResult?.id).toBe("KE-4");
+        expect(actualResult?.match).toBeTruthy();
+
+    });
+
     it('Reconcile an event with name `A Beacon in the Night`, which is not exact match', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
