@@ -2,6 +2,7 @@ import {DataExtensionQueryDTO} from "../../dto/extend";
 import {dropGraph, setupExtendService, uploadDataSet} from "../../../test/util/common-util";
 import {ExtendPropertySettingsEnum} from "../../enum";
 import {ExtendService} from "./extend.service";
+import {Entities} from "../../constant";
 
 /**
  * The order of the values of a property follows the order of the SPARQL solutions, which the
@@ -75,10 +76,10 @@ describe('ExtendService', () => {
                                 "id": "type",
                                 "values": [
                                     {
-                                        "id": "http://schema.org/Event"
+                                        "id": Entities.EVENT
                                     },
                                     {
-                                        "id": "http://kg.artsdata.ca/ontology/Event"
+                                        "id": Entities.ADO_EVENT
                                     }
                                 ]
                             },
@@ -156,10 +157,10 @@ describe('ExtendService', () => {
                                 "id": "type",
                                 "values": [
                                     {
-                                        "id": "http://schema.org/Event"
+                                        "id": Entities.EVENT
                                     },
                                     {
-                                        "id": "http://kg.artsdata.ca/ontology/Event"
+                                        "id": Entities.ADO_EVENT
                                     }
                                 ]
                             },

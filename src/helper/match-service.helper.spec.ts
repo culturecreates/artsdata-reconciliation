@@ -311,7 +311,7 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {
             startDate: '2023-01-01',
-            types: ['http://schema.org/Event']
+            types: [Entities.EVENT]
         };
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
@@ -336,7 +336,7 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {
             startDate: '2023-02-01',
-            types: ['http://schema.org/Event']
+            types: [Entities.EVENT]
         };
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
@@ -365,7 +365,7 @@ describe('isAutoMatch', () => {
             startDate: '2023-01-01',
             endDate: '2023-01-02',
             locationUri: 'http://kg.artsdata.ca/resource/K11-240',
-            types: ['http://schema.org/Event']
+            types: [Entities.EVENT]
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -388,7 +388,7 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {
             locationUri: 'http://kg.artsdata.ca/resource/K22-240',
-            types: ['http://schema.org/Event']
+            types: [Entities.EVENT]
         };
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
@@ -418,7 +418,7 @@ describe('isAutoMatch', () => {
             endDate: '2023-01-02',
             locationName: 'Place Bell',
             postalCode: 'H7N 0E4',
-            types: ['http://schema.org/Event']
+            types: [Entities.EVENT]
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -441,7 +441,7 @@ describe('isAutoMatch', () => {
             startDate: '2023-01-01',
             endDate: '2023-01-02',
             postalCode: '77N 0E4',
-            types: ['http://schema.org/Event']
+            types: [Entities.EVENT]
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -466,7 +466,7 @@ describe('isAutoMatch', () => {
         const additionalProperties = {
             startDate: '2023-01-01',
             locationUri: 'http://kg.artsdata.ca/resource/K11-240',
-            types: ['http://schema.org/Event']
+            types: [Entities.EVENT]
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -501,7 +501,7 @@ describe('isAutoMatch', () => {
             startDate: '2023-01-01T10:00:00Z',
             endDate: '2023-01-02T18:00:00Z',
             locationUri: 'http://kg.artsdata.ca/resource/K11-240',
-            types: ['http://schema.org/Event']
+            types: [Entities.EVENT]
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -521,7 +521,7 @@ describe('isAutoMatch', () => {
         const additionalProperties = {
             startDate: '2023-01-01',
             endDate: '2023-01-02',
-            types: ['http://schema.org/Event']
+            types: [Entities.EVENT]
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -550,7 +550,7 @@ describe('isAutoMatch', () => {
         const additionalProperties = {
             startDate: '2023-01-01T10:00:00Z',
             locationUri: 'http://kg.artsdata.ca/resource/K11-240',
-            types: ['http://schema.org/Event']
+            types: [Entities.EVENT]
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -579,7 +579,7 @@ describe('isAutoMatch', () => {
         const additionalProperties = {
             startDate: '2023-01-01T10:00:00Z',
             locationUri: 'http://kg.artsdata.ca/resource/K11-240',
-            types: ['http://schema.org/Event']
+            types: [Entities.EVENT]
         };
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,

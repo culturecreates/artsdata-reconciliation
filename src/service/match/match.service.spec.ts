@@ -57,8 +57,8 @@ describe('Test reconciling events using sparql query version 1', () => {
         expect(actualResult?.id).toBe("KE-8");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeFalsy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
 
     });
 
@@ -85,8 +85,8 @@ describe('Test reconciling events using sparql query version 1', () => {
         expect(actualResult?.id).toBe("KE-7");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeFalsy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
 
     });
 
@@ -113,8 +113,8 @@ describe('Test reconciling events using sparql query version 1', () => {
         expect(actualResult?.id).toBe("KE-8");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeFalsy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
 
     });
 
@@ -141,8 +141,8 @@ describe('Test reconciling events using sparql query version 1', () => {
         expect(actualResult?.id).toBe("KE-9");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeFalsy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
 
     });
 
@@ -169,8 +169,8 @@ describe('Test reconciling events using sparql query version 1', () => {
         expect(actualResult?.id).toBe("KE-10");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeFalsy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
 
     });
 
@@ -197,8 +197,8 @@ describe('Test reconciling events using sparql query version 1', () => {
         expect(actualResult?.id).toBe("KE-2");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeFalsy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
 
     });
 
@@ -225,8 +225,8 @@ describe('Test reconciling events using sparql query version 1', () => {
         expect(actualResult?.id).toBe("KE-10");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeFalsy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
 
     });
 
@@ -253,8 +253,8 @@ describe('Test reconciling events using sparql query version 1', () => {
         expect(actualResult?.id).toBe("KE-10");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeFalsy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
 
     });
 
@@ -281,8 +281,8 @@ describe('Test reconciling events using sparql query version 1', () => {
         expect(actualResult?.id).toBe("KE-11");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeFalsy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
 
     });
 
@@ -309,8 +309,8 @@ describe('Test reconciling events using sparql query version 1', () => {
         expect(actualResult?.id).toBe("KE-8");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeFalsy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
 
     });
 
@@ -337,8 +337,8 @@ describe('Test reconciling events using sparql query version 1', () => {
         expect(actualResult?.id).toBe("KE-8");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeFalsy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
 
     });
 

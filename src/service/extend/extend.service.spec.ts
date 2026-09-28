@@ -1,6 +1,7 @@
 import {ExtendService} from './extend.service';
 import {DataExtensionQueryDTO} from "../../dto/extend";
 import {dropGraph, setupExtendService, uploadDataSet} from "../../../test/util/common-util";
+import {Entities} from "../../constant";
 
 describe('ExtendService', () => {
     let extendService: ExtendService;
@@ -55,10 +56,10 @@ describe('ExtendService', () => {
                                 "id": "type",
                                 "values": [
                                     {
-                                        "id": "http://schema.org/Event"
+                                        "id": Entities.EVENT
                                     },
                                     {
-                                        "id": "http://kg.artsdata.ca/ontology/Event"
+                                        "id": Entities.ADO_EVENT
                                     }
                                 ]
                             },
