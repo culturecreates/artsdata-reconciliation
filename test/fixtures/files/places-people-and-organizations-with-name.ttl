@@ -48,6 +48,10 @@ adr:GarretWillie a schema:Person, ado:Person , dbo:Agent ;
     rdfs:label "Garret T. Willie" ;
      schema:name "Garret T. Willie" .
 
+adr:LouisT a schema:Person, ado:Person , dbo:Agent ;
+    rdfs:label "Louis T" ;
+     schema:name "Louis T" .
+
 adr:WarrenHoyano a schema:Person, ado:Person , dbo:Agent ;
     rdfs:label "Warren Hoyano" ;
      schema:name "Warren Hoyano" .

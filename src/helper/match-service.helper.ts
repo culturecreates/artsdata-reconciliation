@@ -198,14 +198,17 @@ export class MatchServiceHelper {
 
         function cleanName(name: string) {
             return name
-                .trim()
                 .toLowerCase()
-                .replace(/[^a-z]/g, ""); // keep only letters
+                .replace(/[^a-z\s]/g, "")          // Keeps only letters (a-z) and whitespace (\s)
+                .replace(/\s+/g, " ")              // Replaces multiple spaces with a single space
+                .trim();                           // Removes leading and trailing spaces
         }
 
         function nameSimilarity(nameInQuery: string, nameInResult: string) {
+            const wordsInQuery = nameInQuery.split(" ")?.length;
+            const wordsInResult = nameInResult.split(" ")?.length;
             const similarityScore = JaroWinklerDistance(cleanName(nameInQuery), cleanName(nameInResult));
-            return similarityScore > 0.92;
+            return similarityScore > 0.92 && wordsInQuery === wordsInResult;
         }
 
         const matchers = {

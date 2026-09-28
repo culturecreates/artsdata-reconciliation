@@ -325,6 +325,28 @@ describe('Test matching person using sparql query v1', () => {
         expect(actualResult?.id).toBe("KPR-1");
         expect(actualResult?.match).toBeTruthy();
     });
+
+    it('Louise should not find a true match with Louis T', async () => {
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.PERSON,
+            conditions: [
+                {
+                    matchType: MatchTypeEnum.NAME,
+                    propertyValue: "Louise",
+                    required: true
+                }
+            ],
+            limit: 10
+        };
+
+        let response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+        expect(actualResult?.id).toBe("LouisT");
+        expect(actualResult?.match).toBeFalsy();
+    });
 });
 
 describe('Test reconciling person using sparql query version 2', () => {
