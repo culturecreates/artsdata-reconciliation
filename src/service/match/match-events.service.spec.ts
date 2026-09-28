@@ -92,8 +92,8 @@ describe('Test matching events using sparql query v1', () => {
         expect(actualResult?.id).toBe("KE-1");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeFalsy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
 
     });
 
@@ -292,8 +292,8 @@ describe('Test matching events using sparql query v1', () => {
         expect(actualResult?.id).toBe("KE-4");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeTruthy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
     });
 
 });
@@ -602,8 +602,8 @@ describe('Test reconciling events using sparql query version 2', () => {
         expect(actualResult?.id).toBe("KE-1");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeFalsy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
 
     });
 
@@ -625,8 +625,8 @@ describe('Test reconciling events using sparql query version 2', () => {
         expect(actualResult?.id).toBe("KE-4");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeTruthy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Event")?.id)
-            .toBe("http://schema.org/Event");
+        expect(actualResult?.type?.find(type => type.id === Entities.EVENT)?.id)
+            .toBe(Entities.EVENT);
     });
 });
 
@@ -650,7 +650,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
             isni: undefined,
             alternateName: undefined,
             addressLocality: undefined,
-            types: ["http://schema.org/Event"]
+            types: [Entities.EVENT]
         };
 
         const query: ReconciliationQuery = {
@@ -674,7 +674,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
             locationName: undefined,
             wikidata: undefined,
             isni: undefined,
-            type: "http://schema.org/Event"
+            type: Entities.EVENT
         };
 
         const result = MatchServiceHelper.isAutoMatch(baseRecord, query, additionalProperties, recordFromQuery);
@@ -696,7 +696,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
             isni: undefined,
             alternateName: undefined,
             addressLocality: undefined,
-            types: ["http://schema.org/Event"]
+            types: [Entities.EVENT]
         };
 
         const query: ReconciliationQuery = {
@@ -720,7 +720,7 @@ describe('locationRelated matcher — containment-aware location matching', () =
             locationName: undefined,
             wikidata: undefined,
             isni: undefined,
-            type: "http://schema.org/Event"
+            type: Entities.EVENT
         };
 
         const result = MatchServiceHelper.isAutoMatch(baseRecord, query, additionalProperties, recordFromQuery);
