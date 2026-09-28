@@ -35,6 +35,28 @@ describe('Test matching person using sparql query v1', () => {
         await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
     })
 
+    it('Reconcile a adr:Person with name `Persona bell`, which is exact match', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.ADO_PERSON,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Persona bell"}],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]});
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KPR-1");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeTruthy();
+        expect(actualResult?.type?.find(type => type.id === Entities.ADO_PERSON)?.id)
+            .toBe(Entities.ADO_PERSON);
+    });
+
     it('Reconcile a person with name `Persona bell`, which is exact match', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
@@ -53,8 +75,8 @@ describe('Test matching person using sparql query v1', () => {
         expect(actualResult?.id).toBe("KPR-1");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeTruthy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Person")?.id)
-            .toBe("http://schema.org/Person");
+        expect(actualResult?.type?.find(type => type.id === Entities.PERSON)?.id)
+            .toBe(Entities.PERSON);
 
     });
 
@@ -80,8 +102,8 @@ describe('Test matching person using sparql query v1', () => {
         expect(actualResult?.id).toBe("KPR-1");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeTruthy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Person")?.id)
-            .toBe("http://schema.org/Person");
+        expect(actualResult?.type?.find(type => type.id === Entities.PERSON)?.id)
+            .toBe(Entities.PERSON);
     });
 
     it('Match initial in name without edit distance', async () => {
@@ -346,8 +368,8 @@ describe('Test reconciling person using sparql query version 2', () => {
         expect(actualResult?.id).toBe("KPR-1");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeTruthy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Person")?.id)
-            .toBe("http://schema.org/Person");
+        expect(actualResult?.type?.find(type => type.id === Entities.PERSON)?.id)
+            .toBe(Entities.PERSON);
 
     });
 
@@ -373,7 +395,7 @@ describe('Test reconciling person using sparql query version 2', () => {
         expect(actualResult?.id).toBe("KPR-1");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeTruthy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Person")?.id)
-            .toBe("http://schema.org/Person");
+        expect(actualResult?.type?.find(type => type.id === Entities.PERSON)?.id)
+            .toBe(Entities.PERSON);
     });
 });

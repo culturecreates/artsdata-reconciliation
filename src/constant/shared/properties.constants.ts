@@ -34,6 +34,7 @@ export const Entities = {
     EVENT: "http://schema.org/Event",
     PLACE: "http://schema.org/Place",
     PERSON: "http://schema.org/Person",
+    ADO_PERSON: "http://kg.artsdata.ca/ontology/Person",
     ORGANIZATION: "http://schema.org/Organization",
     ADO_ORGANIZATION: "http://kg.artsdata.ca/ontology/Organization",
     CONCEPT: "http://www.w3.org/2004/02/skos/core#Concept",
