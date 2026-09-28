@@ -492,13 +492,8 @@ export class MatchService {
             rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER",
                 QUERIES.SELECT_ENTITY_QUERY_BY_KEYWORD);
         }
-        if (type) {
-            const filterType = type === Entities.AGENT ? "ado:Organization ado:Person" : `<${type}>`;
-            rawQuery = rawQuery.replace("FILTER_BY_TYPE_PLACE_HOLDER",
-                `VALUES ?exp_types {${filterType}} \n ?entity a ?exp_types .`);
-        } else {
-            rawQuery = rawQuery.replace("FILTER_BY_TYPE_PLACE_HOLDER", ``);
-        }
+
+        rawQuery = this.add_typeFilter(rawQuery, type)
 
         rawQuery = this._addFilterArtsdataEntities(rawQuery, type)
 
@@ -700,5 +695,15 @@ export class MatchService {
             stringToReplace = `FILTER (STRSTARTS(str(?entity), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))`
         }
         return rawQuery.replace("FILTER_ARTSDATA_ENTITIES_PLACE_HOLDER", stringToReplace)
+    }
+
+    private add_typeFilter(rawQuery: string, type: string) {
+        if (type) {
+            const filterType = type === Entities.AGENT ? "ado:Organization ado:Person" : `<${type}>`;
+            return rawQuery.replace("FILTER_BY_TYPE_PLACE_HOLDER",
+                `VALUES ?exp_types {${filterType}} \n ?entity a ?exp_types .`);
+        } else {
+            return rawQuery.replace("FILTER_BY_TYPE_PLACE_HOLDER", ``);
+        }
     }
 }
