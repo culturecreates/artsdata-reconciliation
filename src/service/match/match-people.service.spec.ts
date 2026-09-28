@@ -350,7 +350,7 @@ describe('Test reconciling person using sparql query version 2', () => {
         await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
     })
 
-    it('Reconcile an organization with name `Persona bell`, which is exact match', async () => {
+    it('Reconcile an person with name `Persona bell`, which is exact match', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PERSON,
@@ -373,7 +373,7 @@ describe('Test reconciling person using sparql query version 2', () => {
 
     });
 
-    it(`Reconcile an organization entity with uri 'http://kg.artsdata.ca/resource/KPR-1`, async () => {
+    it(`Reconcile an person entity with uri 'http://kg.artsdata.ca/resource/KPR-1`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.PERSON,
