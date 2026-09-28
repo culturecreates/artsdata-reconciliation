@@ -500,6 +500,8 @@ export class MatchService {
             rawQuery = rawQuery.replace("FILTER_BY_TYPE_PLACE_HOLDER", ``);
         }
 
+        rawQuery = this._addFilterArtsdataEntities(rawQuery, type)
+
         rawQuery = this._addQueryToFetchAdditionalPropertiesForAutoMatchCalculations(type, rawQuery)
 
         rawQuery = rawQuery
@@ -690,5 +692,13 @@ export class MatchService {
 
         }
         return rawQuery;
+    }
+
+    private _addFilterArtsdataEntities(rawQuery: string, type: string) {
+        let stringToReplace = ''
+        if (!type.startsWith(ArtsdataConstants.PREFIX_ADO)) {
+            stringToReplace = `FILTER (STRSTARTS(str(?entity), "${ArtsdataConstants.PREFIX_INCLUDING_K}"))`
+        }
+        return rawQuery.replace("FILTER_ARTSDATA_ENTITIES_PLACE_HOLDER", stringToReplace)
     }
 }
