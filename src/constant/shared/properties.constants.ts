@@ -32,7 +32,9 @@ export const RDF = {
 
 export const Entities = {
     EVENT: "http://schema.org/Event",
+    ADO_EVENT: "http://kg.artsdata.ca/ontology/Event",
     PLACE: "http://schema.org/Place",
+    ADO_PLACE: "http://kg.artsdata.ca/ontology/Place",
     PERSON: "http://schema.org/Person",
     ADO_PERSON: "http://kg.artsdata.ca/ontology/Person",
     ORGANIZATION: "http://schema.org/Organization",
