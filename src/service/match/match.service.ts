@@ -611,6 +611,7 @@ export class MatchService {
 
         switch (type) {
             case Entities.PLACE:
+            case Entities.ADO_PLACE:
                 rawQuery = rawQuery.replace(
                     "ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
                     `(SAMPLE(?postalCode) AS ?postalCode)
@@ -627,6 +628,7 @@ export class MatchService {
                     .replace("GROUP_BY_PLACEHOLDER", QUERIES.GROUP_BY_STATEMENT);
                 break;
             case Entities.EVENT:
+            case Entities.ADO_EVENT:
                 rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
                     `(SAMPLE(?startDate) AS ?startDate)
                                 (SAMPLE(?endDate) AS ?endDate)
@@ -660,7 +662,9 @@ export class MatchService {
                                     }}`)
                     .replace("GROUP_BY_PLACEHOLDER", `${QUERIES.GROUP_BY_STATEMENT} ?subEvent`);
                 break;
+            case Entities.ADO_PERSON:
             case Entities.PERSON:
+            case Entities.ADO_ORGANIZATION:
             case Entities.ORGANIZATION:
             case Entities.AGENT:
                 rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
