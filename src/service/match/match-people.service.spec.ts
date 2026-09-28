@@ -35,7 +35,7 @@ describe('Test matching person using sparql query v1', () => {
         await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
     })
 
-    it('Reconcile a adr:Person with name `Persona bell`, which is exact match', async () => {
+    it('Reconcile a ado:Person with name `Persona bell`, which is exact match', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.ADO_PERSON,

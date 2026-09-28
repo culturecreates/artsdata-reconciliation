@@ -34,7 +34,7 @@ describe('Test matching Place using sparql query v1', () => {
         await dropIndexAndTheGraph(testGraphUri, testLuceneConnectorId);
     })
 
-    it('Reconcile a adr:Place with name `Place bell`', async () => {
+    it('Reconcile a ado:Place with name `Place bell`', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.ADO_PLACE,
