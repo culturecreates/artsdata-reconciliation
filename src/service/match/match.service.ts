@@ -691,7 +691,7 @@ export class MatchService {
 
     private _addFilterArtsdataEntities(rawQuery: string, type: string) {
         let stringToReplace = ''
-        if (!type.startsWith(ArtsdataConstants.PREFIX_ADO)) {
+        if (!type?.startsWith(ArtsdataConstants.PREFIX_ADO)) {
             stringToReplace = `FILTER ( STRSTARTS( STR(?entity), "${ArtsdataConstants.PREFIX_ADR}" ) )`
         }
         return rawQuery.replace("FILTER_ARTSDATA_ENTITIES_PLACE_HOLDER", stringToReplace)
