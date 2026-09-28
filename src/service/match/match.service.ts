@@ -433,7 +433,7 @@ export class MatchService {
         };
 
         if (id) {
-            const uri = id.startsWith('K') ? `${ArtsdataConstants.PREFIX}${id}` : id;
+            const uri = id.startsWith('K') ? `${ArtsdataConstants.PREFIX_ADR}${id}` : id;
             addSubQuery('id', uri, MatchServiceHelper.generateSubQueryToURI);
         } else if (name) {
             addSubQuery('name', name, (value: string, type: string, scoreVar: string) =>
@@ -479,7 +479,7 @@ export class MatchService {
         let luceneQuery: string = this._generateLuceneQuery(name, propertyConditions);
 
         if (id) {
-            id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX}${id}>`;
+            id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX_ADR}${id}>`;
             let query = `BIND(${id} as ?entity)\n`
 
             if (type) {

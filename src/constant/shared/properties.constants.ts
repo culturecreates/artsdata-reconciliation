@@ -14,7 +14,8 @@ export const ArtsdataProperties = {
 };
 
 export const ArtsdataConstants = {
-    PREFIX: "http://kg.artsdata.ca/resource/",
+    PREFIX_ADR: "http://kg.artsdata.ca/resource/",
+    PREFIX_ADO: "http://kg.artsdata.ca/ontology/",
     PREFIX_INCLUDING_K: "http://kg.artsdata.ca/resource/K",
 };
 

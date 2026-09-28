@@ -81,7 +81,7 @@ export class MatchServiceHelper {
             const resultCandidate = new ResultCandidates();
 
             const resultCandidateUri = currentBinding["entity"].value
-            resultCandidate.id = resultCandidateUri?.split(ArtsdataConstants.PREFIX).pop();
+            resultCandidate.id = resultCandidateUri?.split(ArtsdataConstants.PREFIX_ADR).pop();
             const name = currentBinding["name"]?.value;
             const description = currentBinding["description"]?.value;
             const subEventSet = new Set();
@@ -189,7 +189,7 @@ export class MatchServiceHelper {
 
     static isQueryByURIOrArtsdataId(query: string) {
         const artsdataIdPattern = "^K[0-9]+-[0-9]+$";
-        return !!(query?.match(artsdataIdPattern) || (this.isValidURI(query) && query.startsWith(ArtsdataConstants.PREFIX)));
+        return !!(query?.match(artsdataIdPattern) || (this.isValidURI(query) && query.startsWith(ArtsdataConstants.PREFIX_ADR)));
     }
 
     static isAutoMatch(recordFetched: {
