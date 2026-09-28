@@ -13,7 +13,7 @@ export class PreviewService {
    * @param entityId
    */
   async getPreview(entityId: string): Promise<string> {
-    const uri: string = `${ArtsdataConstants.PREFIX}${entityId}`;
+    const uri: string = `${ArtsdataConstants.PREFIX_ADR}${entityId}`;
     const sparqlQuery = PREVIEW_QUERY.replace("URI_PLACE_HOLDER" , uri);
     const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
     return this.formatResult(uri , entityId , result);

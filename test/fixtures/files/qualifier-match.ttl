@@ -1,19 +1,20 @@
 @prefix adr:<http://kg.artsdata.ca/resource/>.
+@prefix ado:    <http://kg.artsdata.ca/ontology/> .
 @prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#>.
 @prefix schema:<http://schema.org/>.
 @prefix xsd:<http://www.w3.org/2001/XMLSchema#>.
 
-adr:Organization1 a schema:Organization ;
+adr:Organization1 a schema:Organization, ado:Organization ;
     schema:name "Culture creates" ;
     rdfs:label "Culture creates" ;
     schema:url "http://culturecreates.com" .
 
-adr:Organization2 a schema:Organization ;
+adr:Organization2 a schema:Organization, ado:Organization ;
     schema:name "Another organization" ;
     rdfs:label "Another organization" ;
     schema:url <https://anotherorganization.com> .
 
-adr:Organization3 a schema:Organization ;
+adr:Organization3 a schema:Organization, ado:Organization ;
     schema:name "BC Alliance for Arts + Culture" ;
     rdfs:label "BC Alliance for Arts + Culture" ;
     schema:url <https://organization.com> .

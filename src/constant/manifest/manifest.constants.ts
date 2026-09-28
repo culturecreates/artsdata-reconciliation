@@ -8,15 +8,15 @@ export const MANIFEST =
         "name": "Artsdata.ca Reconciliation Service",
         "defaultTypes": [
             {
-                "id": "schema:Event",
+                "id": "ado:Event",
                 "name": "Event"
             },
             {
-                "id": "schema:Person",
+                "id": "ado:Person",
                 "name": "Person"
             },
             {
-                "id": "schema:Place",
+                "id": "ado:Place",
                 "name": "Place"
             },
             {
@@ -24,7 +24,7 @@ export const MANIFEST =
                 "name": "Agent"
             },
             {
-                "id": "schema:Organization",
+                "id": "ado:Organization",
                 "name": "Organization"
             },
             {

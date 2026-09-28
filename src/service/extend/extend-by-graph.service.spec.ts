@@ -2,6 +2,7 @@ import {EntityClassEnum} from "../../enum";
 import {dropGraph, setupExtendService, uploadDataSet} from "../../../test/util/common-util";
 import {ExtendService} from "./extend.service";
 import {BadRequestException} from "@nestjs/common";
+import {Entities} from "../../constant";
 
 describe('Test Extend by graph URI', () => {
 
@@ -49,7 +50,7 @@ describe('Test Extend by graph URI', () => {
                 "name": "Person one - reconciled",
                 "isni_uri": "https://isni.org/isni/00000000000000000021",
                 "wikidata_uri": "http://www.wikidata.org/entity/Q21",
-                "type": "http://schema.org/Person",
+                "type": Entities.PERSON,
                 "reconciled": true,
                 "is_flagged_for_review": true
             },
@@ -58,7 +59,7 @@ describe('Test Extend by graph URI', () => {
                 "name": "Person two - reconciled",
                 "artsdata_uri": "http://kg.artsdata.ca/resource/K22",
                 "wikidata_uri": "http://www.wikidata.org/entity/Q22",
-                "type": "http://schema.org/Person",
+                "type": Entities.PERSON,
                 "reconciled": true
             }
         ]
@@ -82,7 +83,7 @@ describe('Test Extend by graph URI', () => {
                 "name": "Person one - reconciled",
                 "isni_uri": "https://isni.org/isni/00000000000000000021",
                 "wikidata_uri": "http://www.wikidata.org/entity/Q21",
-                "type": "http://schema.org/Person",
+                "type": Entities.PERSON,
                 "reconciled": true,
                 "is_flagged_for_review": true
             }
@@ -124,7 +125,7 @@ describe('Test Extend by graph URI', () => {
                 "isni_uri": "https://isni.org/isni/00000000000000000011",
                 "artsdata_uri": "http://kg.artsdata.ca/resource/K11",
                 "wikidata_uri": "http://www.wikidata.org/entity/Q11",
-                "type": "http://schema.org/Organization",
+                "type": Entities.ORGANIZATION,
                 "reconciled": true,
                 "is_flagged_for_review": true,
             },
@@ -132,7 +133,7 @@ describe('Test Extend by graph URI', () => {
                 "uri": "http://external-source.com/resource/Organization2",
                 "url": "http://orgnaization-two.com",
                 "name": "Organization two - non-reconciled",
-                "type": "http://schema.org/Organization"
+                "type": Entities.ORGANIZATION
             }
         ]
         const sortByUri = (a: any, b: any) => a.uri.localeCompare(b.uri);
@@ -153,7 +154,7 @@ describe('Test Extend by graph URI', () => {
                 "isni_uri": "https://isni.org/isni/00000000000000000011",
                 "artsdata_uri": "http://kg.artsdata.ca/resource/K11",
                 "wikidata_uri": "http://www.wikidata.org/entity/Q11",
-                "type": "http://schema.org/Organization",
+                "type": Entities.ORGANIZATION,
                 "reconciled": true,
                 "is_flagged_for_review": true
             },
@@ -161,7 +162,7 @@ describe('Test Extend by graph URI', () => {
                 "uri": "http://external-source.com/resource/Organization2",
                 "url": "http://orgnaization-two.com",
                 "name": "Organization two - non-reconciled",
-                "type": "http://schema.org/Organization"
+                "type": Entities.ORGANIZATION
             },
             {
                 "uri": "http://external-source.com/resource/Person1",
@@ -170,7 +171,7 @@ describe('Test Extend by graph URI', () => {
                 "name": "Person one - reconciled",
                 "isni_uri": "https://isni.org/isni/00000000000000000021",
                 "wikidata_uri": "http://www.wikidata.org/entity/Q21",
-                "type": "http://schema.org/Person",
+                "type": Entities.PERSON,
                 "reconciled": true,
                 "is_flagged_for_review": true
             },
@@ -179,7 +180,7 @@ describe('Test Extend by graph URI', () => {
                 "name": "Person two - reconciled",
                 "artsdata_uri": "http://kg.artsdata.ca/resource/K22",
                 "wikidata_uri": "http://www.wikidata.org/entity/Q22",
-                "type": "http://schema.org/Person",
+                "type": Entities.PERSON,
                 "reconciled": true
             }
         ]

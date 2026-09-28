@@ -433,7 +433,7 @@ export class MatchService {
         };
 
         if (id) {
-            const uri = id.startsWith('K') ? `${ArtsdataConstants.PREFIX}${id}` : id;
+            const uri = id.startsWith('K') ? `${ArtsdataConstants.PREFIX_ADR}${id}` : id;
             addSubQuery('id', uri, MatchServiceHelper.generateSubQueryToURI);
         } else if (name) {
             addSubQuery('name', name, (value: string, type: string, scoreVar: string) =>
@@ -479,7 +479,7 @@ export class MatchService {
         let luceneQuery: string = this._generateLuceneQuery(name, propertyConditions);
 
         if (id) {
-            id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX}${id}>`;
+            id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX_ADR}${id}>`;
             let query = `BIND(${id} as ?entity)\n`
 
             if (type) {
@@ -492,6 +492,10 @@ export class MatchService {
             rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER",
                 QUERIES.SELECT_ENTITY_QUERY_BY_KEYWORD);
         }
+
+        rawQuery = this.add_typeFilter(rawQuery, type)
+
+        rawQuery = this._addFilterArtsdataEntities(rawQuery, type)
 
         rawQuery = this._addQueryToFetchAdditionalPropertiesForAutoMatchCalculations(type, rawQuery)
 
@@ -604,6 +608,7 @@ export class MatchService {
 
         switch (type) {
             case Entities.PLACE:
+            case Entities.ADO_PLACE:
                 rawQuery = rawQuery.replace(
                     "ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
                     `(SAMPLE(?postalCode) AS ?postalCode)
@@ -620,6 +625,7 @@ export class MatchService {
                     .replace("GROUP_BY_PLACEHOLDER", QUERIES.GROUP_BY_STATEMENT);
                 break;
             case Entities.EVENT:
+            case Entities.ADO_EVENT:
                 rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
                     `(SAMPLE(?startDate) AS ?startDate)
                                 (SAMPLE(?endDate) AS ?endDate)
@@ -653,7 +659,9 @@ export class MatchService {
                                     }}`)
                     .replace("GROUP_BY_PLACEHOLDER", `${QUERIES.GROUP_BY_STATEMENT} ?subEvent`);
                 break;
+            case Entities.ADO_PERSON:
             case Entities.PERSON:
+            case Entities.ADO_ORGANIZATION:
             case Entities.ORGANIZATION:
             case Entities.AGENT:
                 rawQuery = rawQuery.replace("ADDITIONAL_SELECT_FOR_MATCH_PLACEHOLDER",
@@ -679,5 +687,23 @@ export class MatchService {
 
         }
         return rawQuery;
+    }
+
+    private _addFilterArtsdataEntities(rawQuery: string, type: string) {
+        let stringToReplace = ''
+        if (!type?.startsWith(ArtsdataConstants.PREFIX_ADO)) {
+            stringToReplace = `FILTER ( STRSTARTS( STR(?entity), "${ArtsdataConstants.PREFIX_ADR}" ) )`
+        }
+        return rawQuery.replace("FILTER_ARTSDATA_ENTITIES_PLACE_HOLDER", stringToReplace)
+    }
+
+    private add_typeFilter(rawQuery: string, type: string) {
+        if (type) {
+            const filterType = type === Entities.AGENT ? "ado:Organization ado:Person" : `<${type}>`;
+            return rawQuery.replace("FILTER_BY_TYPE_PLACE_HOLDER",
+                `VALUES ?exp_types {${filterType}} \n ?entity a ?exp_types .`);
+        } else {
+            return rawQuery.replace("FILTER_BY_TYPE_PLACE_HOLDER", ``);
+        }
     }
 }

@@ -2,15 +2,16 @@
 @prefix schema:<http://schema.org/>.
 @prefix ext:<http://external-source.com/resource/>.
 @prefix xsd:<http://www.w3.org/2001/XMLSchema#>.
+@prefix ado:<http://kg.artsdata.ca/ontology/> .
 
-adr:Place1 a schema:Place ;
+adr:Place1 a schema:Place, ado:Place   ;
     schema:name "Place One" ;
     schema:sameAs "http://www.place-one.com" .
 
-adr:Organization1 a schema:Organization ;
+adr:Organization1 a schema:Organization, ado:Organization ;
     schema:name "Organization One" ;
     schema:url "http://www.organization-one.com" .
 
-adr:Event1 a schema:Event ;
+adr:Event1 a schema:Event, ado:Event ;
     schema:name "Event One" ;
     schema:startDate "2020-01-01"^^xsd:date .

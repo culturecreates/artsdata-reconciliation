@@ -67,8 +67,9 @@ export const QUERIES = {
    ?search a luc-index:INDEX_PLACE_HOLDER ;
      QUERY_FILTER_PLACE_HOLDER
      luc:entities ?entity .
+   FILTER_BY_TYPE_PLACE_HOLDER
    PROPERTY_PLACE_HOLDER
-   FILTER(STRSTARTS(STR(?entity), "${ArtsdataConstants.PREFIX}"))
+   FILTER_ARTSDATA_ENTITIES_PLACE_HOLDER
    ?entity luc:score ?total_score .
    FILTER(?total_score > 0)
  } GROUP BY ?entity ?total_score

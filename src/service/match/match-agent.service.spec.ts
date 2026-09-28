@@ -52,8 +52,8 @@ describe('Test matching Agents using sparql query v1', () => {
         expect(actualResult?.id).toBe("KO-1");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeTruthy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Organization")?.id)
-            .toBe("http://schema.org/Organization");
+        expect(actualResult?.type?.find(type => type.id === "http://kg.artsdata.ca/ontology/Organization")?.id)
+            .toBe("http://kg.artsdata.ca/ontology/Organization");
 
     });
 

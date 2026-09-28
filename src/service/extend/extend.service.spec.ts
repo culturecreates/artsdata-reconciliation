@@ -1,6 +1,7 @@
 import {ExtendService} from './extend.service';
 import {DataExtensionQueryDTO} from "../../dto/extend";
 import {dropGraph, setupExtendService, uploadDataSet} from "../../../test/util/common-util";
+import {Entities} from "../../constant";
 
 describe('ExtendService', () => {
     let extendService: ExtendService;
@@ -32,7 +33,7 @@ describe('ExtendService', () => {
             }
             const result = await extendService.getDataExtension(extendRequest);
 
-            const expectedResult ={
+            const expectedResult = {
                 "meta": [
                     {
                         "id": "type",
@@ -55,7 +56,10 @@ describe('ExtendService', () => {
                                 "id": "type",
                                 "values": [
                                     {
-                                        "id": "http://schema.org/Event"
+                                        "id": Entities.EVENT
+                                    },
+                                    {
+                                        "id": Entities.ADO_EVENT
                                     }
                                 ]
                             },
@@ -63,7 +67,8 @@ describe('ExtendService', () => {
                                 "id": "name",
                                 "values": [
                                     {
-                                        "str": "Event One"}
+                                        "str": "Event One"
+                                    }
                                 ]
                             },
                             {
@@ -100,7 +105,9 @@ describe('ExtendService', () => {
                             "id": "type",
                             "values": [
                                 {
-                                    "id": "http://schema.org/Place"
+                                    "id": Entities.PLACE
+                                }, {
+                                    "id": Entities.ADO_PLACE
                                 }
                             ]
                         },
@@ -138,7 +145,9 @@ describe('ExtendService', () => {
                             "id": "type",
                             "values": [
                                 {
-                                    "id": "http://schema.org/Organization"
+                                    "id": Entities.ORGANIZATION
+                                }, {
+                                    "id": Entities.ADO_ORGANIZATION
                                 }
                             ]
                         },

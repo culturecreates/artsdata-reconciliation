@@ -73,7 +73,7 @@ export class SuggestService {
     private _formatResult(result: any): SuggestResponse {
         const results: any[] = [];
         result.results.bindings?.forEach((item: any) => {
-            const currentId = item.entity?.value?.split(ArtsdataConstants.PREFIX).pop();
+            const currentId = item.entity?.value?.split(ArtsdataConstants.PREFIX_ADR).pop();
             const currentEntry = results.find((r) => r.id === currentId);
 
             if (!currentEntry) {

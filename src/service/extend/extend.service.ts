@@ -79,7 +79,7 @@ export class ExtendService {
         const {ids, properties} = dataExtensionQuery;
 
         // Generate URIs with prefix if necessary
-        const uris = ids.map(id => MatchServiceHelper.isValidURI(id) ? id.trim() : `${ArtsdataConstants.PREFIX}${id.trim()}`);
+        const uris = ids.map(id => MatchServiceHelper.isValidURI(id) ? id.trim() : `${ArtsdataConstants.PREFIX_ADR}${id.trim()}`);
         const uriPlaceholder = uris.map(uri => `(<${uri}>)`).join(" ");
 
         // Replace URI placeholder in the query
@@ -179,7 +179,7 @@ export class ExtendService {
             const id = row.uri.value;
             if (!formattedRow[id]) {
                 formattedRow[id] = {
-                    id: id.split(ArtsdataConstants.PREFIX)[1],
+                    id: id.split(ArtsdataConstants.PREFIX_ADR)[1],
                     properties: []
                 };
             }
@@ -197,8 +197,8 @@ export class ExtendService {
                     }
 
                     if (row[key].type === "uri") {
-                        if (rowValue.startsWith(ArtsdataConstants.PREFIX)) {
-                            currentValue = {"id": rowValue.split(ArtsdataConstants.PREFIX)[1]};
+                        if (rowValue.startsWith(ArtsdataConstants.PREFIX_ADR)) {
+                            currentValue = {"id": rowValue.split(ArtsdataConstants.PREFIX_ADR)[1]};
                         } else {
                             currentValue = {"id": rowValue};
                         }
@@ -229,7 +229,7 @@ export class ExtendService {
                 }
             }
         }
-        const rows = ids.map(id => formattedRow[`${ArtsdataConstants.PREFIX}${id}`]);
+        const rows = ids.map(id => formattedRow[`${ArtsdataConstants.PREFIX_ADR}${id}`]);
         const properties = result.head.vars.filter((item: any) => item !== "uri");
         const meta = properties.map((item: any) => {
             return {id: item, name: item};

@@ -14,7 +14,8 @@ export const ArtsdataProperties = {
 };
 
 export const ArtsdataConstants = {
-    PREFIX: "http://kg.artsdata.ca/resource/",
+    PREFIX_ADR: "http://kg.artsdata.ca/resource/",
+    PREFIX_ADO: "http://kg.artsdata.ca/ontology/",
     PREFIX_INCLUDING_K: "http://kg.artsdata.ca/resource/K",
 };
 
@@ -32,9 +33,13 @@ export const RDF = {
 
 export const Entities = {
     EVENT: "http://schema.org/Event",
+    ADO_EVENT: "http://kg.artsdata.ca/ontology/Event",
     PLACE: "http://schema.org/Place",
+    ADO_PLACE: "http://kg.artsdata.ca/ontology/Place",
     PERSON: "http://schema.org/Person",
+    ADO_PERSON: "http://kg.artsdata.ca/ontology/Person",
     ORGANIZATION: "http://schema.org/Organization",
+    ADO_ORGANIZATION: "http://kg.artsdata.ca/ontology/Organization",
     CONCEPT: "http://www.w3.org/2004/02/skos/core#Concept",
     AGENT: "http://dbpedia.org/ontology/Agent",
     LIVE_PERFORMANCE_WORK: "http://kg.artsdata.ca/ontology/LivePerformanceWork",

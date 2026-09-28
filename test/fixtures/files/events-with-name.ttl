@@ -3,57 +3,58 @@
 @prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
 @prefix schema:<http://schema.org/>.
 @prefix xsd:<http://www.w3.org/2001/XMLSchema#>.
+@prefix ado:<http://kg.artsdata.ca/ontology/> .
 
 
-adr:KE-1 rdf:type <http://schema.org/Event> ;
+adr:KE-1 rdf:type schema:Event, ado:Event  ;
     rdfs:label "A Beacon in the Night" ;
     schema:name "A Beacon in the Night";
     schema:startDate "2025-01-01"^^xsd:date.
 
-adr:KE-2 rdf:type <http://schema.org/Event> ;
+adr:KE-2 rdf:type schema:Event, ado:Event  ;
     rdfs:label "A Beacon AND Night" ;
     schema:name "A Beacon AND Night" ;
     schema:startDate "2025-02-02"^^xsd:date.
 
-adr:KE-4 rdf:type <http://schema.org/Event> ;
+adr:KE-4 rdf:type schema:Event, ado:Event  ;
     rdfs:label "A Beacon during the Night";
     schema:name "A Beacon during the Night";
     schema:startDate "2025-03-03T17:00:00-05:00"^^xsd:dateTime;
     schema:endDate "2025-03-03T18:00:00-05:00"^^xsd:dateTime;
     schema:location adr:KP-1.
 
-adr:KE-5 rdf:type <http://schema.org/Event> ;
+adr:KE-5 rdf:type schema:Event, ado:Event  ;
     rdfs:label "Dance Night" ;
     schema:name "Dance Night" ;
     schema:startDate "2026-04-25T19:30:00-07:00"^^xsd:dateTime;
     schema:location adr:K-PortTheatreAuditorium.
 
-adr:KE-6 rdf:type <http://schema.org/Event> ;
+adr:KE-6 rdf:type schema:Event, ado:Event  ;
     rdfs:label "At the Night" ;
     schema:name "At the Night" ;
     schema:startDate "2025-12-28T13:00:00-04:00"^^xsd:dateTime.
 
-adr:KE-7 rdf:type <http://schema.org/Event> ;
+adr:KE-7 rdf:type schema:Event, ado:Event  ;
     schema:name "Pierre-Yves Roy-Desmarais" ;
     rdfs:label "Pierre-Yves Roy-Desmarais" .
 
-adr:KE-8 rdf:type <http://schema.org/Event> ;
+adr:KE-8 rdf:type schema:Event, ado:Event  ;
     rdfs:label "Banx & Ranx || FMG 2023" ;
     schema:name "Banx & Ranx || FMG 2023" .
 
-adr:KE-9 rdf:type <http://schema.org/Event> ;
+adr:KE-9 rdf:type schema:Event, ado:Event  ;
     rdfs:label "Parcours citoyenne : Maï Nguyen (Vietnam)" ;
     schema:name "Parcours citoyenne : Maï Nguyen (Vietnam)" .
 
-adr:KE-10 rdf:type <http://schema.org/Event> ;
+adr:KE-10 rdf:type schema:Event, ado:Event  ;
     rdfs:label "Kev - M'en c*lisse, j'essaye [Trois-Rivières] 18+" ;
     schema:name "Kev - M'en c*lisse, j'essaye [Trois-Rivières] 18+" .
 
-adr:KE-11 rdf:type <http://schema.org/Event> ;
+adr:KE-11 rdf:type schema:Event, ado:Event  ;
     rdfs:label "Emily D’Angelo" ;
     schema:name "Emily D’Angelo" .
 
-adr:EventSeries1 rdf:type <http://schema.org/Event> ;
+adr:EventSeries1 rdf:type schema:Event, ado:Event  ;
         rdfs:label "Event Series One" ;
         schema:name "Event Series One" ;
         schema:startDate "2025-01-01T13:00:00-04:00"^^xsd:dateTime;
@@ -63,26 +64,26 @@ adr:EventSeries1 rdf:type <http://schema.org/Event> ;
         schema:location adr:KP-1;
         schema:sameAs <https://isni.org/isni/0000000123456789>.
 
-adr:SubEvent1 rdf:type <http://schema.org/Event>;
+adr:SubEvent1 rdf:type schema:Event, ado:Event ;
                 schema:name "Sub Event One" ;
                 rdfs:label "Sub Event One" .
 
-adr:SubEvent2 rdf:type <http://schema.org/Event>;
+adr:SubEvent2 rdf:type schema:Event, ado:Event ;
                 schema:name "Sub Event Two" ;
                 rdfs:label "Sub Event Two" .
 
-adr:KP-1 rdf:type <http://schema.org/Place> ;
+adr:KP-1 rdf:type schema:Place, ado:Place  ;
     rdfs:label "One Location" ;
     schema:name "One Location" ;
     schema:address [
     schema:postalCode "12345" ;
     ].
 
-adr:K-PortTheatre rdf:type <http://schema.org/Place> ;
+adr:K-PortTheatre rdf:type schema:Place, ado:Place   ;
     rdfs:label "Port Theatre" ;
     schema:name "Port Theatre" .
 
-adr:K-PortTheatreAuditorium rdf:type <http://schema.org/Place> ;
+adr:K-PortTheatreAuditorium rdf:type schema:Place, ado:Place    ;
         rdfs:label "Port Theatre Auditorium" ;
         schema:name "Port Theatre Auditorium" ;
         schema:containedInPlace adr:K-PortTheatre.

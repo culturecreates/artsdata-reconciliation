@@ -25,7 +25,7 @@ describe('Test matching organizations using sparql query v1', () => {
         const {
             graphUri,
             luceneConnector
-        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.ORGANIZATION, testDatasetPath)
+        } = await uploadDataSetAndCreateLuceneConnector(IndexFileNameEnum.ALL_LITERALS, testDatasetPath)
         testGraphUri = graphUri;
         testLuceneConnectorId = luceneConnector;
         jest.spyOn(MatchServiceHelper, 'getGraphdbIndex').mockReturnValue(luceneConnector);
@@ -37,7 +37,7 @@ describe('Test matching organizations using sparql query v1', () => {
     it('Reconcile a organization with name `Place Bell`, which is exact match', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: Entities.ORGANIZATION,
+            type: Entities.ADO_ORGANIZATION,
             conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Place Bell"}],
             limit: 1
         };
@@ -52,15 +52,15 @@ describe('Test matching organizations using sparql query v1', () => {
         expect(actualResult?.id).toBe("KO-1");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeTruthy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Organization")?.id)
-            .toBe("http://schema.org/Organization");
+        expect(actualResult?.type?.find(type => type.id === Entities.ADO_ORGANIZATION)?.id)
+            .toBe(Entities.ADO_ORGANIZATION);
 
     });
 
     it(`Reconcile an organization entity with uri 'http://kg.artsdata.ca/resource/KO-1`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: Entities.ORGANIZATION,
+            type: Entities.ADO_ORGANIZATION,
             conditions: [{
                 matchType: MatchTypeEnum.ID,
                 propertyValue: "http://kg.artsdata.ca/resource/KO-1",
@@ -79,8 +79,8 @@ describe('Test matching organizations using sparql query v1', () => {
         expect(actualResult?.id).toBe("KO-1");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeTruthy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Organization")?.id)
-            .toBe("http://schema.org/Organization");
+        expect(actualResult?.type?.find(type => type.id === Entities.ADO_ORGANIZATION)?.id)
+            .toBe(Entities.ADO_ORGANIZATION);
     });
 });
 
@@ -110,7 +110,7 @@ describe('Test reconciling Organizations using sparql query version 2', () => {
     it('Reconcile an organization with name `Place Bell`, which is exact match', async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: Entities.ORGANIZATION,
+            type: Entities.ADO_ORGANIZATION,
             conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Place Bell"}],
             limit: 1
         };
@@ -125,15 +125,38 @@ describe('Test reconciling Organizations using sparql query version 2', () => {
         expect(actualResult?.id).toBe("KO-1");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeTruthy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Organization")?.id)
-            .toBe("http://schema.org/Organization");
+        expect(actualResult?.type?.find(type => type.id === Entities.ADO_ORGANIZATION)?.id)
+            .toBe(Entities.ADO_ORGANIZATION);
+
+    });
+
+    it('Reconcile an agent with name `Place Bell`, which is exact match', async () => {
+
+        const reconciliationQuery: ReconciliationQuery = {
+            type: Entities.AGENT,
+            conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Place Bell"}],
+            limit: 1
+        };
+
+        const response = await matchService.reconcileByQueries(LanguageEnum.ENGLISH,
+            {queries: [reconciliationQuery]}, SparqlVersionEnum.V2);
+
+        expect(response.results).toHaveLength(1);
+        const allResults = response.results?.[0]?.candidates;
+        const actualResult = allResults?.[0];
+
+        expect(actualResult?.id).toBe("KO-1");
+        expect(allResults?.length).toBe(1);
+        expect(actualResult?.match).toBeTruthy();
+        expect(actualResult?.type?.find(type => type.id === Entities.ADO_ORGANIZATION)?.id)
+            .toBe(Entities.ADO_ORGANIZATION);
 
     });
 
     it(`Reconcile an organization entity with uri 'http://kg.artsdata.ca/resource/KO-1`, async () => {
 
         const reconciliationQuery: ReconciliationQuery = {
-            type: Entities.ORGANIZATION,
+            type: Entities.ADO_ORGANIZATION,
             conditions: [{
                 matchType: MatchTypeEnum.ID,
                 propertyValue: "http://kg.artsdata.ca/resource/KO-1",
@@ -152,7 +175,7 @@ describe('Test reconciling Organizations using sparql query version 2', () => {
         expect(actualResult?.id).toBe("KO-1");
         expect(allResults?.length).toBe(1);
         expect(actualResult?.match).toBeTruthy();
-        expect(actualResult?.type?.find(type => type.id === "http://schema.org/Organization")?.id)
-            .toBe("http://schema.org/Organization");
+        expect(actualResult?.type?.find(type => type.id === Entities.ADO_ORGANIZATION)?.id)
+            .toBe(Entities.ADO_ORGANIZATION);
     });
 });

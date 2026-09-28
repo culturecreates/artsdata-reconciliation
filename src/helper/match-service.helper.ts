@@ -81,7 +81,7 @@ export class MatchServiceHelper {
             const resultCandidate = new ResultCandidates();
 
             const resultCandidateUri = currentBinding["entity"].value
-            resultCandidate.id = resultCandidateUri?.split(ArtsdataConstants.PREFIX).pop();
+            resultCandidate.id = resultCandidateUri?.split(ArtsdataConstants.PREFIX_ADR).pop();
             const name = currentBinding["name"]?.value;
             const description = currentBinding["description"]?.value;
             const subEventSet = new Set();
@@ -189,7 +189,7 @@ export class MatchServiceHelper {
 
     static isQueryByURIOrArtsdataId(query: string) {
         const artsdataIdPattern = "^K[0-9]+-[0-9]+$";
-        return !!(query?.match(artsdataIdPattern) || (this.isValidURI(query) && query.startsWith(ArtsdataConstants.PREFIX)));
+        return !!(query?.match(artsdataIdPattern) || (this.isValidURI(query) && query.startsWith(ArtsdataConstants.PREFIX_ADR)));
     }
 
     static isAutoMatch(recordFetched: {
@@ -406,27 +406,31 @@ export class MatchServiceHelper {
         ];
         if (!checkIfTypeIsMatching) {
             return false;
-        } else if (reconciliationQuery.type === Entities.PLACE) {
-            return (
-                checkIfWikidataIdIsExactMatchAndIDisNotDifferent.every(Boolean) ||
-                checkIfIdIsExactMatchAndWikidataisNotDifferent.every(Boolean) ||
-                checkIfNameIsClosePostalCodeIsExactWikidataIsNotDifferentAndIDisNotDifferent.every(Boolean) ||
-                checkIfNameAddressLocalityAreCloseAndPostalCodeWikidataAndIDIsNotDifferentForPlace.every(Boolean) ||
-                checkIfNameIsCloseUrlIsExactAndPostalCodeWikidataAndIdIsNotDifferentForPlace.every(Boolean)
-            );
-        } else if (reconciliationQuery.type === Entities.EVENT) {
-            return (
-                checksNameStartDateEndDatePlaceUriAndSubEventsMatchForEvents.every(Boolean) ||
-                checksNameStartDateEndDatePlaceNamePostalCodeAndSubEventsMatchForEvents.every(Boolean)
-            );
-        } else {
-            // All other types (person, organization, agent, concept, event type, live performance work)
-            return (
-                checkIfWikidataIdIsExactMatchAndISNIAndIdAreNotDifferent.every(Boolean) ||
-                checkIfISNIIsExactMatchAndWikidataAndIdAreNotDifferent.every(Boolean) ||
-                checkIfIdIsExactMatchAndWikidataAndISNIAreNotDifferent.every(Boolean) ||
-                checkIfNameIsCloseAndWikidataIdISNIAndIdAreNotDifferentIfBothPresent.every(Boolean)
-            );
+        }
+        switch (reconciliationQuery.type) {
+            case Entities.PLACE:
+            case Entities.ADO_PLACE:
+                return (
+                    checkIfWikidataIdIsExactMatchAndIDisNotDifferent.every(Boolean) ||
+                    checkIfIdIsExactMatchAndWikidataisNotDifferent.every(Boolean) ||
+                    checkIfNameIsClosePostalCodeIsExactWikidataIsNotDifferentAndIDisNotDifferent.every(Boolean) ||
+                    checkIfNameAddressLocalityAreCloseAndPostalCodeWikidataAndIDIsNotDifferentForPlace.every(Boolean) ||
+                    checkIfNameIsCloseUrlIsExactAndPostalCodeWikidataAndIdIsNotDifferentForPlace.every(Boolean)
+                );
+            case Entities.EVENT:
+            case Entities.ADO_EVENT:
+                return (
+                    checksNameStartDateEndDatePlaceUriAndSubEventsMatchForEvents.every(Boolean) ||
+                    checksNameStartDateEndDatePlaceNamePostalCodeAndSubEventsMatchForEvents.every(Boolean)
+                );
+            default:
+                // All other types
+                return (
+                    checkIfWikidataIdIsExactMatchAndISNIAndIdAreNotDifferent.every(Boolean) ||
+                    checkIfISNIIsExactMatchAndWikidataAndIdAreNotDifferent.every(Boolean) ||
+                    checkIfIdIsExactMatchAndWikidataAndISNIAreNotDifferent.every(Boolean) ||
+                    checkIfNameIsCloseAndWikidataIdISNIAndIdAreNotDifferentIfBothPresent.every(Boolean)
+                );
         }
     }
 
