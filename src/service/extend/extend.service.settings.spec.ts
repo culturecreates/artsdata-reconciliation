@@ -76,6 +76,9 @@ describe('ExtendService', () => {
                                 "values": [
                                     {
                                         "id": "http://schema.org/Event"
+                                    },
+                                    {
+                                        "id": "http://kg.artsdata.ca/ontology/Event"
                                     }
                                 ]
                             },
@@ -154,6 +157,9 @@ describe('ExtendService', () => {
                                 "values": [
                                     {
                                         "id": "http://schema.org/Event"
+                                    },
+                                    {
+                                        "id": "http://kg.artsdata.ca/ontology/Event"
                                     }
                                 ]
                             },
@@ -184,6 +190,9 @@ describe('ExtendService', () => {
                                                 "values": [
                                                     {
                                                         "id": "http://schema.org/Organization"
+                                                    },
+                                                    {
+                                                        "id": "http://kg.artsdata.ca/ontology/Organization"
                                                     }
                                                 ]
                                             },
