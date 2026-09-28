@@ -4,6 +4,7 @@ import {MatchService} from "../../service";
 import {ReconciliationRequest, ReconciliationResponse} from "../../dto";
 import {LanguageEnum} from "../../enum";
 import {Response} from "express";
+import {Entities} from "../../constant";
 
 @Controller()
 @ApiTags("Match Service APIs")
@@ -60,7 +61,7 @@ Escape Regex operators like dot (.) and plus (+) when searching for the literal 
                 value: JSON.stringify({
                     queries: [
                         {
-                            type: "http://schema.org/Place",
+                            type: Entities.ADO_PLACE,
                             limit: 2,
                             conditions: [
                                 {
@@ -79,7 +80,7 @@ Escape Regex operators like dot (.) and plus (+) when searching for the literal 
                 value: JSON.stringify({
                     queries: [
                         {
-                            type: "http://schema.org/Organization",
+                            type: Entities.ADO_ORGANIZATION,
                             conditions: [
                                 {
                                     matchType: "property",
@@ -100,7 +101,7 @@ Escape Regex operators like dot (.) and plus (+) when searching for the literal 
                 value: JSON.stringify({
                     queries: [
                         {
-                            type: "http://schema.org/Organization",
+                            type: Entities.ADO_ORGANIZATION,
                             conditions: [
                                 {
                                     matchType: "property",
@@ -181,7 +182,7 @@ Example:
                 value: {
                     queries: [
                         {
-                            type: "http://schema.org/Place",
+                            type: Entities.ADO_PLACE,
                             limit: 2,
                             conditions: [
                                 {
@@ -200,7 +201,7 @@ Example:
                 value: {
                     queries: [
                         {
-                            type: "http://schema.org/Organization",
+                            type: Entities.ADO_ORGANIZATION,
                             conditions: [
                                 {
                                     matchType: "property",
@@ -221,7 +222,7 @@ Example:
                 value: {
                     queries: [
                         {
-                            type: "http://schema.org/Organization",
+                            type: Entities.ADO_ORGANIZATION,
                             conditions: [
                                 {
                                     matchType: "property",

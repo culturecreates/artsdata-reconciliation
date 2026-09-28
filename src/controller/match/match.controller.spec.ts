@@ -9,6 +9,7 @@ import {validate} from "class-validator";
 import {dropIndexAndTheGraph, uploadDataSetAndCreateLuceneConnector} from "../../../test/util/common-util";
 import {IndexFileNameEnum} from "../../enum/index-names.enum";
 import {MatchServiceHelper} from "../../helper";
+import {Entities} from "../../constant";
 
 describe('MatchController', () => {
     let app: INestApplication;
@@ -106,7 +107,7 @@ describe('MatchController - type as fully qualified URI and not', () => {
                 "queries": [
                     {
                         conditions: [{matchType: MatchTypeEnum.NAME, propertyValue: "Place Bell"}],
-                        type: "http://schema.org/Place",
+                        type: Entities.PLACE,
                         limit: 5
                     }
                 ]
@@ -117,8 +118,8 @@ describe('MatchController - type as fully qualified URI and not', () => {
 
             const resultCandidates = response.results?.[0]?.candidates;
             resultCandidates.forEach(actualResult => {
-                expect(actualResult?.type?.find(type => type.id === "http://schema.org/Place")?.id)
-                    .toBe("http://schema.org/Place");
+                expect(actualResult?.type?.find(type => type.id === Entities.PLACE)?.id)
+                    .toBe(Entities.PLACE);
             })
 
         });
@@ -140,8 +141,8 @@ describe('MatchController - type as fully qualified URI and not', () => {
 
             const resultCandidates = response.results?.[0]?.candidates;
             resultCandidates.forEach(actualResult => {
-                expect(actualResult?.type?.find(type => type.id === "http://schema.org/Place")?.id)
-                    .toBe("http://schema.org/Place");
+                expect(actualResult?.type?.find(type => type.id === Entities.PLACE)?.id)
+                    .toBe(Entities.PLACE);
             })
         });
 

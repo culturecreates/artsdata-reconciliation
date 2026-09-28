@@ -17,7 +17,7 @@ describe('isAutoMatch', () => {
             ],
         };
         const additionalProperties = {postalCode: 'H7N 0E4',
-            types: ['http://schema.org/Place']};
+            types: [Entities.PLACE]};
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
             recordFromQuery);
@@ -39,7 +39,7 @@ describe('isAutoMatch', () => {
             ],
         };
         const additionalProperties = {postalCode: 'H7N 055',
-            types: ['http://schema.org/Place']};
+            types: [Entities.PLACE]};
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
             recordFromQuery);
@@ -65,7 +65,7 @@ describe('isAutoMatch', () => {
             ],
         };
         const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval',
-            types: ['http://schema.org/Place']};
+            types: [Entities.PLACE]};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -92,7 +92,7 @@ describe('isAutoMatch', () => {
             ],
         };
         const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval',
-            types: ['http://schema.org/Place']};
+            types: [Entities.PLACE]};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -118,7 +118,7 @@ describe('isAutoMatch', () => {
             ],
         };
         const additionalProperties = {addressLocality: 'Laval',
-            types: ['http://schema.org/Place']};
+            types: [Entities.PLACE]};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -140,7 +140,7 @@ describe('isAutoMatch', () => {
             ],
         };
         const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval',
-            types: ['http://schema.org/Place']};
+            types: [Entities.PLACE]};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -163,7 +163,7 @@ describe('isAutoMatch', () => {
             ],
         };
         const additionalProperties = {postalCode: 'H7N 0E4', addressLocality: 'Laval',
-            types: ['http://schema.org/Place']};
+            types: [Entities.PLACE]};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -185,7 +185,7 @@ describe('isAutoMatch', () => {
             ],
         };
         const additionalProperties = {addressLocality: 'Laval',
-            types: ['http://schema.org/Place']};
+            types: [Entities.PLACE]};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -208,7 +208,7 @@ describe('isAutoMatch', () => {
             ],
         };
         const additionalProperties = {url: "http://www.placebell.ca/fr",
-            types: ['http://schema.org/Place']};
+            types: [Entities.PLACE]};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -231,7 +231,7 @@ describe('isAutoMatch', () => {
             ],
         };
         const additionalProperties = {url: 'http://www.placebell.ca/fr',
-            types: ['http://schema.org/Place']};
+            types: [Entities.PLACE]};
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
         const result = MatchServiceHelper.isAutoMatch(recordFetched, reconciliationQuery, additionalProperties,
@@ -255,7 +255,7 @@ describe('isAutoMatch', () => {
         };
         const additionalProperties = {
             url: 'http://www.wrong-domain.com/',
-            types: ['http://schema.org/Place']
+            types: [Entities.PLACE]
         };
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);
@@ -285,7 +285,7 @@ describe('isAutoMatch', () => {
         const additionalProperties = {
             isni: 'https://isni.org/isni/0000000123456789',
             wikidata: 'http://www.wikidata.org/entity/Q12345',
-            types: ['http://schema.org/Place']
+            types: [Entities.PLACE]
         };
 
         const recordFromQuery = (MatchServiceHelper as any)['extractRecordFromQuery'](reconciliationQuery);

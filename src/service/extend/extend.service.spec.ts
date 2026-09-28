@@ -33,7 +33,7 @@ describe('ExtendService', () => {
             }
             const result = await extendService.getDataExtension(extendRequest);
 
-            const expectedResult ={
+            const expectedResult = {
                 "meta": [
                     {
                         "id": "type",
@@ -67,7 +67,8 @@ describe('ExtendService', () => {
                                 "id": "name",
                                 "values": [
                                     {
-                                        "str": "Event One"}
+                                        "str": "Event One"
+                                    }
                                 ]
                             },
                             {
@@ -104,9 +105,9 @@ describe('ExtendService', () => {
                             "id": "type",
                             "values": [
                                 {
-                                    "id": "http://schema.org/Place"
-                                },{
-                                    "id": "http://kg.artsdata.ca/ontology/Place"
+                                    "id": Entities.PLACE
+                                }, {
+                                    "id": Entities.ADO_PLACE
                                 }
                             ]
                         },
@@ -144,9 +145,9 @@ describe('ExtendService', () => {
                             "id": "type",
                             "values": [
                                 {
-                                    "id": "http://schema.org/Organization"
-                                },{
-                                "id": "http://kg.artsdata.ca/ontology/Organization"
+                                    "id": Entities.ORGANIZATION
+                                }, {
+                                    "id": Entities.ADO_ORGANIZATION
                                 }
                             ]
                         },
