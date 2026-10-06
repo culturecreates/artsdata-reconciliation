@@ -13,6 +13,9 @@ export class ExtendQueryPropertySettings {
 export class ExtendQueryProperty {
     @ApiProperty({type: String})
     @IsString()
+    @Transform(({value}) =>
+        value?.split("http://schema.org/").pop()
+    )
     id: string;
 
     @ApiPropertyOptional({type: ExtendQueryPropertySettings})
