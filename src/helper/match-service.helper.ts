@@ -562,7 +562,7 @@ export class MatchServiceHelper {
         if ([ArtsdataProperties.START_DATE, ArtsdataProperties.END_DATE].includes(id)) {
             qualifiers.push({
                 id: MatchQualifierEnum.DATE_RANGE,
-                name: "Date range"
+                name: "Date range (Format: YYYY-MM-DD[THH:MM:SSZ]/YYYY-MM-DD[THH:MM:SSZ])"
             })
         }
         return qualifiers;
