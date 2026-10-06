@@ -243,9 +243,8 @@ export class MatchServiceHelper {
                 if (!a || !b) return true;
                 return a === b;
             },
-            listNotDifferentIfBothExists: (a: string[] | undefined, b: string[] | undefined) => {
-                if (!a || !b) return true;
-                return a.every(item => b.includes(item));
+            hasAtLeastOneIfBothExists: (a: string[] | undefined, b: string[] | undefined) => {
+                return Boolean(a?.length) === Boolean(b?.length);
             },
             any: (resultValue: string[] | undefined, queryValue: string | undefined) => {
                 if (!resultValue || !queryValue) return false;
@@ -379,7 +378,7 @@ export class MatchServiceHelper {
             matchers.notDifferentIfBothExists(additionalProperties.uri, recordFromQuery.id)
         ];
 
-        const checksNameStartDateEndDatePlaceUriAndSubEventsMatchForEvents = [
+        const checksNameIsCloseStartDateAndPlaceUriIsExactEndDateIsCloseHasSubEventsAndIDNotDifferent = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate),
             matchers.exactLocationOrRelated(
@@ -393,10 +392,11 @@ export class MatchServiceHelper {
             matchers.closeDates(additionalProperties.startDate, recordFromQuery.startDate as string,
                 additionalProperties.endDate, recordFromQuery.endDate,
             ),
-            matchers.listNotDifferentIfBothExists(additionalProperties.subEvents, recordFromQuery.subEvents)
+            matchers.notDifferentIfBothExists(additionalProperties.uri, recordFromQuery.id),
+            matchers.hasAtLeastOneIfBothExists(additionalProperties.subEvents, recordFromQuery.subEvents)
         ];
 
-        const checksNameStartDateEndDatePlaceNamePostalCodeAndSubEventsMatchForEvents = [
+        const checksNamePlaceNameEndDateIsCloseStartDatePostalCodeIsExactHasSubEventsAndIDNotDifferent = [
             matchers.veryClose(recordFetched.name, recordFromQuery.name, additionalProperties.alternateName),
             matchers.exactDate(additionalProperties.startDate, recordFromQuery.startDate),
             matchers.exact(additionalProperties.postalCode, recordFromQuery.postalCode, true),
@@ -404,9 +404,11 @@ export class MatchServiceHelper {
             matchers.closeDates(
                 additionalProperties.startDate, recordFromQuery.startDate as string, additionalProperties.endDate,
                 recordFromQuery.endDate),
-            matchers.listNotDifferentIfBothExists(additionalProperties.subEvents, recordFromQuery.subEvents)
-
+            matchers.notDifferentIfBothExists(additionalProperties.uri, recordFromQuery.id),
+            matchers.hasAtLeastOneIfBothExists(additionalProperties.subEvents, recordFromQuery.subEvents)
         ];
+        const checkIfIDIsExact: boolean = matchers.exact(additionalProperties.uri, recordFromQuery.id)
+
         if (!checkIfTypeIsMatching) {
             return false;
         }
@@ -423,8 +425,9 @@ export class MatchServiceHelper {
             case Entities.EVENT:
             case Entities.ADO_EVENT:
                 return (
-                    checksNameStartDateEndDatePlaceUriAndSubEventsMatchForEvents.every(Boolean) ||
-                    checksNameStartDateEndDatePlaceNamePostalCodeAndSubEventsMatchForEvents.every(Boolean)
+                    checksNameIsCloseStartDateAndPlaceUriIsExactEndDateIsCloseHasSubEventsAndIDNotDifferent.every(Boolean) ||
+                    checksNamePlaceNameEndDateIsCloseStartDatePostalCodeIsExactHasSubEventsAndIDNotDifferent.every(Boolean) ||
+                    checkIfIDIsExact
                 );
             default:
                 // All other types
