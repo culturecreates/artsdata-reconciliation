@@ -47,7 +47,7 @@ export class MatchServiceHelper {
 
     static generateDateQuery(value: string, propertyId: string) {
         const hours = 24;
-        const boostScore = 2;
+        const boostScore = propertyId === "startDate" ? 2 : 1;
 
         const trimmed = value.trim();
         const normalised = /T[^Z+-]*$/.test(trimmed) ? `${trimmed}Z` : trimmed;
