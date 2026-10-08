@@ -157,12 +157,16 @@ export class MatchServiceHelper {
 
         switch (type) {
             case Entities.EVENT:
+            case Entities.ADO_EVENT:
                 return GRAPHDB_INDEX.EVENT;
             case Entities.PLACE:
+            case Entities.ADO_PLACE:
                 return GRAPHDB_INDEX.PLACE;
             case Entities.ORGANIZATION:
+            case Entities.ADO_ORGANIZATION:
                 return GRAPHDB_INDEX.ORGANIZATION;
             case Entities.PERSON:
+            case Entities.ADO_PERSON:
                 return GRAPHDB_INDEX.PERSON;
             case Entities.AGENT:
                 return GRAPHDB_INDEX.AGENT;
