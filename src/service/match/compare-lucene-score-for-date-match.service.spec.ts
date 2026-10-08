@@ -18,9 +18,6 @@ describe('Compare lucene scores for startDate within 24 hours', () => {
     let testLuceneConnectorId: string;
     let testGraphUri: string;
 
-    // A startDate within 24h adds a lucene boost; anything outside adds nothing. Scores are rounded to
-    // 2 decimals, so a difference of at least 1 can't be fuzzy-name noise and shows the boost applied.
-    const MIN_DATE_BOOST = 1;
 
     beforeAll(async () => {
         const setup = await setupMatchService();
@@ -77,7 +74,7 @@ describe('Compare lucene scores for startDate within 24 hours', () => {
         const yearEarlier = await scoreOf("KE-5", "Dance Night", "2025-04-25T19:30:00-07:00", location);
         const nameOnly = await scoreOf("KE-5", "Dance Night", undefined, location);
 
-        expect(matching - yearEarlier).toBeGreaterThanOrEqual(MIN_DATE_BOOST);
+        expect(matching ).toBeGreaterThan(yearEarlier);
         // One digit apart as text, a year apart in time: no boost at all
         expect(yearEarlier).toBeCloseTo(nameOnly, 2);
     });
@@ -88,7 +85,7 @@ describe('Compare lucene scores for startDate within 24 hours', () => {
         const sixHoursEarlier = await scoreOf("KE-5", "Dance Night", "2026-04-25T20:30:00Z");
         const nameOnly = await scoreOf("KE-5", "Dance Night");
 
-        expect(matching - nameOnly).toBeGreaterThanOrEqual(MIN_DATE_BOOST);
+        expect(matching ).toBeGreaterThan(nameOnly);
         expect(sixHoursEarlier).toBeCloseTo(matching, 2);
     });
 

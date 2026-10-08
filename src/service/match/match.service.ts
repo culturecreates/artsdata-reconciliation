@@ -588,8 +588,10 @@ export class MatchService {
         const values = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
         return values
             .map((value) => {
-                if (propertyId === "startDate" || propertyId === "endDate") {
-                    return `${MatchServiceHelper.generateDateQuery(value, propertyId)}`
+                if (propertyId === "startDate") {
+                    return `${MatchServiceHelper.generateStartDateQuery(value, propertyId)}`
+                } else if (propertyId === "endDate") {
+                    return `${MatchServiceHelper.generateEndDateQuery(value, propertyId)}`
                 } else {
                     return `${MatchServiceHelper.transformSearchQuery(value, propertyId)}`
                 }

@@ -45,9 +45,8 @@ export class MatchServiceHelper {
         }
     }
 
-    static generateDateQuery(value: string, propertyId: string) {
+    static generateStartDateQuery(value: string, propertyId: string) {
         const hours = 24;
-        const boostScore = propertyId === "startDate" ? 2 : 1;
 
         const trimmed = value.trim();
         const normalised = /T[^Z+-]*$/.test(trimmed) ? `${trimmed}Z` : trimmed;
@@ -62,8 +61,24 @@ export class MatchServiceHelper {
         const dt = (d: Date): string => d.toISOString().slice(0, 19).replace(/[-:T]/g, "");
         const dd = (d: Date): string => dt(d).slice(0, 8);
 
-        return `(${propertyId}Time:[${dt(lo)} TO ${dt(hi)}]^${boostScore} ` +
-            `${propertyId}:[${dd(lo)} TO ${dd(hi)}]^${boostScore})`;
+        return `(${propertyId}Time:[${dt(lo)} TO ${dt(hi)}] ` +
+            `${propertyId}:[${dd(lo)} TO ${dd(hi)}])`;
+    }
+
+    static generateEndDateQuery(value: string, propertyId: string) {
+
+        const trimmed = value.trim();
+        const normalised = /T[^Z+-]*$/.test(trimmed) ? `${trimmed}Z` : trimmed;
+
+        const dateObject = new Date(normalised);
+        if (isNaN(dateObject.getTime())) throw new Error(`Invalid date: ${value}`);
+
+        const endDate = new Date(dateObject.getTime());
+
+        const dt = (d: Date): string => d.toISOString().slice(0, 19).replace(/[-:T]/g, "");
+        const dd = (d: Date): string => dt(d).slice(0, 8);
+
+        return `(${propertyId}Time:${dt(endDate)} ${propertyId}:${dd(endDate)})`;
     }
 
     static formatReconciliationResponse(responseLanguage: LanguageEnum, sparqlResponse: any,
