@@ -336,9 +336,16 @@ export class MatchServiceHelper {
             matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
         ];
 
-        if ((additionalProperties.types?.includes(Entities.PERSON) || additionalProperties.types?.includes(Entities.ORGANIZATION)) &&
-            (!additionalProperties.types?.includes(Entities.AGENT))) {
-            additionalProperties.types.push(Entities.AGENT)
+        const types = additionalProperties.types ?? [];
+        const agentTypes = [
+            Entities.PERSON,
+            Entities.ORGANIZATION,
+            Entities.ADO_PERSON,
+            Entities.ADO_ORGANIZATION,
+        ];
+
+        if (agentTypes.some(t => types.includes(t)) && !types.includes(Entities.AGENT)) {
+            types.push(Entities.AGENT);
         }
 
         const checkIfTypeIsMatching = matchers.any(additionalProperties.types, recordFromQuery.type);
