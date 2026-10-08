@@ -46,25 +46,21 @@ export class MatchServiceHelper {
     }
 
     static generateDateQuery(value: string, propertyId: string) {
-        const xsdDateRegex = /^-?\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])(Z|[+-](0\d|1[0-4]):[0-5]\d)?$/;
+        const hours = 24;
+        const boostScore = 2;
 
-        function toLuceneDate(value: string) {
-            const iso = new Date(value).toISOString();
+        const dateObject = new Date(value);
+        if (isNaN(dateObject.getTime())) throw new Error(`Invalid date: ${value}`);
 
-            return iso
-                .slice(0, 19)
-                .replace(/[-:T]/g, '');
-        }
+        const ms = hours * 3600 * 1000;
+        const lo = new Date(dateObject.getTime() - ms);
+        const hi = new Date(dateObject.getTime() + ms);
 
-        if (xsdDateRegex.test(value)) {
-            const startDateRange = toLuceneDate(value);
-            const endDateRange = toLuceneDate(`${value}T23:59:59Z`);
+        const dt = (d: Date): string => d.toISOString().slice(0, 19).replace(/[-:T]/g, "");
+        const dd = (d: Date): string => dt(d).slice(0, 8);
 
-            return `( ${propertyId}:${startDateRange.slice(0, 8)} OR ${propertyId}Time:[${startDateRange} TO ${endDateRange}] )`;
-        } else {
-            return `( ${propertyId}Time:${toLuceneDate(value)}^3 )`;
-        }
-
+        return `(${propertyId}Time:[${dt(lo)} TO ${dt(hi)}]^${boostScore} ` +
+            `${propertyId}:[${dd(lo)} TO ${dd(hi)}]^${boostScore})`;
     }
 
     static formatReconciliationResponse(responseLanguage: LanguageEnum, sparqlResponse: any,
