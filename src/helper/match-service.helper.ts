@@ -49,7 +49,10 @@ export class MatchServiceHelper {
         const hours = 24;
         const boostScore = 2;
 
-        const dateObject = new Date(value);
+        const trimmed = value.trim();
+        const normalised = /T[^Z+-]*$/.test(trimmed) ? `${trimmed}Z` : trimmed;
+
+        const dateObject = new Date(normalised);
         if (isNaN(dateObject.getTime())) throw new Error(`Invalid date: ${value}`);
 
         const ms = hours * 3600 * 1000;
