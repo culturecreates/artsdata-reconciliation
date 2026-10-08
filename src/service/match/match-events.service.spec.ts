@@ -655,7 +655,6 @@ describe('Reconcile events with contained in place', () => {
 
 });
 
-
 describe('Test reconciling events using sparql query version 2', () => {
 
     let matchService: MatchService;

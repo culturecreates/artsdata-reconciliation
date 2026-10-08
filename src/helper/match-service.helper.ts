@@ -46,25 +46,24 @@ export class MatchServiceHelper {
     }
 
     static generateDateQuery(value: string, propertyId: string) {
-        const xsdDateRegex = /^-?\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])(Z|[+-](0\d|1[0-4]):[0-5]\d)?$/;
+        const hours = 24;
+        const boostScore = 2;
 
-        function toLuceneDate(value: string) {
-            const iso = new Date(value).toISOString();
+        const trimmed = value.trim();
+        const normalised = /T[^Z+-]*$/.test(trimmed) ? `${trimmed}Z` : trimmed;
 
-            return iso
-                .slice(0, 19)
-                .replace(/[-:T]/g, '');
-        }
+        const dateObject = new Date(normalised);
+        if (isNaN(dateObject.getTime())) throw new Error(`Invalid date: ${value}`);
 
-        if (xsdDateRegex.test(value)) {
-            const startDateRange = toLuceneDate(value);
-            const endDateRange = toLuceneDate(`${value}T23:59:59Z`);
+        const ms = hours * 3600 * 1000;
+        const lo = new Date(dateObject.getTime() - ms);
+        const hi = new Date(dateObject.getTime() + ms);
 
-            return `( ${propertyId}:${startDateRange.slice(0, 8)} OR ${propertyId}Time:[${startDateRange} TO ${endDateRange}] )`;
-        } else {
-            return `( ${propertyId}Time:${toLuceneDate(value)}^3 )`;
-        }
+        const dt = (d: Date): string => d.toISOString().slice(0, 19).replace(/[-:T]/g, "");
+        const dd = (d: Date): string => dt(d).slice(0, 8);
 
+        return `(${propertyId}Time:[${dt(lo)} TO ${dt(hi)}]^${boostScore} ` +
+            `${propertyId}:[${dd(lo)} TO ${dd(hi)}]^${boostScore})`;
     }
 
     static formatReconciliationResponse(responseLanguage: LanguageEnum, sparqlResponse: any,
@@ -161,12 +160,16 @@ export class MatchServiceHelper {
 
         switch (type) {
             case Entities.EVENT:
+            case Entities.ADO_EVENT:
                 return GRAPHDB_INDEX.EVENT;
             case Entities.PLACE:
+            case Entities.ADO_PLACE:
                 return GRAPHDB_INDEX.PLACE;
             case Entities.ORGANIZATION:
+            case Entities.ADO_ORGANIZATION:
                 return GRAPHDB_INDEX.ORGANIZATION;
             case Entities.PERSON:
+            case Entities.ADO_PERSON:
                 return GRAPHDB_INDEX.PERSON;
             case Entities.AGENT:
                 return GRAPHDB_INDEX.AGENT;
@@ -336,9 +339,16 @@ export class MatchServiceHelper {
             matchers.notDifferentIfBothExists(additionalProperties.wikidata, recordFromQuery.wikidata)
         ];
 
-        if ((additionalProperties.types?.includes(Entities.PERSON) || additionalProperties.types?.includes(Entities.ORGANIZATION)) &&
-            (!additionalProperties.types?.includes(Entities.AGENT))) {
-            additionalProperties.types.push(Entities.AGENT)
+        const types = additionalProperties.types ?? [];
+        const agentTypes = [
+            Entities.PERSON,
+            Entities.ORGANIZATION,
+            Entities.ADO_PERSON,
+            Entities.ADO_ORGANIZATION,
+        ];
+
+        if (agentTypes.some(t => types.includes(t)) && !types.includes(Entities.AGENT)) {
+            types.push(Entities.AGENT);
         }
 
         const checkIfTypeIsMatching = matchers.any(additionalProperties.types, recordFromQuery.type);

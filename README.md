@@ -222,6 +222,20 @@ npm run test:watch
 
 ```
 
+Tests run against a GraphDB at `ARTSDATA_ENDPOINT` (from `.env.test`, default `http://localhost:7200/`).
+The jest global setup (`test/setup.ts`):
+
+- reuses GraphDB if it is already running there, otherwise starts it with Docker using
+  `test/graph-db/docker-compose.yml` (Docker must be running);
+- creates a fresh repository for the run, named `recon-test-<yyyyMMddHHmmss>` (e.g. `recon-test-20261008112130`),
+  from `test/graph-db/data/config.ttl`, and points every suite at it;
+- removes run repositories older than 6 hours that an interrupted run left behind.
+
+The global teardown (`test/teardown.ts`) deletes the run's repository when all suites have finished.
+
+The GraphDB container is left running so later runs start immediately. Stop it with
+`docker compose -f test/graph-db/docker-compose.yml down`.
+
 
 ## API Documentation
 
