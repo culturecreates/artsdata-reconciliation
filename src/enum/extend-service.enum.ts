@@ -22,3 +22,11 @@ export enum ProposedEntityTypeEnum {
   LIVE_PERFORMANCE_WORK = "LivePerformanceWork"
 
 }
+export enum ExtendExternalGraphTypeEnum {
+  EVENT = "Event" ,
+  PLACE = "Place" ,
+  PERSON = "Person" ,
+  ORGANIZATION = "Organization" ,
+  AGENT = "Agent" ,
+  PERFORMANCE_WORK = "PerformanceWork"
+}
