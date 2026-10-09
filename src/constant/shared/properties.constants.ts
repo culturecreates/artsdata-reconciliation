@@ -34,6 +34,7 @@ export const RDF = {
 
 export const SCHEMA = {
     NAME: `${PREFIXES.SCHEMA}name`,
+    ALTERNATE_NAME: `${PREFIXES.SCHEMA}alternateName`,
     URL: `${PREFIXES.SCHEMA}url`,
     SAME_AS: `${PREFIXES.SCHEMA}sameAs`,
     IMAGE: `${PREFIXES.SCHEMA}image`,
@@ -59,7 +60,8 @@ export const SCHEMA = {
     GENRE: `${PREFIXES.SCHEMA}genre`,
     CONTRIBUTOR: `${PREFIXES.SCHEMA}contributor`,
     PRODUCER: `${PREFIXES.SCHEMA}producer`,
-
+    IDENTIFIER: `${PREFIXES.SCHEMA}identifier`,
+    HAS_OCCUPATION: `${PREFIXES.SCHEMA}hasOccupation`
 };
 
 export const RDFS = {
