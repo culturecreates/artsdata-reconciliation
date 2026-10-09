@@ -1,4 +1,4 @@
-import {EntityClassEnum} from "../../enum";
+import {EntityClassEnum, ExtendExternalGraphTypeEnum} from "../../enum";
 import {dropGraph, setupExtendService, uploadDataSet} from "../../../test/util/common-util";
 import {ExtendService} from "./extend.service";
 import {BadRequestException} from "@nestjs/common";
@@ -40,7 +40,7 @@ describe('Test Extend by graph URI', () => {
     it('Should return all people from the external graph ', async () => {
 
         const results = await extendService
-            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.PERSON, [], "", 1, 100);
+            .getExtendDataFromGraph(externalGraphURI, ExtendExternalGraphTypeEnum.PERSON, [], "", 1, 100);
 
         const expectedResult = [
             {
@@ -72,7 +72,7 @@ describe('Test Extend by graph URI', () => {
     it('Should return people from the external graph with filter by a URI', async () => {
 
         const results = await extendService
-            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.PERSON,
+            .getExtendDataFromGraph(externalGraphURI, ExtendExternalGraphTypeEnum.PERSON,
                 ["http://external-source.com/resource/Person1"], "", 1, 100);
 
         const expectedResult = [
@@ -97,7 +97,7 @@ describe('Test Extend by graph URI', () => {
     it('Should return people from the external graph with filter by URI that do not exist', async () => {
 
         const results = await extendService
-            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.PERSON,
+            .getExtendDataFromGraph(externalGraphURI, ExtendExternalGraphTypeEnum.PERSON,
                 ["http://external-source.com/resource/entity-not-exist"], "", 1, 100);
 
         expect(results).toHaveLength(0);
@@ -106,7 +106,7 @@ describe('Test Extend by graph URI', () => {
     it('Should return people from the external graph with filter by URI that is invalid', async () => {
 
         await expect(extendService
-            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.PERSON,
+            .getExtendDataFromGraph(externalGraphURI, ExtendExternalGraphTypeEnum.PERSON,
                 ["Invalid URI"], "", 1, 100))
             .rejects.toThrow(BadRequestException);
     });
@@ -115,7 +115,7 @@ describe('Test Extend by graph URI', () => {
 
 
         const results = await extendService
-            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.ORGANIZATION, [], "", 1, 100);
+            .getExtendDataFromGraph(externalGraphURI, ExtendExternalGraphTypeEnum.ORGANIZATION, [], "", 1, 100);
 
         const expectedResult = [
             {
@@ -144,7 +144,7 @@ describe('Test Extend by graph URI', () => {
 
 
         const results = await extendService
-            .getExtendDataFromGraph(externalGraphURI, EntityClassEnum.AGENT, [], "", 1, 100);
+            .getExtendDataFromGraph(externalGraphURI, ExtendExternalGraphTypeEnum.AGENT, [], "", 1, 100);
 
         const expectedResult = [
             {
