@@ -10,7 +10,7 @@ import {
     ProposedExtendProperty
 } from "../../dto/extend";
 import {QUERY_BY_GRAPH} from "../../constant/extend/query-by-graph.constants";
-import {ExpandablePropertyEnum, ExtendPropertySettingsEnum} from "../../enum";
+import {ExpandablePropertyEnum, ExtendPropertySettingsEnum, ProposedEntityTypeEnum} from "../../enum";
 import {DEFAULT_LITERAL_PROPERTIES, EXPANDABLE_PROPERTIES} from "../../constant/extend/expandable-properties.constants";
 import {FEATURE_FLAG} from "../../config";
 
@@ -58,18 +58,22 @@ export class ExtendService {
         return formattedResult;
     }
 
-    getProposedProperties(entityType: EntityClassEnum): ProposedExtendProperty {
+    getProposedProperties(entityType: ProposedEntityTypeEnum): ProposedExtendProperty {
         switch (entityType) {
-            case EntityClassEnum.EVENT:
+            case ProposedEntityTypeEnum.EVENT:
                 return PROPOSED_EXTEND_PROPERTIES_METADATA.EVENT;
-            case EntityClassEnum.PLACE:
+            case ProposedEntityTypeEnum.PLACE:
                 return PROPOSED_EXTEND_PROPERTIES_METADATA.PLACE;
-            case EntityClassEnum.PERSON:
+            case ProposedEntityTypeEnum.PERSON:
                 return PROPOSED_EXTEND_PROPERTIES_METADATA.PERSON;
-            case EntityClassEnum.ORGANIZATION:
+            case ProposedEntityTypeEnum.ORGANIZATION:
                 return PROPOSED_EXTEND_PROPERTIES_METADATA.ORGANIZATION;
-            case EntityClassEnum.AGENT:
+            case ProposedEntityTypeEnum.AGENT:
                 return PROPOSED_EXTEND_PROPERTIES_METADATA.AGENT;
+            case ProposedEntityTypeEnum.CONCEPT:
+                return PROPOSED_EXTEND_PROPERTIES_METADATA.CONCEPT;
+            case ProposedEntityTypeEnum.LIVE_PERFORMANCE_WORK:
+                return PROPOSED_EXTEND_PROPERTIES_METADATA.LIVE_PERFORMANCE_WORK;
             default:
                 throw Exception.badRequest("Invalid entity type");
         }

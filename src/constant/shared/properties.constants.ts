@@ -22,6 +22,7 @@ export const ArtsdataConstants = {
 export const PREFIXES = {
     SCHEMA: "http://schema.org/",
     RDF: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    RDFS: "http://www.w3.org/2000/01/rdf-schema#",
     SKOS: "http://www.w3.org/2004/02/skos/core#",
     DBO: "http://dbpedia.org/ontology/",
     ADO: "http://kg.artsdata.ca/ontology/"
@@ -29,6 +30,56 @@ export const PREFIXES = {
 
 export const RDF = {
     TYPE: `${PREFIXES.RDF}type`,
+};
+
+export const SCHEMA = {
+    NAME: `${PREFIXES.SCHEMA}name`,
+    URL: `${PREFIXES.SCHEMA}url`,
+    SAME_AS: `${PREFIXES.SCHEMA}sameAs`,
+    IMAGE: `${PREFIXES.SCHEMA}image`,
+    DESCRIPTION: `${PREFIXES.SCHEMA}description`,
+    DISAMBIGUATING_DESCRIPTION: `${PREFIXES.SCHEMA}disambiguatingDescription`,
+    ADDRESS: `${PREFIXES.SCHEMA}address`,
+    POSTAL_CODE: `${PREFIXES.SCHEMA}postalCode`,
+    ADDRESS_LOCALITY: `${PREFIXES.SCHEMA}addressLocality`,
+    ADDRESS_COUNTRY: `${PREFIXES.SCHEMA}addressCountry`,
+    ADDRESS_REGION: `${PREFIXES.SCHEMA}addressRegion`,
+    START_DATE: `${PREFIXES.SCHEMA}startDate`,
+    END_DATE: `${PREFIXES.SCHEMA}endDate`,
+    LOCATION: `${PREFIXES.SCHEMA}location`,
+    ORGANIZER: `${PREFIXES.SCHEMA}organizer`,
+    PERFORMER: `${PREFIXES.SCHEMA}performer`,
+    ADDITIONAL_TYPE: `${PREFIXES.SCHEMA}additionalType`,
+    MAIN_ENTITY_OF_PAGE: `${PREFIXES.SCHEMA}mainEntityOfPage`,
+    AUDIENCE: `${PREFIXES.SCHEMA}audience`,
+    EVENT_STATUS: `${PREFIXES.SCHEMA}eventStatus`,
+    IN_LANGUAGE: `${PREFIXES.SCHEMA}inLanguage`,
+    SUB_EVENT: `${PREFIXES.SCHEMA}subEvent`,
+    OFFERS: `${PREFIXES.SCHEMA}offers`,
+    GENRE: `${PREFIXES.SCHEMA}genre`,
+    CONTRIBUTOR: `${PREFIXES.SCHEMA}contributor`,
+    PRODUCER: `${PREFIXES.SCHEMA}producer`,
+
+};
+
+export const RDFS = {
+    LABEL: `${PREFIXES.RDFS}label`,
+    COMMENT: `${PREFIXES.RDFS}comment`,
+
+};
+
+export const SKOS = {
+    PREF_LABEL: `${PREFIXES.SKOS}prefLabel`,
+    ALT_LABEL: `${PREFIXES.SKOS}altLabel`,
+    BROADER: `${PREFIXES.SKOS}broader`,
+    NARROWER: `${PREFIXES.SKOS}narrower`,
+    RELATED: `${PREFIXES.SKOS}related`,
+    CLOSE_MATCH: `${PREFIXES.SKOS}closeMatch`,
+    EXACT_MATCH: `${PREFIXES.SKOS}exactMatch`,
+    NARROW_MATCH: `${PREFIXES.SKOS}narrowMatch`,
+    RELATED_MATCH: `${PREFIXES.SKOS}relatedMatch`,
+    DEFINITION: `${PREFIXES.SKOS}definition`,
+    IN_SCHEME: `${PREFIXES.SKOS}inScheme`,
 };
 
 export const Entities = {
