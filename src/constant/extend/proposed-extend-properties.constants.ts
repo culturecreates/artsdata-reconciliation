@@ -35,20 +35,36 @@ export const PROPOSED_EXTEND_PROPERTIES_METADATA = {
         type: "Person",
         properties: [
             {id: RDF.TYPE, name: "type"},
-            {id: "name", name: "name"},
-            {id: "url", name: "url"},
-            {id: "sameAs", name: "sameAs"},
-            {id: "disambiguatingDescription", name: "disambiguatingDescription"}
+            {id: SCHEMA.NAME, name: "name"},
+            {id: SCHEMA.ALTERNATE_NAME, name: "alternateName"},
+            {id: SCHEMA.DESCRIPTION, name: "description"},
+            {id: SCHEMA.SAME_AS, name: "sameAs"},
+            {id: SCHEMA.URL, name: "url"},
+            {id: SCHEMA.IMAGE, name: "image"},
+            {id: SCHEMA.IDENTIFIER, name: "identifier"},
+            {id: SCHEMA.ADDITIONAL_TYPE, name: "additionalType"},
+            {id: SCHEMA.DISAMBIGUATING_DESCRIPTION, name: "disambiguatingDescription"},
+            {id:SCHEMA.MAIN_ENTITY_OF_PAGE, name: "mainEntityOfPage"},
+            {id:SCHEMA.ADDRESS, name: "address"},
+            {id:SCHEMA.HAS_OCCUPATION, name: "hasOccupation"},
         ]
     },
     ORGANIZATION: {
         type: "Organization",
         properties: [
             {id: RDF.TYPE, name: "type"},
-            {id: "name", name: "name"},
-            {id: "url", name: "url"},
-            {id: "sameAs", name: "sameAs"},
-            {id: "disambiguatingDescription", name: "disambiguatingDescription"}
+            {id: SCHEMA.NAME, name: "name"},
+            {id: SCHEMA.ALTERNATE_NAME, name: "alternateName"},
+            {id: SCHEMA.DESCRIPTION, name: "description"},
+            {id: SCHEMA.SAME_AS, name: "sameAs"},
+            {id: SCHEMA.URL, name: "url"},
+            {id: SCHEMA.IMAGE, name: "image"},
+            {id: SCHEMA.IDENTIFIER, name: "identifier"},
+            {id: SCHEMA.ADDITIONAL_TYPE, name: "additionalType"},
+            {id: SCHEMA.DISAMBIGUATING_DESCRIPTION, name: "disambiguatingDescription"},
+            {id:SCHEMA.MAIN_ENTITY_OF_PAGE, name: "mainEntityOfPage"},
+            {id:SCHEMA.ADDRESS, name: "address"},
+            {id:SCHEMA.LOCATION, name: "location"}
         ]
     },
     AGENT: {
