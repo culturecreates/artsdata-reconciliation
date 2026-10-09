@@ -1,6 +1,5 @@
 import {Injectable} from "@nestjs/common";
 import {ArtsdataService} from "../artsdata";
-import {EntityClassEnum} from "../../enum/entity-class.enum";
 import {ArtsdataConstants, EXTEND_QUERY, PREFIXES, PROPOSED_EXTEND_PROPERTIES_METADATA} from "../../constant";
 import {Exception, MatchServiceHelper} from "../../helper";
 import {
@@ -10,7 +9,12 @@ import {
     ProposedExtendProperty
 } from "../../dto/extend";
 import {QUERY_BY_GRAPH} from "../../constant/extend/query-by-graph.constants";
-import {ExpandablePropertyEnum, ExtendPropertySettingsEnum, ProposedEntityTypeEnum} from "../../enum";
+import {
+    ExpandablePropertyEnum,
+    ExtendExternalGraphTypeEnum,
+    ExtendPropertySettingsEnum,
+    ProposedEntityTypeEnum
+} from "../../enum";
 import {DEFAULT_LITERAL_PROPERTIES, EXPANDABLE_PROPERTIES} from "../../constant/extend/expandable-properties.constants";
 import {FEATURE_FLAG} from "../../config";
 
@@ -246,7 +250,7 @@ export class ExtendService {
     }
 
 
-    async getExtendDataFromGraph(graphURI: string, entityClass: EntityClassEnum, entityUris: string[], region: string,
+    async getExtendDataFromGraph(graphURI: string, entityClass: ExtendExternalGraphTypeEnum, entityUris: string[], region: string,
                                  page: number = 1, limit: number = 10) {
         if (entityUris?.length) {
             this._validateUris(entityUris);
@@ -258,7 +262,7 @@ export class ExtendService {
         return this._formatExtendDataFromGraphResults(result);
     }
 
-    private _getSparqlQueryByTypeAndGraph(graphURI: string, entityClass: EntityClassEnum, entityUris: string[],
+    private _getSparqlQueryByTypeAndGraph(graphURI: string, entityClass: ExtendExternalGraphTypeEnum, entityUris: string[],
                                           region: string, page: number, limit: number): string {
         let query: string = QUERY_BY_GRAPH.GENERIC;
         let uriQueryReplacement: string = ''
@@ -268,7 +272,7 @@ export class ExtendService {
         query = query.replace("<FILTER_BY_ENTITY_URIS_PLACEHOLDER>", uriQueryReplacement);
 
         switch (entityClass) {
-            case EntityClassEnum.EVENT:
+            case ExtendExternalGraphTypeEnum.EVENT:
                 if (!FEATURE_FLAG.ENABLE_EVENT_BATCH_RECONCILIATION) {
                     Exception.badRequest("The option to reconcile events is currently disabled.")
                 }
@@ -310,7 +314,7 @@ export class ExtendService {
             OPTIONAL { ?uri schema:eventAttendanceMode ?eventAttendanceMode }`)
                     .replace("<FILTER_BY_REGION_PLACEHOLDER>", "");
                 break;
-            case EntityClassEnum.PLACE:
+            case ExtendExternalGraphTypeEnum.PLACE:
                 query = query.replace("TYPE_PLACEHOLDER", "schema:Place")
                     .replace("<EXTRA_FIELD_SELECT_CLAUSE_QUERY_PLACEHOLDER>",
                         `(sample(?postalCode) as ?postal_code)
@@ -330,7 +334,7 @@ export class ExtendService {
                         region ? `?uri schema:address/schema:addressRegion ?region.
                    FILTER (LCASE(STR(?region)) = LCASE("${region}"))` : "");
                 break;
-            case EntityClassEnum.ORGANIZATION:
+            case ExtendExternalGraphTypeEnum.ORGANIZATION:
                 query = query.replace("TYPE_PLACEHOLDER", "schema:Organization")
                     .replace("<FILTER_BY_REGION_PLACEHOLDER>",
                         region ?
@@ -339,13 +343,13 @@ export class ExtendService {
               FILTER(LCASE(STR(?addressRegion)) = LCASE("${region}") || LCASE(STR(?locationRegion)) = LCASE("${region}"))`
                             : "");
                 break;
-            case EntityClassEnum.PERSON:
+            case ExtendExternalGraphTypeEnum.PERSON:
                 query = query.replace("TYPE_PLACEHOLDER", "schema:Person")
                     .replace("<FILTER_BY_REGION_PLACEHOLDER>",
                         region ? `?uri schema:workLocation/schema:address/schema:addressRegion ?region.
         filter(LCASE(str(?region)) = LCASE("${region}"))` : "");
                 break;
-            case EntityClassEnum.AGENT:
+            case ExtendExternalGraphTypeEnum.AGENT:
                 query = query.replace("TYPE_PLACEHOLDER", "dbo:Agent")
                     .replace("<FILTER_BY_REGION_PLACEHOLDER>",
                         region ? `OPTIONAL { ?uri schema:address/schema:addressRegion ?addressRegion.}
@@ -353,6 +357,10 @@ export class ExtendService {
                OPTIONAL {?uri schema:workLocation/schema:address/schema:addressRegion ?region}
               FILTER(LCASE(STR(?addressRegion)) = LCASE("${region}") || LCASE(STR(?locationRegion)) = LCASE(STR("${region}")) || LCASE(STR(?region)) = LCASE("${region}"))`
                             : "");
+                break;
+            case ExtendExternalGraphTypeEnum.PERFORMANCE_WORK:
+                query = query.replace("TYPE_PLACEHOLDER", "schema:PerformanceWork")
+                    .replace("<FILTER_BY_REGION_PLACEHOLDER>", "")
                 break;
             default:
                 throw Exception.badRequest("Invalid type provided");

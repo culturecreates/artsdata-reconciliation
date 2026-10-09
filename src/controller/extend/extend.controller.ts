@@ -1,10 +1,8 @@
 import {Body, Controller, Get, Param, ParseArrayPipe, ParseIntPipe, Post, Query,} from "@nestjs/common";
 import {ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags,} from "@nestjs/swagger";
-import {EntityClassEnum} from "../../enum/entity-class.enum";
 import {ExtendService} from "../../service/extend";
 import {DataExtensionQueryDTO, DataExtensionResponseDTO, ProposedExtendProperty,} from "../../dto/extend";
-import {MANIFEST} from "../../constant";
-import {ProposedEntityTypeEnum} from "../../enum";
+import {ExtendExternalGraphTypeEnum, ProposedEntityTypeEnum} from "../../enum";
 
 @Controller("/extend")
 @ApiTags("Extend Service APIs")
@@ -51,7 +49,7 @@ export class ExtendController {
         name: "entity_class",
         description: "**entity-class**",
         required: true,
-        enum: Object.values(EntityClassEnum),
+        enum: Object.values(ExtendExternalGraphTypeEnum),
     })
     @ApiQuery({
         name: "page",
@@ -83,7 +81,7 @@ export class ExtendController {
     })
     async getExtendDataFromGraph(
         @Param("graph_uri") graphURI: string,
-        @Param("entity_class") entityClass: EntityClassEnum,
+        @Param("entity_class") entityClass: ExtendExternalGraphTypeEnum,
         @Query("region") region: string,
         @Query("uri", new ParseArrayPipe({items: String, optional: true})) entityUris: string[],
         @Query("page", ParseIntPipe) page: number,
