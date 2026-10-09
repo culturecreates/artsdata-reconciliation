@@ -50,11 +50,13 @@ export const SCHEMA = {
     LOCATION: `${PREFIXES.SCHEMA}location`,
     ORGANIZER: `${PREFIXES.SCHEMA}organizer`,
     PERFORMER: `${PREFIXES.SCHEMA}performer`,
+    WORKED_PERFORMED: `${PREFIXES.SCHEMA}workedPerformed`,
     ADDITIONAL_TYPE: `${PREFIXES.SCHEMA}additionalType`,
     MAIN_ENTITY_OF_PAGE: `${PREFIXES.SCHEMA}mainEntityOfPage`,
     AUDIENCE: `${PREFIXES.SCHEMA}audience`,
     EVENT_STATUS: `${PREFIXES.SCHEMA}eventStatus`,
     IN_LANGUAGE: `${PREFIXES.SCHEMA}inLanguage`,
+    SUPER_EVENT: `${PREFIXES.SCHEMA}superEvent`,
     SUB_EVENT: `${PREFIXES.SCHEMA}subEvent`,
     OFFERS: `${PREFIXES.SCHEMA}offers`,
     GENRE: `${PREFIXES.SCHEMA}genre`,
@@ -66,6 +68,8 @@ export const SCHEMA = {
     CONTAINS_IN_PLACE: `${PREFIXES.SCHEMA}containsInPlace`,
     GEO: `${PREFIXES.SCHEMA}geo`,
     MAXIMUM_ATTENDEE_CAPACITY: `${PREFIXES.SCHEMA}maximumAttendeeCapacity`,
+    DURATION: `${PREFIXES.SCHEMA}duration`,
+    EVENT_ATTENDANCE_MODE: `${PREFIXES.SCHEMA}eventAttendanceMode`
 };
 
 export const RDFS = {
