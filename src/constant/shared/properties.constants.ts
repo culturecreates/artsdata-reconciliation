@@ -61,13 +61,24 @@ export const SCHEMA = {
     CONTRIBUTOR: `${PREFIXES.SCHEMA}contributor`,
     PRODUCER: `${PREFIXES.SCHEMA}producer`,
     IDENTIFIER: `${PREFIXES.SCHEMA}identifier`,
-    HAS_OCCUPATION: `${PREFIXES.SCHEMA}hasOccupation`
+    HAS_OCCUPATION: `${PREFIXES.SCHEMA}hasOccupation`,
+    CONTAINED_IN_PLACE: `${PREFIXES.SCHEMA}containedInPlace`,
+    CONTAINS_IN_PLACE: `${PREFIXES.SCHEMA}containsInPlace`,
+    GEO: `${PREFIXES.SCHEMA}geo`,
+    MAXIMUM_ATTENDEE_CAPACITY: `${PREFIXES.SCHEMA}maximumAttendeeCapacity`,
 };
 
 export const RDFS = {
     LABEL: `${PREFIXES.RDFS}label`,
     COMMENT: `${PREFIXES.RDFS}comment`,
 
+};
+
+export const ADO = {
+    MANAGED_BY: `${PREFIXES.ADO}managedBy`,
+    OWNED_BY: `${PREFIXES.ADO}ownedBy`,
+    USED_BY: `${PREFIXES.ADO}usedBy`,
+    HAS_RESIDENT: `${PREFIXES.ADO}hasResident`,
 };
 
 export const SKOS = {

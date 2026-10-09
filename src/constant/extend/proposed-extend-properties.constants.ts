@@ -1,4 +1,4 @@
-import {RDF, RDFS, SCHEMA, SKOS} from "../shared";
+import {ADO, RDF, RDFS, SCHEMA, SKOS} from "../shared";
 
 export const PROPOSED_EXTEND_PROPERTIES_METADATA = {
     EVENT: {
@@ -24,11 +24,21 @@ export const PROPOSED_EXTEND_PROPERTIES_METADATA = {
         type: "Place",
         properties: [
             {id: RDF.TYPE, name: "type"},
-            {id: "name", name: "name"},
-            {id: "url", name: "url"},
-            {id: "sameAs", name: "sameAs"},
-            {id: "disambiguatingDescription", name: "disambiguatingDescription"},
-            {id: "address", name: "address"}
+            {id: SCHEMA.NAME, name: "name"},
+            {id: SCHEMA.ALTERNATE_NAME, name: "alternateName"},
+            {id: SCHEMA.ADDRESS, name: "address"},
+            {id: SCHEMA.ADDITIONAL_TYPE, name: "additionalType"},
+            {id: SCHEMA.SAME_AS, name: "sameAs"},
+            {id: SCHEMA.DISAMBIGUATING_DESCRIPTION, name: "disambiguatingDescription"},
+            {id: SCHEMA.URL, name: "url"},
+            {id: SCHEMA.CONTAINED_IN_PLACE, name: "containedInPlace"},
+            {id: SCHEMA.CONTAINS_IN_PLACE, name: "containsInPlace"},
+            {id: SCHEMA.GEO, name: "geo"},
+            {id: SCHEMA.MAXIMUM_ATTENDEE_CAPACITY, name: "maximumAttendeeCapacity"},
+            {id: ADO.OWNED_BY, name: "ownedBy"},
+            {id: ADO.MANAGED_BY, name: "managedBy"},
+            {id: ADO.USED_BY, name: "usedBy"},
+            {id: ADO.HAS_RESIDENT, name: "hasResident"},
         ]
     },
     PERSON: {
@@ -44,9 +54,9 @@ export const PROPOSED_EXTEND_PROPERTIES_METADATA = {
             {id: SCHEMA.IDENTIFIER, name: "identifier"},
             {id: SCHEMA.ADDITIONAL_TYPE, name: "additionalType"},
             {id: SCHEMA.DISAMBIGUATING_DESCRIPTION, name: "disambiguatingDescription"},
-            {id:SCHEMA.MAIN_ENTITY_OF_PAGE, name: "mainEntityOfPage"},
-            {id:SCHEMA.ADDRESS, name: "address"},
-            {id:SCHEMA.HAS_OCCUPATION, name: "hasOccupation"},
+            {id: SCHEMA.MAIN_ENTITY_OF_PAGE, name: "mainEntityOfPage"},
+            {id: SCHEMA.ADDRESS, name: "address"},
+            {id: SCHEMA.HAS_OCCUPATION, name: "hasOccupation"},
         ]
     },
     ORGANIZATION: {
@@ -62,9 +72,9 @@ export const PROPOSED_EXTEND_PROPERTIES_METADATA = {
             {id: SCHEMA.IDENTIFIER, name: "identifier"},
             {id: SCHEMA.ADDITIONAL_TYPE, name: "additionalType"},
             {id: SCHEMA.DISAMBIGUATING_DESCRIPTION, name: "disambiguatingDescription"},
-            {id:SCHEMA.MAIN_ENTITY_OF_PAGE, name: "mainEntityOfPage"},
-            {id:SCHEMA.ADDRESS, name: "address"},
-            {id:SCHEMA.LOCATION, name: "location"}
+            {id: SCHEMA.MAIN_ENTITY_OF_PAGE, name: "mainEntityOfPage"},
+            {id: SCHEMA.ADDRESS, name: "address"},
+            {id: SCHEMA.LOCATION, name: "location"}
         ]
     },
     AGENT: {
@@ -80,9 +90,9 @@ export const PROPOSED_EXTEND_PROPERTIES_METADATA = {
             {id: SCHEMA.IDENTIFIER, name: "identifier"},
             {id: SCHEMA.ADDITIONAL_TYPE, name: "additionalType"},
             {id: SCHEMA.DISAMBIGUATING_DESCRIPTION, name: "disambiguatingDescription"},
-            {id:SCHEMA.MAIN_ENTITY_OF_PAGE, name: "mainEntityOfPage"},
-            {id:SCHEMA.ADDRESS, name: "address"},
-            {id:SCHEMA.HAS_OCCUPATION, name: "hasOccupation"},
+            {id: SCHEMA.MAIN_ENTITY_OF_PAGE, name: "mainEntityOfPage"},
+            {id: SCHEMA.ADDRESS, name: "address"},
+            {id: SCHEMA.HAS_OCCUPATION, name: "hasOccupation"},
         ]
     },
     CONCEPT: {
@@ -118,11 +128,11 @@ export const PROPOSED_EXTEND_PROPERTIES_METADATA = {
             {id: SCHEMA.MAIN_ENTITY_OF_PAGE, name: "mainEntityOfPage"},
             {id: SCHEMA.IMAGE, name: "image"},
             {id: SCHEMA.DESCRIPTION, name: "description"},
-            {id:SCHEMA.GENRE, name: "genre"},
-            {id:SCHEMA.IN_LANGUAGE, name: "inLanguage"},
-            {id:SCHEMA.CONTRIBUTOR, name: "contributor"},
-            {id:SCHEMA.PRODUCER, name: "producer"},
-            {id:SCHEMA.AUDIENCE, name: "audience"}
+            {id: SCHEMA.GENRE, name: "genre"},
+            {id: SCHEMA.IN_LANGUAGE, name: "inLanguage"},
+            {id: SCHEMA.CONTRIBUTOR, name: "contributor"},
+            {id: SCHEMA.PRODUCER, name: "producer"},
+            {id: SCHEMA.AUDIENCE, name: "audience"}
 
         ]
     }
