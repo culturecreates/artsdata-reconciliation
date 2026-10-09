@@ -3,6 +3,8 @@ import {ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags,} from "@nestjs/s
 import {EntityClassEnum} from "../../enum/entity-class.enum";
 import {ExtendService} from "../../service/extend";
 import {DataExtensionQueryDTO, DataExtensionResponseDTO, ProposedExtendProperty,} from "../../dto/extend";
+import {MANIFEST} from "../../constant";
+import {ProposedEntityTypeEnum} from "../../enum";
 
 @Controller("/extend")
 @ApiTags("Extend Service APIs")
@@ -14,7 +16,7 @@ export class ExtendController {
     @ApiOperation({summary: "Get proposed properties for the selected type"})
     @ApiQuery({
         name: "type",
-        enum: EntityClassEnum,
+        enum: ProposedEntityTypeEnum,
         type: String,
         description: "Select type",
         required: true,
@@ -26,7 +28,7 @@ export class ExtendController {
         description: "Proposed properties for the selected type",
     })
     getProposedProperties(
-        @Query("type") type: EntityClassEnum,
+        @Query("type") type: ProposedEntityTypeEnum,
     ): ProposedExtendProperty {
         return this._extendService.getProposedProperties(type);
     }

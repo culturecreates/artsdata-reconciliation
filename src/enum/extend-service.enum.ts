@@ -11,3 +11,14 @@ export enum ExtendPropertySettingsEnum {
   LITERAL = "literal" ,
   EXPAND = "expand"
 }
+
+export enum ProposedEntityTypeEnum {
+  EVENT = "Event" ,
+  PLACE = "Place" ,
+  PERSON = "Person" ,
+  ORGANIZATION = "Organization" ,
+  AGENT = "Agent",
+  CONCEPT = "Concept",
+  LIVE_PERFORMANCE_WORK = "LivePerformanceWork"
+
+}
