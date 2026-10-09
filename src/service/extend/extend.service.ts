@@ -77,6 +77,7 @@ export class ExtendService {
             case ProposedEntityTypeEnum.CONCEPT:
                 return PROPOSED_EXTEND_PROPERTIES_METADATA.CONCEPT;
             case ProposedEntityTypeEnum.LIVE_PERFORMANCE_WORK:
+            case ProposedEntityTypeEnum.PERFORMANCE_WORK:
                 return PROPOSED_EXTEND_PROPERTIES_METADATA.LIVE_PERFORMANCE_WORK;
             default:
                 throw Exception.badRequest("Invalid entity type");

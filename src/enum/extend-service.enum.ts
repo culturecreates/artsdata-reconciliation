@@ -19,7 +19,8 @@ export enum ProposedEntityTypeEnum {
   ORGANIZATION = "Organization" ,
   AGENT = "Agent",
   CONCEPT = "Concept",
-  LIVE_PERFORMANCE_WORK = "LivePerformanceWork"
+  LIVE_PERFORMANCE_WORK = "LivePerformanceWork",
+  PERFORMANCE_WORK = "PerformanceWork"
 
 }
 export enum ExtendExternalGraphTypeEnum {
