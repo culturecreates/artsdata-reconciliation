@@ -179,6 +179,11 @@ export class MatchService {
                     sparqlQuery = this._generateSparqlQuery(id, name as string, type, limit || 25, propertyConditions, requestLanguage);
                 }
 
+                if (!sparqlQuery) {
+                    results.push({candidates: []});
+                    continue;
+                }
+
                 const response = await this._artsdataService.executeSparqlQuery(sparqlQuery, false);
                 const candidates = MatchServiceHelper.formatReconciliationResponse(requestLanguage,
                     response, reconciliationQuery, isQueryByURI);
@@ -472,13 +477,23 @@ export class MatchService {
      */
     private _generateSparqlQuery(
         id: string | undefined, name: string | undefined, type: string, limit: number,
-        propertyConditions: QueryCondition[], requestLanguage: string): string {
+        propertyConditions: QueryCondition[], requestLanguage: string): string | undefined {
 
         const graphdbIndex = MatchServiceHelper.getGraphdbIndex(type);
         let rawQuery = QUERIES.RECONCILIATION_QUERY;
-        let luceneQuery: string = this._generateLuceneQuery(name, propertyConditions);
+        const luceneQuery: string = this._generateLuceneQuery(name, propertyConditions);
+        const requiredConditionsCount = propertyConditions.filter(({required}) => required).length;
 
-        if (id) {
+        if (!id && !luceneQuery.length) {
+            // Nothing binds ?entity without a literal string, a required condition or a type
+            if (!requiredConditionsCount && !type) {
+                return undefined;
+            }
+            // No literal string: skip the (slow) empty Lucene search and score +1 for the type and +1 per required condition
+            const score = requiredConditionsCount + (type ? 1 : 0);
+            rawQuery = rawQuery.replace("SELECT_ENTITY_QUERY_BY_KEYWORD_PLACEHOLDER",
+                QUERIES.SELECT_ENTITY_QUERY_WITHOUT_KEYWORD.replace("SCORE_PLACE_HOLDER", `${score}`));
+        } else if (id) {
             id = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `<${ArtsdataConstants.PREFIX_ADR}${id}>`;
             let query = `BIND(${id} as ?entity)\n`
 
@@ -502,7 +517,7 @@ export class MatchService {
         rawQuery = rawQuery
             .replace("INDEX_PLACE_HOLDER", graphdbIndex)
             .replace("REQUEST_LANG_PLACEHOLDER", requestLanguage)
-            .replace("QUERY_FILTER_PLACE_HOLDER", luceneQuery.length ? `luc:query ${luceneQuery}` : luceneQuery)
+            .replace("QUERY_FILTER_PLACE_HOLDER", luceneQuery.length ? `luc:query ${luceneQuery}` : '')
             .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
 
         return this._resolvePropertyConditions(rawQuery, propertyConditions);
@@ -573,7 +588,7 @@ export class MatchService {
             luceneQuery = luceneQuery?.length ? `${uriLuceneQuery} OR ${luceneQuery} ` : uriLuceneQuery;
         }
 
-        return `"${luceneQuery}" ;`;
+        return luceneQuery?.trim().length ? `"${luceneQuery}" ;` : '';
     }
 
     /**
