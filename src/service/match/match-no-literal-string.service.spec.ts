@@ -175,3 +175,47 @@ describe('Test the properties searched in the Lucene index by v1 match', () => {
         expect(sparql).toBeUndefined();
     });
 });
+
+describe('Test the order applied before the LIMIT of the sub-select in v1 match', () => {
+    let executeSparqlQuery: jest.Mock;
+    let matchService: MatchService;
+
+    beforeEach(() => {
+        executeSparqlQuery = jest.fn().mockResolvedValue({results: {bindings: []}});
+        matchService = new MatchService({executeSparqlQuery} as unknown as ArtsdataService, {} as ManifestService);
+    });
+
+    const sparqlFor = async (type: string, conditions: any[]) => {
+        await matchService.reconcileByQueries(LanguageEnum.ENGLISH, {
+            queries: [{type, conditions, limit: 50} as ReconciliationQuery]
+        }, SparqlVersionEnum.V1);
+        return executeSparqlQuery.mock.calls[0][0] as string;
+    };
+
+    const requiredLocation = {
+        matchType: "property", propertyId: "schema:location",
+        propertyValue: "http://kg.artsdata.ca/resource/K11-25", required: true, matchQuantifier: "any"
+    };
+
+    it.each([Entities.EVENT, Entities.ADO_EVENT])('Should order %s by score, then start date, before the limit without a literal string', async (type) => {
+        const sparql = await sparqlFor(type, [requiredLocation]);
+
+        expect(sparql).toContain('SELECT ?entity ?total_score (MIN(?sub_startDate) AS ?sub_start) WHERE {');
+        expect(sparql).toContain('OPTIONAL { ?entity <http://schema.org/startDate> ?sub_startDate }');
+        expect(sparql).toMatch(/GROUP BY \?entity \?total_score\s+ORDER BY DESC\(\?total_score\) \?sub_start\s+LIMIT 50/);
+    });
+
+    it('Should order events by score, then start date, before the limit of the Lucene search', async () => {
+        const sparql = await sparqlFor(Entities.EVENT, [{matchType: "name", propertyValue: "Romeo", required: true}]);
+
+        expect(sparql).toContain('luc:query');
+        expect(sparql).toMatch(/GROUP BY \?entity \?total_score\s+ORDER BY DESC\(\?total_score\) \?sub_start\s+LIMIT 50/);
+    });
+
+    it.each([Entities.PLACE, Entities.ORGANIZATION])('Should not order %s before the limit', async (type) => {
+        const sparql = await sparqlFor(type, [{matchType: "name", propertyValue: "Romeo", required: true}]);
+
+        expect(sparql).not.toContain('sub_start');
+        expect(sparql).not.toContain('PLACE_HOLDER');
+    });
+});
