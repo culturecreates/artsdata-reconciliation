@@ -1,5 +1,5 @@
 import {DataExtensionQueryDTO} from "../../dto/extend";
-import {dropGraph, setupExtendService, uploadDataSet} from "../../../test/util/common-util";
+import {dropGraph, itWithArtsdataPlugin, setupExtendService, uploadDataSet} from "../../../test/util/common-util";
 import {ExtendPropertySettingsEnum} from "../../enum";
 import {ExtendService} from "./extend.service";
 import {Entities} from "../../constant";
@@ -31,7 +31,7 @@ describe('ExtendService', () => {
 
     describe('Test Extend data Service with settings', () => {
 
-        it(`Extend data for an Event with content id and literal`, async () => {
+        itWithArtsdataPlugin(`Extend data for an Event with content id and literal`, async () => {
 
             const extendRequest: DataExtensionQueryDTO = {
                 ids: ["KP-1-event"],
@@ -122,7 +122,7 @@ describe('ExtendService', () => {
             expect(result).toEqual(expectedResult);
         });
 
-        it(`Extend property organizer`, async () => {
+        itWithArtsdataPlugin(`Extend property organizer`, async () => {
 
             const extendRequest: DataExtensionQueryDTO = {
                 ids: ["KP-1-event"],
@@ -215,7 +215,7 @@ describe('ExtendService', () => {
             expect(result).toEqual(expectedResult);
         });
 
-        it(`Extend data with content id falls back to the literal of a literal only property`, async () => {
+        itWithArtsdataPlugin(`Extend data with content id falls back to the literal of a literal only property`, async () => {
 
             const extendRequest: DataExtensionQueryDTO = {
                 ids: ["KP-1-event"],
@@ -241,7 +241,7 @@ describe('ExtendService', () => {
             });
         });
 
-        it(`Extend data with content literal returns the name of a linked entity and the value of a literal only property`, async () => {
+        itWithArtsdataPlugin(`Extend data with content literal returns the name of a linked entity and the value of a literal only property`, async () => {
 
             const extendRequest: DataExtensionQueryDTO = {
                 ids: ["KP-1-event"],
@@ -281,7 +281,7 @@ describe('ExtendService', () => {
             });
         });
 
-        it(`Extend data with content literal returns the name of a linked entity in every language`, async () => {
+        itWithArtsdataPlugin(`Extend data with content literal returns the name of a linked entity in the requested language only`, async () => {
 
             const extendRequest: DataExtensionQueryDTO = {
                 ids: ["KP-2-event"],
@@ -291,13 +291,18 @@ describe('ExtendService', () => {
             }
             const result = await extendService.getDataExtension(extendRequest);
 
-            expect(getValues(result, "performer").sort(byLang)).toEqual([
-                {"str": "Performer Two", "lang": "en"},
+            expect(getValues(result, "performer")).toEqual([
+                {"str": "Performer Two", "lang": "en"}
+            ]);
+
+            const frenchResult = await extendService.getDataExtension(extendRequest, "fr");
+
+            expect(getValues(frenchResult, "performer")).toEqual([
                 {"str": "Interprete Deux", "lang": "fr"}
             ]);
         });
 
-        it(`Extend data with content literal returns no value when the linked entity has no name`, async () => {
+        itWithArtsdataPlugin(`Extend data with content literal returns no value when the linked entity has no name`, async () => {
 
             const extendRequest: DataExtensionQueryDTO = {
                 ids: ["KP-2-event"],
@@ -370,7 +375,7 @@ describe('ExtendService', () => {
             expect(getValues(result, "location")).toEqual([{"id": "KP-1"}]);
         });
 
-        it(`Extend data with settings returns the rows in the order of the requested ids`, async () => {
+        itWithArtsdataPlugin(`Extend data with settings returns the rows in the order of the requested ids`, async () => {
 
             const extendRequest: DataExtensionQueryDTO = {
                 ids: ["KP-2-event", "KP-1-event"],

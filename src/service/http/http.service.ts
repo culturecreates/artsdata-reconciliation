@@ -5,13 +5,13 @@ import axios from "axios";
 @Injectable()
 export class HttpService {
 
-    async postRequest(url: string, query: string, token?: string): Promise<any> {
+    async postRequest(url: string, query: string, token?: string, accept?: string): Promise<any> {
         const response = await axios.post(
             url,
             query,
             {
                 headers: {
-                    "Accept": "application/x-sparqlstar-results+json, application/sparql-results+json;q=0.9, */*;q=0.8",
+                    "Accept": accept ?? "application/x-sparqlstar-results+json, application/sparql-results+json;q=0.9, */*;q=0.8",
                     "Origin": "https://db.artsdata.ca",
                     "Referer": "https://db.artsdata.ca/",
                     Authorization: token

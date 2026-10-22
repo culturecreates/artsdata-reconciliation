@@ -1,8 +1,9 @@
-import {Body, Controller, Get, Param, ParseArrayPipe, ParseIntPipe, Post, Query,} from "@nestjs/common";
-import {ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags,} from "@nestjs/swagger";
+import {Body, Controller, Get, Headers, Param, ParseArrayPipe, ParseIntPipe, Post, Query, Res,} from "@nestjs/common";
+import {Response} from "express";
+import {ApiHeader, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags,} from "@nestjs/swagger";
 import {ExtendService} from "../../service/extend";
 import {DataExtensionQueryDTO, DataExtensionResponseDTO, ProposedExtendProperty,} from "../../dto/extend";
-import {ExtendExternalGraphTypeEnum, ProposedEntityTypeEnum} from "../../enum";
+import {ExtendExternalGraphTypeEnum, LanguageEnum, ProposedEntityTypeEnum} from "../../enum";
 
 @Controller("/extend")
 @ApiTags("Extend Service APIs")
@@ -39,8 +40,22 @@ export class ExtendController {
         isArray: true,
         description: "Reconciliation candidates for each query",
     })
-    async getDataExtension(@Body() dataExtensionQuery: DataExtensionQueryDTO) {
-        return await this._extendService.getDataExtension(dataExtensionQuery);
+    @ApiHeader({
+        name: "accept-language",
+        description:
+            "Select language for the string values (name, description...). 'en' for English and 'fr' for French. 'en' is the default.",
+        required: false,
+        enum: ["en", "fr"],
+        example: "en",
+    })
+    async getDataExtension(
+        @Body() dataExtensionQuery: DataExtensionQueryDTO,
+        @Headers("accept-language") acceptLanguage: LanguageEnum,
+        @Res({passthrough: true}) response: Response,
+    ) {
+        acceptLanguage = acceptLanguage || LanguageEnum.ENGLISH;
+        response.setHeader("Content-Language", acceptLanguage);
+        return await this._extendService.getDataExtension(dataExtensionQuery, acceptLanguage);
     }
 
     @Get(":graph_uri/:entity_class")

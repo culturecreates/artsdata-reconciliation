@@ -205,3 +205,11 @@ export async function dropGraph(graphUri: string) {
         `
     await executeSparql(dropGraphQuery);
 }
+
+/**
+ * `it` for specs that query string properties (name, description...) through GraphDB. They are read with the
+ * Artsdata plugin function `adp:prefLangLiteral` (https://github.com/culturecreates/graphdb-docker-compose,
+ * plugins/artsdata-plugin), which the GraphDB image used by the tests does not ship. They are skipped until the
+ * plugin jar is mounted in test/graph-db/docker-compose.yml; set ARTSDATA_PLUGIN=true to run them.
+ */
+export const itWithArtsdataPlugin: typeof it = process.env.ARTSDATA_PLUGIN === "true" ? it : it.skip;

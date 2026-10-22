@@ -24,8 +24,9 @@ export class ArtsdataService {
      * Executes a SPARQL query against the Artsdata endpoint.
      * @param sparqlQuery
      * @param infer
+     * @param accept optional Accept header, e.g. an RDF media type for CONSTRUCT queries
      */
-    async executeSparqlQuery(sparqlQuery: string, infer = false): Promise<any> {
+    async executeSparqlQuery(sparqlQuery: string, infer = false, accept?: string): Promise<any> {
         const sparqlEndpoint = this._getArtsdataEndPoint();
 
         if (FEATURE_FLAG.LOG_QUERIES) {
@@ -35,7 +36,7 @@ export class ArtsdataService {
         const queryParam = `query=${encodeURIComponent(sparqlQuery)}&infer=${infer}`;
 
         try {
-            return await this.httpService.postRequest(sparqlEndpoint, queryParam, this.token);
+            return await this.httpService.postRequest(sparqlEndpoint, queryParam, this.token, accept);
         } catch (error) {
             if (error?.response?.status === 401) {
                 console.warn("GraphDB returned 401 — token may be expired. Attempting token refresh...");
@@ -43,7 +44,7 @@ export class ArtsdataService {
                 if (refreshed) {
                     console.log("Token refreshed successfully. Retrying original request...");
                     try {
-                        return await this.httpService.postRequest(sparqlEndpoint, queryParam, this.token);
+                        return await this.httpService.postRequest(sparqlEndpoint, queryParam, this.token, accept);
                     } catch (retryError) {
                         console.error("Request failed after token refresh:", retryError.message);
                         throw Exception.internalServerError(`SPARQL query failed after token refresh: ${retryError.message}`);

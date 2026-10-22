@@ -1,6 +1,6 @@
 import {ExtendService} from './extend.service';
 import {DataExtensionQueryDTO} from "../../dto/extend";
-import {dropGraph, setupExtendService, uploadDataSet} from "../../../test/util/common-util";
+import {dropGraph, itWithArtsdataPlugin, setupExtendService, uploadDataSet} from "../../../test/util/common-util";
 import {Entities} from "../../constant";
 
 describe('ExtendService', () => {
@@ -21,7 +21,7 @@ describe('ExtendService', () => {
 
     describe('Test Extend data Service', () => {
 
-        it(`Extend data for an Event `, async () => {
+        itWithArtsdataPlugin(`Extend data for an Event `, async () => {
 
             const extendRequest: DataExtensionQueryDTO = {
                 ids: ["Event1"],
@@ -125,7 +125,7 @@ describe('ExtendService', () => {
             expect(result.rows).toEqual(expectedResult);
         });
 
-        it(`Extend data for an Organization`, async () => {
+        itWithArtsdataPlugin(`Extend data for an Organization`, async () => {
 
             const extendRequest: DataExtensionQueryDTO = {
                 ids: ["Organization1"],
