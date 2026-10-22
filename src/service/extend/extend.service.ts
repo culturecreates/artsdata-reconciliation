@@ -13,10 +13,34 @@ import {
     ExpandablePropertyEnum,
     ExtendExternalGraphTypeEnum,
     ExtendPropertySettingsEnum,
+    LanguageEnum,
     ProposedEntityTypeEnum
 } from "../../enum";
-import {DEFAULT_LITERAL_PROPERTIES, EXPANDABLE_PROPERTIES} from "../../constant/extend/expandable-properties.constants";
+import {
+    DEFAULT_LITERAL_PROPERTIES,
+    EXPANDABLE_PROPERTIES,
+    LANGUAGE_LITERAL_PROPERTIES
+} from "../../constant/extend/expandable-properties.constants";
 import {FEATURE_FLAG} from "../../config";
+import {Literal, Parser as N3Parser, Term} from "n3";
+
+const N_TRIPLES_MEDIA_TYPE = "application/n-triples";
+
+/**
+ * A variable of the extend query and where its values come from: the triples with this predicate about the
+ * entity, or, when `parent` is set, about the entity linked by the `parent` variable (an expanded property).
+ */
+interface ExtendSlot {
+    variable: string;
+    predicate: string;
+    parent?: string;
+}
+
+interface ExtendPropertyParts {
+    pattern: string;
+    constructTriples: string[];
+    slots: ExtendSlot[];
+}
 
 @Injectable()
 export class ExtendService {
@@ -25,12 +49,12 @@ export class ExtendService {
     }
 
 
-    async getDataExtension(dataExtensionQuery: DataExtensionQueryDTO) {
-        const sparqlQuery: string = this._generateQuery(dataExtensionQuery);
+    async getDataExtension(dataExtensionQuery: DataExtensionQueryDTO, requestLanguage: string = LanguageEnum.ENGLISH) {
+        const {sparqlQuery, slots} = this._generateQuery(dataExtensionQuery, this._resolveLanguage(requestLanguage));
         const expandProperties = dataExtensionQuery.properties
             .filter(property => property.settings?.content === ExtendPropertySettingsEnum.EXPAND);
-        const result = await this._artsdataService.executeSparqlQuery(sparqlQuery);
-        const formattedResult = this._formatResult(dataExtensionQuery.ids, result);
+        const result = await this._artsdataService.executeSparqlQuery(sparqlQuery, false, N_TRIPLES_MEDIA_TYPE);
+        const formattedResult = this._formatResult(dataExtensionQuery.ids, slots, result);
 
         if (expandProperties.length > 0) {
             const expandedPropertyPrefixes = expandProperties.map(property => `${property.id}_`);
@@ -84,24 +108,47 @@ export class ExtendService {
         }
     }
 
-    private _generateQuery(dataExtensionQuery: DataExtensionQueryDTO) {
+    /**
+     * Only languages we know are interpolated into the query; anything else falls back to English.
+     * Handles header values such as "fr-CA,fr;q=0.9".
+     */
+    private _resolveLanguage(requestLanguage: string): string {
+        const language = `${requestLanguage ?? ""}`.split(",")[0].split(";")[0].trim().slice(0, 2).toLowerCase();
+        return Object.values(LanguageEnum).includes(language as LanguageEnum) ? language : LanguageEnum.ENGLISH;
+    }
+
+    private _toEntityUri(id: string): string {
+        return MatchServiceHelper.isValidURI(id) ? id.trim() : `${ArtsdataConstants.PREFIX_ADR}${id.trim()}`;
+    }
+
+    private _generateQuery(dataExtensionQuery: DataExtensionQueryDTO, language: string) {
         const {ids, properties} = dataExtensionQuery;
 
         // Generate URIs with prefix if necessary
-        const uris = ids.map(id => MatchServiceHelper.isValidURI(id) ? id.trim() : `${ArtsdataConstants.PREFIX_ADR}${id.trim()}`);
-        const uriPlaceholder = uris.map(uri => `(<${uri}>)`).join(" ");
+        const uriPlaceholder = ids.map(id => `(<${this._toEntityUri(id)}>)`).join(" ");
 
-        // Replace URI placeholder in the query
-        let query = EXTEND_QUERY.replace("<URI_PLACE_HOLDER>", uriPlaceholder);
+        // Generate property patterns, the triples to construct and the variables to read them back from
+        const parts = properties.map(property => this._generateTripleFromCondition(property, language));
+        const slots: ExtendSlot[] = parts.flatMap(part => part.slots);
 
-        // Generate property triples and replace the placeholder
-        const propertyTriples = properties.map(property => this._generateTripleFromCondition(property)).join("");
-        query = query.replace("<TRIPLES_PLACE_HOLDER>", propertyTriples);
+        const query = EXTEND_QUERY
+            .replace("<CONSTRUCT_PLACE_HOLDER>", parts.flatMap(part => part.constructTriples).join("\n"))
+            .replace("<URI_PLACE_HOLDER>", uriPlaceholder)
+            .replace("<TRIPLES_PLACE_HOLDER>", parts.map(part => part.pattern).join(""));
 
-        return query;
+        return {sparqlQuery: query, slots};
     }
 
-    private _generateTripleFromCondition(property: ExtendQueryProperty) {
+    /**
+     * @private
+     * @name _isLanguageLiteralProperty
+     * @description Properties holding strings or language strings, read with `adp:prefLangLiteral`
+     */
+    private _isLanguageLiteralProperty(predicate: string): boolean {
+        return LANGUAGE_LITERAL_PROPERTIES.some(property => predicate === `${PREFIXES.SCHEMA}${property}`);
+    }
+
+    private _generateTripleFromCondition(property: ExtendQueryProperty, language: string): ExtendPropertyParts {
         const {id, settings} = property;
 
         let objectId = id;
@@ -117,45 +164,85 @@ export class ExtendService {
                 objectId = id.slice(matchedPrefix.length);
             }
         }
+        const predicateIri = MatchServiceHelper.isValidURI(id) ? id : `${PREFIXES.SCHEMA}${objectId}`;
         const predicate = MatchServiceHelper.isValidURI(id) ? `<${id}>` : `schema:${objectId}`;
+        const slots: ExtendSlot[] = [{variable: objectId, predicate: predicateIri}];
 
         if (settings?.content === ExtendPropertySettingsEnum.LITERAL) {
-            return this._generateLiteralTriple(id, objectId, predicate);
+            return this._generateLiteralTriple(objectId, predicate, predicateIri, language);
         }
 
-        let expandedTriples;
-        if (settings?.content === ExtendPropertySettingsEnum.EXPAND) {
-            const expandedProperties = this._getExpandableProperties(id);
-            if (!expandedProperties.length) {
-                console.log("No expanded properties found for id: ", id);
-            }
-            expandedTriples = expandedProperties
-                .map(prop => {
-                    const predicate = prop === "type" ? `rdf:type` : `schema:${prop}`;
-                    return `\t\tOPTIONAL {?${objectId} ${predicate} ?${objectId}_${prop}.}`
-                }).join("\n");
+        if (settings?.content !== ExtendPropertySettingsEnum.EXPAND) {
+            return {
+                pattern: this._valuePattern("?uri", predicate, predicateIri, objectId, language),
+                constructTriples: [`?uri ${predicate} ?${objectId} .`],
+                slots
+            };
         }
 
-        return `OPTIONAL { ?uri ${predicate} ?${objectId}. 
-                ${expandedTriples ? `\n${expandedTriples}\n` : ""}}\n`;
+        const expandedProperties = this._getExpandableProperties(id);
+        if (!expandedProperties.length) {
+            console.log("No expanded properties found for id: ", id);
+        }
+        const constructTriples = [`?uri ${predicate} ?${objectId} .`];
+        const expandedPatterns = expandedProperties.map(prop => {
+            const subPredicate = prop === "type" ? "rdf:type" : `schema:${prop}`;
+            const subPredicateIri = prop === "type" ? `${PREFIXES.RDF}type` : `${PREFIXES.SCHEMA}${prop}`;
+            constructTriples.push(`?${objectId} ${subPredicate} ?${objectId}_${prop} .`);
+            slots.push({variable: `${objectId}_${prop}`, predicate: subPredicateIri, parent: objectId});
+            return this._valuePattern(`?${objectId}`, subPredicate, subPredicateIri, `${objectId}_${prop}`, language);
+        });
+
+        return {
+            pattern: `OPTIONAL { ?uri ${predicate} ?${objectId} .\n${expandedPatterns.join("")}}\n`,
+            constructTriples,
+            slots
+        };
+    }
+
+    /**
+     * @private
+     * @name _valuePattern
+     * @description Pattern binding `?variable` to the value(s) of `predicate` on `subject`. String and language
+     * string properties are bound with `adp:prefLangLiteral`, which returns one literal in the requested language
+     * instead of one row per language; the other properties keep a plain OPTIONAL.
+     */
+    private _valuePattern(subject: string, predicate: string, predicateIri: string, variable: string, language: string) {
+        if (this._isLanguageLiteralProperty(predicateIri)) {
+            return `BIND(adp:prefLangLiteral(${subject}, ${predicate}, "${language}") AS ?${variable})\n`;
+        }
+        return `OPTIONAL { ${subject} ${predicate} ?${variable} . }\n`;
     }
 
     /**
      * @name _generateLiteralTriple
-     * @description Builds the triple for a property requested with `settings.content = literal`.
-     * The property is followed one hop further to the literal that labels the linked entity
-     * (for example `schema:organizer/schema:name`). The hop is made optional with `?` so that
-     * literal-only properties fall back to their own value, and the filter drops the entity URI
-     * that the zero-length match keeps. Both cases therefore bind the same variable, so the
-     * response keeps a single `literal` value per property and needs no post-processing.
+     * @description Builds the patterns for a property requested with `settings.content = literal`.
+     * A literal value of the property is kept as is. When the property links to an entity, the literal that
+     * labels the linked entity (for example `schema:organizer/schema:name`) is read with `adp:prefLangLiteral`,
+     * so a single value in the requested language is returned. Both cases are constructed with the property's
+     * predicate, so the response keeps a single `literal` value per property and needs no post-processing.
      * @private
      */
-    private _generateLiteralTriple(id: string, objectId: string, predicate: string) {
-        const literalPath = DEFAULT_LITERAL_PROPERTIES.map(prop => `schema:${prop}`)
-            .join("|");
+    private _generateLiteralTriple(objectId: string, predicate: string, predicateIri: string, language: string): ExtendPropertyParts {
+        const slots: ExtendSlot[] = [{variable: objectId, predicate: predicateIri}];
 
-        return `OPTIONAL { ?uri ${predicate}/(${literalPath})? ?${objectId}.
-                FILTER(isLiteral(?${objectId}))\n}\n`;
+        if (this._isLanguageLiteralProperty(predicateIri)) {
+            return {
+                pattern: this._valuePattern("?uri", predicate, predicateIri, objectId, language),
+                constructTriples: [`?uri ${predicate} ?${objectId} .`],
+                slots
+            };
+        }
+
+        const labelProperty = DEFAULT_LITERAL_PROPERTIES.find(prop => this._isLanguageLiteralProperty(`${PREFIXES.SCHEMA}${prop}`))
+            ?? DEFAULT_LITERAL_PROPERTIES[0];
+        return {
+            pattern: `OPTIONAL { ?uri ${predicate} ?${objectId}_literal . FILTER(isLiteral(?${objectId}_literal)) }
+                OPTIONAL { ?uri ${predicate} ?${objectId}_entity . FILTER(!isLiteral(?${objectId}_entity))
+                    BIND(adp:prefLangLiteral(?${objectId}_entity, schema:${labelProperty}, "${language}") AS ?${objectId}) }\n`,
+            constructTriples: [`?uri ${predicate} ?${objectId}_literal .`, `?uri ${predicate} ?${objectId} .`],
+            slots
+        };
     }
 
     /**
@@ -181,73 +268,77 @@ export class ExtendService {
         }
     }
 
-    private _formatResult(ids: string[], result: any): DataExtensionResponseDTO {
-        const bindings = result.results.bindings;
-        const formattedRow: { [key: string]: any } = {};
-        for (const row of bindings) {
-            const id = row.uri.value;
-            if (!formattedRow[id]) {
-                formattedRow[id] = {
-                    id: id.split(ArtsdataConstants.PREFIX_ADR)[1],
-                    properties: []
-                };
+    /**
+     * @private
+     * @name _formatResult
+     * @description Rebuilds one row per requested id from the N-Triples returned by the CONSTRUCT query. Triples
+     * about the entity are matched to the requested property by predicate; triples about an expanded entity
+     * (a location, performer...) are added to the `<property>_<sub property>` value of every entity that links to it.
+     * Every requested id gets a row, empty when nothing was found.
+     */
+    private _formatResult(ids: string[], slots: ExtendSlot[], result: string): DataExtensionResponseDTO {
+        const entityUris = ids.map(id => this._toEntityUri(id));
+        const valuesByEntity = new Map<string, Map<string, any[]>>(entityUris.map(uri => [uri, new Map()]));
+        // entity uri -> expanded property variable -> uris of the linked entities
+        const linkedEntities = new Map<string, Map<string, Set<string>>>(entityUris.map(uri => [uri, new Map()]));
+        const mainSlots = slots.filter(slot => !slot.parent);
+        const subSlots = slots.filter(slot => slot.parent);
+
+        const addValue = (entityUri: string, variable: string, term: Term) => {
+            const entityValues = valuesByEntity.get(entityUri)!;
+            const values = entityValues.get(variable) ?? [];
+            const value = this._toValue(term);
+            if (!values.some(existing => existing.id === value.id && existing.str === value.str && existing.lang === value.lang)) {
+                values.push(value);
             }
-            for (const key in row) {
-                const valueId = key;
-                let currentValue: any;
-                const rowValue = row[key].value;
+            entityValues.set(variable, values);
+        };
 
-                if (key !== "uri") {
-                    if (row[key].type === "literal") {
-                        currentValue = {"str": row[key].value, lang: row[key]["xml:lang"]};
-                    }
-                    if (row[key].type === "bnode") {
-                        currentValue = {"id": rowValue};
-                    }
+        const quads = new N3Parser({format: "N-Triples"}).parse(result ?? "");
 
-                    if (row[key].type === "uri") {
-                        if (rowValue.startsWith(ArtsdataConstants.PREFIX_ADR)) {
-                            currentValue = {"id": rowValue.split(ArtsdataConstants.PREFIX_ADR)[1]};
-                        } else {
-                            currentValue = {"id": rowValue};
-                        }
-                    }
+        for (const {subject, predicate, object} of quads) {
+            const mainSlot = mainSlots.find(slot => slot.predicate === predicate.value);
+            if (mainSlot && valuesByEntity.has(subject.value)) {
+                addValue(subject.value, mainSlot.variable, object);
+                if (subSlots.some(slot => slot.parent === mainSlot.variable)) {
+                    const linked = linkedEntities.get(subject.value)!;
+                    linked.set(mainSlot.variable, (linked.get(mainSlot.variable) ?? new Set()).add(object.value));
+                }
+            }
+        }
 
-                    const existingValues: any = formattedRow[id].properties.find((item: any) => item.id === key);
-                    if (!existingValues) {
-                        formattedRow[id].properties.push({id: valueId, values: [currentValue]});
-                    } else {
-                        const existingValue = existingValues.values;
-                        // Check if the value already exists
-                        const valueExists = existingValue.some((existingItem: any) => {
-                            if (existingItem.id && currentValue.id) {
-                                return existingItem.id === currentValue.id;
-                            } else if (existingItem.str && currentValue.str) {
-                                return existingItem.str === currentValue.str && existingItem.lang === currentValue.lang;
-                            } else if (existingItem.str && currentValue.str) {
-                                return existingItem.str === currentValue.str;
-                            }
-                            return false;
-                        });
-
-                        if (!valueExists) {
-                            existingValues.values.push(currentValue);
-                        }
-
+        for (const {subject, predicate, object} of quads) {
+            for (const slot of subSlots.filter(subSlot => subSlot.predicate === predicate.value)) {
+                for (const [entityUri, linked] of linkedEntities) {
+                    if (linked.get(slot.parent!)?.has(subject.value)) {
+                        addValue(entityUri, slot.variable, object);
                     }
                 }
             }
         }
-        const rows = ids.map(id => formattedRow[`${ArtsdataConstants.PREFIX_ADR}${id}`]);
-        const properties = result.head.vars.filter((item: any) => item !== "uri");
-        const meta = properties.map((item: any) => {
-            return {id: item, name: item};
-        });
+
+        const rows = entityUris.map(uri => ({
+            id: uri.startsWith(ArtsdataConstants.PREFIX_ADR) ? uri.slice(ArtsdataConstants.PREFIX_ADR.length) : uri,
+            properties: slots
+                .filter(slot => valuesByEntity.get(uri)!.has(slot.variable))
+                .map(slot => ({id: slot.variable, values: valuesByEntity.get(uri)!.get(slot.variable)!}))
+        }));
+        const meta = slots.map(({variable}) => ({id: variable, name: variable}));
 
         return {
             meta,
             rows
         };
+    }
+
+    private _toValue(term: Term): any {
+        if (term.termType === "Literal") {
+            return {str: term.value, lang: (term as Literal).language || undefined};
+        }
+        if (term.termType === "NamedNode" && term.value.startsWith(ArtsdataConstants.PREFIX_ADR)) {
+            return {id: term.value.slice(ArtsdataConstants.PREFIX_ADR.length)};
+        }
+        return {id: term.value};
     }
 
 
