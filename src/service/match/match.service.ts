@@ -322,6 +322,22 @@ export class MatchService {
 
     /**
      * @private
+     * @name _asStringLiteral
+     * @description STR() returns a string, which never equals an IRI. A value written as an IRI (`<uri>`) is
+     * therefore turned into the string of that IRI, so that an exact match finds a property stored as a string
+     * literal as well as one stored as an IRI. Other values (already quoted strings) are returned as is.
+     * @param value
+     */
+    private _asStringLiteral(value: string): string {
+        if (!value.startsWith("<") || !value.endsWith(">")) {
+            return value;
+        }
+        const uri = value.slice(1, -1).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+        return `"${uri}"`;
+    }
+
+    /**
+     * @private
      * @name _resolveMatchQualifierAndQuantifier
      * @description Resolve match qualifier, matchQualifier is defaulted to exact match
      * @param matchQualifier
@@ -356,19 +372,19 @@ export class MatchService {
                     switch (matchQuantifier) {
                         case MatchQuantifierEnum.ANY:
                             triple = `?entity ${formattedPropertyId} ${objectId}.
-                            FILTER( STR(${objectId}) IN (${(formattedConditionValue as string[]).join(" , ")}) ||
+                            FILTER( STR(${objectId}) IN (${(formattedConditionValue as string[]).map(v => this._asStringLiteral(v)).join(" , ")}) ||
                                 ${objectId} IN (${(formattedConditionValue as string[]).join(" , ")})).`;
                             break;
                         case MatchQuantifierEnum.ALL:
                             triple = `${(formattedConditionValue as string[])
                                 .map((v) => ` FILTER EXISTS {?entity ${formattedPropertyId} ${objectId}
-                                FILTER(STR(${objectId})  = ${v} || ${objectId} = ${v})}`)
+                                FILTER(STR(${objectId})  = ${this._asStringLiteral(v)} || ${objectId} = ${v})}`)
                                 .join("\n")}`;
                             break;
                         case MatchQuantifierEnum.NONE:
                             triple = `${(formattedConditionValue as string[])
                                 .map((v) => ` FILTER NOT EXISTS {?entity ${formattedPropertyId} ${objectId}
-                                FILTER( STR(${objectId})  = ${v} || ${objectId} = ${v} )}`)
+                                FILTER( STR(${objectId})  = ${this._asStringLiteral(v)} || ${objectId} = ${v} )}`)
                                 .join("\n")}`;
                             break;
                         default:
@@ -392,7 +408,7 @@ export class MatchService {
                 case MatchQualifierEnum.EXACT_MATCH:
 
                     triple = `?entity ${formattedPropertyId} ${objectId}.
-                               FILTER( STR(${objectId})  = ${formattedConditionValue} || ${objectId} = ${formattedConditionValue}) .`;
+                               FILTER( STR(${objectId})  = ${this._asStringLiteral(formattedConditionValue as string)} || ${objectId} = ${formattedConditionValue}) .`;
                     break;
 
                 case MatchQualifierEnum.REGEX_MATCH:

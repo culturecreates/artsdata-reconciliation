@@ -108,9 +108,8 @@ describe('Test matching Organization using qualifier RegexMatch using sparql que
 
     });
 
-    it('Should NOT match string "url" without REGEX qualifier', async () => {
-        // a string "url" is converted to URI unless using REGEX_MATCH qualifier
-        // All schema:url values should be stored as <URI> in the core graph
+    it('Should match a "url" stored as a string with the exact match qualifier', async () => {
+        // an exact match finds a schema:url stored as a string literal as well as one stored as an <URI>
         const reconciliationQuery: ReconciliationQuery = {
             type: Entities.ORGANIZATION,
             conditions: [{
@@ -126,8 +125,7 @@ describe('Test matching Organization using qualifier RegexMatch using sparql que
             {queries: [reconciliationQuery]}, SparqlVersionEnum.V1);
 
         const allResults = response.results?.[0]?.candidates;
-        expect(allResults).toHaveLength(0);
-
+        expect(allResults?.map(({id}) => id)).toEqual(["Organization1"]);
     });
 
     it('Should match URI <url> without REGEX qualifier', async () => {

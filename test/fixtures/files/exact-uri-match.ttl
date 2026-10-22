@@ -1,0 +1,15 @@
+@prefix adr:    <http://kg.artsdata.ca/resource/> .
+@prefix ado:    <http://kg.artsdata.ca/ontology/> .
+@prefix schema: <http://schema.org/> .
+
+# The same kind of value stored as a string literal and as an IRI
+
+adr:KU-1 a schema:Place, ado:Place ;
+    schema:name "Literal Url Place" ;
+    schema:url "http://www.literal-url.ca" ;
+    schema:sameAs "http://www.wikidata.org/entity/Q100" .
+
+adr:KU-2 a schema:Place, ado:Place ;
+    schema:name "Iri Url Place" ;
+    schema:url <http://www.iri-url.ca> ;
+    schema:sameAs <http://www.wikidata.org/entity/Q200> .
