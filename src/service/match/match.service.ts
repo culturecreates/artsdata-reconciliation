@@ -520,7 +520,8 @@ export class MatchService {
             .replace("QUERY_FILTER_PLACE_HOLDER", luceneQuery.length ? `luc:query ${luceneQuery}` : '')
             .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
 
-        return this._resolvePropertyConditions(rawQuery, propertyConditions);
+        const sparqlQuery = this._resolvePropertyConditions(rawQuery, propertyConditions);
+        return sparqlQuery.includes('?startDate') ? `${sparqlQuery}\nORDER BY DESC(?total_score) ?startDate` : sparqlQuery;
     }
 
     /**

@@ -107,3 +107,29 @@ describe('Test v1 match SPARQL when there is no literal string to search in the 
         expect(sparql).toContain('luc:query');
     });
 });
+
+describe('Test ORDER BY DESC(?total_score) ?startDate in v1 match SPARQL', () => {
+    let executeSparqlQuery: jest.Mock;
+    let matchService: MatchService;
+
+    beforeEach(() => {
+        executeSparqlQuery = jest.fn().mockResolvedValue({results: {bindings: []}});
+        matchService = new MatchService({executeSparqlQuery} as unknown as ArtsdataService, {} as ManifestService);
+    });
+
+    it.each([
+        [Entities.EVENT, true],
+        [Entities.ORGANIZATION, false],
+    ])('type %s should add ORDER BY DESC(?total_score) ?startDate: %s', async (type, expected) => {
+        await matchService.reconcileByQueries(LanguageEnum.ENGLISH, {
+            queries: [{
+                type,
+                conditions: [{matchType: "name", propertyValue: "Some name", required: true}],
+                limit: 10
+            } as ReconciliationQuery]
+        }, SparqlVersionEnum.V1);
+
+        const sparql: string = executeSparqlQuery.mock.calls[0][0];
+        expect(sparql.includes('ORDER BY DESC(?total_score) ?startDate')).toBe(expected);
+    });
+});
