@@ -1,7 +1,7 @@
 import {MatchService,} from "../../service";
 import {ReconciliationQuery} from "../../dto";
 import {Entities} from "../../constant";
-import {LanguageEnum, MatchTypeEnum} from "../../enum";
+import {LanguageEnum, MatchQualifierEnum, MatchTypeEnum} from "../../enum";
 import {
     dropIndexAndTheGraph,
     setupMatchService,
@@ -374,9 +374,11 @@ describe('Test matching Place using sparql query v1', () => {
             limit: 1,
             conditions: [
                 {
-                    matchType: "url",
-                    propertyValue: "http://www.placebell.ca",
-                    required: true
+                    matchType: "property",
+                    propertyId: "http://schema.org/url",
+                    propertyValue: "placebell.ca",
+                    required: true,
+                    matchQualifier: MatchQualifierEnum.REGEX_MATCH
                 }
             ],
         };
