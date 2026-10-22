@@ -485,8 +485,9 @@ export class MatchService {
         const requiredConditionsCount = propertyConditions.filter(({required}) => required).length;
 
         if (!id && !luceneQuery.length) {
-            // Nothing binds ?entity without a literal string, a required condition or a type
-            if (!requiredConditionsCount && !type) {
+            // Without a literal string or a required condition nothing selects an entity: a type alone would
+            // return arbitrary entities of that type
+            if (!requiredConditionsCount) {
                 return undefined;
             }
             // No literal string: skip the (slow) empty Lucene search and score +1 for the type and +1 per required condition
@@ -561,17 +562,21 @@ export class MatchService {
             "http://schema.org/url": "url",
             "http://schema.org/sameAs": "sameAs",
             "http://schema.org/postalCode": "postalCode",
+            "<http://schema.org/address>/<http://schema.org/postalCode>": "postalCode",
+            "<http://schema.org/address>/<http://schema.org/addressRegion>": "addressRegion",
             "http://schema.org/startDate": "startDate",
             "http://schema.org/endDate": "endDate",
-            "<https://schema.org/location>/<https://schema.org/name>": "locationName",
-            "<https://schema.org/location>/<https://schema.org/address>/<https://schema.org/postalCode>": "locationPostalCode",
+            "<http://schema.org/location>/<http://schema.org/name>": "locationName",
+            "<http://schema.org/location>/<http://schema.org/address>/<http://schema.org/postalCode>": "locationPostalCode",
         };
 
         let luceneQuery = propertyConditions
             .filter((condition) => condition.matchType === MatchTypeEnum.PROPERTY)
             .reduce((query, condition) => {
+                // schema.org is also written with https
+                const propertyId = condition.propertyId?.replace(/https:\/\/schema\.org\//g, "http://schema.org/");
                 Object.entries(propertyMap).forEach(([key, value]) => {
-                    if (condition.propertyId === key && (!condition.matchQualifier || condition.matchQualifier === MatchQualifierEnum.EXACT_MATCH)) {
+                    if (propertyId === key && (!condition.matchQualifier || condition.matchQualifier === MatchQualifierEnum.EXACT_MATCH)) {
                         const connector = !query?.length ? '' : condition.required ? "AND" : "OR";
                         query = `${query} ${connector} ${this._resolvePropertyValueForLucene(condition.propertyValue, value)}`;
                     }
