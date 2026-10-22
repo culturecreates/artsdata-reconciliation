@@ -75,6 +75,15 @@ export const QUERIES = {
  } GROUP BY ?entity ?total_score
   LIMIT_PLACE_HOLDER`,
 
+  SELECT_ENTITY_QUERY_WITHOUT_KEYWORD: `
+ SELECT ?entity ?total_score WHERE {
+   FILTER_BY_TYPE_PLACE_HOLDER
+   PROPERTY_PLACE_HOLDER
+   FILTER_ARTSDATA_ENTITIES_PLACE_HOLDER
+   BIND(SCORE_PLACE_HOLDER AS ?total_score)
+ } GROUP BY ?entity ?total_score
+  LIMIT_PLACE_HOLDER`,
+
   GROUP_BY_STATEMENT: `GROUP BY ?entity ?total_score ?type_label ?type`,
 
 };
