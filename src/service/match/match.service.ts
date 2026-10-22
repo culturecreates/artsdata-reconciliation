@@ -536,6 +536,7 @@ export class MatchService {
             .replace("REQUEST_LANG_PLACEHOLDER", requestLanguage)
             .replace("QUERY_FILTER_PLACE_HOLDER", luceneQuery.length ? `luc:query ${luceneQuery}` : '')
             .replace("LIMIT_PLACE_HOLDER", `LIMIT ${limit}`);
+        rawQuery = this._addOrderBeforeLimit(rawQuery, type);
 
         const sparqlQuery = this._resolvePropertyConditions(rawQuery, propertyConditions);
         return sparqlQuery.includes('?startDate') ? `${sparqlQuery}\nORDER BY DESC(?total_score) ?startDate` : sparqlQuery;
@@ -726,6 +727,25 @@ export class MatchService {
 
         }
         return rawQuery;
+    }
+
+    /**
+     * @private
+     * @name _addOrderBeforeLimit
+     * @description The LIMIT of the sub-select that finds the entities is applied before the final ORDER BY, so
+     * without an order there the candidates kept are arbitrary: for 108 upcoming events with the same score a limit
+     * of 50 dropped events that start before others it kept. For events, order by score and then by start date inside
+     * the sub-select, so that the limit keeps the best scoring and earliest events.
+     * @param rawQuery
+     * @param type
+     */
+    private _addOrderBeforeLimit(rawQuery: string, type: string) {
+        const isEvent = [Entities.EVENT, Entities.ADO_EVENT].includes(type);
+        return rawQuery
+            .replace("SELECT_START_DATE_PLACE_HOLDER", isEvent ? "(MIN(?sub_startDate) AS ?sub_start)" : "")
+            .replace("START_DATE_PLACE_HOLDER",
+                isEvent ? "OPTIONAL { ?entity <http://schema.org/startDate> ?sub_startDate }" : "")
+            .replace("ORDER_PLACE_HOLDER", isEvent ? "ORDER BY DESC(?total_score) ?sub_start" : "");
     }
 
     private _addFilterArtsdataEntities(rawQuery: string, type: string) {

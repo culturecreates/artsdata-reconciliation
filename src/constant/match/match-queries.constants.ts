@@ -63,7 +63,7 @@ export const QUERIES = {
  GROUP_BY_PLACEHOLDER`,
 
   SELECT_ENTITY_QUERY_BY_KEYWORD: `
- SELECT ?entity ?total_score WHERE {
+ SELECT ?entity ?total_score SELECT_START_DATE_PLACE_HOLDER WHERE {
    ?search a luc-index:INDEX_PLACE_HOLDER ;
      QUERY_FILTER_PLACE_HOLDER
      luc:entities ?entity .
@@ -72,16 +72,20 @@ export const QUERIES = {
    FILTER_ARTSDATA_ENTITIES_PLACE_HOLDER
    ?entity luc:score ?total_score .
    FILTER(?total_score > 0)
+   START_DATE_PLACE_HOLDER
  } GROUP BY ?entity ?total_score
+  ORDER_PLACE_HOLDER
   LIMIT_PLACE_HOLDER`,
 
   SELECT_ENTITY_QUERY_WITHOUT_KEYWORD: `
- SELECT ?entity ?total_score WHERE {
+ SELECT ?entity ?total_score SELECT_START_DATE_PLACE_HOLDER WHERE {
    FILTER_BY_TYPE_PLACE_HOLDER
    PROPERTY_PLACE_HOLDER
    FILTER_ARTSDATA_ENTITIES_PLACE_HOLDER
    BIND(SCORE_PLACE_HOLDER AS ?total_score)
+   START_DATE_PLACE_HOLDER
  } GROUP BY ?entity ?total_score
+  ORDER_PLACE_HOLDER
   LIMIT_PLACE_HOLDER`,
 
   GROUP_BY_STATEMENT: `GROUP BY ?entity ?total_score ?type_label ?type`,
