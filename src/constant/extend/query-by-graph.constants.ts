@@ -3,14 +3,15 @@ export const QUERY_BY_GRAPH = {
 PREFIX sh: <http://www.w3.org/ns/shacl#>
 PREFIX dbo: <http://dbpedia.org/ontology/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX adp: <http://kg.artsdata.ca/plugin#>
+
 SELECT ?uri 
 (SAMPLE(?urls) AS ?url)
 (SAMPLE(?name) AS ?name)
 (SAMPLE(?isni_uris) AS ?isni_uri)
 (COALESCE(SAMPLE(?adid), SAMPLE(?adid_int), SAMPLE(?adid_ext)) AS ?artsdata_uri)
 (COALESCE(SAMPLE(?wikidata_ids), SAMPLE(?wikidata_self)) AS ?wikidata_uri)
-(GROUP_CONCAT(DISTINCT ?types;
-        SEPARATOR = ", ") AS ?type)
+(GROUP_CONCAT(DISTINCT ?types; SEPARATOR = ", ") AS ?type)
 ?is_flagged_for_review
 ?reconciled
 (SAMPLE(?disambiguating_descriptions) AS ?disambiguating_description)
@@ -102,6 +103,8 @@ WHERE {
             BIND(TRUE AS ?reconciled) 
         }
     }
+    <EXTRACT_PERFORMER_NAME>
+    
 } 
 GROUP BY ?uri ?reconciled ?is_flagged_for_review
 ORDER BY ?name
