@@ -404,7 +404,11 @@ export class ExtendService {
             OPTIONAL { ?uri schema:offers/schema:url ?offer_url }
             OPTIONAL { ?uri schema:eventStatus ?eventStatus }
             OPTIONAL { ?uri schema:eventAttendanceMode ?eventAttendanceMode }`)
-                    .replace("<FILTER_BY_REGION_PLACEHOLDER>", "");
+                    .replace("<FILTER_BY_REGION_PLACEHOLDER>", "")
+                    .replace("<EXTRACT_PERFORMER_NAME>",
+                        "OPTIONAL { BIND(adp:prefLangLiteral(?performer, schema:name, \"en fr mul\") AS ?performerName) }"
+                        )
+                ;
                 break;
             case ExtendExternalGraphTypeEnum.PLACE:
                 query = query.replace("TYPE_PLACEHOLDER", "schema:Place")
@@ -424,7 +428,8 @@ export class ExtendService {
                   BIND(COALESCE(?addressRegion_en, ?addressRegion_fr, ?addressRegion_no) as ?addressRegion)`)
                     .replace("<FILTER_BY_REGION_PLACEHOLDER>",
                         region ? `?uri schema:address/schema:addressRegion ?region.
-                   FILTER (LCASE(STR(?region)) = LCASE("${region}"))` : "");
+                   FILTER (LCASE(STR(?region)) = LCASE("${region}"))` : "")
+                    .replace("<EXTRACT_PERFORMER_NAME>","");
                 break;
             case ExtendExternalGraphTypeEnum.ORGANIZATION:
                 query = query.replace("TYPE_PLACEHOLDER", "schema:Organization")
@@ -433,13 +438,15 @@ export class ExtendService {
                             `OPTIONAL { ?uri schema:address/schema:addressRegion ?addressRegion.}
                OPTIONAL {?uri schema:location/schema:address/schema:addressRegion ?locationRegion}
               FILTER(LCASE(STR(?addressRegion)) = LCASE("${region}") || LCASE(STR(?locationRegion)) = LCASE("${region}"))`
-                            : "");
+                            : "")
+                    .replace("<EXTRACT_PERFORMER_NAME>","");
                 break;
             case ExtendExternalGraphTypeEnum.PERSON:
                 query = query.replace("TYPE_PLACEHOLDER", "schema:Person")
                     .replace("<FILTER_BY_REGION_PLACEHOLDER>",
                         region ? `?uri schema:workLocation/schema:address/schema:addressRegion ?region.
-        filter(LCASE(str(?region)) = LCASE("${region}"))` : "");
+        filter(LCASE(str(?region)) = LCASE("${region}"))` : "")
+                    .replace("<EXTRACT_PERFORMER_NAME>","");
                 break;
             case ExtendExternalGraphTypeEnum.AGENT:
                 query = query.replace("TYPE_PLACEHOLDER", "dbo:Agent")
@@ -448,11 +455,13 @@ export class ExtendService {
                OPTIONAL {?uri schema:location/schema:address/schema:addressRegion ?locationRegion}
                OPTIONAL {?uri schema:workLocation/schema:address/schema:addressRegion ?region}
               FILTER(LCASE(STR(?addressRegion)) = LCASE("${region}") || LCASE(STR(?locationRegion)) = LCASE(STR("${region}")) || LCASE(STR(?region)) = LCASE("${region}"))`
-                            : "");
+                            : "")
+                    .replace("<EXTRACT_PERFORMER_NAME>","");
                 break;
             case ExtendExternalGraphTypeEnum.PERFORMANCE_WORK:
                 query = query.replace("TYPE_PLACEHOLDER", "schema:PerformanceWork")
                     .replace("<FILTER_BY_REGION_PLACEHOLDER>", "")
+                    .replace("<EXTRACT_PERFORMER_NAME>","");
                 break;
             default:
                 throw Exception.badRequest("Invalid type provided");
