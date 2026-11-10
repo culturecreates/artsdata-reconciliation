@@ -24,7 +24,8 @@ INSERT DATA {
     "http://schema.org/Place",
     "http://schema.org/Person",
     "http://schema.org/Organization",
-    "http://www.w3.org/2004/02/skos/core#Concept"
+    "http://www.w3.org/2004/02/skos/core#Concept",
+    "http://kg.artsdata.ca/ontology/LivePerformanceWork"
   ],
   "readonly": false,
   "detectFields": false,
